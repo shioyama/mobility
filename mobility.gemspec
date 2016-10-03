@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["chris@dejimata.com"]
 
   spec.summary       = %q{Pluggable translation framework for Ruby on Rails.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+#  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

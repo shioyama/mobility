@@ -18,6 +18,17 @@ module Mobility
         cache[locale]
       end
 
+      module Setup
+        def setup_model(model_class, attributes, options = {})
+          super
+          model_class.include BackendResetter.new(:clear_cache, attributes)
+        end
+      end
+
+      def self.included(backend_class)
+        backend_class.extend(Setup)
+      end
+
       def clear_cache
         @cache = {}
       end

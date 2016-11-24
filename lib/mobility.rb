@@ -7,6 +7,7 @@ module Mobility
   autoload :AttributeMethods, "mobility/attribute_methods"
   autoload :Attributes,       "mobility/attributes"
   autoload :Backend,          "mobility/backend"
+  autoload :BackendResetter,  "mobility/backend_resetter"
   autoload :Configuration,    "mobility/configuration"
   autoload :Translates,       "mobility/translates"
 
@@ -18,6 +19,7 @@ module Mobility
       end
 
       model_class.include(AttributeMethods) if model_class.ancestors.include?(ActiveModel::AttributeMethods)
+      model_class.include(ActiveRecord)     if model_class < ::ActiveRecord::Base
     end
 
     def included(model_class)

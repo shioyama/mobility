@@ -113,4 +113,57 @@ describe Mobility::Backend::Cache do
       end
     end
   end
+
+  context "ActiveRecord model" do
+    before do
+      stub_const 'Article', Class.new(ActiveRecord::Base)
+      Article.include Mobility
+    end
+
+    context "with one backend" do
+      before do
+        Article.translates :title, backend: backend_class, cache: true
+        @article = Article.create
+      end
+
+      shared_examples_for "cache that resets on model action" do |action|
+        it "updates backend cache on #{action}" do
+          backend = @article.title_translations
+          backend.write(:en, "foo")
+          expect(backend.read(:en)).to eq("foo")
+          @article.send action
+          expect(backend.read(:en)).to eq(nil)
+        end
+      end
+
+      it_behaves_like "cache that resets on model action", :reload
+      it_behaves_like "cache that resets on model action", :save
+    end
+
+    context "with multiple backends" do
+      before do
+        other_backend = Class.new(backend_class)
+        Article.translates :title,   backend: backend_class, cache: true
+        Article.translates :content, backend: other_backend, cache: true
+        @article = Article.create
+      end
+
+      shared_examples_for "cache that resets on model action" do |action|
+        it "updates cache on both backends on #{action}" do
+          title_backend = @article.title_translations
+          content_backend = @article.content_translations
+          title_backend.write(:en, "foo")
+          content_backend.write(:en, "bar")
+          expect(title_backend.read(:en)).to eq("foo")
+          expect(content_backend.read(:en)).to eq("bar")
+          @article.send(action)
+          expect(title_backend.read(:en)).to eq(nil)
+          expect(content_backend.read(:en)).to eq(nil)
+        end
+      end
+
+      it_behaves_like "cache that resets on model action", :reload
+      it_behaves_like "cache that resets on model action", :save
+    end
+  end
 end

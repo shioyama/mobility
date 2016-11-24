@@ -26,6 +26,7 @@ module Mobility
           super
           model_class.class_eval do
             include ActiveModel::Dirty
+            include BackendResetter.new(:clear_original_values, attributes)
             %w[changed? change was will_change! previously_changed? previous_change].each do |suffix|
               attributes.each do |attribute|
                 class_eval <<-EOM, __FILE__, __LINE__ + 1
@@ -37,6 +38,10 @@ module Mobility
             end
           end
         end
+      end
+
+      def clear_original_values
+        @original_values = {}
       end
 
       private

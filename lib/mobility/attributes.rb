@@ -12,6 +12,8 @@ module Mobility
 
       @backend_class.include Backend::Cache unless options[:cache] == false
       @backend_class.include Backend::Fallbacks if options[:fallbacks]
+      @accessor_locales = options[:locale_accessors]
+      @accessor_locales = Mobility.config.default_accessor_locales if options[:locale_accessors] == true
 
       attributes.each do |attribute|
         define_backend(attribute)
@@ -23,6 +25,8 @@ module Mobility
         define_method "#{attribute}=" do |value|
           send("#{attribute}_translations").write(Mobility.locale, value.presence)
         end if %i[accessor writer].include?(method)
+
+        define_locale_accessors(attribute, @accessor_locales) if @accessor_locales
       end
     end
 
@@ -37,6 +41,18 @@ module Mobility
       define_method "#{attribute}_translations" do
         @mobility_backends ||= {}
         @mobility_backends[attribute] ||= _backend_class.new(self, attribute, _options)
+      end
+    end
+
+    def define_locale_accessors(attribute, locales)
+      locales.each do |locale|
+        normalized_locale = Mobility.normalize_locale(locale)
+        define_method "#{attribute}_#{normalized_locale}" do |options={}|
+          send("#{attribute}_translations").read(locale).to_s.presence
+        end
+        define_method "#{attribute}_#{normalized_locale}=" do |value, options={}|
+          send("#{attribute}_translations").write(locale, value.presence)
+        end
       end
     end
 

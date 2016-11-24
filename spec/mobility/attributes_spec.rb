@@ -135,5 +135,74 @@ describe Mobility::Attributes do
         article.title = ""
       end
     end
+
+    describe "defining locale accessors" do
+      let(:article) { Article.new }
+      let(:backend) { backend_klass.new(article, "title", options) }
+      before do
+        allow(backend_klass).to receive(:new).with(article, "title", options).and_return(backend)
+        allow(Mobility).to receive(:locale).and_return(:de)
+        Article.include described_class.new(:accessor, "title", options.merge("backend" => backend_klass))
+      end
+
+      context "with accessor_locales unset" do
+        let(:options) { {} }
+
+        it "does not define locale accessors" do
+          expect { article.title_en }.to raise_error(NoMethodError)
+          expect { article.title_de }.to raise_error(NoMethodError)
+        end
+      end
+
+      context "with accessor_locales = true" do
+        let(:options) { { locale_accessors: true } }
+
+        it "defines accessors for locales in I18n.available_locales" do
+          expect(backend).to receive(:read).with(:de).and_return("foo")
+          expect(article.title_de).to eq("foo")
+        end
+
+        it "does not define accessors for other locales" do
+          expect { article.title_pt }.to raise_error(NoMethodError)
+        end
+      end
+
+      context "with accessor_locales a hash" do
+        let(:options) { { locale_accessors: [:en, :pt] } }
+
+        it "defines accessors for locales in locale_accessors hash" do
+          expect(backend).to receive(:read).with(:en).and_return("enfoo")
+          expect(article.title_en).to eq("enfoo")
+          expect(backend).to receive(:read).with(:pt).and_return("ptfoo")
+          expect(article.title_pt).to eq("ptfoo")
+        end
+
+        it "does not define accessors for locales not in locale_accessors hash" do
+          expect { article.title_de }.to raise_error(NoMethodError)
+          expect { article.title_es }.to raise_error(NoMethodError)
+        end
+      end
+
+      context "accessor locale includes dash" do
+        let(:options) { { locale_accessors: [:'pt-BR'] } }
+
+        it "translates dashes to underscores when defining locale accessors" do
+          expect(backend).to receive(:read).with(:'pt-BR').and_return("foo")
+          expect(article.title_pt_br).to eq("foo")
+        end
+      end
+
+      context "with backend that uses a stash" do
+        let(:options) { { locale_accessors: true } }
+
+        it "returns value from stash" do
+          stash = double("stash")
+          expect(article.title_en).to eq(nil)
+          expect(stash).to receive(:to_s).once.and_return("foo")
+          expect(backend).to receive(:read).with(:en).and_return(stash)
+          expect(article.title_en).to eq("foo")
+        end
+      end
+    end
   end
 end

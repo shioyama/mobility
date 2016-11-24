@@ -62,6 +62,10 @@ module Mobility
     end
     delegate :default_fallbacks, to: :config
 
+    def configure
+      yield config
+    end
+
     def normalize_locale(locale)
       "#{locale.to_s.downcase.sub("-", "_")}"
     end

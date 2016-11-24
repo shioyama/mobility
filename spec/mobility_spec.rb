@@ -126,5 +126,13 @@ describe Mobility do
     end
   end
 
+  describe ".configure" do
+    it "yields configuration" do
+      expect { |block|
+        Mobility.configure &block
+      }.to yield_with_args(Mobility.config)
+    end
+  end
+
   it { should delegate_method(:default_fallbacks).to(:config) }
 end

@@ -73,6 +73,24 @@ describe Mobility do
     end
   end
 
+  describe '.locale=' do
+    it "sets locale for locale in I18n.available_locales" do
+      Mobility.locale = :fr
+      expect(Mobility.locale).to eq(:fr)
+    end
+
+    it "converts string to symbol" do
+      Mobility.locale = "fr"
+      expect(Mobility.locale).to eq(:fr)
+    end
+
+    it "raises Mobility::InvalidLocale for locale not in I18n.available_locales" do
+      expect {
+        Mobility.locale = :es
+      }.to raise_error(Mobility::InvalidLocale)
+    end
+  end
+
   describe '.normalize_locale' do
     it "normalizes locale to lowercase string underscores" do
       expect(Mobility.normalize_locale(:"pt-BR")).to eq("pt_br")

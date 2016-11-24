@@ -23,6 +23,10 @@ module Mobility
       end
     end
 
+    def included(model_class)
+      backend_class.setup_model(model_class, attributes, options)
+    end
+
     private
 
     def define_backend(attribute)

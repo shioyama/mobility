@@ -12,6 +12,8 @@ module Mobility
   autoload :InstanceMethods,  "mobility/instance_methods"
   autoload :Translates,       "mobility/translates"
 
+  autoload :InstallGenerator, "generators/mobility/install_generator"
+
   class << self
     def extended(model_class)
       return if model_class.respond_to? :translation_accessor

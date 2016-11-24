@@ -3,6 +3,8 @@ require 'active_record'
 require 'mobility/version'
 
 module Mobility
+  autoload :Attributes,    "mobility/attributes"
+  autoload :Backend,       "mobility/backend"
   autoload :Configuration, "mobility/configuration"
 
   class << self
@@ -45,4 +47,6 @@ module Mobility
       storage[:mobility_locale] = locale.try(:to_sym)
     end
   end
+
+  class BackendRequired < ArgumentError; end
 end

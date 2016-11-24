@@ -7,3 +7,7 @@
 /pkg/
 /spec/reports/
 /tmp/
+
+.ruby-version
+.byebug_history
+Guardfile

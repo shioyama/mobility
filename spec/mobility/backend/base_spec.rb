@@ -27,6 +27,14 @@ describe Mobility::Backend::Base do
     it "assigns options" do
       expect(subject.options).to eq(options)
     end
+
+    context "with fallbacks" do
+      let(:options) { { fallbacks: { :'en-US' => 'de-DE' } } }
+
+      it "sets @fallbacks variable" do
+        expect(subject.instance_variable_get(:'@fallbacks')).to eq(I18n::Locale::Fallbacks.new(:'en-US' => 'de-DE'))
+      end
+    end
   end
 
   describe ".setup" do

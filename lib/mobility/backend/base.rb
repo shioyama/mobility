@@ -7,6 +7,8 @@ module Mobility
         @model = model
         @attribute = attribute
         @options = options
+        fallbacks = options[:fallbacks]
+        @fallbacks = I18n::Locale::Fallbacks.new(fallbacks) if fallbacks.is_a?(Hash)
       end
 
       def self.included(base)

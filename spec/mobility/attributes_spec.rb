@@ -29,6 +29,18 @@ describe Mobility::Attributes do
       Article.include described_class.new(:accessor, "title", { backend: backend_klass })
     end
 
+    describe "cache" do
+      it "includes Backend::Cache into backend when options[:cache] is not false" do
+        expect(backend_klass).to receive(:include).with(Mobility::Backend::Cache)
+        Article.include described_class.new(:accessor, "title", { backend: backend_klass })
+      end
+
+      it "does not include Backend::Cache into backend when options[:cache] is false" do
+        expect(backend_klass).not_to receive(:include).with(Mobility::Backend::Cache)
+        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false })
+      end
+    end
+
     describe "defining attribute backend on model" do
       before do
         Article.include described_class.new(:accessor, "title", { backend: backend_klass, foo: "bar" })

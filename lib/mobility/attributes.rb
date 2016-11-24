@@ -10,6 +10,8 @@ module Mobility
 
       @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
 
+      @backend_class.include Backend::Cache unless options[:cache] == false
+
       attributes.each do |attribute|
         define_backend(attribute)
 

@@ -3,7 +3,7 @@ module Mobility
     def initialize(backend_reset_method, attributes)
       @model_reset_method = model_reset_method = Proc.new do
         attributes.each do |attribute|
-          send("#{attribute}_translations").send(backend_reset_method)
+          mobility_backend_for(attribute).send(backend_reset_method)
         end
       end
 

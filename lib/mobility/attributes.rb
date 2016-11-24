@@ -20,12 +20,12 @@ module Mobility
       attributes.each do |attribute|
         define_backend(attribute)
 
-        define_method attribute do
-          send("#{attribute}_translations").read(Mobility.locale).to_s.presence
+        define_method attribute do |options={}|
+          mobility_get(attribute, options)
         end if %i[accessor reader].include?(method)
 
         define_method "#{attribute}=" do |value|
-          send("#{attribute}_translations").write(Mobility.locale, value.presence)
+          mobility_set(attribute, value)
         end if %i[accessor writer].include?(method)
 
         define_locale_accessors(attribute, @accessor_locales) if @accessor_locales
@@ -40,7 +40,7 @@ module Mobility
 
     def define_backend(attribute)
       _backend_class, _options = backend_class, options
-      define_method "#{attribute}_translations" do
+      define_method Backend.method_name(attribute) do
         @mobility_backends ||= {}
         @mobility_backends[attribute] ||= _backend_class.new(self, attribute, _options)
       end
@@ -50,10 +50,10 @@ module Mobility
       locales.each do |locale|
         normalized_locale = Mobility.normalize_locale(locale)
         define_method "#{attribute}_#{normalized_locale}" do |options={}|
-          send("#{attribute}_translations").read(locale).to_s.presence
+          mobility_get(attribute, options.with_indifferent_access.merge(locale: locale))
         end
         define_method "#{attribute}_#{normalized_locale}=" do |value, options={}|
-          send("#{attribute}_translations").write(locale, value.presence)
+          mobility_set(attribute, value, locale: locale)
         end
       end
     end

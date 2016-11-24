@@ -84,7 +84,7 @@ describe Mobility::Attributes do
 
     describe "defining getters and setters" do
       let(:article) { Article.new }
-      let(:backend) { backend_klass.new(article, "title", {}) }
+      let(:backend) { backend_klass.new(article, "title") }
       before do
         allow(backend_klass).to receive(:new).with(article, "title", {}).and_return(backend)
         allow(Mobility).to receive(:locale).and_return(:de)
@@ -92,8 +92,18 @@ describe Mobility::Attributes do
 
       shared_examples_for "reader" do
         it "correctly maps getter method for translated attribute to backend" do
-          expect(backend).to receive(:read).with(:de).and_return("foo")
+          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
           expect(article.title).to eq("foo")
+        end
+
+        it "correctly maps locale through getter options" do
+          expect(backend).to receive(:read).with(:fr, {}).and_return("foo")
+          expect(article.title(locale: "fr")).to eq("foo")
+        end
+
+        it "correctly maps other options to getter" do
+          expect(backend).to receive(:read).with(:de, fallbacks: false).and_return("foo")
+          expect(article.title(fallbacks: false)).to eq("foo")
         end
       end
 
@@ -136,7 +146,7 @@ describe Mobility::Attributes do
       it "converts blanks to nil when receiving from backend getter" do
         Article.include described_class.new(:reader, "title", { "backend" => backend_klass })
         allow(Mobility).to receive(:locale).and_return(:ru)
-        expect(backend).to receive(:read).with(:ru).and_return("")
+        expect(backend).to receive(:read).with(:ru, {}).and_return("")
         expect(article.title).to eq(nil)
       end
 
@@ -170,7 +180,7 @@ describe Mobility::Attributes do
         let(:options) { { locale_accessors: true } }
 
         it "defines accessors for locales in I18n.available_locales" do
-          expect(backend).to receive(:read).with(:de).and_return("foo")
+          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
           expect(article.title_de).to eq("foo")
         end
 
@@ -183,9 +193,9 @@ describe Mobility::Attributes do
         let(:options) { { locale_accessors: [:en, :pt] } }
 
         it "defines accessors for locales in locale_accessors hash" do
-          expect(backend).to receive(:read).with(:en).and_return("enfoo")
+          expect(backend).to receive(:read).with(:en, {}).and_return("enfoo")
           expect(article.title_en).to eq("enfoo")
-          expect(backend).to receive(:read).with(:pt).and_return("ptfoo")
+          expect(backend).to receive(:read).with(:pt, {}).and_return("ptfoo")
           expect(article.title_pt).to eq("ptfoo")
         end
 
@@ -199,7 +209,7 @@ describe Mobility::Attributes do
         let(:options) { { locale_accessors: [:'pt-BR'] } }
 
         it "translates dashes to underscores when defining locale accessors" do
-          expect(backend).to receive(:read).with(:'pt-BR').and_return("foo")
+          expect(backend).to receive(:read).with(:'pt-BR', {}).and_return("foo")
           expect(article.title_pt_br).to eq("foo")
         end
       end
@@ -211,7 +221,7 @@ describe Mobility::Attributes do
           stash = double("stash")
           expect(article.title_en).to eq(nil)
           expect(stash).to receive(:to_s).once.and_return("foo")
-          expect(backend).to receive(:read).with(:en).and_return(stash)
+          expect(backend).to receive(:read).with(:en, {}).and_return(stash)
           expect(article.title_en).to eq("foo")
         end
       end

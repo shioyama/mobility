@@ -7,5 +7,9 @@ module Mobility
     autoload :Fallbacks, 'mobility/backend/fallbacks'
     autoload :Null,      'mobility/backend/null'
     autoload :Table,     'mobility/backend/table'
+
+    def self.method_name(attribute)
+      "#{attribute}_translations"
+    end
   end
 end

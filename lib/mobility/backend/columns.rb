@@ -3,11 +3,11 @@ module Mobility
     class Columns
       include Base
 
-      def read(locale)
+      def read(locale, options = {})
         model.send(column(locale))
       end
 
-      def write(locale, value)
+      def write(locale, value, options = {})
         model.send("#{column(locale)}=", value)
       end
 

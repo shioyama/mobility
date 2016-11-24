@@ -9,6 +9,7 @@ module Mobility
   autoload :Backend,          "mobility/backend"
   autoload :BackendResetter,  "mobility/backend_resetter"
   autoload :Configuration,    "mobility/configuration"
+  autoload :InstanceMethods,  "mobility/instance_methods"
   autoload :Translates,       "mobility/translates"
 
   class << self
@@ -18,6 +19,7 @@ module Mobility
         extend Translates
       end
 
+      model_class.include(InstanceMethods)
       model_class.include(AttributeMethods) if model_class.ancestors.include?(ActiveModel::AttributeMethods)
       model_class.include(ActiveRecord)     if model_class < ::ActiveRecord::Base
     end

@@ -3,8 +3,8 @@ module Mobility
     class Null
       include Base
 
-      def read(locale); end
-      def write(locale, value); end
+      def read(locale, options = {}); end
+      def write(locale, value, options = {}); end
       def self.configure!(options); end
     end
   end

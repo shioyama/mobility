@@ -26,7 +26,13 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.add_dependency 'activerecord', '>= 5.0', '< 5.1'
+  spec.add_dependency 'request_store', '~> 1.0'
   spec.add_development_dependency "bundler", "~> 1.12"
+  spec.add_development_dependency "database_cleaner", '~> 1.5.3'
+  spec.add_development_dependency "generator_spec", '~> 0.9.3'
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rspec-its", "~> 1.2.0"
+  spec.add_development_dependency "shoulda-matchers", '~> 3.1'
 end

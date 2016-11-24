@@ -42,4 +42,29 @@ describe Mobility::Backend::Columns do
       expect(comment.content_pt_br).to eq "Olá Olá"
     end
   end
+
+  describe "Model.find_by_<translated attribute>" do
+    let!(:comment_1) do
+      Comment.create(content_en: "Good post!", content_ja: "面白い記事")
+    end
+    let!(:comment_2) do
+      Comment.create(content_en: "Crappy post!", content_ja: "面白くない!")
+    end
+
+    it "finds by column with locale suffix" do
+      expect(Comment.find_by_content("Good post!")).to eq(comment_1)
+      expect(Comment.find_by_content("Crappy post!")).to eq(comment_2)
+      Mobility.with_locale(:ja) do
+        expect(Comment.find_by_content("面白い記事")).to eq(comment_1)
+        expect(Comment.find_by_content("面白くない!")).to eq(comment_2)
+      end
+    end
+
+    it "does not return result for other locale" do
+      Mobility.with_locale(:ja) do
+        expect(Comment.find_by_content("Good post!")).to be_nil
+        expect(Comment.find_by_content("Crappy post!")).to be_nil
+      end
+    end
+  end
 end

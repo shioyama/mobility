@@ -14,6 +14,13 @@ module Mobility
             t.integer :translatable_id
             t.string  :translatable_type
           end
+
+          create_table "comments" do |t|
+            t.text :content_en
+            t.text :content_ja
+            t.text :content_pt_br
+            t.text :content_ru
+          end
         end
       end
     end

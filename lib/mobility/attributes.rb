@@ -11,7 +11,9 @@ module Mobility
       @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
 
       @backend_class.include Backend::Cache unless options[:cache] == false
+      @backend_class.include Backend::Dirty if options[:dirty]
       @backend_class.include Backend::Fallbacks if options[:fallbacks]
+      options[:locale_accessors] ||= options[:dirty] if options[:dirty]
       @accessor_locales = options[:locale_accessors]
       @accessor_locales = Mobility.config.default_accessor_locales if options[:locale_accessors] == true
 

@@ -3,11 +3,12 @@ require 'active_record'
 require 'mobility/version'
 
 module Mobility
-  autoload :ActiveRecord,  "mobility/active_record"
-  autoload :Attributes,    "mobility/attributes"
-  autoload :Backend,       "mobility/backend"
-  autoload :Configuration, "mobility/configuration"
-  autoload :Translates,    "mobility/translates"
+  autoload :ActiveRecord,     "mobility/active_record"
+  autoload :AttributeMethods, "mobility/attribute_methods"
+  autoload :Attributes,       "mobility/attributes"
+  autoload :Backend,          "mobility/backend"
+  autoload :Configuration,    "mobility/configuration"
+  autoload :Translates,       "mobility/translates"
 
   class << self
     def extended(model_class)
@@ -15,6 +16,8 @@ module Mobility
       model_class.class_eval do
         extend Translates
       end
+
+      model_class.include(AttributeMethods) if model_class.ancestors.include?(ActiveModel::AttributeMethods)
     end
 
     def included(model_class)

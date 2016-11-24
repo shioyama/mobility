@@ -41,6 +41,18 @@ describe Mobility::Attributes do
       end
     end
 
+    describe "dirty" do
+      it "includes Backend::Dirty into backend when options[:dirty] is truty" do
+        expect(backend_klass).to receive(:include).with(Mobility::Backend::Dirty)
+        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, dirty: true })
+      end
+
+      it "does not include Backend::Dirty into backend when options[:dirty] is falsey" do
+        expect(backend_klass).not_to receive(:include).with(Mobility::Backend::Dirty)
+        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false })
+      end
+    end
+
     describe "fallbacks" do
       it "includes Backend::Fallbacks into backend when options[:fallbacks] is truthy" do
         expect(backend_klass).to receive(:include).with(Mobility::Backend::Fallbacks)

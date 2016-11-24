@@ -8,6 +8,8 @@ module Mobility
       @attributes = _attributes.map &:to_s
       @backend_class = Class.new(get_backend_class(options.delete(:backend)))
 
+      @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
+
       attributes.each do |attribute|
         define_backend(attribute)
 

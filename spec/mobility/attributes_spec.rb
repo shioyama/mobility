@@ -19,6 +19,11 @@ describe Mobility::Attributes do
   end
 
   describe "including Attributes in a model" do
+    it "calls configure! on backend class with options" do
+      expect(backend_klass).to receive(:configure!).with({ foo: "bar" })
+      Article.include described_class.new(:accessor, "title", { backend: backend_klass, foo: "bar" })
+    end
+
     describe "defining attribute backend on model" do
       before do
         Article.include described_class.new(:accessor, "title", { backend: backend_klass, foo: "bar" })

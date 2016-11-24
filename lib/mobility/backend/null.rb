@@ -5,6 +5,7 @@ module Mobility
 
       def read(locale); end
       def write(locale, value); end
+      def self.configure!(options); end
     end
   end
 end

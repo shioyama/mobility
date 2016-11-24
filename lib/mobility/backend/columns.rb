@@ -16,6 +16,10 @@ module Mobility
         "#{attribute}_#{normalized_locale}".to_sym
       end
 
+      def self.configure!(options)
+        options[:locale_accessors] = false
+      end
+
       setup do |attributes, options|
         attributes.each do |attribute|
           class_eval <<-EOM, __FILE__, __LINE__ + 1

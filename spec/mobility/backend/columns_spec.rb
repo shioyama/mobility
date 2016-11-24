@@ -67,4 +67,12 @@ describe Mobility::Backend::Columns do
       end
     end
   end
+
+  describe "with locale accessors" do
+    it "still works as usual" do
+      Comment.translates attribute, backend: :columns, cache: false, locale_accessors: true
+      backend.write(:en, "Crappy post!")
+      expect(comment.content_en).to eq("Crappy post!")
+    end
+  end
 end

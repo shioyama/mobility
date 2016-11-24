@@ -167,5 +167,22 @@ describe Mobility::Backend::Table do
         expect(article.reload.send(:mobility_translations).size).to eq(1)
       end
     end
+
+    describe "Model.find_by_<translated attribute>" do
+      it "finds correct translation if exists in current locale" do
+        Mobility.locale = :ja
+        article = Article.create(title: "タイトル")
+        expect(Article.find_by_title("タイトル")).to eq(article)
+        expect(Article.find_by_title("foo")).to be_nil
+      end
+
+      it "returns nil if no matching translation exists in this locale" do
+        Mobility.locale = :ja
+        article = Article.create(title: "タイトル")
+        Mobility.locale = :en
+        expect(Article.find_by_title("タイトル")).to eq(nil)
+        expect(Article.find_by_title("foo")).to be_nil
+      end
+    end
   end
 end

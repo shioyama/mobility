@@ -35,6 +35,18 @@ module Mobility
           send(association_name).select { |t| t.value.blank? }.each(&:destroy)
         end
 
+        scope :with_translations, -> {
+          preload(association_name).joins(association_name).merge(translations_class.where(locale: Mobility.locale))
+        }
+
+        attributes.each do |attribute|
+          class_eval <<-EOM, __FILE__, __LINE__ + 1
+            def self.find_by_#{attribute}(value)
+              with_translations.merge(#{translations_class}.where(key: "#{attribute}", value: value)).first
+            end
+          EOM
+        end
+
         private association_name, "#{association_name}="
       end
 

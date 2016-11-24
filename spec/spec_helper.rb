@@ -16,6 +16,7 @@ Dir[File.expand_path("./spec/support/**/*.rb")].each { |f| require f }
 
 require "database"
 require "schema"
+require "models"
 
 Mobility::Test::Database.connect
 at_exit {ActiveRecord::Base.connection.disconnect!}

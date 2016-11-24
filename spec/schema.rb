@@ -3,6 +3,14 @@ module Mobility
     class Schema < ::ActiveRecord::Migration[[::ActiveRecord::VERSION::MAJOR, ::ActiveRecord::VERSION::MINOR].join(".")]
       class << self
         def up
+          create_table "posts" do |t|
+            t.boolean :published
+          end
+
+          create_table "fallback_posts" do |t|
+            t.boolean :published
+          end
+
           create_table "articles" do |t|
             t.string :slug
           end

@@ -17,7 +17,7 @@ module Mobility
         define_backend(attribute)
 
         define_method attribute do
-          send("#{attribute}_translations").read(Mobility.locale).presence
+          send("#{attribute}_translations").read(Mobility.locale).to_s.presence
         end if %i[accessor reader].include?(method)
 
         define_method "#{attribute}=" do |value|

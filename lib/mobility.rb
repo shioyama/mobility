@@ -3,6 +3,7 @@ require 'active_record'
 require 'mobility/version'
 
 module Mobility
+  autoload :ActiveRecord,  "mobility/active_record"
   autoload :Attributes,    "mobility/attributes"
   autoload :Backend,       "mobility/backend"
   autoload :Configuration, "mobility/configuration"

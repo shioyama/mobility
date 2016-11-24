@@ -5,5 +5,6 @@ module Mobility
     autoload :Columns,   'mobility/backend/columns'
     autoload :Fallbacks, 'mobility/backend/fallbacks'
     autoload :Null,      'mobility/backend/null'
+    autoload :Table,     'mobility/backend/table'
   end
 end

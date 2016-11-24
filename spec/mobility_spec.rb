@@ -21,6 +21,12 @@ describe Mobility do
         expect(Mobility::Attributes).not_to receive(:new)
         model.include Mobility
       end
+
+      it "defines Model.mobility as memoized wrapper" do
+        model.include Mobility
+        expect(MyModel.mobility).to be_a(Mobility::Wrapper)
+        expect(MyModel.mobility).to be(MyModel.mobility)
+      end
     end
 
     context "with translated attributes" do

@@ -11,6 +11,7 @@ module Mobility
   autoload :Configuration,    "mobility/configuration"
   autoload :InstanceMethods,  "mobility/instance_methods"
   autoload :Translates,       "mobility/translates"
+  autoload :Wrapper,          "mobility/wrapper"
 
   autoload :InstallGenerator, "generators/mobility/install_generator"
 
@@ -18,6 +19,10 @@ module Mobility
     def extended(model_class)
       return if model_class.respond_to? :translation_accessor
       model_class.class_eval do
+        def self.mobility
+          @mobility ||= Mobility::Wrapper.new(self)
+        end
+
         extend Translates
       end
 

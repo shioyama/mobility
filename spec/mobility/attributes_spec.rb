@@ -41,6 +41,18 @@ describe Mobility::Attributes do
       end
     end
 
+    describe "fallbacks" do
+      it "includes Backend::Fallbacks into backend when options[:fallbacks] is truthy" do
+        expect(backend_klass).to receive(:include).with(Mobility::Backend::Fallbacks)
+        Article.include described_class.new(:accessor, "title", { backend: backend_klass, fallbacks: true, cache: false })
+      end
+
+      it "does not include Backend::Fallbacks into backend when options[:fallbacks] is falsey" do
+        expect(backend_klass).not_to receive(:include).with(Mobility::Backend::Fallbacks)
+        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false })
+      end
+    end
+
     describe "defining attribute backend on model" do
       before do
         Article.include described_class.new(:accessor, "title", { backend: backend_klass, foo: "bar" })

@@ -73,6 +73,19 @@ describe Mobility do
     end
   end
 
+  describe ".locale" do
+    it "returns locale if set" do
+      Mobility.locale = :de
+      expect(Mobility.locale).to eq(:de)
+    end
+
+    it "returns I18n.locale otherwise" do
+      Mobility.locale = nil
+      I18n.locale = :de
+      expect(Mobility.locale).to eq(:de)
+    end
+  end
+
   describe '.locale=' do
     it "sets locale for locale in I18n.available_locales" do
       Mobility.locale = :fr

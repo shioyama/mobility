@@ -13,6 +13,7 @@ describe Mobility do
           { "foo" => "bar" }
         end
       end
+      model.include ActiveModel::AttributeMethods
       model
     end
 
@@ -20,6 +21,11 @@ describe Mobility do
       it "does not include Attributes into model class" do
         expect(Mobility::Attributes).not_to receive(:new)
         model.include Mobility
+      end
+
+      it "defines translated_attribute_names as empty array" do
+        model.include Mobility
+        expect(MyModel.translated_attribute_names).to eq([])
       end
 
       it "defines Model.mobility as memoized wrapper" do
@@ -38,6 +44,12 @@ describe Mobility do
         expect(backend_module).not_to be_nil
         expect(backend_module.attributes).to eq ["title"]
         expect(backend_module.options).to eq("foo" => :bar)
+      end
+
+      it "defines translated_attribute_names" do
+        model.include Mobility
+        model.translates :title, backend: :null
+        expect(MyModel.translated_attribute_names).to eq(["title"])
       end
     end
   end

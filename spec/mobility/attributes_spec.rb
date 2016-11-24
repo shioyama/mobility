@@ -29,6 +29,12 @@ describe Mobility::Attributes do
       Article.include described_class.new(:accessor, "title", { backend: backend_klass })
     end
 
+    it "includes module in model_class.mobility" do
+      backend_module = described_class.new(:accessor, "title", { backend: backend_klass })
+      Article.include backend_module
+      expect(Article.mobility.modules).to eq([backend_module])
+    end
+
     describe "cache" do
       it "includes Backend::Cache into backend when options[:cache] is not false" do
         expect(backend_klass).to receive(:include).with(Mobility::Backend::Cache)

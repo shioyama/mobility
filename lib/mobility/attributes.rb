@@ -33,6 +33,7 @@ module Mobility
     end
 
     def included(model_class)
+      model_class.mobility << self
       backend_class.setup_model(model_class, attributes, options)
     end
 

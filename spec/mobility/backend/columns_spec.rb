@@ -82,5 +82,21 @@ describe Mobility::Backend::Columns do
       backend.write(:en, "Crappy post!")
       expect(comment.content_en).to eq("Crappy post!")
     end
+
+    it "tracks changed attributes" do
+      Comment.translates attribute, backend: :columns, cache: false, dirty: true
+      comment = Comment.new
+
+      expect(comment.content).to eq(nil)
+      expect(comment.changed?).to eq(false)
+      expect(comment.changed).to eq([])
+      expect(comment.changes).to eq({})
+
+      comment.content = "foo"
+      expect(comment.content).to eq("foo")
+      expect(comment.changed?).to eq(true)
+      expect(comment.changed).to eq(["content_en"])
+      expect(comment.changes).to eq({ "content_en" => [nil, "foo"] })
+    end
   end
 end

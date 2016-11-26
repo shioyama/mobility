@@ -8,7 +8,7 @@ module Mobility
       @attributes = _attributes.map &:to_s
       @backend_class = Class.new(get_backend_class(options.delete(:backend)))
 
-      options[:locale_accessors] ||= options[:dirty] if options[:dirty]
+      options[:locale_accessors] ||= true if options[:dirty]
 
       @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
 

@@ -75,4 +75,12 @@ describe Mobility::Backend::Columns do
       expect(comment.content_en).to eq("Crappy post!")
     end
   end
+
+  describe "with dirty" do
+    it "still works as usual" do
+      Comment.translates attribute, backend: :columns, cache: false, dirty: true
+      backend.write(:en, "Crappy post!")
+      expect(comment.content_en).to eq("Crappy post!")
+    end
+  end
 end

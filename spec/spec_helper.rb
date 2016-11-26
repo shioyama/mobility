@@ -5,7 +5,6 @@ require 'pry-byebug'
 require 'i18n'
 require 'rspec'
 require 'rspec/its'
-require 'shoulda-matchers'
 
 require 'mobility'
 
@@ -38,13 +37,4 @@ RSpec.configure do |config|
   config.after :each do
     DatabaseCleaner.clean
   end
-
-  Shoulda::Matchers.configure do |config|
-    config.integrate do |with|
-      with.test_framework :rspec
-      with.library :active_record
-    end
-  end
-
-  config.include(Shoulda::Matchers::ActiveModel, type: :model)
 end

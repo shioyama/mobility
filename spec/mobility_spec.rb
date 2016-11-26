@@ -146,5 +146,11 @@ describe Mobility do
     end
   end
 
-  it { should delegate_method(:default_fallbacks).to(:config) }
+  describe ".default_fallbacks" do
+    it "delegates to config" do
+      fallbacks = double("fallbacks")
+      expect(Mobility.config).to receive(:default_fallbacks).and_return(fallbacks)
+      expect(Mobility.default_fallbacks).to eq(fallbacks)
+    end
+  end
 end

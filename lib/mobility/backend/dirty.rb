@@ -3,7 +3,7 @@ module Mobility
     module Dirty
       def read(locale, options = {})
         super.tap do |value|
-          original_values[locale] = value.to_s.presence unless original_values.has_key?(locale)
+          original_values[locale] = _read_value(value).presence unless original_values.has_key?(locale)
         end
       end
 

@@ -67,11 +67,11 @@ module Mobility
           @translation = translation
         end
 
-        def to_s
+        def __mobility_get
           @translation.value
         end
 
-        def write(value)
+        def __mobility_set(value)
           @translation.value = value
         end
       end

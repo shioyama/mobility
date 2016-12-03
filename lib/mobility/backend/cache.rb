@@ -10,8 +10,8 @@ module Mobility
       end
 
       def write(locale, value, options = {})
-        if cache[locale].respond_to?(:write)
-          cache[locale].write(value)
+        if cache[locale].respond_to?(:__mobility_set)
+          cache[locale].__mobility_set(value)
         else
           cache[locale] = super
         end

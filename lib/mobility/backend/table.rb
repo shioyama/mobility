@@ -10,11 +10,11 @@ module Mobility
       end
 
       def read(locale, options = {})
-        Stash.new(translation_for(locale))
+        translation_for(locale)
       end
 
       def write(locale, value, options = {})
-        Stash.new(translation_for(locale).tap { |t| t.value = value })
+        translation_for(locale).tap { |t| t.value = value }
       end
 
       def self.configure!(options)
@@ -60,20 +60,6 @@ module Mobility
         translation = translations.find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= translations.build(locale: locale, key: attribute)
         translation
-      end
-
-      class Stash
-        def initialize(translation)
-          @translation = translation
-        end
-
-        def __mobility_get
-          @translation.value
-        end
-
-        def __mobility_set(value)
-          @translation.value = value
-        end
       end
     end
   end

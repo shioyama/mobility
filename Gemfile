@@ -4,10 +4,19 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
+  if ENV['ORM'] == 'active_record'
+    gem 'activerecord', '>= 5.0', '< 5.1'
+    gem "generator_spec", '~> 0.9.3'
+  end
+
+  if ENV['ORM'] == 'sequel'
+    gem 'sequel', '>= 4.0.0', '< 5.0'
+    gem 'sequel_polymorphic', git: "https://github.com/jackdempsey/sequel_polymorphic", ref: "45491e"
+  end
+
   platforms :ruby do
     gem 'guard-rspec'
     gem 'pry-byebug'
-    gem 'guard-rspec'
     gem 'sqlite3'
     gem 'mysql2', '~> 0.3.10'
     gem 'pg'

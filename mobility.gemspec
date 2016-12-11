@@ -9,6 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Chris Salzberg"]
   spec.email         = ["chris@dejimata.com"]
 
+  spec.required_ruby_version = '>= 2.0.0'
+
   spec.summary       = %q{Pluggable translation framework for Ruby on Rails.}
 #  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
@@ -26,11 +28,10 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'activerecord', '>= 5.0', '< 5.1'
   spec.add_dependency 'request_store', '~> 1.0'
+  spec.add_dependency 'i18n'
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "database_cleaner", '~> 1.5.3'
-  spec.add_development_dependency "generator_spec", '~> 0.9.3'
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "rspec-its", "~> 1.2.0"

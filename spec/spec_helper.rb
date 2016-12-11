@@ -1,6 +1,10 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'active_record'
+if orm = ENV['ORM']
+  require orm
+else
+  orm = 'none'
+end
 require 'pry-byebug'
 require 'i18n'
 require 'rspec'
@@ -13,15 +17,20 @@ I18n.available_locales = [:en, :ja, :fr, :de, :cz, :pl]
 
 Dir[File.expand_path("./spec/support/**/*.rb")].each { |f| require f }
 
-require "database"
-require "schema"
-require "models"
+unless orm == 'none'
+  require "database"
+  require "#{orm}/schema"
 
-Mobility::Test::Database.connect
-at_exit {ActiveRecord::Base.connection.disconnect!}
+  require 'database_cleaner'
+  DatabaseCleaner.strategy = :transaction
 
-require 'database_cleaner'
-DatabaseCleaner.strategy = :transaction
+  DB = Mobility::Test::Database.connect(orm)
+  # for in-memory sqlite database
+  Mobility::Test::Database.auto_migrate
+
+  require "#{orm}/models"
+end
+
 
 RSpec.configure do |config|
   config.filter_run focus: true
@@ -31,10 +40,17 @@ RSpec.configure do |config|
   end
 
   config.before :each do
-    DatabaseCleaner.start
     Mobility.locale = :en
   end
-  config.after :each do
-    DatabaseCleaner.clean
+
+  unless orm == 'none'
+    config.before :each do
+      DatabaseCleaner.start
+    end
+    config.after :each do
+      DatabaseCleaner.clean
+    end
   end
+
+  config.filter_run_excluding orm: lambda { |v| v != orm.to_sym }
 end

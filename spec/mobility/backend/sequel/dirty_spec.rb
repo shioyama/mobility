@@ -87,26 +87,29 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
                                               title_fr: ["Titre en Francais 1", "Titre en Francais 2"]})
     end
 
-    pending "resets changes when locale is set to original value" do
-      article = Article.create(title: "foo")
+    it "resets changes when locale is set to original value" do
+      post = Post.create(title: "foo")
 
-      expect(article.column_changed?(:title)).to eq(false)
+      expect(post.column_changed?(:title)).to eq(false)
 
-      article.title = "bar"
-      expect(article.column_changed?(:title)).to eq(true)
-      expect(article.changed_columns).to eq([:title_en])
-      expect(article.column_changes).to eq({ title_en: ["foo", "bar"] })
+      post.title = "bar"
+      expect(post.column_changed?(:title)).to eq(true)
+      expect(post.changed_columns).to eq([:title_en])
+      expect(post.column_changes).to eq({ title_en: ["foo", "bar"] })
 
-      article.title = "foo"
-      expect(article.column_changed?(:title)).to eq(false)
-      expect(article.changed_columns).to eq([])
-      expect(article.column_changes).to eq({})
+      post.title = "foo"
+      expect(post.changed_columns).to eq([])
+      expect(post.column_changes).to eq({})
+      expect(post.title).to eq("foo")
 
-      Mobility.with_locale(:fr) { article.title = "Titre en Francais" }
+      Mobility.with_locale(:fr) { post.title = "Titre en Francais" }
 
-      expect(article.column_changed?(:title)).to eq(true)
-      expect(article.changed_columns).to eq([:title_fr])
-      expect(article.column_changes).to eq({ title_fr: [nil, "Titre en Francais"] })
+      expect(post.column_changed?(:title)).to eq(false)
+      expect(post.changed_columns).to eq([:title_fr])
+      expect(post.column_changes).to eq({ title_fr: [nil, "Titre en Francais"] })
+
+      Mobility.locale = :fr
+      expect(post.column_changed?(:title)).to eq(true)
     end
   end
 end

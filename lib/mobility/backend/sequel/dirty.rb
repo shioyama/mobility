@@ -4,8 +4,14 @@ module Mobility
   module Backend
     module Sequel::Dirty
       def write(locale, value, **options)
-        model.send(:will_change_column, "#{attribute}_#{locale}".to_sym)
-        super
+        locale_accessor = "#{attribute}_#{locale}".to_sym
+        if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
+          super
+          [model.changed_columns, model.initial_values].each { |h| h.delete(locale_accessor) }
+        else
+          model.will_change_column("#{attribute}_#{locale}".to_sym)
+          super
+        end
       end
 
       def self.included(backend_class)

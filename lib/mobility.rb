@@ -27,7 +27,6 @@ module Mobility
     Loaded::ActiveRecord = true
   rescue LoadError
     Loaded::ActiveRecord = false
-    module AttributeMethods; end
   end
 
   begin

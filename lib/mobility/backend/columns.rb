@@ -3,11 +3,11 @@ module Mobility
     module Columns
       include OrmDelegator
 
-      def read(locale, options = {})
+      def read(locale, **options)
         model.send(column(locale))
       end
 
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         model.send("#{column(locale)}=", value)
       end
 

@@ -14,7 +14,7 @@ describe Mobility::Backend::Cache do
         nil
       end
 
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         @writes += 1
         value
       end
@@ -32,7 +32,7 @@ describe Mobility::Backend::Cache do
         nil
       end
 
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         @writes += 1
         # let's implement a very simple stash
         value.instance_eval { alias :__mobility_set :replace }

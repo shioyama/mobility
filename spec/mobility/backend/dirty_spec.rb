@@ -3,11 +3,11 @@ require "spec_helper"
 describe Mobility::Backend::Dirty, orm: :active_record do
   let(:backend_class) do
     Class.new(Mobility::Backend::Null) do
-      def read(locale, options = {})
+      def read(locale, **options)
         values[locale]
       end
 
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         values[locale] = value
       end
 

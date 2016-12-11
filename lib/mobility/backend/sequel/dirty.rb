@@ -3,7 +3,7 @@ require "sequel/plugins/dirty"
 module Mobility
   module Backend
     module Sequel::Dirty
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         model.send(:will_change_column, "#{attribute}_#{locale}".to_sym)
         super
       end
@@ -13,7 +13,7 @@ module Mobility
       end
 
       module ClassMethods
-        def setup_model(model_class, attributes, options = {})
+        def setup_model(model_class, attributes, **options)
           super
           model_class.class_eval do
             plugin :dirty

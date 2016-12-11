@@ -4,16 +4,16 @@ module Mobility
       include Base
       attr_reader :association_name
 
-      def initialize(model, attribute, options = {})
+      def initialize(model, attribute, **options)
         super
         @association_name = options[:association_name]
       end
 
-      def read(locale, options = {})
+      def read(locale, **options)
         translation_for(locale)
       end
 
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         translation_for(locale).tap { |t| t.value = value }
       end
 

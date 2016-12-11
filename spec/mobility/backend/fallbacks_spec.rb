@@ -5,7 +5,7 @@ describe Mobility::Backend::Fallbacks do
     backend_class = stub_const 'MyBackend', Class.new
     backend_class.include(Mobility::Backend::Base)
     backend_class.class_eval do
-      def read(locale, options = {})
+      def read(locale, **options)
         {
           "title" => {
             :'de-DE' => "foo",

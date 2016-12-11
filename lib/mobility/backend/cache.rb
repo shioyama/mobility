@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     module Cache
-      def read(locale, options = {})
+      def read(locale, **options)
         if cache.has_key?(locale)
           cache[locale]
         else
@@ -9,7 +9,7 @@ module Mobility
         end
       end
 
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         if cache[locale].respond_to?(:__mobility_set)
           cache[locale].__mobility_set(value)
         else
@@ -19,7 +19,7 @@ module Mobility
       end
 
       module Setup
-        def setup_model(model_class, attributes, options = {})
+        def setup_model(model_class, attributes, **options)
           super
           model_class.include BackendResetter.for(model_class).new(:clear_cache, attributes)
         end

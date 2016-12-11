@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     module Fallbacks
-      def read(locale, options = {})
+      def read(locale, **options)
         return super if options[:fallbacks] == false
         fallbacks[locale].detect do |locale|
           value = super(locale)

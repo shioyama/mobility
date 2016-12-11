@@ -23,7 +23,7 @@ module Mobility
       attributes.each do |attribute|
         define_backend(attribute)
 
-        define_method attribute do |options={}|
+        define_method attribute do |**options|
           mobility_get(attribute, options)
         end if %i[accessor reader].include?(method)
 

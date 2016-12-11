@@ -3,7 +3,7 @@ module Mobility
     module Base
       attr_reader :attribute, :model, :options
 
-      def initialize(model, attribute, options = {})
+      def initialize(model, attribute, **options)
         @model = model
         @attribute = attribute
         @options = options
@@ -28,7 +28,7 @@ module Mobility
           subclass.instance_variable_set(:@setup_block, @setup_block)
         end
 
-        def setup_model(model_class, attributes, options = {})
+        def setup_model(model_class, attributes, **options)
           return unless setup_block = @setup_block
           model_class.class_exec(attributes, options, &setup_block)
         end

@@ -13,7 +13,9 @@ describe Mobility do
           { "foo" => "bar" }
         end
       end
-      model.include ActiveModel::AttributeMethods
+      if ENV['ORM'] == 'activerecord'
+        model.include ActiveModel::AttributeMethods
+      end
       model
     end
 
@@ -43,7 +45,7 @@ describe Mobility do
         backend_module = model.ancestors.find { |a| a.class == Mobility::Attributes }
         expect(backend_module).not_to be_nil
         expect(backend_module.attributes).to eq ["title"]
-        expect(backend_module.options).to eq("foo" => :bar)
+        expect(backend_module.options).to eq(foo: :bar)
       end
 
       it "defines translated_attribute_names" do

@@ -32,6 +32,10 @@ module Mobility
           return unless setup_block = @setup_block
           model_class.class_exec(attributes, options, &setup_block)
         end
+
+        def for(_)
+          self
+        end
       end
 
       private

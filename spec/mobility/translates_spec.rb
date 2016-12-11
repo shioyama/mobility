@@ -8,7 +8,7 @@ describe Mobility::Translates do
   describe ".translates" do
     it "includes new Attributes module" do
       attributes = Module.new
-      expect(Mobility::Attributes).to receive(:new).with(:accessor, :title, :content).and_return(attributes)
+      expect(Mobility::Attributes).to receive(:new).with(:accessor, :title, :content, { model_class: MyClass }).and_return(attributes)
       MyClass.translates :title, :content
     end
 

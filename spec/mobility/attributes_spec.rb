@@ -48,14 +48,34 @@ describe Mobility::Attributes do
     end
 
     describe "dirty" do
-      it "includes Backend::Dirty into backend when options[:dirty] is truty" do
-        expect(backend_klass).to receive(:include).with(Mobility::Backend::Dirty)
-        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, dirty: true })
+      context "ActiveModel", orm: :active_record do
+        it "includes Backend::ActiveModel::Dirty into backend when options[:dirty] is truthy and model class includes ActiveModel::Dirty" do
+          expect(backend_klass).to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
+          Article.include ::ActiveModel::Dirty
+          Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, dirty: true, model_class: Article })
+        end
+
+        it "does not include Backend::Model::Dirty into backend when options[:dirty] is falsey" do
+          expect(backend_klass).not_to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
+          Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, model_class: Article })
+        end
       end
 
-      it "does not include Backend::Dirty into backend when options[:dirty] is falsey" do
-        expect(backend_klass).not_to receive(:include).with(Mobility::Backend::Dirty)
-        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false })
+      context "Sequel", orm: :sequel do
+        before do
+          stub_const 'Article', Class.new(::Sequel::Model)
+          Article.include Mobility
+        end
+
+        it "includes Backend::Sequel::Dirty into backend when options[:dirty] is truthy and model class is a ::Sequel::Model" do
+          expect(backend_klass).to receive(:include).with(Mobility::Backend::Sequel::Dirty)
+          Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, dirty: true, model_class: Article })
+        end
+
+        it "does not include Backend::Sequel::Dirty into backend when options[:dirty] is falsey" do
+          expect(backend_klass).not_to receive(:include).with(Mobility::Backend::Sequel::Dirty)
+          Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, model_class: Article })
+        end
       end
     end
 
@@ -121,14 +141,14 @@ describe Mobility::Attributes do
       end
 
       describe "method = :accessor" do
-        before { Article.include described_class.new(:accessor, "title", { "backend" => backend_klass }) }
+        before { Article.include described_class.new(:accessor, "title", { backend: backend_klass }) }
 
         it_behaves_like "reader"
         it_behaves_like "writer"
       end
 
       describe "method = :reader" do
-        before { Article.include described_class.new(:reader, "title", { "backend" => backend_klass }) }
+        before { Article.include described_class.new(:reader, "title", { backend: backend_klass }) }
 
         it_behaves_like "reader"
 
@@ -138,7 +158,7 @@ describe Mobility::Attributes do
       end
 
       describe "method = :writer" do
-        before { Article.include described_class.new(:writer, "title", { "backend" => backend_klass }) }
+        before { Article.include described_class.new(:writer, "title", { backend: backend_klass }) }
 
         it_behaves_like "writer"
 
@@ -150,14 +170,14 @@ describe Mobility::Attributes do
       # Note: this is important normalization so backends do not need
       # to consider storing blank values.
       it "converts blanks to nil when receiving from backend getter" do
-        Article.include described_class.new(:reader, "title", { "backend" => backend_klass })
+        Article.include described_class.new(:reader, "title", { backend: backend_klass })
         allow(Mobility).to receive(:locale).and_return(:ru)
         expect(backend).to receive(:read).with(:ru, {}).and_return("")
         expect(article.title).to eq(nil)
       end
 
       it "converts blanks to nil when sending to backend setter" do
-        Article.include described_class.new(:writer, "title", { "backend" => backend_klass })
+        Article.include described_class.new(:writer, "title", { backend: backend_klass })
         allow(Mobility).to receive(:locale).and_return(:fr)
         expect(backend).to receive(:write).with(:fr, nil)
         article.title = ""
@@ -170,7 +190,7 @@ describe Mobility::Attributes do
       before do
         allow(backend_klass).to receive(:new).with(article, "title", options).and_return(backend)
         allow(Mobility).to receive(:locale).and_return(:de)
-        Article.include described_class.new(:accessor, "title", options.merge("backend" => backend_klass))
+        Article.include described_class.new(:accessor, "title", options.merge(backend: backend_klass))
       end
 
       context "with accessor_locales unset" do

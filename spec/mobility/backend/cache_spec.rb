@@ -114,7 +114,7 @@ describe Mobility::Backend::Cache do
     end
   end
 
-  context "ActiveRecord model" do
+  context "ActiveRecord model", orm: :active_record do
     before do
       stub_const 'Article', Class.new(ActiveRecord::Base)
       Article.include Mobility

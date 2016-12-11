@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "ActiveRecord compatibility" do
+describe "ActiveRecord compatibility", orm: :active_record do
   describe "#assign_attributes" do
     let!(:post) { Post.create(title: "foo title") }
 
@@ -67,8 +67,10 @@ describe "ActiveRecord compatibility" do
     end
 
     it "resets original values when model is reloaded" do
-      expect(post.title_translations).to receive(:clear_original_values).once
+      post.title = "foo"
+      expect(post.changed?).to eq(true)
       post.reload
+      expect(post.changed?).to eq(false)
     end
   end
 

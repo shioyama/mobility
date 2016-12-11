@@ -1,6 +1,7 @@
 module Mobility
   module ActiveRecord
-    autoload :Translation, "mobility/active_record/translation"
+    autoload :Translation,     "mobility/active_record/translation"
+    autoload :BackendResetter, "mobility/active_record/backend_resetter"
 
     def changes_applied
       @previously_changed = changes

@@ -1,10 +1,15 @@
 require 'request_store'
-require 'active_record'
 require 'mobility/version'
 
+%w[object nil string].each do |type|
+  begin
+    require "active_support/core_ext/#{type}"
+  rescue LoadError
+    require "mobility/core_ext/#{type}"
+  end
+end
+
 module Mobility
-  autoload :ActiveRecord,     "mobility/active_record"
-  autoload :AttributeMethods, "mobility/attribute_methods"
   autoload :Attributes,       "mobility/attributes"
   autoload :Backend,          "mobility/backend"
   autoload :BackendResetter,  "mobility/backend_resetter"
@@ -13,7 +18,36 @@ module Mobility
   autoload :Translates,       "mobility/translates"
   autoload :Wrapper,          "mobility/wrapper"
 
-  autoload :InstallGenerator, "generators/mobility/install_generator"
+  require "mobility/orm"
+
+  begin
+    require "active_record"
+    autoload :ActiveModel,      "mobility/active_model"
+    autoload :ActiveRecord,     "mobility/active_record"
+    autoload :AttributeMethods, "mobility/attribute_methods"
+    Loaded::ActiveRecord = true
+  rescue LoadError
+    Loaded::ActiveRecord = false
+    module AttributeMethods; end
+  end
+
+  begin
+    require "rails"
+    autoload :InstallGenerator, "generators/mobility/install_generator"
+    Loaded::Rails = true
+  rescue LoadError
+    class InstallGenerator; end
+    Loaded::Rails = false
+  end
+
+  begin
+    require "sequel"
+    require "sequel/extensions/inflector"
+    autoload :Sequel, "mobility/sequel"
+    Loaded::Sequel = true
+  rescue LoadError
+    Loaded::Sequel = false
+  end
 
   class << self
     def extended(model_class)
@@ -22,13 +56,19 @@ module Mobility
         def self.mobility
           @mobility ||= Mobility::Wrapper.new(self)
         end
+        def self.translated_attribute_names
+          mobility.translated_attribute_names
+        end
 
         extend Translates
       end
 
       model_class.include(InstanceMethods)
-      model_class.include(AttributeMethods) if model_class.ancestors.include?(ActiveModel::AttributeMethods)
-      model_class.include(ActiveRecord)     if model_class < ::ActiveRecord::Base
+
+      if Loaded::ActiveRecord
+        model_class.include(AttributeMethods) if model_class.ancestors.include?(::ActiveModel::AttributeMethods)
+        model_class.include(ActiveRecord)     if model_class < ::ActiveRecord::Base
+      end
     end
 
     def included(model_class)
@@ -60,7 +100,11 @@ module Mobility
     def config
       storage[:mobility_configuration] ||= Mobility::Configuration.new
     end
-    delegate :default_fallbacks, to: :config
+    %w[default_fallbacks default_backend default_accessor_locales].each do |method_name|
+      define_method method_name do
+        config.public_send(method_name)
+      end
+    end
 
     def configure
       yield config
@@ -77,9 +121,9 @@ module Mobility
     end
 
     def set_locale(locale)
-      locale = locale.try(:to_sym)
+      locale = locale.to_sym if locale
       raise Mobility::InvalidLocale.new(locale) unless I18n.available_locales.include?(locale) || locale.nil?
-      storage[:mobility_locale] = locale.try(:to_sym)
+      storage[:mobility_locale] = locale
     end
   end
 

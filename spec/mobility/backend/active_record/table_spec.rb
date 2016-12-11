@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::Table do
+describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
   context "in isolation" do
     let(:attributes) { ["title", "content"] }
     let(:options) { {} }

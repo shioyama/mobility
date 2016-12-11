@@ -1,8 +1,11 @@
 require "spec_helper"
-require "generator_spec/test_case"
 
-describe Mobility::InstallGenerator, type: :generator do
+describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
+  break unless Mobility::Loaded::Rails
+
+  require "generator_spec/test_case"
   include GeneratorSpec::TestCase
+
   destination File.expand_path("../tmp", __FILE__)
 
   after(:all) { prepare_destination }

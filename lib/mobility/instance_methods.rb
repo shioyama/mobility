@@ -6,7 +6,7 @@ module Mobility
 
     private
 
-    def mobility_get(attribute, options = {}.with_indifferent_access)
+    def mobility_get(attribute, options = {})
       locale = options.delete(:locale) || Mobility.locale
       mobility_backend_for(attribute)._read(locale.to_sym, options).presence
     end

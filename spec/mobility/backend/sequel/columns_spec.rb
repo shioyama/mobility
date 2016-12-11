@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::Columns do
+describe Mobility::Backend::Sequel::Columns, orm: :sequel do
   let(:attribute) { "content" }
   let(:options) { {} }
   let(:backend) { described_class.new(comment, attribute, options) }
@@ -11,7 +11,8 @@ describe Mobility::Backend::Columns do
   end
 
   before do
-    stub_const 'Comment', Class.new(ActiveRecord::Base)
+    stub_const 'Comment', Class.new(Sequel::Model)
+    Comment.dataset = DB[:comments]
     Comment.include Mobility
     Comment.translates attribute, backend: :columns, cache: false
   end
@@ -43,7 +44,7 @@ describe Mobility::Backend::Columns do
     end
   end
 
-  describe "Model.find_by_<translated attribute>" do
+  describe "Model.first_by_<translated attribute>" do
     let!(:comment_1) do
       Comment.create(content_en: "Good post!", content_ja: "面白い記事")
     end
@@ -52,18 +53,18 @@ describe Mobility::Backend::Columns do
     end
 
     it "finds by column with locale suffix" do
-      expect(Comment.find_by_content("Good post!")).to eq(comment_1)
-      expect(Comment.find_by_content("Crappy post!")).to eq(comment_2)
+      expect(Comment.first_by_content("Good post!")).to eq(comment_1)
+      expect(Comment.first_by_content("Crappy post!")).to eq(comment_2)
       Mobility.with_locale(:ja) do
-        expect(Comment.find_by_content("面白い記事")).to eq(comment_1)
-        expect(Comment.find_by_content("面白くない!")).to eq(comment_2)
+        expect(Comment.first_by_content("面白い記事")).to eq(comment_1)
+        expect(Comment.first_by_content("面白くない!")).to eq(comment_2)
       end
     end
 
     it "does not return result for other locale" do
       Mobility.with_locale(:ja) do
-        expect(Comment.find_by_content("Good post!")).to be_nil
-        expect(Comment.find_by_content("Crappy post!")).to be_nil
+        expect(Comment.first_by_content("Good post!")).to be_nil
+        expect(Comment.first_by_content("Crappy post!")).to be_nil
       end
     end
   end
@@ -73,30 +74,6 @@ describe Mobility::Backend::Columns do
       Comment.translates attribute, backend: :columns, cache: false, locale_accessors: true
       backend.write(:en, "Crappy post!")
       expect(comment.content_en).to eq("Crappy post!")
-    end
-  end
-
-  describe "with dirty" do
-    it "still works as usual" do
-      Comment.translates attribute, backend: :columns, cache: false, dirty: true
-      backend.write(:en, "Crappy post!")
-      expect(comment.content_en).to eq("Crappy post!")
-    end
-
-    it "tracks changed attributes" do
-      Comment.translates attribute, backend: :columns, cache: false, dirty: true
-      comment = Comment.new
-
-      expect(comment.content).to eq(nil)
-      expect(comment.changed?).to eq(false)
-      expect(comment.changed).to eq([])
-      expect(comment.changes).to eq({})
-
-      comment.content = "foo"
-      expect(comment.content).to eq("foo")
-      expect(comment.changed?).to eq(true)
-      expect(comment.changed).to eq(["content_en"])
-      expect(comment.changes).to eq({ "content_en" => [nil, "foo"] })
     end
   end
 end

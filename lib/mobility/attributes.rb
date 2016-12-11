@@ -2,18 +2,20 @@ module Mobility
   class Attributes < Module
     attr_reader :attributes, :options, :backend_class
 
-    def initialize(method, *_attributes)
+    def initialize(method, *_attributes, **_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
-      @options = _attributes.extract_options!.with_indifferent_access
+      @options = _options
       @attributes = _attributes.map &:to_s
-      @backend_class = Class.new(get_backend_class(options.delete(:backend)))
+      model_class = options.delete(:model_class)
+      @backend_class = Class.new(get_backend_class(backend:     options.delete(:backend),
+                                                   model_class: model_class))
 
       options[:locale_accessors] ||= true if options[:dirty]
 
       @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
 
       @backend_class.include Backend::Cache unless options[:cache] == false
-      @backend_class.include Backend::Dirty if options[:dirty]
+      @backend_class.include Backend::Dirty.for(model_class) if options[:dirty]
       @backend_class.include Backend::Fallbacks if options[:fallbacks]
       @accessor_locales = options[:locale_accessors]
       @accessor_locales = Mobility.config.default_accessor_locales if options[:locale_accessors] == true
@@ -51,19 +53,19 @@ module Mobility
     def define_locale_accessors(attribute, locales)
       locales.each do |locale|
         normalized_locale = Mobility.normalize_locale(locale)
-        define_method "#{attribute}_#{normalized_locale}" do |options={}|
-          mobility_get(attribute, options.with_indifferent_access.merge(locale: locale))
+        define_method "#{attribute}_#{normalized_locale}" do |**options|
+          mobility_get(attribute, options.merge(locale: locale))
         end
-        define_method "#{attribute}_#{normalized_locale}=" do |value, options={}|
+        define_method "#{attribute}_#{normalized_locale}=" do |value, **options|
           mobility_set(attribute, value, locale: locale)
         end
       end
     end
 
-    def get_backend_class(object)
-      object ||= Mobility.config.default_backend
-      raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if object.nil?
-      Module === object ? object : Mobility::Backend.const_get(object.to_s.titleize.camelize.gsub(/\s+/, ''))
+    def get_backend_class(backend: Mobility.config.default_backend, model_class: nil)
+      raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
+      klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''))
+      model_class.nil? ? klass : klass.for(model_class)
     end
   end
 end

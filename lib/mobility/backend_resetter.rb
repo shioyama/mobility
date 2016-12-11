@@ -1,31 +1,22 @@
 module Mobility
   class BackendResetter < Module
     def initialize(backend_reset_method, attributes)
-      @model_reset_method = model_reset_method = Proc.new do
+      @model_reset_method = Proc.new do
         attributes.each do |attribute|
           mobility_backend_for(attribute).send(backend_reset_method)
         end
       end
-
-      %i[changes_applied clear_changes_information].each do |method|
-        define_method method do
-          super()
-          instance_eval &model_reset_method
-        end
-      end
     end
 
-    def included(model_class)
-      if model_class < ::ActiveRecord::Base
-        model_reset_method = @model_reset_method
-        model_class.class_eval do
-          mod = Module.new do
-            define_method :reload do
-              super().tap { instance_eval &model_reset_method }
-            end
-          end
-          include mod
-        end
+    def self.for(model_class)
+      if Loaded::ActiveRecord && model_class < ::ActiveRecord::Base
+        ActiveRecord::BackendResetter
+      elsif Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
+        ActiveModel::BackendResetter
+      elsif Loaded::Sequel && model_class < ::Sequel::Model
+        Sequel::BackendResetter
+      else
+        self
       end
     end
   end

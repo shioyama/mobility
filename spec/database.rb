@@ -12,8 +12,9 @@ module Mobility
             ::ActiveRecord::Base.connection
           when 'sequel'
             adapter = config[driver]['adapter'].gsub(/^sqlite3$/,'sqlite')
+            user = config[driver]['username']
             database = config[driver]['database']
-            ::Sequel.connect(adapter: adapter, database: database)
+            ::Sequel.connect(adapter: adapter, database: database, username: user)
           end
         end
 

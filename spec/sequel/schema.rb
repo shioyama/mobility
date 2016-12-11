@@ -39,6 +39,10 @@ module Mobility
             String      :content_ru,    size: 65535
           end
         end
+
+        def up
+          migrate(:up)
+        end
       end
     end
   end

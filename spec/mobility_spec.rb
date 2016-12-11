@@ -14,7 +14,7 @@ describe Mobility do
         end
       end
       if ENV['ORM'] == 'activerecord'
-        model.include ActiveModel::AttributeMethods
+        model.include ::ActiveModel::AttributeMethods
       end
       model
     end

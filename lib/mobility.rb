@@ -24,7 +24,6 @@ module Mobility
     require "active_record"
     autoload :ActiveModel,      "mobility/active_model"
     autoload :ActiveRecord,     "mobility/active_record"
-    autoload :AttributeMethods, "mobility/attribute_methods"
     Loaded::ActiveRecord = true
   rescue LoadError
     Loaded::ActiveRecord = false
@@ -66,8 +65,8 @@ module Mobility
       model_class.include(InstanceMethods)
 
       if Loaded::ActiveRecord
-        model_class.include(AttributeMethods) if model_class.ancestors.include?(::ActiveModel::AttributeMethods)
-        model_class.include(ActiveRecord)     if model_class < ::ActiveRecord::Base
+        model_class.include(ActiveRecord)                   if model_class < ::ActiveRecord::Base
+        model_class.include(ActiveModel::AttributeMethods)  if model_class.ancestors.include?(::ActiveModel::AttributeMethods)
       end
     end
 

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::AttributeMethods, orm: :active_record do
+describe Mobility::ActiveModel::AttributeMethods, orm: :active_record do
   before do
     model = stub_const 'BaseModel', Class.new
     model.class_eval do

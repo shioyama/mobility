@@ -1,3 +1,4 @@
+require 'i18n'
 require 'request_store'
 require 'mobility/version'
 

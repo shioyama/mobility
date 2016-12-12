@@ -41,6 +41,7 @@ module Mobility
   begin
     require "sequel"
     require "sequel/extensions/inflector"
+    require "sequel/plugins/dirty"
     autoload :Sequel, "mobility/sequel"
     Loaded::Sequel = true
   rescue LoadError

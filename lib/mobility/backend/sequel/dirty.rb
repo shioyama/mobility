@@ -1,5 +1,3 @@
-require "sequel/plugins/dirty"
-
 module Mobility
   module Backend
     module Sequel::Dirty

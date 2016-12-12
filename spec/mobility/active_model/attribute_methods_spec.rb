@@ -7,7 +7,7 @@ describe "Mobility::ActiveModel::AttributeMethods", orm: :active_record do
       def attributes; { "untranslated" => "bar" }; end
     end
     mobility_model = stub_const 'MobilityModel', Class.new(BaseModel)
-    klass = described_class
+    klass = Mobility::ActiveModel::AttributeMethods
     mobility_model.class_eval do
       def self.translated_attribute_names; ["title"]; end
       def title; "foo"; end

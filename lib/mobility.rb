@@ -21,8 +21,12 @@ module Mobility
 
   require "mobility/orm"
 
+  # General error for version compatibility conflicts
+  class VersionNotSupportedError < ArgumentError; end
+
   begin
     require "active_record"
+    raise VersionNotSupportedError, "Mobility is only compatible with ActiveRecord 5.0 and greater" if ::ActiveRecord::VERSION::MAJOR < 5
     autoload :ActiveModel,      "mobility/active_model"
     autoload :ActiveRecord,     "mobility/active_record"
     Loaded::ActiveRecord = true

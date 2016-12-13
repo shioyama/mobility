@@ -45,6 +45,7 @@ module Mobility
 
   begin
     require "sequel"
+    raise VersionNotSupportedError, "Mobility is only compatible with Sequel 4.0 and greater" if ::Sequel::MAJOR < 4
     require "sequel/extensions/inflector"
     require "sequel/plugins/dirty"
     autoload :Sequel, "mobility/sequel"

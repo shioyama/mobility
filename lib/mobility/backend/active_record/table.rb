@@ -43,9 +43,8 @@ module Mobility
         # non-standard, is possible and should in principle be supported.
         #
         attrs_method_name = :"#{association_name}_attributes"
-        cattr_accessor attrs_method_name unless respond_to?(attrs_method_name)
-        association_attributes = (send(attrs_method_name) || []) + attributes
-        send(:"#{attrs_method_name}=", association_attributes)
+        association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
+        instance_variable_set(:"@#{attrs_method_name}", association_attributes)
 
         has_many association_name, ->{ where key: association_attributes },
           as: :translatable,

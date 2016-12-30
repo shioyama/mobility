@@ -36,7 +36,19 @@ module Mobility
       setup do |attributes, options|
         association_name   = options[:association_name]
         translations_class = options[:class_name]
-        has_many association_name, as: :translatable,
+
+        # Track all attributes for this association, so that we can limit the scope
+        # of keys for the association to only these attributes. This matters if we have
+        # multiple backends that use the same association, a configuration which, while
+        # non-standard, is possible and should in principle be supported.
+        #
+        attrs_method_name = :"#{association_name}_attributes"
+        cattr_accessor attrs_method_name unless respond_to?(attrs_method_name)
+        association_attributes = (send(attrs_method_name) || []) + attributes
+        send(:"#{attrs_method_name}=", association_attributes)
+
+        has_many association_name, ->{ where key: association_attributes },
+          as: :translatable,
           class_name: translations_class,
           dependent:  :destroy,
           inverse_of: :translatable,

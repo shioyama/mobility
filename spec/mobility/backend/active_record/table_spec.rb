@@ -125,6 +125,20 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       end
     end
 
+    describe "translations association" do
+      it "limits association to translations with keys matching attributes" do
+        # This limits the results returned by the association to only those whose keys match the set of
+        # translated attributes we have defined. This matters if, say, we save some translations, then change
+        # the translated attributes for the model; we should only see the new translations, not the ones
+        # created earlier with different keys.
+        article = Article.create(title: "Article", content: "Content")
+        translation = Mobility::ActiveRecord::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
+        article = Article.first
+        expect(article.mobility_text_translations).not_to include(translation)
+        expect(article.mobility_text_translations.count).to eq(2)
+      end
+    end
+
     describe "creating a new record with translations" do
       it "creates record and translation in current locale" do
         Mobility.locale = :en

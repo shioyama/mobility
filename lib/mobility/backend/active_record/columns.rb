@@ -1,6 +1,8 @@
 module Mobility
   module Backend
     class ActiveRecord::Columns
+      autoload :QueryMethods, 'mobility/backend/active_record/columns/query_methods'
+
       include Base
       include Mobility::Backend::Columns
 
@@ -9,14 +11,12 @@ module Mobility
       end
 
       setup do |attributes, options|
-        attributes.each do |attribute|
-          class_eval <<-EOM, __FILE__, __LINE__ + 1
-            def self.find_by_#{attribute}(value)
-              normalized_locale = Mobility.locale.to_s.downcase.sub("-", "_")
-              send("find_by_#{attribute}_" + normalized_locale, value)
-            end
-          EOM
+        mod = Module.new do
+          define_method :i18n do
+            @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
+          end
         end
+        extend mod
       end
     end
   end

@@ -12,6 +12,10 @@ module Mobility
       end
 
       def column(locale)
+        Columns.column_name_for(attribute, locale)
+      end
+
+      def self.column_name_for(attribute, locale)
         normalized_locale = locale.to_s.downcase.sub("-", "_")
         "#{attribute}_#{normalized_locale}".to_sym
       end

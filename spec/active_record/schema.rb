@@ -7,6 +7,11 @@ module Mobility
             t.boolean :published
           end
 
+          create_table "post_metadatas" do |t|
+            t.string  :metadata
+            t.integer :post_id
+          end
+
           create_table "fallback_posts" do |t|
             t.boolean :published
           end
@@ -30,6 +35,7 @@ module Mobility
             t.text :content_ja
             t.text :content_pt_br
             t.text :content_ru
+            t.boolean :published
           end
         end
       end

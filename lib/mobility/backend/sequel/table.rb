@@ -54,7 +54,7 @@ module Mobility
         association_name   = options[:association_name]
         translations_class = options[:class_name]
         plugin :polymorphic
-        one_to_many association_name, as: :translatable, class: translations_class, read_only: true
+        one_to_many association_name, as: :translatable, class: translations_class
         plugin :association_dependencies, association_name => :destroy
 
         callback_methods = Module.new do

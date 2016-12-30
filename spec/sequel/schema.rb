@@ -10,6 +10,12 @@ module Mobility
             TrueClass   :published
           end
 
+          DB.create_table? :post_metadatas do
+            primary_key :id
+            String      :metadata
+            Integer     :post_id
+          end
+
           DB.create_table? :fallback_posts do
             primary_key :id
             TrueClass   :published
@@ -37,6 +43,7 @@ module Mobility
             String      :content_ja,    size: 65535
             String      :content_pt_br, size: 65535
             String      :content_ru,    size: 65535
+            TrueClass   :published
           end
         end
 

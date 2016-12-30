@@ -1,6 +1,8 @@
 module Mobility
   module Backend
     class Sequel::Columns
+      autoload :QueryMethods, 'mobility/backend/sequel/columns/query_methods'
+
       include Base
       include Mobility::Backend::Columns
 
@@ -9,14 +11,12 @@ module Mobility
       end
 
       setup do |attributes, options|
-        attributes.each do |attribute|
-          class_eval <<-EOM, __FILE__, __LINE__ + 1
-            def self.first_by_#{attribute}(value)
-              normalized_locale = Mobility.locale.to_s.downcase.sub("-", "_")
-              where(:"#{attribute}_\#{normalized_locale}" => value).first
-            end
-          EOM
+        extension = Module.new do
+          define_method :i18n do
+            @mobility_scope ||= super().with_extend(QueryMethods.new(attributes, options))
+          end
         end
+        extend extension
       end
     end
   end

@@ -26,15 +26,15 @@ module Mobility
             String      :slug
           end
 
-          DB.create_table? :mobility_translations do
+          DB.create_table? :mobility_text_translations do
             primary_key :id
             String      :locale,            null: false
             String      :key,               null: false
             String      :value,             null: false
             Integer     :translatable_id,   null: false
             String      :translatable_type, null: false
-            index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_translations_on_keys
-            index [:translatable_id, :translatable_type], name: :index_mobility_translations_on_translatable
+            index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_text_translations_on_keys
+            index [:translatable_id, :translatable_type], name: :index_mobility_text_translations_on_translatable
           end
 
           DB.create_table?  :comments do

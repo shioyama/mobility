@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe "Mobility::Backend::Sequel::Table", orm: :sequel do
-  let(:translation_class) { Mobility::Sequel::Translation }
+  let(:translation_class) { Mobility::Sequel::TextTranslation }
   let(:title_backend) { article.title_translations }
   let(:content_backend) { article.content_translations }
 
@@ -119,7 +119,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       Mobility.locale = :en
       article = Article.create(title: "New Article", content: "Once upon a time...")
       expect(Article.count).to eq(1)
-      expect(Mobility::Sequel::Translation.count).to eq(2)
+      expect(Mobility::Sequel::TextTranslation.count).to eq(2)
       expect(article.mobility_translations.size).to eq(2)
       expect(article.title).to eq("New Article")
       expect(article.content).to eq("Once upon a time...")
@@ -138,7 +138,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       expect(article.mobility_translations.count).to eq(2)
       article.save
       expect(article.mobility_translations.count).to eq(4)
-      expect(Mobility::Sequel::Translation.count).to eq(4)
+      expect(Mobility::Sequel::TextTranslation.count).to eq(4)
     end
   end
 

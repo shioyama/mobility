@@ -53,8 +53,15 @@ module Mobility
       setup do |attributes, options|
         association_name   = options[:association_name]
         translations_class = options[:class_name]
+
+        attrs_method_name = :"#{association_name}_attributes"
+        association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
+        instance_variable_set(:"@#{attrs_method_name}", association_attributes)
+
         plugin :polymorphic
-        one_to_many association_name, as: :translatable, class: translations_class
+        one_to_many association_name, as: :translatable, class: translations_class do |ds|
+          ds.where key: association_attributes
+        end
         plugin :association_dependencies, association_name => :destroy
 
         callback_methods = Module.new do

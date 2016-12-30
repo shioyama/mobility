@@ -115,6 +115,16 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
     end
   end
 
+  describe "translations association" do
+    it "limits association to translations with keys matching attributes" do
+      article = Article.create(title: "Article", content: "Content")
+      translation = Mobility::Sequel::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
+      article = Article.first
+      expect(article.mobility_text_translations).not_to include(translation)
+      expect(article.mobility_text_translations.count).to eq(2)
+    end
+  end
+
   describe "creating a new record with translations" do
     it "creates record and translation in current locale" do
       Mobility.locale = :en

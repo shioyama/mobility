@@ -20,7 +20,16 @@ module Mobility
       end
 
       def self.configure!(options)
-        options[:association_name] ||= :mobility_translations
+        if type = options[:type]
+          case type.to_sym
+          when :text, :string
+            options[:class_name] = Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
+            options[:association_name] = :"mobility_#{type}_translations"
+          else
+            raise ArgumentError, "type must be one of: [text, string]"
+          end
+        end
+        options[:association_name] ||= :mobility_text_translations
         options[:association_name] = options[:association_name].to_sym
         options[:class_name]       ||= Mobility::ActiveRecord::TextTranslation
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)

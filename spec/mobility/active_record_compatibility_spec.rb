@@ -30,11 +30,11 @@ describe "ActiveRecord compatibility", orm: :active_record do
 
     it "updates cache when translations association is modified directly" do
       expect(post.title).to eq("foo title")
-      post.send(:mobility_translations).first.value = "association changed value"
+      post.send(:mobility_text_translations).first.value = "association changed value"
       expect(post.title).to eq("association changed value")
       post.title = "writer changed value"
       expect(post.title).to eq("writer changed value")
-      post.send(:mobility_translations).first.value = "association changed value"
+      post.send(:mobility_text_translations).first.value = "association changed value"
       post.save
       expect(Post.first.title).to eq("association changed value")
     end

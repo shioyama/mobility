@@ -43,7 +43,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       it "builds translation if no translation exists" do
         expect {
           title_backend.read(:de)
-        }.to change(subject.send(:mobility_translations), :size).by(1)
+        }.to change(subject.send(:mobility_text_translations), :size).by(1)
       end
 
       describe "reading back written attributes" do
@@ -62,7 +62,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         it "creates translation for locale" do
           expect {
             title_backend.write(:en, "New Article")
-          }.to change(subject.send(:mobility_translations), :size).by(1)
+          }.to change(subject.send(:mobility_text_translations), :size).by(1)
 
           expect { subject.save! }.to change(Mobility::ActiveRecord::TextTranslation, :count).by(1)
         end
@@ -70,7 +70,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         it "assigns attributes to translation" do
           title_backend.write(:en, "New Article")
 
-          translation = subject.send(:mobility_translations).first
+          translation = subject.send(:mobility_text_translations).first
           expect(translation.key).to eq("title")
           expect(translation.value).to eq("New Article")
           expect(translation.translatable).to eq(subject)
@@ -90,7 +90,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         it "does not create new translation for locale" do
           expect {
             title_backend.write(:en, "New Article")
-          }.not_to change(subject.send(:mobility_translations), :size)
+          }.not_to change(subject.send(:mobility_text_translations), :size)
         end
 
         it "updates value attribute on existing translation" do
@@ -98,7 +98,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
           subject.save!
           subject.reload
 
-          translation = subject.send(:mobility_translations).first
+          translation = subject.send(:mobility_text_translations).first
           expect(translation.key).to eq("title")
           expect(translation.value).to eq("New New Article")
           expect(translation.translatable).to eq(subject)
@@ -107,11 +107,11 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         it "removes translation if assigned nil when record is saved" do
           expect {
             title_backend.write(:en, nil)
-          }.not_to change(subject.send(:mobility_translations), :count)
+          }.not_to change(subject.send(:mobility_text_translations), :count)
 
           expect {
             subject.save!
-          }.to change(subject.send(:mobility_translations), :count).by(-1)
+          }.to change(subject.send(:mobility_text_translations), :count).by(-1)
         end
       end
     end
@@ -127,8 +127,8 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
 
     it "marks translations association as private" do
       article = Article.create(title: "title")
-      expect { article.mobility_translations }.to raise_error(NoMethodError)
-      expect { article.send(:mobility_translations) }.not_to raise_error
+      expect { article.mobility_text_translations }.to raise_error(NoMethodError)
+      expect { article.send(:mobility_text_translations) }.not_to raise_error
     end
 
     describe "creating a new record with translations" do
@@ -137,7 +137,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         article = Article.create(title: "New Article", content: "Once upon a time...")
         expect(Article.count).to eq(1)
         expect(Mobility::ActiveRecord::TextTranslation.count).to eq(2)
-        expect(article.send(:mobility_translations).size).to eq(2)
+        expect(article.send(:mobility_text_translations).size).to eq(2)
         expect(article.title).to eq("New Article")
         expect(article.content).to eq("Once upon a time...")
       end
@@ -153,7 +153,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         expect(article.content).to eq("昔々あるところに…")
         expect(Article.count).to eq(1)
         expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
-        expect(article.send(:mobility_translations).size).to eq(4)
+        expect(article.send(:mobility_text_translations).size).to eq(4)
       end
 
       it "builds nil translations when reading but does not save them" do
@@ -161,10 +161,10 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         article = Article.create(title: "New Article")
         Mobility.locale = :ja
         article.title
-        expect(article.send(:mobility_translations).size).to eq(2)
+        expect(article.send(:mobility_text_translations).size).to eq(2)
         article.save
         expect(article.title).to be_nil
-        expect(article.reload.send(:mobility_translations).size).to eq(1)
+        expect(article.reload.send(:mobility_text_translations).size).to eq(1)
       end
     end
 
@@ -189,6 +189,41 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
 
         string = Mobility::ActiveRecord::StringTranslation.first
         expect(string.value).to eq("bar short title")
+      end
+    end
+
+    describe ".configure!" do
+      it "sets association_name and class_name from string type" do
+        options = { type: :string }
+        described_class.configure!(options)
+        expect(options).to eq({
+          type: :string,
+          class_name: Mobility::ActiveRecord::StringTranslation,
+          association_name: :mobility_string_translations
+        })
+      end
+
+      it "sets association_name and class_name from text type" do
+        options = { type: :text }
+        described_class.configure!(options)
+        expect(options).to eq({
+          type: :text,
+          class_name: Mobility::ActiveRecord::TextTranslation,
+          association_name: :mobility_text_translations
+        })
+      end
+
+      it "raises ArgumentError if type is not string or text" do
+        expect { described_class.configure!(type: :foo) }.to raise_error(ArgumentError)
+      end
+
+      it "sets default association_name and class_name" do
+        options = {}
+        described_class.configure!(options)
+        expect(options).to eq({
+          association_name: :mobility_text_translations,
+          class_name: Mobility::ActiveRecord::TextTranslation
+        })
       end
     end
 

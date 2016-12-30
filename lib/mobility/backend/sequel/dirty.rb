@@ -20,8 +20,6 @@ module Mobility
         def setup_model(model_class, attributes, **options)
           super
           model_class.class_eval do
-            plugin :dirty
-
             mod = Module.new do
               %w[initial_value column_change column_changed? reset_column].each do |method_name|
                 define_method method_name do |column|

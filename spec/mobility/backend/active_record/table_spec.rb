@@ -122,6 +122,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       stub_const('Article', Class.new(ActiveRecord::Base)).class_eval do
         include Mobility
         translates :title, :content, backend: :table
+        translates :subtitle, backend: :table
       end
     end
 
@@ -131,11 +132,11 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         # translated attributes we have defined. This matters if, say, we save some translations, then change
         # the translated attributes for the model; we should only see the new translations, not the ones
         # created earlier with different keys.
-        article = Article.create(title: "Article", content: "Content")
+        article = Article.create(title: "Article", subtitle: "Article subtitle", content: "Content")
         translation = Mobility::ActiveRecord::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
         article = Article.first
         expect(article.mobility_text_translations).not_to include(translation)
-        expect(article.mobility_text_translations.count).to eq(2)
+        expect(article.mobility_text_translations.count).to eq(3)
       end
     end
 

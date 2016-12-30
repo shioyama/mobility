@@ -7,6 +7,8 @@ end
 module Mobility
   module Backend
     class Sequel::Table
+      autoload :QueryMethods, 'mobility/backend/sequel/table/query_methods'
+
       include Base
       attr_reader :association_name, :class_name
 
@@ -46,7 +48,7 @@ module Mobility
         one_to_many association_name, as: :translatable, class: translations_class, read_only: true
         plugin :association_dependencies, association_name => :destroy
 
-        mod = Module.new do
+        callback_methods = Module.new do
           define_method :before_save do
             super()
             send(association_name).select { |t| t.value.blank? }.each(&:destroy)
@@ -56,22 +58,14 @@ module Mobility
             attributes.each { |attribute| mobility_backend_for(attribute).save_stashes }
           end
         end
-        include mod
+        include callback_methods
 
-        table_name = self.table_name
-        dataset_module do
-          define_method :with_translations do
-            join(association_name, translatable_id: :id).select_all(table_name).where(locale: Mobility.locale.to_s)
+        extension = Module.new do
+          define_method :i18n do
+            @mobility_scope ||= super().with_extend(QueryMethods.new(attributes, options))
           end
         end
-
-        attributes.each do |attribute|
-          class_eval <<-EOM, __FILE__, __LINE__ + 1
-            def self.first_by_#{attribute}(value)
-              with_translations.where(key: "#{attribute}", value: value).first
-            end
-          EOM
-        end
+        extend extension
       end
 
       class CacheRequired < ::StandardError; end

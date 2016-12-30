@@ -26,7 +26,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
           { key: "title", value: "新規記事", locale: "ja", translatable: article },
           { key: "content", value: "Once upon a time...", locale: "en", translatable: article },
           { key: "content", value: "昔々あるところに…", locale: "ja", translatable: article }
-        ].each { |attrs| Mobility::ActiveRecord::Translation.create!(attrs) }
+        ].each { |attrs| Mobility::ActiveRecord::TextTranslation.create!(attrs) }
       end
 
       it "returns attribute in locale from translations table" do
@@ -64,7 +64,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
             title_backend.write(:en, "New Article")
           }.to change(subject.send(:mobility_translations), :size).by(1)
 
-          expect { subject.save! }.to change(Mobility::ActiveRecord::Translation, :count).by(1)
+          expect { subject.save! }.to change(Mobility::ActiveRecord::TextTranslation, :count).by(1)
         end
 
         it "assigns attributes to translation" do
@@ -79,7 +79,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
 
       context "translation for locale exists" do
         before do
-          Mobility::ActiveRecord::Translation.create!(
+          Mobility::ActiveRecord::TextTranslation.create!(
             key: "title",
             value: "foo",
             locale: "en",
@@ -136,7 +136,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         Mobility.locale = :en
         article = Article.create(title: "New Article", content: "Once upon a time...")
         expect(Article.count).to eq(1)
-        expect(Mobility::ActiveRecord::Translation.count).to eq(2)
+        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(2)
         expect(article.send(:mobility_translations).size).to eq(2)
         expect(article.title).to eq("New Article")
         expect(article.content).to eq("Once upon a time...")
@@ -152,7 +152,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         expect(article.title).to eq("新規記事")
         expect(article.content).to eq("昔々あるところに…")
         expect(Article.count).to eq(1)
-        expect(Mobility::ActiveRecord::Translation.count).to eq(4)
+        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
         expect(article.send(:mobility_translations).size).to eq(4)
       end
 

@@ -23,7 +23,7 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
             migration "create_translations" do
               contains "class CreateTranslations"
               contains "def change"
-              contains "create_table :mobility_translations"
+              contains "create_table :mobility_text_translations"
             end
           end
         end

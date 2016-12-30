@@ -1,7 +1,8 @@
 module Mobility
   module ActiveRecord
     class Translation < ::ActiveRecord::Base
-      self.table_name = "mobility_translations"
+      self.abstract_class = true
+
       belongs_to :translatable, polymorphic: true
 
       validates :key, presence: true, uniqueness: { scope: [:translatable_id, :translatable_type, :locale] }

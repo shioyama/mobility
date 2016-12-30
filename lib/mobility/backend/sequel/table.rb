@@ -67,7 +67,7 @@ module Mobility
         callback_methods = Module.new do
           define_method :before_save do
             super()
-            send(association_name).select { |t| t.value.blank? }.each(&:destroy)
+            send(association_name).select { |t| attributes.include?(t.key) && t.value.blank? }.each(&:destroy)
           end
           define_method :after_save do
             super()

@@ -12,6 +12,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
     Article.class_eval do
       include Mobility
       translates :title, :content, backend: :table
+      translates :subtitle, backend: :table
     end
   end
 
@@ -117,11 +118,11 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
 
   describe "translations association" do
     it "limits association to translations with keys matching attributes" do
-      article = Article.create(title: "Article", content: "Content")
+      article = Article.create(title: "Article", subtitle: "Article subtitle", content: "Content")
       translation = Mobility::Sequel::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
       article = Article.first
       expect(article.mobility_text_translations).not_to include(translation)
-      expect(article.mobility_text_translations.count).to eq(2)
+      expect(article.mobility_text_translations.count).to eq(3)
     end
   end
 

@@ -16,14 +16,36 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
       run_generator
     end
 
-    it "generates migration for translations table" do
+    it "generates migration for text translations table" do
       expect(destination_root).to have_structure {
         directory "db" do
           directory "migrate" do
-            migration "create_translations" do
-              contains "class CreateTranslations"
+            migration "create_text_translations" do
+              contains "class CreateTextTranslations"
               contains "def change"
               contains "create_table :mobility_text_translations"
+              contains "t.text    :value"
+              contains "add_index :mobility_text_translations"
+              contains "name: :index_mobility_text_translations_on_keys"
+              contains "name: :index_mobility_text_translations_on_translatable"
+            end
+          end
+        end
+      }
+    end
+
+    it "generates migration for string translations table" do
+      expect(destination_root).to have_structure {
+        directory "db" do
+          directory "migrate" do
+            migration "create_string_translations" do
+              contains "class CreateStringTranslations"
+              contains "def change"
+              contains "create_table :mobility_string_translations"
+              contains "t.string  :value"
+              contains "add_index :mobility_string_translations"
+              contains "name: :index_mobility_string_translations_on_keys"
+              contains "name: :index_mobility_string_translations_on_translatable"
             end
           end
         end

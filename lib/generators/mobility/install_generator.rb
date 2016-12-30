@@ -16,7 +16,8 @@ module Mobility
     )
 
     def create_migration_file
-      add_mobility_migration("create_translations") unless options.without_table?
+      add_mobility_migration("create_text_translations")   unless options.without_table?
+      add_mobility_migration("create_string_translations") unless options.without_table?
     end
 
     def create_initializer

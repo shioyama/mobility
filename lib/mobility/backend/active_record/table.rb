@@ -51,8 +51,6 @@ module Mobility
           end
         end
         extend mod
-
-        private association_name, "#{association_name}="
       end
 
       private

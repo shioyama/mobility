@@ -125,12 +125,6 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       end
     end
 
-    it "marks translations association as private" do
-      article = Article.create(title: "title")
-      expect { article.mobility_text_translations }.to raise_error(NoMethodError)
-      expect { article.send(:mobility_text_translations) }.not_to raise_error
-    end
-
     describe "creating a new record with translations" do
       it "creates record and translation in current locale" do
         Mobility.locale = :en

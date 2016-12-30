@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe "Mobility::Backend::Sequel::Table", orm: :sequel do
+  let(:described_class) { Mobility::Backend::Sequel::Table }
   let(:translation_class) { Mobility::Sequel::TextTranslation }
   let(:title_backend) { article.title_translations }
   let(:content_backend) { article.content_translations }
@@ -94,7 +95,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
           subject.save
           subject.reload
 
-          translation = subject.mobility_translations.first
+          translation = subject.mobility_text_translations.first
           expect(translation.key).to eq("title")
           expect(translation.value).to eq("New New Article")
           expect(translation.locale).to eq("en")
@@ -120,7 +121,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       article = Article.create(title: "New Article", content: "Once upon a time...")
       expect(Article.count).to eq(1)
       expect(Mobility::Sequel::TextTranslation.count).to eq(2)
-      expect(article.mobility_translations.size).to eq(2)
+      expect(article.mobility_text_translations.size).to eq(2)
       expect(article.title).to eq("New Article")
       expect(article.content).to eq("Once upon a time...")
     end
@@ -128,16 +129,16 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
     it "creates translations for other locales" do
       Mobility.locale = :en
       article = Article.create(title: "New Article", content: "Once upon a time...")
-      expect(article.mobility_translations.count).to eq(2)
+      expect(article.mobility_text_translations.count).to eq(2)
       Mobility.locale = :ja
       expect(article.title).to eq(nil)
       expect(article.content).to eq(nil)
       article.update(title: "新規記事", content: "昔々あるところに…")
       expect(article.title).to eq("新規記事")
       expect(article.content).to eq("昔々あるところに…")
-      expect(article.mobility_translations.count).to eq(2)
+      expect(article.mobility_text_translations.count).to eq(2)
       article.save
-      expect(article.mobility_translations.count).to eq(4)
+      expect(article.mobility_text_translations.count).to eq(4)
       expect(Mobility::Sequel::TextTranslation.count).to eq(4)
     end
   end
@@ -174,7 +175,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       article.title
       article.save
       expect(translation_class.count).to eq(1)
-      expect(article.mobility_translations.count).to eq(1)
+      expect(article.mobility_text_translations.count).to eq(1)
       article.title = ""
       article.save
       expect(article.title).to be_nil
@@ -217,6 +218,41 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       article.save
       expect(translation_class.count).to eq(1)
       expect(translation_class.first.value).to eq("New Article")
+    end
+  end
+
+  describe ".configure!" do
+    it "sets association_name and class_name from string type" do
+      options = { type: :string }
+      described_class.configure!(options)
+      expect(options).to eq({
+        type: :string,
+        class_name: Mobility::Sequel::StringTranslation,
+        association_name: :mobility_string_translations
+      })
+    end
+
+    it "sets association_name and class_name from text type" do
+      options = { type: :text }
+      described_class.configure!(options)
+      expect(options).to eq({
+        type: :text,
+        class_name: Mobility::Sequel::TextTranslation,
+        association_name: :mobility_text_translations
+      })
+    end
+
+    it "raises ArgumentError if type is not string or text" do
+      expect { described_class.configure!(type: :foo) }.to raise_error(ArgumentError)
+    end
+
+    it "sets default association_name and class_name" do
+      options = {}
+      described_class.configure!(options)
+      expect(options).to eq({
+        association_name: :mobility_text_translations,
+        class_name: Mobility::Sequel::TextTranslation
+      })
     end
   end
 

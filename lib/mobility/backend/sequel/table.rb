@@ -34,6 +34,7 @@ module Mobility
       def self.configure!(options)
         raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
         options[:association_name] ||= :mobility_translations
+        options[:association_name] = options[:association_name].to_sym
         options[:class_name]       ||= Mobility::Sequel::Translation
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
       end

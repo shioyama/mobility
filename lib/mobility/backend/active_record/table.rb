@@ -19,6 +19,7 @@ module Mobility
 
       def self.configure!(options)
         options[:association_name] ||= :mobility_translations
+        options[:association_name] = options[:association_name].to_sym
         options[:class_name]       ||= Mobility::ActiveRecord::Translation
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
       end

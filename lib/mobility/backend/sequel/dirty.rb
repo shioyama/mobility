@@ -21,15 +21,19 @@ module Mobility
           super
           model_class.class_eval do
             plugin :dirty
-            %w[initial_value column_change column_changed? reset_column].each do |method_name|
-              define_method method_name do |column|
-                if attributes.map(&:to_sym).include?(column)
-                  super("#{column}_#{Mobility.locale}".to_sym)
-                else
-                  super(column)
+
+            mod = Module.new do
+              %w[initial_value column_change column_changed? reset_column].each do |method_name|
+                define_method method_name do |column|
+                  if attributes.map(&:to_sym).include?(column)
+                    super("#{column}_#{Mobility.locale}".to_sym)
+                  else
+                    super(column)
+                  end
                 end
               end
             end
+            include mod
           end
         end
       end

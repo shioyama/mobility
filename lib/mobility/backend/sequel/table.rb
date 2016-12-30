@@ -39,15 +39,13 @@ module Mobility
           case type.to_sym
           when :text, :string
             options[:class_name] = Mobility::Sequel.const_get("#{type.capitalize}Translation")
-            options[:association_name] = :"mobility_#{type}_translations"
           else
             raise ArgumentError, "type must be one of: [text, string]"
           end
         end
-        options[:association_name] ||= :mobility_text_translations
-        options[:association_name] = options[:association_name].to_sym
         options[:class_name]       ||= Mobility::Sequel::TextTranslation
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
+        options[:association_name] ||= options[:class_name].table_name.to_sym
       end
 
       setup do |attributes, options|

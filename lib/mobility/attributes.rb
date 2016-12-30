@@ -62,7 +62,8 @@ module Mobility
       end
     end
 
-    def get_backend_class(backend: Mobility.config.default_backend, model_class: nil)
+    def get_backend_class(backend: nil, model_class: nil)
+      backend ||= Mobility.config.default_backend
       raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
       klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''))
       model_class.nil? ? klass : klass.for(model_class)

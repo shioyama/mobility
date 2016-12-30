@@ -16,6 +16,13 @@ describe Mobility::Attributes do
     it "raises BackendRequired error if backend is nil and no default is set" do
       expect { described_class.new(:accessor, "title") }.to raise_error(Mobility::BackendRequired)
     end
+
+    it "does not raise error if backend is nil but default_backend is set" do
+      original_default_backend = Mobility.config.default_backend
+      Mobility.config.default_backend = :null
+      expect { described_class.new(:accessor, "title") }.not_to raise_error
+      Mobility.config.default_backend = original_default_backend
+    end
   end
 
   describe "including Attributes in a model" do

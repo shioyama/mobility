@@ -56,10 +56,10 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
   describe "--without_table set to true" do
     before(:all) do
       prepare_destination
-      run_generator %w(--without_table)
+      run_generator %w(--without_tables)
     end
 
-    it "does not generate migration for translations table" do
+    it "does not generate migration for translations tables" do
       expect((Pathname.new(destination_root) + "db" + "migrate").exist?).to eq(false)
     end
   end

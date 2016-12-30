@@ -5,19 +5,19 @@ module Mobility
   class InstallGenerator < ::Rails::Generators::Base
     include ::Rails::Generators::Migration
 
-    desc "Generates a migration to add a translations table."
+    desc "Generates migrations to add translations tables."
 
     source_root File.expand_path("../templates", __FILE__)
     class_option(
-      :without_table,
+      :without_tables,
       type: :boolean,
       default: false,
-      desc: "Skip creating translations table."
+      desc: "Skip creating translations tables."
     )
 
     def create_migration_file
-      add_mobility_migration("create_text_translations")   unless options.without_table?
-      add_mobility_migration("create_string_translations") unless options.without_table?
+      add_mobility_migration("create_text_translations")   unless options.without_tables?
+      add_mobility_migration("create_string_translations") unless options.without_tables?
     end
 
     def create_initializer

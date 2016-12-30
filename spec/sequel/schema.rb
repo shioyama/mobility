@@ -30,11 +30,22 @@ module Mobility
             primary_key :id
             String      :locale,            null: false
             String      :key,               null: false
-            String      :value,             null: false
+            Text        :value,             null: false
             Integer     :translatable_id,   null: false
             String      :translatable_type, null: false
             index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_text_translations_on_keys
             index [:translatable_id, :translatable_type], name: :index_mobility_text_translations_on_translatable
+          end
+
+          DB.create_table? :mobility_string_translations do
+            primary_key :id
+            String      :locale,            null: false
+            String      :key,               null: false
+            String      :value,             null: false
+            Integer     :translatable_id,   null: false
+            String      :translatable_type, null: false
+            index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_string_translations_on_keys
+            index [:translatable_id, :translatable_type], name: :index_mobility_string_translations_on_translatable
           end
 
           DB.create_table?  :comments do

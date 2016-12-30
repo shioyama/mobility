@@ -142,6 +142,30 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
     end
   end
 
+  context "with separate string and text translations" do
+    before do
+      Article.class_eval do
+        translates :short_title, backend: :table, class_name: Mobility::Sequel::StringTranslation, association_name: :mobility_string_translations
+      end
+    end
+
+    it "saves translations correctly" do
+      article = Article.create(title: "foo title", short_title: "bar short title")
+      expect(article.title).to eq("foo title")
+      expect(article.short_title).to eq("bar short title")
+
+      article = Article.first
+      expect(article.title).to eq("foo title")
+      expect(article.short_title).to eq("bar short title")
+
+      text = Mobility::Sequel::TextTranslation.first
+      expect(text.value).to eq("foo title")
+
+      string = Mobility::Sequel::StringTranslation.first
+      expect(string.value).to eq("bar short title")
+    end
+  end
+
   describe "storing translations" do
     it "does not save translations unless they have a value present" do
       Mobility.locale = :en
@@ -253,7 +277,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
         end
       end
 
-      context "model with two translated attributes" do
+      context "model with two translated attributes on same table" do
         before do
           @post1 = Post.create(title: "foo post"                                          )
           @post2 = Post.create(title: "foo post", content: "foo content"                  )
@@ -308,6 +332,23 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
               expect(Post.i18n.where(title: "foo post ja", content: "foo content ja").select_all(:posts).all).to eq([@ja_post1])
             end
           end
+        end
+      end
+
+      context "model with two translated attributes on different tables" do
+        before do
+          Article.class_eval do
+            translates :short_title, backend: :table, class_name: Mobility::Sequel::StringTranslation, association_name: :mobility_string_translations
+          end
+          @article1 = Article.create(title: "foo post", short_title: "bar short 1")
+          @article2 = Article.create(title: "foo post", short_title: "bar short 2")
+          @article3 = Article.create(                   short_title: "bar short 1")
+        end
+
+        it "returns correct result when querying on multiple tables" do
+          expect(Article.i18n.where(title: "foo post", short_title: "bar short 2").select_all(:articles).all).to eq([@article2])
+          expect(Article.i18n.where(title: nil, short_title: "bar short 2").select_all(:articles).all).to eq([])
+          expect(Article.i18n.where(title: nil, short_title: "bar short 1").select_all(:articles).all).to eq([@article3])
         end
       end
     end

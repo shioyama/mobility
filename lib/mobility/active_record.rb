@@ -16,5 +16,15 @@ module Mobility
     def previous_changes
       super.merge(@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new)
     end
+
+    def self.included(model_class)
+      model_class.extend(ClassMethods)
+    end
+
+    module ClassMethods
+      def i18n
+        all
+      end
+    end
   end
 end

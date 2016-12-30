@@ -11,7 +11,8 @@ group :development, :test do
 
   if ENV['ORM'] == 'sequel'
     gem 'sequel', '>= 4.0.0', '< 5.0'
-    gem 'sequel_polymorphic', git: "https://github.com/jackdempsey/sequel_polymorphic", ref: "v0.3.0"
+    #gem 'sequel_polymorphic', git: "https://github.com/jackdempsey/sequel_polymorphic", ref: "v0.3.0"
+    gem 'sequel_polymorphic', git: "https://github.com/shioyama/sequel_polymorphic", branch: "pass_blocks_to_super"
   end
 
   platforms :ruby do

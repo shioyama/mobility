@@ -55,8 +55,8 @@ module Mobility
           key:             :translatable_id,
           reciprocal_type: :one_to_many,
           conditions:      { translatable_type: self.to_s, key: association_attributes },
-          adder:           proc { |many_of_instance| many_of_instance.update(translatable_id: pk, translatable_type: self.class.to_s) },
-          remover:         proc { |many_of_instance| many_of_instance.update(translatable_id: nil, translatable_type: nil) },
+          adder:           proc { |translation| translation.update(translatable_id: pk, translatable_type: self.class.to_s) },
+          remover:         proc { |translation| translation.update(translatable_id: nil, translatable_type: nil) },
           clearer:         proc { send(:"#{association_name}_dataset").update(translatable_id: nil, translatable_type: nil) },
           class:           translations_class
 

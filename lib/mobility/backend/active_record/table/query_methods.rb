@@ -19,10 +19,6 @@ module Mobility
           end
         end
 
-        define_method :where do |opts = :chain, *rest|
-          opts == :chain ? self.const_get(:MobilityWhereChain).new(spawn) : super(opts, *rest)
-        end
-
         define_method :where! do |opts, *rest|
           if opts.is_a?(Hash) && (keys = opts.keys.map(&:to_s) & attributes).present?
             opts = opts.stringify_keys

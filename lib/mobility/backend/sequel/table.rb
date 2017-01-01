@@ -58,8 +58,15 @@ module Mobility
         association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
         instance_variable_set(:"@#{attrs_method_name}", association_attributes)
 
-        plugin :polymorphic
-        one_to_many association_name, as: :translatable, class: translations_class do |ds|
+        one_to_many association_name,
+          reciprocal:      :translatable,
+          key:             :translatable_id,
+          reciprocal_type: :one_to_many,
+          conditions:      { translatable_type: self.to_s },
+          adder:           proc { |many_of_instance| many_of_instance.update(translatable_id: pk, translatable_type: self.class.to_s) },
+          remover:         proc { |many_of_instance| many_of_instance.update(translatable_id: nil, translatable_type: nil) },
+          clearer:         proc { send(:"#{association_name}_dataset").update(translatable_id: nil, translatable_type: nil) },
+          class:           translations_class do |ds|
           ds.where key: association_attributes
         end
         plugin :association_dependencies, association_name => :destroy

@@ -1,11 +1,3 @@
-begin
-  require "sequel_polymorphic"
-  require "sequel_polymorphic/version"
-  raise Mobility::VersionNotSupportedError, "Mobility is only compatible with sequel_polymorphic version >= 3.0" if Sequel::Plugins::Polymorphic::VERSION < '0.3.0'
-rescue LoadError
-  raise LoadError, "You must include sequel_polymorphic in your Gemfile to use the Table backend with Sequel"
-end
-
 module Mobility
   module Backend
     class Sequel::Table

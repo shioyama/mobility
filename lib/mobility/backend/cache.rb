@@ -10,12 +10,7 @@ module Mobility
       end
 
       def write(locale, value, **options)
-        if cache[locale].respond_to?(:__mobility_set)
-          cache[locale].__mobility_set(value)
-        else
-          cache[locale] = super
-        end
-        cache[locale]
+        cache[locale] = write_to_cache? ? value : super
       end
 
       module Setup
@@ -26,17 +21,27 @@ module Mobility
       end
 
       def self.included(backend_class)
-        backend_class.extend(Setup)
+        backend_class.class_eval do
+          extend Setup
+
+          def new_cache
+            {}
+          end unless method_defined?(:new_cache)
+
+          def write_to_cache?
+            false
+          end unless method_defined?(:write_to_cache?)
+        end
       end
 
       def clear_cache
-        @cache = {}
+        @cache = new_cache
       end
 
       private
 
       def cache
-        @cache ||= {}
+        @cache ||= new_cache
       end
     end
   end

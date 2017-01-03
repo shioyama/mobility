@@ -12,11 +12,11 @@ module Mobility
       end
 
       def read(locale, **options)
-        translation_for(locale)
+        translation_for(locale).value
       end
 
       def write(locale, value, **options)
-        translation_for(locale).tap { |t| t.value = value }
+        translation_for(locale).tap { |t| t.value = value }.value
       end
 
       def self.configure!(options)
@@ -64,16 +64,22 @@ module Mobility
         extend mod
       end
 
-      private
+      def new_cache
+        Table::TranslationCache.new(self)
+      end
 
-      def translations
-        model.send(association_name)
+      def write_to_cache?
+        true
       end
 
       def translation_for(locale)
         translation = translations.find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= translations.build(locale: locale, key: attribute)
         translation
+      end
+
+      def translations
+        model.send(association_name)
       end
     end
   end

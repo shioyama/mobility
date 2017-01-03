@@ -15,10 +15,6 @@ module Mobility
         base.extend(Setup)
       end
 
-      def _read(*args)
-        _read_value(read(*args))
-      end
-
       module Setup
         def setup &block
           @setup_block = block
@@ -36,12 +32,6 @@ module Mobility
         def for(_)
           self
         end
-      end
-
-      private
-
-      def _read_value(value)
-        value.respond_to?(:__mobility_get) ? value.__mobility_get : value
       end
     end
   end

@@ -246,18 +246,6 @@ describe Mobility::Attributes do
           expect(article.title_pt_br).to eq("foo")
         end
       end
-
-      context "with backend that uses a stash" do
-        let(:options) { { locale_accessors: true } }
-
-        it "returns value from stash" do
-          stash = double("stash")
-          expect(article.title_en).to eq(nil)
-          expect(stash).to receive(:__mobility_get).once.and_return("foo")
-          expect(backend).to receive(:read).with(:en, {}).and_return(stash)
-          expect(article.title_en).to eq("foo")
-        end
-      end
     end
   end
 end

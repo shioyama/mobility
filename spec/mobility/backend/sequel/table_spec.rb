@@ -33,14 +33,14 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       end
 
       it "returns attribute in locale from translations table" do
-        expect(title_backend.read(:en)).to have_stash("New Article")
-        expect(content_backend.read(:en)).to have_stash("Once upon a time...")
-        expect(title_backend.read(:ja)).to have_stash("新規記事")
-        expect(content_backend.read(:ja)).to have_stash("昔々あるところに…")
+        expect(title_backend.read(:en)).to eq("New Article")
+        expect(content_backend.read(:en)).to eq("Once upon a time...")
+        expect(title_backend.read(:ja)).to eq("新規記事")
+        expect(content_backend.read(:ja)).to eq("昔々あるところに…")
       end
 
       it "returns nil if no translation exists" do
-        expect(title_backend.read(:de)).to have_stash(nil)
+        expect(title_backend.read(:de)).to eq(nil)
       end
 
       describe "reading back written attributes" do
@@ -49,7 +49,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
         end
 
         it "returns changed value" do
-          expect(title_backend.read(:en)).to have_stash("Changed Article Title")
+          expect(title_backend.read(:en)).to eq("Changed Article Title")
         end
       end
     end

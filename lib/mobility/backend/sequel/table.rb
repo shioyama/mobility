@@ -13,15 +13,15 @@ module Mobility
       end
 
       def read(locale, **options)
-        translation_for(locale)
+        translation_for(locale).value
       end
 
       def write(locale, value, **options)
-        translation_for(locale).tap { |t| t.value = value }
+        translation_for(locale).tap { |t| t.value = value }.value
       end
 
-      def save_stashes
-        cache.each_value do |translation|
+      def save_translations
+        cache.each_translation do |translation|
           next unless translation.value.present?
           translation.id ? translation.save : model.send("add_#{association_name.to_s.singularize}", translation)
         end
@@ -69,7 +69,7 @@ module Mobility
           end
           define_method :after_save do
             super()
-            attributes.each { |attribute| mobility_backend_for(attribute).save_stashes }
+            attributes.each { |attribute| mobility_backend_for(attribute).save_translations }
           end
         end
         include callback_methods
@@ -82,15 +82,21 @@ module Mobility
         extend extension
       end
 
-      class CacheRequired < ::StandardError; end
+      def new_cache
+        Table::TranslationCache.new(self)
+      end
 
-      private
+      def write_to_cache?
+        true
+      end
 
       def translation_for(locale)
         translation = model.send(association_name).find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= class_name.new(locale: locale, key: attribute)
         translation
       end
+
+      class CacheRequired < ::StandardError; end
     end
   end
 end

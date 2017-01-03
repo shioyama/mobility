@@ -5,7 +5,7 @@ module Mobility
         return super if options[:fallbacks] == false
         fallbacks[locale].detect do |locale|
           value = super(locale)
-          break value if _read_value(value).present?
+          break value if value.present?
         end
       end
 

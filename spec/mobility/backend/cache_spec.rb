@@ -25,25 +25,13 @@ describe Mobility::Backend::Cache do
     Class.new(backend_class).include(described_class)
   end
 
-  let(:cached_backend_class_with_stash) do
-    klass = Class.new(backend_class) do
-      def read(*)
-        @reads += 1
-        nil
-      end
-
-      def write(locale, value, **options)
-        @writes += 1
-        # let's implement a very simple stash
-        value.instance_eval { alias :__mobility_set :replace }
-        value
+  context "non-ActiveRecord model" do
+    let(:model_class) do
+      Class.new do
+        def title; end
+        def title=(value); value; end
       end
     end
-    Class.new(klass).include(described_class)
-  end
-
-  context "non-ActiveRecord model" do
-    let(:model_class) { Class.new }
     let(:model) { model_class.new }
 
     describe "caching reads" do
@@ -63,7 +51,7 @@ describe Mobility::Backend::Cache do
     end
 
     describe "updating on writes" do
-      it "updates cache on write" do
+      it "writes to backend and updates cache" do
         backend = cached_backend_class.new(model, "title")
         expect(backend.read(:en)).to eq(nil)
         expect(backend.write(:en, "foo")).to eq("foo")
@@ -74,18 +62,35 @@ describe Mobility::Backend::Cache do
         expect(backend.writes).to eq(2)
       end
 
-      context "backend using values with setter" do
-        it "updates cache on write with no request to backend" do
-          backend = cached_backend_class_with_stash.new(model, "title")
+      context "with write_to_cache enabled" do
+        it "updates cache but does not write to backend" do
+          klass = Class.new(backend_class) do
+            def write_to_cache?; true; end
+          end
+          backend = Class.new(klass).include(described_class).new(model, "title")
           expect(backend.read(:en)).to eq(nil)
           expect(backend.write(:en, "foo")).to eq("foo")
           expect(backend.read(:en)).to eq("foo")
           expect(backend.write(:en, "bar")).to eq("bar")
           expect(backend.read(:en)).to eq("bar")
           expect(backend.reads).to eq(1)
-          # only one write, since second time reads from stash
-          expect(backend.writes).to eq(1)
+          expect(backend.writes).to eq(0)
         end
+      end
+    end
+
+    describe "with custom cache class" do
+      it "uses custom class" do
+        hash = {}
+        klass = Class.new(backend_class) do
+          define_method :new_cache do
+            hash
+          end
+        end
+        backend = Class.new(klass).include(described_class).new(model, "title")
+        expect(hash).to receive(:has_key?).with(:en).and_return(true)
+        expect(hash).to receive(:[]).with(:en).and_return("foo")
+        expect(backend.read(:en)).to eq("foo")
       end
     end
 

@@ -53,7 +53,9 @@ module Mobility
           inverse_of: :translatable,
           autosave:   true
         before_save do
-          send(association_name).select { |t| t.value.blank? }.each(&:destroy)
+          send(association_name).select { |t| t.value.blank? }.each do |translation|
+            send(association_name).delete(translation)
+          end
         end
 
         mod = Module.new do

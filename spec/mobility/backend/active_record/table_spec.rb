@@ -104,7 +104,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
           expect(translation.translatable).to eq(subject)
         end
 
-        it "removes translation if assigned nil when record is saved" do
+        it "removes persisted translation if assigned nil when record is saved" do
           expect {
             title_backend.write(:en, nil)
           }.not_to change(subject.send(:mobility_text_translations), :count)
@@ -112,6 +112,15 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
           expect {
             subject.save!
           }.to change(subject.send(:mobility_text_translations), :count).by(-1)
+        end
+
+        it "removes unpersisted translation if value is nil when record is saved" do
+          article = Article.find_by(slug: "foo")
+          expect(article.title).to eq(nil)
+          article.title = ""
+          expect(article.mobility_text_translations.size).to eq(1)
+          article.save
+          expect(article.mobility_text_translations.size).to eq(0)
         end
       end
     end

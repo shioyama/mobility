@@ -41,7 +41,6 @@ module Mobility
 
       def extended(relation)
         super
-        model_class = relation.model
         attributes, association_name = @attributes, @association_name
         mod = Module.new do
           define_method :not do |opts, *rest|
@@ -54,7 +53,7 @@ module Mobility
             end
           end
         end
-        model_class.const_get(:MobilityWhereChain).prepend(mod)
+        relation.model.const_get(:MobilityWhereChain).prepend(mod)
       end
     end
   end

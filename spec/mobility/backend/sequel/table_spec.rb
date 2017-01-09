@@ -427,7 +427,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
         expect(Post.i18n.where(title: nil).invert.sql).not_to match /OUTER/
 
         # but we should not remove other OUTER joins
-        expect(Post.i18n.where(title: nil).join_table(:left_outer, :post_metadatas).invert.sql).to match /LEFT OUTER JOIN \`post_metadatas/
+        expect(Post.i18n.where(title: nil).join_table(:left_outer, :post_metadatas).invert.sql).to match /LEFT OUTER JOIN \W*post_metadatas/
       end
     end
 

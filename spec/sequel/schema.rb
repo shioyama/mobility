@@ -56,6 +56,13 @@ module Mobility
             String      :content_ru,    size: 65535
             TrueClass   :published
           end
+
+          DB.create_table? :serialized_posts do
+            primary_key :id
+            String      :title,         size: 65535
+            String      :content,       size: 65535
+            TrueClass   :published
+          end
         end
 
         def up

@@ -53,7 +53,7 @@ module Mobility
             end
           end
         EOM
-      end if Loaded::ActiveRecord
+      end
     end
   end
 end

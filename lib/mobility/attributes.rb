@@ -40,6 +40,10 @@ module Mobility
       backend_class.setup_model(model_class, attributes, options)
     end
 
+    def each &block
+      attributes.each &block
+    end
+
     private
 
     def define_backend(attribute)

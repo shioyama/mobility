@@ -248,4 +248,11 @@ describe Mobility::Attributes do
       end
     end
   end
+
+  describe "#each" do
+    it "delegates to attributes" do
+      attributes = described_class.new(:accessor, :title, :content, backend: :null)
+      expect { |b| attributes.each(&b) }.to yield_successive_args("title", "content")
+    end
+  end
 end

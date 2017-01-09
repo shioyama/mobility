@@ -9,10 +9,6 @@ module Mobility
           @backend = backend
         end
 
-        def has_key?(_)
-          true
-        end
-
         def cached_translation(locale)
           @cache[locale] ||= @backend.translation_for(locale)
         end

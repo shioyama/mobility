@@ -2,10 +2,10 @@ module Mobility
   module Backend
     module Cache
       def read(locale, **options)
-        if cache.has_key?(locale)
+        if write_to_cache? || cache.has_key?(locale)
           cache[locale]
         else
-          super.tap { |value| cache[locale] = value }
+          cache[locale] = super
         end
       end
 

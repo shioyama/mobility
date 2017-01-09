@@ -63,7 +63,7 @@ describe Mobility::Backend::Cache do
       end
 
       context "with write_to_cache enabled" do
-        it "updates cache but does not write to backend" do
+        it "updates cache but does not write to or read from backend" do
           klass = Class.new(backend_class) do
             def write_to_cache?; true; end
           end
@@ -73,7 +73,7 @@ describe Mobility::Backend::Cache do
           expect(backend.read(:en)).to eq("foo")
           expect(backend.write(:en, "bar")).to eq("bar")
           expect(backend.read(:en)).to eq("bar")
-          expect(backend.reads).to eq(1)
+          expect(backend.reads).to eq(0)
           expect(backend.writes).to eq(0)
         end
       end

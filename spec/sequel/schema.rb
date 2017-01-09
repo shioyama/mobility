@@ -30,7 +30,7 @@ module Mobility
             primary_key :id
             String      :locale,            null: false
             String      :key,               null: false
-            Text        :value,             null: false
+            String      :value,             null: false, size: 65535
             Integer     :translatable_id,   null: false
             String      :translatable_type, null: false
             index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_text_translations_on_keys
@@ -48,7 +48,7 @@ module Mobility
             index [:translatable_id, :translatable_type], name: :index_mobility_string_translations_on_translatable
           end
 
-          DB.create_table?  :comments do
+          DB.create_table? :comments do
             primary_key :id
             String      :content_en,    size: 65535
             String      :content_ja,    size: 65535

@@ -160,11 +160,12 @@ describe Mobility do
     end
   end
 
-  describe ".default_fallbacks" do
-    it "delegates to config" do
-      fallbacks = double("fallbacks")
-      expect(Mobility.config).to receive(:default_fallbacks).and_return(fallbacks)
-      expect(Mobility.default_fallbacks).to eq(fallbacks)
+  %w[accessor_method default_fallbacks default_accessor_locales].each do |delegated_method|
+    describe ".#{delegated_method}" do
+      it "delegates to config" do
+        expect(Mobility.config).to receive(delegated_method).and_return("foo")
+        expect(Mobility.send(delegated_method)).to eq("foo")
+      end
     end
   end
 end

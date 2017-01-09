@@ -114,7 +114,7 @@ module Mobility
     def config
       storage[:mobility_configuration] ||= Mobility::Configuration.new
     end
-    %w[default_fallbacks default_backend default_accessor_locales].each do |method_name|
+    %w[accessor_method default_fallbacks default_backend default_accessor_locales].each do |method_name|
       define_method method_name do
         config.public_send(method_name)
       end

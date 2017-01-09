@@ -65,7 +65,12 @@ module Mobility
           mobility.translated_attribute_names
         end
 
-        extend Translates
+        class << self
+          include Translates
+          if translates = Mobility.config.accessor_method
+            alias_method translates, :mobility_accessor
+          end
+        end
       end
 
       model_class.include(InstanceMethods)

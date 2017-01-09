@@ -13,7 +13,5 @@ module Mobility
         end
       EOM
     end
-
-    alias :translates :mobility_accessor
   end
 end

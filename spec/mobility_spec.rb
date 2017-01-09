@@ -16,6 +16,21 @@ describe Mobility do
       model
     end
 
+    it "aliases mobility_accessor if Mobility.config.accessor_method is set" do
+      expect(Mobility.config).to receive(:accessor_method).and_return(:foo_translates)
+      model.include Mobility
+      expect { Mobility.translates }.to raise_error(NoMethodError)
+      model.foo_translates :title, backend: :null, foo: :bar
+      expect(model.new.methods).to include :title
+      expect(model.new.methods).to include :title=
+    end
+
+    it "does not alias mobility_accessor to anything if Mobility.config.accessor_method is falsy" do
+      expect(Mobility.config).to receive(:accessor_method).and_return(nil)
+      model.include Mobility
+      expect { Mobility.translates }.to raise_error(NoMethodError)
+    end
+
     context "with no translated attributes" do
       it "does not include Attributes into model class" do
         expect(Mobility::Attributes).not_to receive(:new)

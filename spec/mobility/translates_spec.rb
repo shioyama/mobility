@@ -6,13 +6,13 @@ describe Mobility::Translates do
   end
   let(:attribute_names) { [:title, :content] }
 
-  describe ".translates" do
+  describe ".mobility_accessor" do
     it "includes new Attributes module" do
       attributes = Module.new do
         def self.each &block; end
       end
       expect(Mobility::Attributes).to receive(:new).with(:accessor, *attribute_names, { model_class: MyClass }).and_return(attributes)
-      MyClass.translates *attribute_names
+      MyClass.mobility_accessor *attribute_names
     end
 
     it "yields backend to block if block given" do
@@ -24,7 +24,7 @@ describe Mobility::Translates do
       expect(attributes).to receive(:backend).and_return(backend)
       expect(backend).to receive(:foo).with("bar")
       allow(Mobility::Attributes).to receive(:new).and_return(attributes)
-      MyClass.translates :title do |backend|
+      MyClass.mobility_accessor :title do |backend|
         backend.foo("bar")
       end
     end
@@ -40,7 +40,7 @@ describe Mobility::Translates do
       end
       before { allow(Mobility::Attributes).to receive(:new).and_return(attributes) }
 
-      describe ".translates" do
+      describe ".mobility_accessor" do
         it "aliases getter and setter methods if defined to <attribute>_before_mobility and <attribute_before_mobility=" do
           MyClass.class_eval do
             def title
@@ -51,7 +51,7 @@ describe Mobility::Translates do
               value
             end
           end
-          MyClass.translates *attribute_names
+          MyClass.mobility_accessor *attribute_names
           expect(MyClass.new.title).to eq("foo")
           expect(MyClass.new.title_before_mobility).to eq("foo")
           expect(MyClass.new.title="baz").to eq("baz")

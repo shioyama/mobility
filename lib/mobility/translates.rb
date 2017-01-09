@@ -2,7 +2,7 @@ module Mobility
   module Translates
     %w[accessor reader writer].each do |method|
       class_eval <<-EOM, __FILE__, __LINE__ + 1
-        def translation_#{method}(*args, **options)
+        def mobility_#{method}(*args, **options)
           attributes = Attributes.new(:#{method}, *args, options.merge(model_class: self))
           yield(attributes.backend) if block_given?
           attributes.each do |attribute|
@@ -14,6 +14,6 @@ module Mobility
       EOM
     end
 
-    alias :translates :translation_accessor
+    alias :translates :mobility_accessor
   end
 end

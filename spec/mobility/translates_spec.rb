@@ -63,7 +63,7 @@ describe Mobility::Translates do
         end
       end
 
-      describe ".translation_reader" do
+      describe ".mobility_reader" do
         it "aliases getter methods only if defined to <attribute>_before_mobility" do
           MyClass.class_eval do
             def title
@@ -74,7 +74,7 @@ describe Mobility::Translates do
               value
             end
           end
-          MyClass.translation_reader *attribute_names
+          MyClass.mobility_reader *attribute_names
           expect(MyClass.new.title).to eq("foo")
           expect(MyClass.new.title_before_mobility).to eq("foo")
           expect(MyClass.new.title="baz").to eq("baz")
@@ -82,7 +82,7 @@ describe Mobility::Translates do
         end
       end
 
-      describe ".translation_writer" do
+      describe ".mobility_writer" do
         it "aliases getter methods only if defined to <attribute>_before_mobility=" do
           MyClass.class_eval do
             def title
@@ -93,7 +93,7 @@ describe Mobility::Translates do
               value
             end
           end
-          MyClass.translation_writer *attribute_names
+          MyClass.mobility_writer *attribute_names
           expect(MyClass.new.title).to eq("foo")
           expect { MyClass.new.title_before_mobility }.to raise_error(NoMethodError)
           expect(MyClass.new.title="baz").to eq("baz")

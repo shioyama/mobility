@@ -56,7 +56,7 @@ module Mobility
 
   class << self
     def extended(model_class)
-      return if model_class.respond_to? :translation_accessor
+      return if model_class.respond_to? :mobility_accessor
       model_class.class_eval do
         def self.mobility
           @mobility ||= Mobility::Wrapper.new(self)

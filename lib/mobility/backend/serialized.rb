@@ -29,8 +29,6 @@ module Mobility
           end
         end
       end
-
-      FORMATS = Hash[%i[yaml json].map { |format| [format, [serializer_for(format), deserializer_for(format)]] }]
     end
   end
 end

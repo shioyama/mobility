@@ -20,21 +20,18 @@ module Mobility
 
       setup do |attributes, options|
         format = options[:format]
-        to_format = :"to_#{format}"
         plugin :serialization
         plugin :serialization_modification_detection
-        m = self
-        serializer, deserializer = Serialized::FORMATS[format]
 
         define_method :initialize_set do |values|
           super(values)
-          attributes.each { |attribute| send(:"#{attribute}_before_mobility=", {}.send(to_format)) }
+          attributes.each { |attribute| send(:"#{attribute}_before_mobility=", {}.send(:"to_#{format}")) }
         end
 
         attributes.each do |_attribute|
           attribute = _attribute.to_sym
-          m.serialization_map[attribute] = serializer
-          m.deserialization_map[attribute] = deserializer
+          self.serialization_map[attribute] = Serialized.serializer_for(format)
+          self.deserialization_map[attribute] = Serialized.deserializer_for(format)
         end
 
         extension = Module.new do

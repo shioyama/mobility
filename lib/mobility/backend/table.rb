@@ -3,7 +3,7 @@ module Mobility
     module Table
       include OrmDelegator
 
-      class TranslationCache
+      class TranslationsCache
         def initialize(backend)
           @cache   = {}
           @backend = backend

@@ -83,7 +83,7 @@ module Mobility
       end
 
       def new_cache
-        Table::TranslationCache.new(self)
+        Table::TranslationsCache.new(self)
       end
 
       def write_to_cache?

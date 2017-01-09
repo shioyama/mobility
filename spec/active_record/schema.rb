@@ -47,6 +47,12 @@ module Mobility
             t.text :content_ru
             t.boolean :published
           end
+
+          create_table "serialized_posts" do |t|
+            t.text :title
+            t.text :content
+            t.boolean :published
+          end
         end
       end
     end

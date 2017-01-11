@@ -4,11 +4,11 @@ module Mobility
       autoload :QueryMethods, 'mobility/backend/sequel/serialized/query_methods'
       include Base
 
-      def read(locale, options = {})
+      def read(locale, **options)
         translations[locale]
       end
 
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         translations[locale] = value
       end
 

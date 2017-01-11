@@ -5,11 +5,11 @@ module Mobility
 
       include Base
 
-      def read(locale, options = {})
+      def read(locale, **options)
         translations[locale]
       end
 
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         translations[locale] = value
       end
 

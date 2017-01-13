@@ -54,6 +54,10 @@ module Mobility
             String      :content_ja,    size: 65535
             String      :content_pt_br, size: 65535
             String      :content_ru,    size: 65535
+            String      :author_en
+            String      :author_ja
+            String      :author_pt_br
+            String      :author_ru
             TrueClass   :published
           end
 

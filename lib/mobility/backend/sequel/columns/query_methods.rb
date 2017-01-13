@@ -2,7 +2,7 @@ module Mobility
   module Backend
     class Sequel::Columns::QueryMethods < Backend::Sequel::QueryMethods
       def initialize(attributes, **options)
-        define_method :where do |cond, &block|
+        define_method :_filter_or_exclude do |invert, clause, cond, &block|
           if cond.is_a?(Hash) && (keys = cond.keys & attributes.map(&:to_sym)).present?
             cond = cond.dup
             keys.each do |attr|
@@ -10,7 +10,7 @@ module Mobility
               cond[attr_with_locale.to_sym] = cond.delete(attr)
             end
           end
-          super(cond, &block)
+          super(invert, clause, cond, &block)
         end
 
         attributes.each do |attribute|

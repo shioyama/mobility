@@ -20,25 +20,29 @@ module Mobility
           end
         end
 
-        define_method :where do |*cond, &block|
+        define_method :_filter_or_exclude do |invert, clause, *cond, &block|
           if cond.first.is_a?(Hash) && (keys = cond.first.keys & attributes).present?
             cond = cond.first.dup
             null_keys = keys.select { |key| cond[key].nil? }
             keys.each { |attr| cond[::Sequel[:"#{attr}_#{association_name}"][:value]] = cond.delete(attr) }
-            super(cond, &block).
+            super(invert, clause, cond, &block).
               send("join_#{association_name}", *(keys - null_keys)).
               send("join_#{association_name}", *null_keys, outer_join: true)
           else
-            super(*cond, &block)
+            super(invert, clause, *cond, &block)
           end
         end
 
         define_method :invert do
           if opts[:join] && (translation_joins = opts[:join].to_a.select { |join| join.table == translations_class.table_name }).present?
-            # We need to actually update the exisiting mobility joins in-place to avoid issues,
-            # but this is not nice.
-            # TODO: Improve this.
-            translation_joins.each { |join| join.instance_variable_set :@join_type, :inner }
+            translation_joins.each do |join|
+              # We invert the join type when we invert the relation, so if we had a LEFT OUTER join, we
+              # change it to an inner join, and vice versa. There should be a better way to do this...
+              # TODO: Find a better way to do this.
+              join.instance_variable_get(:@join_type) == :left_outer ?
+                join.instance_variable_set(:@join_type, :inner) :
+                join.instance_variable_set(:@join_type, :left_outer)
+            end
           end
           super()
         end

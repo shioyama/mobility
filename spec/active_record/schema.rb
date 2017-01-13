@@ -45,6 +45,10 @@ module Mobility
             t.text :content_ja
             t.text :content_pt_br
             t.text :content_ru
+            t.text :author_en
+            t.text :author_ja
+            t.text :author_pt_br
+            t.text :author_ru
             t.boolean :published
           end
 

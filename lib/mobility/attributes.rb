@@ -1,13 +1,14 @@
 module Mobility
   class Attributes < Module
-    attr_reader :attributes, :options, :backend_class
+    attr_reader :attributes, :options, :backend_class, :backend_name
 
     def initialize(method, *_attributes, **_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @options = _options
       @attributes = _attributes.map &:to_s
       model_class = options.delete(:model_class)
-      @backend_class = Class.new(get_backend_class(backend:     options.delete(:backend),
+      @backend_name = options.delete(:backend)
+      @backend_class = Class.new(get_backend_class(backend:     @backend_name,
                                                    model_class: model_class))
 
       options[:locale_accessors] ||= true if options[:dirty]

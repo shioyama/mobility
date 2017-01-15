@@ -255,4 +255,11 @@ describe Mobility::Attributes do
       expect { |b| attributes.each(&b) }.to yield_successive_args("title", "content")
     end
   end
+
+  describe "#backend_name" do
+    it "returns backend name" do
+      attributes = described_class.new(:accessor, :title, :content, backend: :null)
+      expect(attributes.backend_name).to eq(:null)
+    end
+  end
 end

@@ -24,8 +24,8 @@ module Mobility
         plugin :serialization_modification_detection
 
         define_method :initialize_set do |values|
-          super(values)
           attributes.each { |attribute| send(:"#{attribute}_before_mobility=", {}.send(:"to_#{format}")) }
+          super(values)
         end
 
         attributes.each do |_attribute|

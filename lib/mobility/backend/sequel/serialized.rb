@@ -23,16 +23,19 @@ module Mobility
         plugin :serialization
         plugin :serialization_modification_detection
 
-        define_method :initialize_set do |values|
-          attributes.each { |attribute| send(:"#{attribute}_before_mobility=", {}.send(:"to_#{format}")) }
-          super(values)
-        end
-
         attributes.each do |_attribute|
           attribute = _attribute.to_sym
           self.serialization_map[attribute] = Serialized.serializer_for(format)
           self.deserialization_map[attribute] = Serialized.deserializer_for(format)
         end
+
+        method_overrides = Module.new do
+          define_method :initialize_set do |values|
+            attributes.each { |attribute| send(:"#{attribute}_before_mobility=", {}.send(:"to_#{format}")) }
+            super(values)
+          end
+        end
+        include method_overrides
 
         extension = Module.new do
           define_method :i18n do
@@ -40,6 +43,8 @@ module Mobility
           end
         end
         extend extension
+
+        include SerializationModificationDetectionFix
       end
 
       def translations
@@ -59,6 +64,17 @@ module Mobility
 
       def write_to_cache?
         true
+      end
+
+      # This is basically a depth-two dup of the deserialized values, necessary in order to assure we
+      # have a distinct copy for all locales. The original serialization modification detection plugin
+      # just points original_deserialized_values to deserialized_values, which prevents detection of
+      # changes.
+      module SerializationModificationDetectionFix
+        def after_save
+          super()
+          @original_deserialized_values = @deserialized_values.inject({}) { |vs, (col, trs)| vs[col] = trs.dup; vs}
+        end
       end
 
       private

@@ -1,6 +1,6 @@
 # Basic test of translated attribute accessors which can be applied to any backend, and (since there
 # is no ORM-specific code here) to any ORM.
-shared_examples_for "model with translated attribute accessors" do |model_class_name, attribute1=:title, attribute2=:content|
+shared_examples_for "model with translated attribute accessors" do |model_class_name, attribute1=:title, attribute2=:content, **options|
   let(:model_class) { model_class_name.constantize }
   let(:instance) { model_class.new }
 
@@ -65,6 +65,21 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
       expect(instance.send(attribute1)).to eq("foo")
       Mobility.with_locale(:ja) { expect(instance.send(attribute1)).to eq("あああ") }
       Mobility.with_locale(:ja) { expect(instance.send(attribute2)).to eq(nil) }
+    end
+  end
+
+  it "sets translations in multiple locales when updating model" do
+    skip if %i[table serialized].include?(options[:backend])
+    aggregate_failures do
+      instance = model_class.create
+
+      instance.update(attribute1 => "foo")
+      Mobility.with_locale(:ja) { instance.update(attribute1 => "あああ") }
+
+      instance = model_class.first
+
+      expect(instance.send(attribute1)).to eq("foo")
+      Mobility.with_locale(:ja) { expect(instance.send(attribute1)) }.to eq("あああ")
     end
   end
 end

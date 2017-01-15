@@ -69,7 +69,11 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
   end
 
   it "sets translations in multiple locales when updating model" do
-    skip if %i[table serialized].include?(options[:backend])
+    # TODO: get Sequel serialized + table backends to pass this spec
+    model_class.mobility.modules.map(&:backend_name).each do |backend_name|
+      skip if %i[table serialized].include?(backend_name)
+    end if Mobility::Loaded::Sequel
+
     aggregate_failures do
       instance = model_class.create
 

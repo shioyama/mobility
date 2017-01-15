@@ -18,7 +18,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
     end
   end
 
-  include_accessor_examples 'Article', backend: :table
+  include_accessor_examples 'Article'
 
   describe "Backend methods" do
     before { %w[foo bar baz].each { |slug| Article.create(slug: slug) } }

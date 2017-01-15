@@ -47,7 +47,7 @@ describe Mobility::Backend::Sequel::Columns, orm: :sequel do
   end
 
   describe "Model accessors" do
-    include_accessor_examples "Post"
+    include_accessor_examples 'Comment', :content, :author
   end
 
   describe "with locale accessors" do

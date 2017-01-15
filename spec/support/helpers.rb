@@ -1,21 +1,29 @@
 module Helpers
   module ActiveRecord
-    def include_querying_examples(model_class_name, *attributes)
-      it_behaves_like "AR Model with translated scope", model_class_name, *attributes
+    def include_accessor_examples *args
+      it_behaves_like "model with translated attribute accessors", *args
     end
 
-    def include_serialization_examples(model_class_name, *attributes)
-      it_behaves_like "AR Model with serialized translations", model_class_name, *attributes
+    def include_querying_examples *args
+      it_behaves_like "AR Model with translated scope", *args
+    end
+
+    def include_serialization_examples *args
+      it_behaves_like "AR Model with serialized translations", *args
     end
   end
 
   module Sequel
-    def include_querying_examples(model_class_name, *attributes)
-      it_behaves_like "Sequel Model with translated dataset", model_class_name, *attributes
+    def include_accessor_examples *args
+      it_behaves_like "model with translated attribute accessors", *args
     end
 
-    def include_serialization_examples(model_class_name, *attributes)
-      it_behaves_like "Sequel Model with serialized translations", model_class_name, *attributes
+    def include_querying_examples *args
+      it_behaves_like "Sequel Model with translated dataset", *args
+    end
+
+    def include_serialization_examples *args
+      it_behaves_like "Sequel Model with serialized translations", *args
     end
   end
 end

@@ -45,6 +45,10 @@ describe Mobility::Backend::ActiveRecord::Columns, orm: :active_record do
     end
   end
 
+  describe "Model accessors" do
+    include_accessor_examples "Post"
+  end
+
   describe "with locale accessors" do
     it "still works as usual" do
       Comment.translates *attributes, backend: :columns, cache: false, locale_accessors: true

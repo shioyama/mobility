@@ -11,7 +11,8 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
   describe "serialized backend without cache" do
     context "yaml format" do
       before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false }
-      include_serialization_examples('SerializedPost')
+      include_accessor_examples 'SerializedPost'
+      include_serialization_examples 'SerializedPost'
 
       # SANITY CHECK
       it "serializes as YAML" do
@@ -38,7 +39,8 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
 
     context "json format" do
       before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false }
-      include_serialization_examples('SerializedPost')
+      include_accessor_examples 'SerializedPost'
+      include_serialization_examples 'SerializedPost'
 
       # SANITY CHECK
       it "serializes as JSON" do
@@ -52,7 +54,8 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
 
   describe "serialized backend with cache" do
     before { SerializedPost.translates :title, :content, backend: :serialized }
-    include_serialization_examples('SerializedPost')
+    include_accessor_examples 'SerializedPost'
+    include_serialization_examples 'SerializedPost'
 
     it "uses cache for reads" do
       post = SerializedPost.new

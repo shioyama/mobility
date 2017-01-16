@@ -34,10 +34,12 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       end
 
       it "returns attribute in locale from translations table" do
-        expect(title_backend.read(:en)).to eq("New Article")
-        expect(content_backend.read(:en)).to eq("Once upon a time...")
-        expect(title_backend.read(:ja)).to eq("新規記事")
-        expect(content_backend.read(:ja)).to eq("昔々あるところに…")
+        aggregate_failures do
+          expect(title_backend.read(:en)).to eq("New Article")
+          expect(content_backend.read(:en)).to eq("Once upon a time...")
+          expect(title_backend.read(:ja)).to eq("新規記事")
+          expect(content_backend.read(:ja)).to eq("昔々あるところに…")
+        end
       end
 
       it "returns nil if no translation exists" do
@@ -75,9 +77,12 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
           title_backend.write(:en, "New Article")
 
           translation = subject.send(:mobility_text_translations).first
-          expect(translation.key).to eq("title")
-          expect(translation.value).to eq("New Article")
-          expect(translation.translatable).to eq(subject)
+
+          aggregate_failures do
+            expect(translation.key).to eq("title")
+            expect(translation.value).to eq("New Article")
+            expect(translation.translatable).to eq(subject)
+          end
         end
       end
 
@@ -103,9 +108,12 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
           subject.reload
 
           translation = subject.send(:mobility_text_translations).first
-          expect(translation.key).to eq("title")
-          expect(translation.value).to eq("New New Article")
-          expect(translation.translatable).to eq(subject)
+
+          aggregate_failures do
+            expect(translation.key).to eq("title")
+            expect(translation.value).to eq("New New Article")
+            expect(translation.translatable).to eq(subject)
+          end
         end
 
         it "removes persisted translation if assigned nil when record is saved" do
@@ -142,8 +150,11 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       article = Article.create(title: "Article", subtitle: "Article subtitle", content: "Content")
       translation = Mobility::ActiveRecord::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
       article = Article.first
-      expect(article.mobility_text_translations).not_to include(translation)
-      expect(article.mobility_text_translations.count).to eq(3)
+
+      aggregate_failures do
+        expect(article.mobility_text_translations).not_to include(translation)
+        expect(article.mobility_text_translations.count).to eq(3)
+      end
     end
   end
 
@@ -151,25 +162,35 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
     it "creates record and translation in current locale" do
       Mobility.locale = :en
       article = Article.create(title: "New Article", content: "Once upon a time...")
-      expect(Article.count).to eq(1)
-      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(2)
-      expect(article.send(:mobility_text_translations).size).to eq(2)
-      expect(article.title).to eq("New Article")
-      expect(article.content).to eq("Once upon a time...")
+
+      aggregate_failures do
+        expect(Article.count).to eq(1)
+        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(2)
+        expect(article.send(:mobility_text_translations).size).to eq(2)
+        expect(article.title).to eq("New Article")
+        expect(article.content).to eq("Once upon a time...")
+      end
     end
 
     it "creates translations for other locales" do
       Mobility.locale = :en
       article = Article.create(title: "New Article", content: "Once upon a time...")
-      Mobility.locale = :ja
-      expect(article.title).to eq(nil)
-      expect(article.content).to eq(nil)
-      article.update_attributes!(title: "新規記事", content: "昔々あるところに…")
-      expect(article.title).to eq("新規記事")
-      expect(article.content).to eq("昔々あるところに…")
-      expect(Article.count).to eq(1)
-      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
-      expect(article.send(:mobility_text_translations).size).to eq(4)
+
+      aggregate_failures "in one locale" do
+        expect(article.mobility_text_translations.count).to eq(2)
+      end
+
+      aggregate_failures "in another locale" do
+        Mobility.locale = :ja
+        expect(article.title).to eq(nil)
+        expect(article.content).to eq(nil)
+        article.update_attributes!(title: "新規記事", content: "昔々あるところに…")
+        expect(article.title).to eq("新規記事")
+        expect(article.content).to eq("昔々あるところに…")
+        expect(Article.count).to eq(1)
+        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
+        expect(article.send(:mobility_text_translations).size).to eq(4)
+      end
     end
 
     it "builds nil translations when reading but does not save them" do
@@ -177,10 +198,13 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       article = Article.create(title: "New Article")
       Mobility.locale = :ja
       article.title
-      expect(article.send(:mobility_text_translations).size).to eq(2)
-      article.save
-      expect(article.title).to be_nil
-      expect(article.reload.send(:mobility_text_translations).size).to eq(1)
+
+      aggregate_failures do
+        expect(article.send(:mobility_text_translations).size).to eq(2)
+        article.save
+        expect(article.title).to be_nil
+        expect(article.reload.send(:mobility_text_translations).size).to eq(1)
+      end
     end
   end
 
@@ -193,18 +217,23 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
 
     it "saves translations correctly" do
       article = Article.create(title: "foo title", short_title: "bar short title")
-      expect(article.title).to eq("foo title")
-      expect(article.short_title).to eq("bar short title")
 
-      article = Article.first
-      expect(article.title).to eq("foo title")
-      expect(article.short_title).to eq("bar short title")
+      aggregate_failures "setting attributes" do
+        expect(article.title).to eq("foo title")
+        expect(article.short_title).to eq("bar short title")
+      end
 
-      text = Mobility::ActiveRecord::TextTranslation.first
-      expect(text.value).to eq("foo title")
+      aggregate_failures "after reloading" do
+        article = Article.first
+        expect(article.title).to eq("foo title")
+        expect(article.short_title).to eq("bar short title")
 
-      string = Mobility::ActiveRecord::StringTranslation.first
-      expect(string.value).to eq("bar short title")
+        text = Mobility::ActiveRecord::TextTranslation.first
+        expect(text.value).to eq("foo title")
+
+        string = Mobility::ActiveRecord::StringTranslation.first
+        expect(string.value).to eq("bar short title")
+      end
     end
   end
 
@@ -269,9 +298,11 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       end
 
       it "returns correct result when querying on multiple tables" do
-        expect(Article.i18n.where(title: "foo post", short_title: "bar short 2")).to eq([@article2])
-        expect(Article.i18n.where(title: nil, short_title: "bar short 2")).to eq([])
-        expect(Article.i18n.where(title: nil, short_title: "bar short 1")).to eq([@article3])
+        aggregate_failures do
+          expect(Article.i18n.where(title: "foo post", short_title: "bar short 2")).to eq([@article2])
+          expect(Article.i18n.where(title: nil, short_title: "bar short 2")).to eq([])
+          expect(Article.i18n.where(title: nil, short_title: "bar short 1")).to eq([@article3])
+        end
       end
     end
 

@@ -22,8 +22,10 @@ describe Mobility::Backend::ActiveRecord::Columns, orm: :active_record do
 
   describe "#read" do
     it "returns attribute in locale from appropriate column" do
-      expect(backend.read(:en)).to eq("Good post!")
-      expect(backend.read(:ja)).to eq("なかなか面白い記事")
+      aggregate_failures do
+        expect(backend.read(:en)).to eq("Good post!")
+        expect(backend.read(:ja)).to eq("なかなか面白い記事")
+      end
     end
 
     it "handles dashed locales" do
@@ -35,8 +37,11 @@ describe Mobility::Backend::ActiveRecord::Columns, orm: :active_record do
     it "assigns to appropriate columnn" do
       backend.write(:en, "Crappy post!")
       backend.write(:ja, "面白くない")
-      expect(comment.content_en).to eq("Crappy post!")
-      expect(comment.content_ja).to eq("面白くない")
+
+      aggregate_failures do
+        expect(comment.content_en).to eq("Crappy post!")
+        expect(comment.content_ja).to eq("面白くない")
+      end
     end
 
     it "handles dashed locales" do
@@ -68,16 +73,18 @@ describe Mobility::Backend::ActiveRecord::Columns, orm: :active_record do
       Comment.translates *attributes, backend: :columns, cache: false, dirty: true
       comment = Comment.new
 
-      expect(comment.content).to eq(nil)
-      expect(comment.changed?).to eq(false)
-      expect(comment.changed).to eq([])
-      expect(comment.changes).to eq({})
+      aggregate_failures do
+        expect(comment.content).to eq(nil)
+        expect(comment.changed?).to eq(false)
+        expect(comment.changed).to eq([])
+        expect(comment.changes).to eq({})
 
-      comment.content = "foo"
-      expect(comment.content).to eq("foo")
-      expect(comment.changed?).to eq(true)
-      expect(comment.changed).to eq(["content_en"])
-      expect(comment.changes).to eq({ "content_en" => [nil, "foo"] })
+        comment.content = "foo"
+        expect(comment.content).to eq("foo")
+        expect(comment.changed?).to eq(true)
+        expect(comment.changed).to eq(["content_en"])
+        expect(comment.changes).to eq({ "content_en" => [nil, "foo"] })
+      end
     end
   end
 

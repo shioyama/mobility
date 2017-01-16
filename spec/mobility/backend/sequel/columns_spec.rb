@@ -23,8 +23,10 @@ describe Mobility::Backend::Sequel::Columns, orm: :sequel do
 
   describe "#read" do
     it "returns attribute in locale from appropriate column" do
-      expect(backend.read(:en)).to eq("Good post!")
-      expect(backend.read(:ja)).to eq("なかなか面白い記事")
+      aggregate_failures do
+        expect(backend.read(:en)).to eq("Good post!")
+        expect(backend.read(:ja)).to eq("なかなか面白い記事")
+      end
     end
 
     it "handles dashed locales" do
@@ -36,8 +38,11 @@ describe Mobility::Backend::Sequel::Columns, orm: :sequel do
     it "assigns to appropriate columnn" do
       backend.write(:en, "Crappy post!")
       backend.write(:ja, "面白くない")
-      expect(comment.content_en).to eq("Crappy post!")
-      expect(comment.content_ja).to eq("面白くない")
+
+      aggregate_failures do
+        expect(comment.content_en).to eq("Crappy post!")
+        expect(comment.content_ja).to eq("面白くない")
+      end
     end
 
     it "handles dashed locales" do

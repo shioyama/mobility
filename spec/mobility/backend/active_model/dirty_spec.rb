@@ -29,28 +29,35 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     it "tracks changes in one locale" do
       article = Article.new
 
-      expect(article.title).to eq(nil)
-      expect(article.changed?).to eq(false)
-      expect(article.changed).to eq([])
-      expect(article.changes).to eq({})
+      aggregate_failures "before change" do
+        expect(article.title).to eq(nil)
+        expect(article.changed?).to eq(false)
+        expect(article.changed).to eq([])
+        expect(article.changes).to eq({})
+      end
 
       article.title = "foo"
-      expect(article.title).to eq("foo")
-      expect(article.changed?).to eq(true)
-      expect(article.changed).to eq(["title_en"])
-      expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
+
+      aggregate_failures "after change" do
+        expect(article.title).to eq("foo")
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to eq(["title_en"])
+        expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
+      end
     end
 
     it "tracks previous changes in one locale" do
       article = Article.create(title: "foo")
 
-      article.title = "bar"
-      expect(article.changed?).to eq(true)
+      aggregate_failures do
+        article.title = "bar"
+        expect(article.changed?).to eq(true)
 
-      article.save
+        article.save
 
-      expect(article.changed?).to eq(false)
-      expect(article.previous_changes).to eq({ "title_en" => ["foo", "bar"]})
+        expect(article.changed?).to eq(false)
+        expect(article.previous_changes).to eq({ "title_en" => ["foo", "bar"]})
+      end
     end
 
     it "tracks changes in multiple locales" do
@@ -58,18 +65,22 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
 
       expect(article.title).to eq(nil)
 
-      article.title = "English title"
+      aggregate_failures "change in English locale" do
+        article.title = "English title"
 
-      expect(article.changed?).to eq(true)
-      expect(article.changed).to eq(["title_en"])
-      expect(article.changes).to eq({ "title_en" => [nil, "English title"] })
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to eq(["title_en"])
+        expect(article.changes).to eq({ "title_en" => [nil, "English title"] })
+      end
 
-      Mobility.locale = :fr
+      aggregate_failures "change in French locale" do
+        Mobility.locale = :fr
 
-      article.title = "Titre en Francais"
-      expect(article.changed?).to eq(true)
-      expect(article.changed).to match_array(["title_en", "title_fr"])
-      expect(article.changes).to eq({ "title_en" => [nil, "English title"], "title_fr" => [nil, "Titre en Francais"] })
+        article.title = "Titre en Francais"
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to match_array(["title_en", "title_fr"])
+        expect(article.changes).to eq({ "title_en" => [nil, "English title"], "title_fr" => [nil, "Titre en Francais"] })
+      end
     end
 
     it "tracks previous changes in multiple locales" do
@@ -89,21 +100,27 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
 
       expect(article.changed?).to eq(false)
 
-      article.title = "foo"
-      expect(article.changed?).to eq(true)
-      expect(article.changed).to eq(["title_en"])
-      expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
+      aggregate_failures "after change" do
+        article.title = "foo"
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to eq(["title_en"])
+        expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
+      end
 
-      article.title = nil
-      expect(article.changed?).to eq(false)
-      expect(article.changed).to eq([])
-      expect(article.changes).to eq({})
+      aggregate_failures "after setting attribute back to original value" do
+        article.title = nil
+        expect(article.changed?).to eq(false)
+        expect(article.changed).to eq([])
+        expect(article.changes).to eq({})
+      end
 
-      Mobility.with_locale(:fr) { article.title = "Titre en Francais" }
+      aggregate_failures "changing value in different locale" do
+        Mobility.with_locale(:fr) { article.title = "Titre en Francais" }
 
-      expect(article.changed?).to eq(true)
-      expect(article.changed).to eq(["title_fr"])
-      expect(article.changes).to eq({ "title_fr" => [nil, "Titre en Francais"] })
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to eq(["title_fr"])
+        expect(article.changes).to eq({ "title_fr" => [nil, "Titre en Francais"] })
+      end
     end
   end
 
@@ -111,30 +128,36 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     it "defines suffix methods on translated attribute" do
       article = Article.create(title: "foo")
       article.title = "bar"
-      expect(article.title_changed?).to eq(true)
-      expect(article.title_change).to eq(["foo", "bar"])
-      expect(article.title_was).to eq("foo")
 
-      article.save
-      expect(article.title_previously_changed?).to eq(true)
-      expect(article.title_previous_change).to eq(["foo", "bar"])
+      aggregate_failures do
+        expect(article.title_changed?).to eq(true)
+        expect(article.title_change).to eq(["foo", "bar"])
+        expect(article.title_was).to eq("foo")
 
-      expect(article.title_changed?).to eq(false)
-      article.title_will_change!
-      expect(article.title_changed?).to eq(true)
+        article.save
+        expect(article.title_previously_changed?).to eq(true)
+        expect(article.title_previous_change).to eq(["foo", "bar"])
+
+        expect(article.title_changed?).to eq(false)
+        article.title_will_change!
+        expect(article.title_changed?).to eq(true)
+      end
     end
 
     it "returns changes on attribute for current locale" do
       article = Article.create(title: "foo")
       article.title = "bar"
-      expect(article.title_changed?).to eq(true)
-      expect(article.title_change).to eq(["foo", "bar"])
-      expect(article.title_was).to eq("foo")
 
-      Mobility.locale = :fr
-      expect(article.title_changed?).to eq(false)
-      expect(article.title_change).to eq(nil)
-      expect(article.title_was).to eq(nil)
+      aggregate_failures do
+        expect(article.title_changed?).to eq(true)
+        expect(article.title_change).to eq(["foo", "bar"])
+        expect(article.title_was).to eq("foo")
+
+        Mobility.locale = :fr
+        expect(article.title_changed?).to eq(false)
+        expect(article.title_change).to eq(nil)
+        expect(article.title_was).to eq(nil)
+      end
     end
   end
 
@@ -143,19 +166,21 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
       it "resets changes when model on #{action}" do
         article = Article.create
 
-        article.title = "foo"
-        expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
+        aggregate_failures do
+          article.title = "foo"
+          expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
 
-        article.send(action)
+          article.send(action)
 
-        # bypass the dirty module and set the variable directly
-        article.title_translations.instance_variable_set(:@values, { :en => "bar" })
+          # bypass the dirty module and set the variable directly
+          article.title_translations.instance_variable_set(:@values, { :en => "bar" })
 
-        expect(article.title).to eq("bar")
-        expect(article.changes).to eq({})
+          expect(article.title).to eq("bar")
+          expect(article.changes).to eq({})
 
-        article.title = nil
-        expect(article.changes).to eq({ "title_en" => ["bar", nil]})
+          article.title = nil
+          expect(article.changes).to eq({ "title_en" => ["bar", nil]})
+        end
       end
     end
 

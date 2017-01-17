@@ -1,6 +1,6 @@
 module Mobility
   module Backend
-    class Sequel::Table::QueryMethods < Sequel::QueryMethods
+    class Sequel::KeyValue::QueryMethods < Sequel::QueryMethods
       def initialize(_attributes, **options)
         attributes = _attributes.map &:to_sym
         association_name, translations_class = options[:association_name], options[:class_name]

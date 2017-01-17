@@ -53,7 +53,7 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
     end
   end
 
-  describe "--without_table set to true" do
+  describe "--without_tables set to true" do
     before(:all) do
       prepare_destination
       run_generator %w(--without_tables)

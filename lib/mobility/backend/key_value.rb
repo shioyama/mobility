@@ -1,6 +1,6 @@
 module Mobility
   module Backend
-    module Table
+    module KeyValue
       include OrmDelegator
 
       class TranslationsCache

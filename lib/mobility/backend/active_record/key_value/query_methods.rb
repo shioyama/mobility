@@ -1,6 +1,6 @@
 module Mobility
   module Backend
-    class ActiveRecord::Table::QueryMethods < ActiveRecord::QueryMethods
+    class ActiveRecord::KeyValue::QueryMethods < ActiveRecord::QueryMethods
       def initialize(attributes, **options)
         association_name, translations_class = options[:association_name], options[:class_name]
         @association_name = association_name

@@ -7,11 +7,11 @@ module Mobility
     autoload :Columns,      'mobility/backend/columns'
     autoload :Dirty,        'mobility/backend/dirty'
     autoload :Fallbacks,    'mobility/backend/fallbacks'
+    autoload :KeyValue,     'mobility/backend/key_value'
     autoload :Null,         'mobility/backend/null'
     autoload :OrmDelegator, 'mobility/backend/orm_delegator'
     autoload :Sequel,       'mobility/backend/sequel'
     autoload :Serialized,   'mobility/backend/serialized'
-    autoload :Table,        'mobility/backend/table'
 
     def self.method_name(attribute)
       "#{attribute}_translations"

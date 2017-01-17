@@ -1,7 +1,7 @@
 module Mobility
   module Backend
-    class Sequel::Table
-      autoload :QueryMethods, 'mobility/backend/sequel/table/query_methods'
+    class Sequel::KeyValue
+      autoload :QueryMethods, 'mobility/backend/sequel/key_value/query_methods'
 
       include Base
       attr_reader :association_name, :class_name
@@ -28,7 +28,7 @@ module Mobility
       end
 
       def self.configure!(options)
-        raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
+        raise CacheRequired, "Cache required for Sequel::KeyValue backend" if options[:cache] == false
         if type = options[:type]
           case type.to_sym
           when :text, :string
@@ -85,7 +85,7 @@ module Mobility
       end
 
       def new_cache
-        Table::TranslationsCache.new(self)
+        KeyValue::TranslationsCache.new(self)
       end
 
       def write_to_cache?

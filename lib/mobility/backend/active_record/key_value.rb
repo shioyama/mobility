@@ -1,7 +1,7 @@
 module Mobility
   module Backend
-    class ActiveRecord::Table
-      autoload :QueryMethods, 'mobility/backend/active_record/table/query_methods'
+    class ActiveRecord::KeyValue
+      autoload :QueryMethods, 'mobility/backend/active_record/key_value/query_methods'
 
       include Base
       attr_reader :association_name
@@ -67,7 +67,7 @@ module Mobility
       end
 
       def new_cache
-        Table::TranslationsCache.new(self)
+        KeyValue::TranslationsCache.new(self)
       end
 
       def write_to_cache?

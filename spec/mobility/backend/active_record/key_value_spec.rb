@@ -1,28 +1,25 @@
 require "spec_helper"
 
-describe "Mobility::Backend::Sequel::Table", orm: :sequel do
-  extend Helpers::Sequel
+describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
+  extend Helpers::ActiveRecord
 
-  let(:described_class) { Mobility::Backend::Sequel::Table }
-  let(:translation_class) { Mobility::Sequel::TextTranslation }
   let(:title_backend) { article.title_translations }
   let(:content_backend) { article.content_translations }
 
   before do
-    stub_const 'Article', Class.new(::Sequel::Model)
-    Article.dataset = DB[:articles]
+    stub_const 'Article', Class.new(ActiveRecord::Base)
     Article.class_eval do
       include Mobility
-      translates :title, :content, backend: :table
-      translates :subtitle, backend: :table
+      translates :title, :content, backend: :key_value, cache: false
+      translates :subtitle, backend: :key_value
     end
   end
 
-  include_accessor_examples 'Article'
+  include_accessor_examples "Article"
 
   describe "Backend methods" do
-    before { %w[foo bar baz].each { |slug| Article.create(slug: slug) } }
-    let(:article) { Article.find(slug: "baz") }
+    before { %w[foo bar baz].each { |slug| Article.create!(slug: slug) } }
+    let(:article) { Article.find_by(slug: "baz") }
 
     subject { article }
 
@@ -33,7 +30,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
           { key: "title", value: "新規記事", locale: "ja", translatable: article },
           { key: "content", value: "Once upon a time...", locale: "en", translatable: article },
           { key: "content", value: "昔々あるところに…", locale: "ja", translatable: article }
-        ].each { |attrs| translation_class.create(attrs) }
+        ].each { |attrs| Mobility::ActiveRecord::TextTranslation.create!(attrs) }
       end
 
       it "returns attribute in locale from translations table" do
@@ -49,6 +46,12 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
         expect(title_backend.read(:de)).to eq(nil)
       end
 
+      it "builds translation if no translation exists" do
+        expect {
+          title_backend.read(:de)
+        }.to change(subject.send(:mobility_text_translations), :size).by(1)
+      end
+
       describe "reading back written attributes" do
         before do
           title_backend.write(:en, "Changed Article Title")
@@ -62,30 +65,30 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
 
     describe "#write" do
       context "no translation for locale exists" do
-        it "stashes translation with value" do
-          translation = translation_class.new(locale: :en, key: "title")
-
-          expect(translation_class).to receive(:new).with(locale: :en, key: "title").and_return(translation)
+        it "creates translation for locale" do
           expect {
             title_backend.write(:en, "New Article")
-          }.not_to change(translation_class, :count)
+          }.to change(subject.send(:mobility_text_translations), :size).by(1)
 
-          aggregate_failures do
-            expect(translation.locale).to eq("en")
-            expect(translation.key).to eq("title")
-            expect(translation.value).to eq("New Article")
-          end
+          expect { subject.save! }.to change(Mobility::ActiveRecord::TextTranslation, :count).by(1)
         end
 
-        it "creates translation for locale when model is saved" do
+        it "assigns attributes to translation" do
           title_backend.write(:en, "New Article")
-          expect { subject.save }.to change(translation_class, :count).by(1)
+
+          translation = subject.send(:mobility_text_translations).first
+
+          aggregate_failures do
+            expect(translation.key).to eq("title")
+            expect(translation.value).to eq("New Article")
+            expect(translation.translatable).to eq(subject)
+          end
         end
       end
 
       context "translation for locale exists" do
         before do
-          translation_class.create(
+          Mobility::ActiveRecord::TextTranslation.create!(
             key: "title",
             value: "foo",
             locale: "en",
@@ -96,33 +99,43 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
         it "does not create new translation for locale" do
           expect {
             title_backend.write(:en, "New Article")
-            subject.save
-          }.not_to change(translation_class, :count)
+          }.not_to change(subject.send(:mobility_text_translations), :size)
         end
 
         it "updates value attribute on existing translation" do
           title_backend.write(:en, "New New Article")
-          subject.save
+          subject.save!
           subject.reload
 
-          translation = subject.mobility_text_translations.first
+          translation = subject.send(:mobility_text_translations).first
 
           aggregate_failures do
             expect(translation.key).to eq("title")
             expect(translation.value).to eq("New New Article")
-            expect(translation.locale).to eq("en")
             expect(translation.translatable).to eq(subject)
           end
         end
 
-        it "removes translation if assigned nil when record is saved" do
+        it "removes persisted translation if assigned nil when record is saved" do
+          expect(Mobility::ActiveRecord::TextTranslation.count).to eq(1)
           expect {
             title_backend.write(:en, nil)
-          }.not_to change(translation_class, :count)
+          }.not_to change(subject.send(:mobility_text_translations), :count)
 
           expect {
-            subject.save
-          }.to change(translation_class, :count).by(-1)
+            subject.save!
+          }.to change(subject.send(:mobility_text_translations), :count).by(-1)
+
+          expect(Mobility::ActiveRecord::TextTranslation.count).to eq(0)
+        end
+
+        it "removes unpersisted translation if value is nil when record is saved" do
+          article = Article.find_by(slug: "foo")
+          expect(article.title).to eq(nil)
+          article.title = ""
+          expect(article.mobility_text_translations.size).to eq(1)
+          article.save
+          expect(article.mobility_text_translations.size).to eq(0)
         end
       end
     end
@@ -130,8 +143,12 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
 
   describe "translations association" do
     it "limits association to translations with keys matching attributes" do
+      # This limits the results returned by the association to only those whose keys match the set of
+      # translated attributes we have defined. This matters if, say, we save some translations, then change
+      # the translated attributes for the model; we should only see the new translations, not the ones
+      # created earlier with different keys.
       article = Article.create(title: "Article", subtitle: "Article subtitle", content: "Content")
-      translation = Mobility::Sequel::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
+      translation = Mobility::ActiveRecord::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
       article = Article.first
 
       aggregate_failures do
@@ -148,8 +165,8 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
 
       aggregate_failures do
         expect(Article.count).to eq(1)
-        expect(Mobility::Sequel::TextTranslation.count).to eq(2)
-        expect(article.mobility_text_translations.size).to eq(2)
+        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(2)
+        expect(article.send(:mobility_text_translations).size).to eq(2)
         expect(article.title).to eq("New Article")
         expect(article.content).to eq("Once upon a time...")
       end
@@ -163,20 +180,30 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
         expect(article.mobility_text_translations.count).to eq(2)
       end
 
-      aggregate_failures "in other locale" do
+      aggregate_failures "in another locale" do
         Mobility.locale = :ja
         expect(article.title).to eq(nil)
         expect(article.content).to eq(nil)
-        article.update(title: "新規記事", content: "昔々あるところに…")
+        article.update_attributes!(title: "新規記事", content: "昔々あるところに…")
         expect(article.title).to eq("新規記事")
         expect(article.content).to eq("昔々あるところに…")
-        expect(article.mobility_text_translations.count).to eq(4)
+        expect(Article.count).to eq(1)
+        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
+        expect(article.send(:mobility_text_translations).size).to eq(4)
       end
+    end
 
-      aggregate_failures "after reloading" do
-        article = Article.first
-        expect(article.mobility_text_translations.count).to eq(4)
-        expect(Mobility::Sequel::TextTranslation.count).to eq(4)
+    it "builds nil translations when reading but does not save them" do
+      Mobility.locale = :en
+      article = Article.create(title: "New Article")
+      Mobility.locale = :ja
+      article.title
+
+      aggregate_failures do
+        expect(article.send(:mobility_text_translations).size).to eq(2)
+        article.save
+        expect(article.title).to be_nil
+        expect(article.reload.send(:mobility_text_translations).size).to eq(1)
       end
     end
   end
@@ -184,7 +211,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
   context "with separate string and text translations" do
     before do
       Article.class_eval do
-        translates :short_title, backend: :table, class_name: Mobility::Sequel::StringTranslation, association_name: :mobility_string_translations
+        translates :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :mobility_string_translations
       end
     end
 
@@ -201,73 +228,11 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
         expect(article.title).to eq("foo title")
         expect(article.short_title).to eq("bar short title")
 
-        text = Mobility::Sequel::TextTranslation.first
+        text = Mobility::ActiveRecord::TextTranslation.first
         expect(text.value).to eq("foo title")
 
-        string = Mobility::Sequel::StringTranslation.first
+        string = Mobility::ActiveRecord::StringTranslation.first
         expect(string.value).to eq("bar short title")
-      end
-    end
-  end
-
-  describe "storing translations" do
-    it "does not save translations unless they have a value present" do
-      aggregate_failures do
-        Mobility.locale = :en
-        article = Article.create(title: "New Article")
-        Mobility.locale = :ja
-        article.title
-        article.save
-        expect(translation_class.count).to eq(1)
-        expect(article.mobility_text_translations.count).to eq(1)
-        article.title = ""
-        article.save
-        expect(article.title).to be_nil
-        expect(translation_class.count).to eq(1)
-      end
-    end
-
-    it "destroys translation on save if value is set to a blank value" do
-      Article.create(title: "New Article")
-
-      article = Article.first
-      article.title = ""
-
-      aggregate_failures do
-        expect { article.valid? }.not_to change(translation_class, :count)
-        expect { article.save }.to change(translation_class, :count).by(-1)
-
-        expect(article.title).to eq(nil)
-      end
-    end
-
-    it "does not override after_save method" do
-      mod = Module.new do
-        attr_reader :after_save_called
-        def after_save
-          super
-          @after_save_called = true
-        end
-      end
-      Article.prepend(mod)
-
-      Mobility.locale = :en
-      article = Article.create(title: "New Article")
-      article.save
-      expect(article.after_save_called).to eq(true)
-    end
-
-    it "resets translations if model is reloaded" do
-      article = Article.create(title: "New Article")
-      Mobility.locale = :ja
-      article.title = "新規記事"
-
-      article.reload
-      article.save
-
-      aggregate_failures do
-        expect(translation_class.count).to eq(1)
-        expect(translation_class.first.value).to eq("New Article")
       end
     end
   end
@@ -278,7 +243,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       described_class.configure!(options)
       expect(options).to eq({
         type: :string,
-        class_name: Mobility::Sequel::StringTranslation,
+        class_name: Mobility::ActiveRecord::StringTranslation,
         association_name: :mobility_string_translations
       })
     end
@@ -288,7 +253,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       described_class.configure!(options)
       expect(options).to eq({
         type: :text,
-        class_name: Mobility::Sequel::TextTranslation,
+        class_name: Mobility::ActiveRecord::TextTranslation,
         association_name: :mobility_text_translations
       })
     end
@@ -302,33 +267,30 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
       described_class.configure!(options)
       expect(options).to eq({
         association_name: :mobility_text_translations,
-        class_name: Mobility::Sequel::TextTranslation
+        class_name: Mobility::ActiveRecord::TextTranslation
       })
     end
   end
 
-  describe "mobility dataset (.i18n)" do
-    include_querying_examples 'Post'
+  describe "mobility scope (.i18n)" do
+    include_querying_examples('Post')
 
     describe "joins" do
-      it "uses inner join for WHERE queries with non-nil values" do
-        expect(Post.i18n.where(title: "foo").sql).not_to match(/OUTER/)
+      it "uses inner join for WHERE queries" do
+        expect(Post.i18n.where(title: "foo").to_sql).not_to match(/OUTER/)
       end
 
-      it "does not use OUTER JOIN with invert" do
-        # we don't need an OUTER join when matching nil values since we're searching for negative matches
-        expect(Post.i18n.where(title: nil).invert.sql).not_to match /OUTER/
-      end
-
-      it "does not remove other OUTER joins" do
-        expect(Post.i18n.where(title: nil).join_table(:left_outer, :post_metadatas).invert.sql).to match /LEFT OUTER JOIN \W*post_metadatas/
+      it "does not use OUTER JOIN with .not" do
+        # we don't need an OUTER join when matching nil values since
+        # we're searching for negative matches
+        expect(Post.i18n.where.not(title: nil).to_sql).not_to match /OUTER/
       end
     end
 
     context "model with two translated attributes on different tables" do
       before do
         Article.class_eval do
-          translates :short_title, backend: :table, class_name: Mobility::Sequel::StringTranslation, association_name: :mobility_string_translations
+          translates :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :mobility_string_translations
         end
         @article1 = Article.create(title: "foo post", short_title: "bar short 1")
         @article2 = Article.create(title: "foo post", short_title: "bar short 2")
@@ -337,10 +299,44 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
 
       it "returns correct result when querying on multiple tables" do
         aggregate_failures do
-          expect(Article.i18n.where(title: "foo post", short_title: "bar short 2").select_all(:articles).all).to eq([@article2])
-          expect(Article.i18n.where(title: nil, short_title: "bar short 2").select_all(:articles).all).to eq([])
-          expect(Article.i18n.where(title: nil, short_title: "bar short 1").select_all(:articles).all).to eq([@article3])
+          expect(Article.i18n.where(title: "foo post", short_title: "bar short 2")).to eq([@article2])
+          expect(Article.i18n.where(title: nil, short_title: "bar short 2")).to eq([])
+          expect(Article.i18n.where(title: nil, short_title: "bar short 1")).to eq([@article3])
         end
+      end
+    end
+
+    describe "Subclassing WhereChain" do
+      it "extends Post::MobilityWhereChain to handle translated attributes without creating memory leak" do
+        expect(Post.const_defined?(:MobilityWhereChain)).to eq(true)
+        expect { Post.i18n.where.not(title: "foo") }.not_to change(Post::MobilityWhereChain, :ancestors)
+      end
+    end
+  end
+
+  describe "Model.i18n.find_by_<translated attribute>" do
+    it "finds correct translation if exists in current locale" do
+      Mobility.locale = :ja
+      article = Article.create(title: "タイトル")
+      expect(Article.i18n.find_by_title("タイトル")).to eq(article)
+      expect(Article.i18n.find_by_title("foo")).to be_nil
+    end
+
+    it "returns nil if no matching translation exists in this locale" do
+      Mobility.locale = :ja
+      article = Article.create(title: "タイトル")
+      Mobility.locale = :en
+      expect(Article.i18n.find_by_title("タイトル")).to eq(nil)
+      expect(Article.i18n.find_by_title("foo")).to be_nil
+    end
+
+    it "works on a scope" do
+      Mobility.locale = :ja
+      article1 = Article.create(title: "タイトル")
+      Mobility.locale = :en
+      article2 = Article.create(title: "title")
+      Mobility.with_locale(:ja) do
+        expect(Article.i18n.all.find_by_title("タイトル")).to eq(article1)
       end
     end
   end

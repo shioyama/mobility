@@ -82,7 +82,7 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
       end
 
       it "does not raise error for queries on attributes translated with other backends" do
-        SerializedPost.translates :subtitle, backend: :table
+        SerializedPost.translates :subtitle, backend: :key_value
 
         post = SerializedPost.create(subtitle: "foo")
         expect(SerializedPost.i18n.where(subtitle: "foo")).to eq([post])
@@ -106,7 +106,7 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
       end
 
       it "does not raise error for queries on attributes translated with other backends" do
-        SerializedPost.translates :subtitle, backend: :table
+        SerializedPost.translates :subtitle, backend: :key_value
 
         post = SerializedPost.create(subtitle: "foo")
         expect(SerializedPost.i18n.where.not(subtitle: "bar")).to eq([post])

@@ -1,9 +1,10 @@
 module Mobility
   module Backend
     class ActiveRecord::KeyValue
+      include Backend
+
       autoload :QueryMethods, 'mobility/backend/active_record/key_value/query_methods'
 
-      include Base
       attr_reader :association_name
 
       def initialize(model, attribute, **options)

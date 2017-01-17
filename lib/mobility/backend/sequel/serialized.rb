@@ -1,8 +1,9 @@
 module Mobility
   module Backend
     class Sequel::Serialized
+      include Backend
+
       autoload :QueryMethods, 'mobility/backend/sequel/serialized/query_methods'
-      include Base
 
       def read(locale, **options)
         translations[locale]

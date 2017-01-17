@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     class Null
-      include Base
+      include Backend
 
       def read(*); end
       def write(*); end

@@ -1,9 +1,10 @@
 module Mobility
   module Backend
     class Sequel::KeyValue
+      include Backend
+
       autoload :QueryMethods, 'mobility/backend/sequel/key_value/query_methods'
 
-      include Base
       attr_reader :association_name, :class_name
 
       def initialize(model, attribute, **options)

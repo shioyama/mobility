@@ -3,7 +3,7 @@ module Mobility
     class ActiveRecord::Column
       autoload :QueryMethods, 'mobility/backend/active_record/column/query_methods'
 
-      include Base
+      include Backend
       include Mobility::Backend::Column
 
       def self.configure!(options)

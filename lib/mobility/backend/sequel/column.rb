@@ -1,10 +1,10 @@
 module Mobility
   module Backend
     class Sequel::Column
-      autoload :QueryMethods, 'mobility/backend/sequel/column/query_methods'
-
-      include Base
+      include Backend
       include Mobility::Backend::Column
+
+      autoload :QueryMethods, 'mobility/backend/sequel/column/query_methods'
 
       def self.configure!(options)
         options[:locale_accessors] = false

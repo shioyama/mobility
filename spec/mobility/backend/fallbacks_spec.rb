@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Backend::Fallbacks do
   let(:backend_class) do
     backend_class = stub_const 'MyBackend', Class.new
-    backend_class.include(Mobility::Backend::Base)
+    backend_class.include(Mobility::Backend)
     backend_class.class_eval do
       def read(locale, **options)
         {

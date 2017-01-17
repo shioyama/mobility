@@ -1,9 +1,9 @@
 module Mobility
   module Backend
     class ActiveRecord::Serialized
-      autoload :QueryMethods, 'mobility/backend/active_record/serialized/query_methods'
+      include Backend
 
-      include Base
+      autoload :QueryMethods, 'mobility/backend/active_record/serialized/query_methods'
 
       def read(locale, **options)
         translations[locale]

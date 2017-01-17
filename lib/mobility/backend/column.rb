@@ -1,6 +1,6 @@
 module Mobility
   module Backend
-    module Columns
+    module Column
       include OrmDelegator
 
       def read(locale, **options)
@@ -12,7 +12,7 @@ module Mobility
       end
 
       def column(locale)
-        Columns.column_name_for(attribute, locale)
+        Backend::Column.column_name_for(attribute, locale)
       end
 
       def self.column_name_for(attribute, locale)

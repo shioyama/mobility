@@ -1,10 +1,10 @@
 module Mobility
   module Backend
-    class ActiveRecord::Columns
-      autoload :QueryMethods, 'mobility/backend/active_record/columns/query_methods'
+    class ActiveRecord::Column
+      autoload :QueryMethods, 'mobility/backend/active_record/column/query_methods'
 
       include Base
-      include Mobility::Backend::Columns
+      include Mobility::Backend::Column
 
       def self.configure!(options)
         options[:locale_accessors] = false

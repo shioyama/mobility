@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::Sequel::Columns, orm: :sequel do
+describe Mobility::Backend::Sequel::Column, orm: :sequel do
   extend Helpers::Sequel
 
   let(:attributes) { %w[content author] }
@@ -16,7 +16,7 @@ describe Mobility::Backend::Sequel::Columns, orm: :sequel do
     stub_const 'Comment', Class.new(Sequel::Model)
     Comment.dataset = DB[:comments]
     Comment.include Mobility
-    Comment.translates *attributes, backend: :columns, cache: false
+    Comment.translates *attributes, backend: :column, cache: false
   end
 
   subject { comment }
@@ -57,7 +57,7 @@ describe Mobility::Backend::Sequel::Columns, orm: :sequel do
 
   describe "with locale accessors" do
     it "still works as usual" do
-      Comment.translates *attributes, backend: :columns, cache: false, locale_accessors: true
+      Comment.translates *attributes, backend: :column, cache: false, locale_accessors: true
       backend.write(:en, "Crappy post!")
       expect(comment.content_en).to eq("Crappy post!")
     end

@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     module Sequel
-      autoload :Columns,      'mobility/backend/sequel/columns'
+      autoload :Column,       'mobility/backend/sequel/column'
       autoload :Dirty,        'mobility/backend/sequel/dirty'
       autoload :KeyValue,     'mobility/backend/sequel/key_value'
       autoload :Serialized,   'mobility/backend/sequel/serialized'

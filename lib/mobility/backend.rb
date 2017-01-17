@@ -4,7 +4,7 @@ module Mobility
     autoload :ActiveRecord, 'mobility/backend/active_record'
     autoload :Base,         'mobility/backend/base'
     autoload :Cache,        'mobility/backend/cache'
-    autoload :Columns,      'mobility/backend/columns'
+    autoload :Column,       'mobility/backend/column'
     autoload :Dirty,        'mobility/backend/dirty'
     autoload :Fallbacks,    'mobility/backend/fallbacks'
     autoload :KeyValue,     'mobility/backend/key_value'

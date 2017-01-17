@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::ActiveRecord::Columns, orm: :active_record do
+describe Mobility::Backend::ActiveRecord::Column, orm: :active_record do
   extend Helpers::ActiveRecord
 
   let(:attributes) { %w[content author] }
@@ -15,7 +15,7 @@ describe Mobility::Backend::ActiveRecord::Columns, orm: :active_record do
   before do
     stub_const 'Comment', Class.new(ActiveRecord::Base)
     Comment.include Mobility
-    Comment.translates *attributes, backend: :columns, cache: false
+    Comment.translates *attributes, backend: :column, cache: false
   end
 
   subject { comment }
@@ -56,7 +56,7 @@ describe Mobility::Backend::ActiveRecord::Columns, orm: :active_record do
 
   describe "with locale accessors" do
     it "still works as usual" do
-      Comment.translates *attributes, backend: :columns, cache: false, locale_accessors: true
+      Comment.translates *attributes, backend: :column, cache: false, locale_accessors: true
       backend.write(:en, "Crappy post!")
       expect(comment.content_en).to eq("Crappy post!")
     end
@@ -64,13 +64,13 @@ describe Mobility::Backend::ActiveRecord::Columns, orm: :active_record do
 
   describe "with dirty" do
     it "still works as usual" do
-      Comment.translates *attributes, backend: :columns, cache: false, dirty: true
+      Comment.translates *attributes, backend: :column, cache: false, dirty: true
       backend.write(:en, "Crappy post!")
       expect(comment.content_en).to eq("Crappy post!")
     end
 
     it "tracks changed attributes" do
-      Comment.translates *attributes, backend: :columns, cache: false, dirty: true
+      Comment.translates *attributes, backend: :column, cache: false, dirty: true
       comment = Comment.new
 
       aggregate_failures do

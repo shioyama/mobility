@@ -66,14 +66,13 @@ module Mobility
         true
       end
 
-      # This is basically a depth-two dup of the deserialized values, necessary in order to assure we
-      # have a distinct copy for all locales. The original serialization modification detection plugin
-      # just points original_deserialized_values to deserialized_values, which prevents detection of
-      # changes.
+      # The original serialization_modification_detection plugin sets
+      # @original_deserialized_values to be @deserialized_values, which
+      # doesn't work. Setting it to a new empty hash seems to work better.
       module SerializationModificationDetectionFix
         def after_save
           super()
-          @original_deserialized_values = @deserialized_values.inject({}) { |vs, (col, trs)| vs[col] = trs.dup; vs}
+          @original_deserialized_values = {}
         end
       end
 

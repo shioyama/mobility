@@ -68,11 +68,6 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
   end
 
   it "sets translations in multiple locales when updating model" do
-    # TODO: get Sequel table backend to pass this spec
-    model_class.mobility.modules.each do |backend_module|
-      skip if backend_module.backend_name == :table
-    end if Mobility::Loaded::Sequel
-
     instance = model_class.create
 
     aggregate_failures "setting attributes with update" do
@@ -89,6 +84,32 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
     aggregate_failures "reading attributes from db after update" do
       expect(instance.send(attribute1)).to eq("foo")
       Mobility.with_locale(:ja) { expect(instance.send(attribute1)).to eq("あああ") }
+    end
+  end
+end
+
+shared_examples_for "Sequel model with translated attribute accessors" do |model_class_name, attribute1=:title, attribute2=:content, **options|
+  let(:model_class) { model_class_name.constantize }
+
+  it "marks model as modified if translation(s) change" do
+    instance = model_class.create(attribute1 => "foo")
+
+    aggregate_failures "before saving" do
+      expect(instance.modified?).to eq(false)
+
+      instance.send("#{attribute1}=", "bar")
+      expect(instance.modified?).to eq(true)
+    end
+
+    instance.save
+
+    aggregate_failures "after saving" do
+      expect(instance.modified?).to eq(false)
+      instance.send("#{attribute1}=", "bar")
+      instance.modified?
+      expect(instance.modified?).to eq(false)
+      instance.send("#{attribute1}=", "foo")
+      expect(instance.modified?).to eq(true)
     end
   end
 end

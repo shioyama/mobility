@@ -80,6 +80,8 @@ module Mobility
           end
         end
         extend extension
+
+        include Mobility::Sequel::ColumnChanges.new(attributes)
       end
 
       def new_cache

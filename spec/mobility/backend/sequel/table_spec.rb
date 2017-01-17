@@ -170,11 +170,11 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
         article.update(title: "新規記事", content: "昔々あるところに…")
         expect(article.title).to eq("新規記事")
         expect(article.content).to eq("昔々あるところに…")
-        expect(article.mobility_text_translations.count).to eq(2)
+        expect(article.mobility_text_translations.count).to eq(4)
       end
 
-      aggregate_failures "after saving" do
-        article.save
+      aggregate_failures "after reloading" do
+        article = Article.first
         expect(article.mobility_text_translations.count).to eq(4)
         expect(Mobility::Sequel::TextTranslation.count).to eq(4)
       end

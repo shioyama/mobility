@@ -16,6 +16,7 @@ module Helpers
   module Sequel
     def include_accessor_examples *args
       it_behaves_like "model with translated attribute accessors", *args
+      it_behaves_like "Sequel model with translated attribute accessors", *args
     end
 
     def include_querying_examples *args

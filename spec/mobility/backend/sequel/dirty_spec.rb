@@ -100,33 +100,33 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
     end
 
     it "resets changes when locale is set to original value" do
-      post = Post.create(title: "foo")
+      article = Article.create(title: "foo")
 
-      expect(post.column_changed?(:title)).to eq(false)
+      expect(article.column_changed?(:title)).to eq(false)
 
       aggregate_failures "after change" do
-        post.title = "bar"
-        expect(post.column_changed?(:title)).to eq(true)
-        expect(post.changed_columns).to eq([:title_en])
-        expect(post.column_changes).to eq({ title_en: ["foo", "bar"] })
+        article.title = "bar"
+        expect(article.column_changed?(:title)).to eq(true)
+        expect(article.changed_columns).to eq([:title_en])
+        expect(article.column_changes).to eq({ title_en: ["foo", "bar"] })
       end
 
       aggregate_failures "after setting attribute back to original value" do
-        post.title = "foo"
-        expect(post.changed_columns).to eq([])
-        expect(post.column_changes).to eq({})
-        expect(post.title).to eq("foo")
+        article.title = "foo"
+        expect(article.changed_columns).to eq([])
+        expect(article.column_changes).to eq({})
+        expect(article.title).to eq("foo")
       end
 
       aggregate_failures "changing value in different locale" do
-        Mobility.with_locale(:fr) { post.title = "Titre en Francais" }
+        Mobility.with_locale(:fr) { article.title = "Titre en Francais" }
 
-        expect(post.column_changed?(:title)).to eq(false)
-        expect(post.changed_columns).to eq([:title_fr])
-        expect(post.column_changes).to eq({ title_fr: [nil, "Titre en Francais"] })
+        expect(article.column_changed?(:title)).to eq(false)
+        expect(article.changed_columns).to eq([:title_fr])
+        expect(article.column_changes).to eq({ title_fr: [nil, "Titre en Francais"] })
 
         Mobility.locale = :fr
-        expect(post.column_changed?(:title)).to eq(true)
+        expect(article.column_changed?(:title)).to eq(true)
       end
     end
   end

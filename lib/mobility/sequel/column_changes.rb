@@ -6,8 +6,12 @@ module Mobility
 
         define_method :mobility_set do |attribute, value, locale: Mobility.locale|
           if attributes.include?(attribute)
-            column = :"#{attribute}_#{locale}"
-            @changed_columns << column if !changed_columns.include?(column) && (mobility_get(attribute) != value)
+            column = attribute.to_sym
+            column_with_locale = :"#{attribute}_#{locale}"
+            if mobility_get(attribute) != value
+              @changed_columns << column_with_locale if !changed_columns.include?(column_with_locale)
+              @changed_columns << column             if !changed_columns.include?(column)
+            end
           end
           super(attribute, value, locale: locale)
         end

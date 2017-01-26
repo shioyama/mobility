@@ -232,31 +232,6 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
     end
   end
 
-  describe ".invert" do
-    before do
-      @post1 = model_class.create(attribute1 => "foo post"                                               )
-      @post2 = model_class.create(attribute1 => "foo post", attribute2 => "foo content"                  )
-      @post3 = model_class.create(attribute1 => "foo post", attribute2 => "foo content", published: false)
-      @post4 = model_class.create(                          attribute2 => "foo content"                  )
-      @post5 = model_class.create(attribute1 => "bar post", attribute2 => "bar content", published: true )
-      @post6 = model_class.create(attribute1 => "bar post", attribute2 => "bar content", published: false)
-      @post7 = model_class.create(                                                       published: true )
-    end
-
-    it "returns record without translated attribute value" do
-      expect(model_class.i18n.where(attribute1 => "foo post").invert.select_all(table_name).all).to match_array([@post5, @post6])
-    end
-
-    it "works in combination with untranslated attributes" do
-      expect(model_class.i18n.where(attribute1 => "foo post", published: true).invert.select_all(table_name).all).to eq([@post1, @post2, @post3, @post4, @post5, @post6])
-      expect(model_class.i18n.where(attribute1 => "foo post").or(published: true).invert.select_all(table_name).all).to eq([@post6])
-    end
-
-    it "works with nil values" do
-      expect(model_class.i18n.where(attribute1 => nil).invert.select_all(table_name).all).to match_array([@post1, @post2, @post3, @post5, @post6])
-    end
-  end
-
   describe ".exclude" do
     before do
       @post1 = model_class.create(attribute1 => "foo post"                                               )

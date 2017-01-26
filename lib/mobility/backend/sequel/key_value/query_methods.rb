@@ -37,20 +37,6 @@ module Mobility
         end
         private :_filter_or_exclude
 
-        define_method :invert do
-          if opts[:join] && (translation_joins = opts[:join].to_a.select { |join| join.table == translations_class.table_name }).present?
-            translation_joins.each do |join|
-              # We invert the join type when we invert the relation, so if we had a LEFT OUTER join, we
-              # change it to an inner join, and vice versa. There should be a better way to do this...
-              # TODO: Find a better way to do this.
-              join.instance_variable_get(:@join_type) == :left_outer ?
-                join.instance_variable_set(:@join_type, :inner) :
-                join.instance_variable_set(:@join_type, :left_outer)
-            end
-          end
-          super()
-        end
-
         attributes.each do |attribute|
           define_method :"first_by_#{attribute}" do |value|
             where(attribute => value).select_all(model.table_name).first

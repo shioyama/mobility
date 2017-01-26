@@ -314,15 +314,6 @@ describe "Mobility::Backend::Sequel::KeyValue", orm: :sequel do
       it "uses inner join for WHERE queries with non-nil values" do
         expect(Post.i18n.where(title: "foo").sql).not_to match(/OUTER/)
       end
-
-      it "does not use OUTER JOIN with invert" do
-        # we don't need an OUTER join when matching nil values since we're searching for negative matches
-        expect(Post.i18n.where(title: nil).invert.sql).not_to match /OUTER/
-      end
-
-      it "does not remove other OUTER joins" do
-        expect(Post.i18n.where(title: nil).join_table(:left_outer, :post_metadatas).invert.sql).to match /LEFT OUTER JOIN \W*post_metadatas/
-      end
     end
 
     context "model with two translated attributes on different tables" do

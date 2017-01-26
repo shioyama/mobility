@@ -1,11 +1,13 @@
 module Mobility
   module Backend
     class Sequel::Serialized::QueryMethods < Sequel::QueryMethods
-      def initialize(_attributes, **options)
-        attributes = _attributes.map &:to_sym
+      def initialize(attributes, **options)
+        super
+        attributes_extractor = @attributes_extractor
         cond_checker = @cond_checker = lambda do |cond|
-          if cond.is_a?(Hash) && (cond.keys & attributes).present?
-            raise ArgumentError, "You cannot query on mobility attributes translated with the Serialized backend."
+          if i18n_keys = attributes_extractor.call(cond)
+            raise ArgumentError,
+              "You cannot query on mobility attributes translated with the Serialized backend (#{i18n_keys.join(", ")})."
           end
         end
 

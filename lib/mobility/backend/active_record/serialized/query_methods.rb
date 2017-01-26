@@ -2,9 +2,12 @@ module Mobility
   module Backend
     class ActiveRecord::Serialized::QueryMethods < ActiveRecord::QueryMethods
       def initialize(attributes, **options)
+        super
+        attributes_extractor = @attributes_extractor
         opts_checker = @opts_checker = lambda do |opts|
-          if opts.is_a?(Hash) && (opts.keys.map(&:to_s) & attributes).present?
-            raise ArgumentError, "You cannot query on mobility attributes translated with the Serialized backend."
+          if keys = attributes_extractor.call(opts)
+            raise ArgumentError,
+              "You cannot query on mobility attributes translated with the Serialized backend (#{keys.join(", ")})."
           end
         end
 

@@ -2,13 +2,13 @@ module Mobility
   module Backend
     class Sequel::Column::QueryMethods < Backend::Sequel::QueryMethods
       def initialize(attributes, **options)
+        super
+        attributes_extractor = @attributes_extractor
+
         define_method :_filter_or_exclude do |invert, clause, cond, &block|
-          if cond.is_a?(Hash) && (keys = cond.keys & attributes.map(&:to_sym)).present?
+          if keys = attributes_extractor.call(cond)
             cond = cond.dup
-            keys.each do |attr|
-              attr_with_locale = Mobility::Backend::Column.column_name_for(attr, Mobility.locale)
-              cond[attr_with_locale.to_sym] = cond.delete(attr)
-            end
+            keys.each { |attr| cond[Column.column_name_for(attr)] = cond.delete(attr) }
           end
           super(invert, clause, cond, &block)
         end

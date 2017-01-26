@@ -1,8 +1,9 @@
 module Mobility
   module Backend
     class Sequel::KeyValue::QueryMethods < Sequel::QueryMethods
-      def initialize(_attributes, **options)
-        attributes = _attributes.map &:to_sym
+      def initialize(attributes, **options)
+        super
+        attributes_extractor = @attributes_extractor
         association_name, translations_class = options[:association_name], options[:class_name]
 
         define_method :"join_#{association_name}" do |*attributes, **options|
@@ -20,18 +21,21 @@ module Mobility
           end
         end
 
+        # TODO: find a better way to do this that doesn't involve overriding
+        # a private method...
         define_method :_filter_or_exclude do |invert, clause, *cond, &block|
-          if cond.first.is_a?(Hash) && (keys = cond.first.keys & attributes).present?
+          if i18n_keys = attributes_extractor.call(cond.first)
             cond = cond.first.dup
-            null_keys = keys.select { |key| cond[key].nil? }
-            keys.each { |attr| cond[::Sequel[:"#{attr}_#{association_name}"][:value]] = cond.delete(attr) }
+            i18n_nulls = i18n_keys.select { |key| cond[key].nil? }
+            i18n_keys.each { |attr| cond[::Sequel[:"#{attr}_#{association_name}"][:value]] = cond.delete(attr) }
             super(invert, clause, cond, &block).
-              send("join_#{association_name}", *(keys - null_keys)).
-              send("join_#{association_name}", *null_keys, outer_join: true)
+              send("join_#{association_name}", *(i18n_keys - i18n_nulls)).
+              send("join_#{association_name}", *i18n_nulls, outer_join: true)
           else
             super(invert, clause, *cond, &block)
           end
         end
+        private :_filter_or_exclude
 
         define_method :invert do
           if opts[:join] && (translation_joins = opts[:join].to_a.select { |join| join.table == translations_class.table_name }).present?

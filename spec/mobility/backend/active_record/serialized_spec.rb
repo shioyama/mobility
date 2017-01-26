@@ -74,11 +74,14 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
 
   describe "mobility scope (.i18n)" do
     before { SerializedPost.translates :title, backend: :serialized }
-    let(:error_msg) { "You cannot query on mobility attributes translated with the Serialized backend." }
+
+    def error_msg(*attributes)
+      "You cannot query on mobility attributes translated with the Serialized backend (#{attributes.join(", ")})."
+    end
 
     describe ".where" do
       it "raises error for queries on attributes translated with serialized backend" do
-        expect { SerializedPost.i18n.where(title: "foo") }.to raise_error(ArgumentError, error_msg)
+        expect { SerializedPost.i18n.where(title: "foo") }.to raise_error(ArgumentError, error_msg("title"))
       end
 
       it "does not raise error for queries on attributes translated with other backends" do
@@ -95,14 +98,14 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
 
       it "raises error with multiple serialized attributes defined separatly" do
         SerializedPost.translates :content, backend: :serialized
-        expect { SerializedPost.i18n.where(content: "foo") }.to raise_error(ArgumentError, error_msg)
-        expect { SerializedPost.i18n.where(title: "foo")   }.to raise_error(ArgumentError, error_msg)
+        expect { SerializedPost.i18n.where(content: "foo") }.to raise_error(ArgumentError, error_msg("content"))
+        expect { SerializedPost.i18n.where(title: "foo")   }.to raise_error(ArgumentError, error_msg("title"))
       end
     end
 
     describe ".not" do
       it "raises an error for queries on attributes translated with serialized backend" do
-        expect { SerializedPost.i18n.where.not(title: "foo") }.to raise_error(ArgumentError, error_msg)
+        expect { SerializedPost.i18n.where.not(title: "foo") }.to raise_error(ArgumentError, error_msg("title"))
       end
 
       it "does not raise error for queries on attributes translated with other backends" do
@@ -120,8 +123,8 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
       it "raises error with multiple serialized attributes defined separatly" do
         SerializedPost.translates :content, backend: :serialized
 
-        expect { SerializedPost.i18n.where.not(content: "foo") }.to raise_error(ArgumentError, error_msg)
-        expect { SerializedPost.i18n.where.not(title: "foo")   }.to raise_error(ArgumentError, error_msg)
+        expect { SerializedPost.i18n.where.not(content: "foo") }.to raise_error(ArgumentError, error_msg("content"))
+        expect { SerializedPost.i18n.where.not(title: "foo")   }.to raise_error(ArgumentError, error_msg("title"))
       end
     end
   end

@@ -2,6 +2,13 @@ module Mobility
   module Backend
     module ActiveRecord
       class QueryMethods < Module
+        def initialize(attributes, **options)
+          @attributes = attributes
+          @attributes_extractor = lambda do |opts|
+            opts.is_a?(Hash) && (opts.keys.map(&:to_s) & attributes).presence
+          end
+        end
+
         def extended(relation)
           model_class = relation.model
 

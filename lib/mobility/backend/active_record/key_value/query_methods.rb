@@ -2,9 +2,10 @@ module Mobility
   module Backend
     class ActiveRecord::KeyValue::QueryMethods < ActiveRecord::QueryMethods
       def initialize(attributes, **options)
+        super
         association_name, translations_class = options[:association_name], options[:class_name]
-        @association_name = association_name
-        @attributes = attributes
+        @association_name    = association_name
+        attributes_extractor = @attributes_extractor
 
         define_method :"join_#{association_name}" do |*attributes, **options|
           attributes.inject(self) do |relation, attribute|
@@ -20,13 +21,13 @@ module Mobility
         end
 
         define_method :where! do |opts, *rest|
-          if opts.is_a?(Hash) && (keys = opts.keys.map(&:to_s) & attributes).present?
-            opts = opts.stringify_keys
-            null_keys = keys.select { |key| opts[key].nil? }
-            keys.each { |attr| opts["#{attr}_#{association_name}"] = { value: opts.delete(attr) }}
+          if i18n_keys = attributes_extractor.call(opts)
+            opts = opts.with_indifferent_access
+            i18n_nulls = i18n_keys.select { |key| opts[key].nil? }
+            i18n_keys.each { |attr| opts["#{attr}_#{association_name}"] = { value: opts.delete(attr) }}
             super(opts, *rest).
-              send("join_#{association_name}", *(keys - null_keys)).
-              send("join_#{association_name}", *null_keys, outer_join: true)
+              send("join_#{association_name}", *(i18n_keys - i18n_nulls)).
+              send("join_#{association_name}", *i18n_nulls, outer_join: true)
           else
             super(opts, *rest)
           end
@@ -41,13 +42,15 @@ module Mobility
 
       def extended(relation)
         super
-        attributes, association_name = @attributes, @association_name
+        association_name     = @association_name
+        attributes_extractor = @attributes_extractor
+
         mod = Module.new do
           define_method :not do |opts, *rest|
-            if opts.is_a?(Hash) && (keys = opts.keys.map(&:to_s) & attributes).present?
-              opts = opts.stringify_keys
-              keys.each { |attr| opts["#{attr}_#{association_name}"] = { value: opts.delete(attr) }}
-              super(opts, *rest).send(:"join_#{association_name}", *keys)
+            if i18n_keys = attributes_extractor.call(opts)
+              opts = opts.with_indifferent_access
+              i18n_keys.each { |attr| opts["#{attr}_#{association_name}"] = { value: opts.delete(attr) }}
+              super(opts, *rest).send(:"join_#{association_name}", *i18n_keys)
             else
               super(opts, *rest)
             end

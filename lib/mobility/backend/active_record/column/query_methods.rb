@@ -2,43 +2,38 @@ module Mobility
   module Backend
     class ActiveRecord::Column::QueryMethods < Backend::ActiveRecord::QueryMethods
       def initialize(attributes, **options)
-        @attributes = attributes
+        super
+        attributes_extractor = @attributes_extractor
 
         define_method :where! do |opts, *rest|
-          if opts.is_a?(Hash) && (keys = opts.keys.map(&:to_s) & attributes).present?
-            opts = opts.stringify_keys
-            keys.each do |attribute|
-              attr_with_locale = Mobility::Backend::Column.column_name_for(attribute, Mobility.locale)
-              opts[attr_with_locale] = opts.delete(attribute)
-            end
+          if i18n_keys = attributes_extractor.call(opts)
+            opts = opts.with_indifferent_access
+            i18n_keys.each { |attr| opts[Column.column_name_for(attr)] = opts.delete(attr) }
           end
           super(opts, *rest)
         end
 
         attributes.each do |attribute|
           define_method :"find_by_#{attribute}" do |value|
-            find_by(Mobility::Backend::Column.column_name_for(attribute, Mobility.locale) => value)
+            find_by(Column.column_name_for(attribute) => value)
           end
         end
       end
 
       def extended(relation)
         super
-        attributes = @attributes
-        model_class = relation.model
+        attributes_extractor = @attributes_extractor
+
         mod = Module.new do
           define_method :not do |opts, *rest|
-            if opts.is_a?(Hash) && (keys = opts.keys.map(&:to_s) & attributes).present?
-              opts = opts.stringify_keys
-              keys.each do |attr|
-                attr_with_locale = Mobility::Backend::Column.column_name_for(attr, Mobility.locale)
-                opts[attr_with_locale] = opts.delete(attr)
-              end
+            if i18n_keys = attributes_extractor.call(opts)
+              opts = opts.with_indifferent_access
+              i18n_keys.each { |attr| opts[Column.column_name_for(attr)] = opts.delete(attr) }
             end
             super(opts, *rest)
           end
         end
-        model_class.const_get(:MobilityWhereChain).prepend(mod)
+        relation.model.const_get(:MobilityWhereChain).prepend(mod)
       end
     end
   end

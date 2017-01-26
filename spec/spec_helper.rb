@@ -5,6 +5,7 @@ if orm = ENV['ORM']
 else
   orm = 'none'
 end
+db = ENV['DB'] || 'none'
 require 'pry-byebug'
 require 'i18n'
 require 'rspec'
@@ -26,6 +27,7 @@ unless orm == 'none'
   DatabaseCleaner.strategy = :transaction
 
   DB = Mobility::Test::Database.connect(orm)
+  DB.extension :pg_json if orm == 'sequel' && db == 'postgres'
   # for in-memory sqlite database
   Mobility::Test::Database.auto_migrate
 
@@ -53,5 +55,5 @@ RSpec.configure do |config|
     end
   end
 
-  config.filter_run_excluding orm: lambda { |v| v != orm.to_sym }
+  config.filter_run_excluding orm: lambda { |v| v != orm.to_sym }, db: lambda { |v| v!= db.to_sym }
 end

@@ -57,6 +57,14 @@ module Mobility
             t.text :content
             t.boolean :published
           end
+
+          if ENV['DB'] == 'postgres'
+            create_table "jsonb_posts" do |t|
+              t.jsonb :title
+              t.jsonb :content
+              t.boolean :published
+            end
+          end
         end
       end
     end

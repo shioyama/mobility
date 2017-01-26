@@ -67,6 +67,15 @@ module Mobility
             String      :content,       size: 65535
             TrueClass   :published
           end
+
+          if ENV['DB'] == 'postgres'
+            DB.create_table? :jsonb_posts do
+              primary_key :id
+              jsonb       :title
+              jsonb       :content
+              TrueClass   :published
+            end
+          end
         end
 
         def up

@@ -1,4 +1,10 @@
 module Helpers
+  def stringify_keys(hash)
+    result = Hash.new
+    hash.each_key { |key| result[key.to_s] = hash[key] }
+    result
+  end
+
   module ActiveRecord
     def include_accessor_examples *args
       it_behaves_like "model with translated attribute accessors", *args

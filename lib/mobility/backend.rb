@@ -6,6 +6,7 @@ module Mobility
     autoload :Column,       'mobility/backend/column'
     autoload :Dirty,        'mobility/backend/dirty'
     autoload :Fallbacks,    'mobility/backend/fallbacks'
+    autoload :Jsonb,        'mobility/backend/jsonb'
     autoload :KeyValue,     'mobility/backend/key_value'
     autoload :Null,         'mobility/backend/null'
     autoload :OrmDelegator, 'mobility/backend/orm_delegator'

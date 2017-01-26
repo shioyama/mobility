@@ -109,7 +109,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
       @post3 = model_class.create(attribute1 => "foo post", attribute2 => "foo content", published: false)
       @post4 = model_class.create(                          attribute2 => "foo content"                  )
       @post5 = model_class.create(attribute1 => "bar post", attribute2 => "bar content", published: true )
-      @post6 = model_class.create(attribute1 => "bar post", attribute2 => "bar content", published: false)
+      @post6 = model_class.create(attribute1 => "bar post", attribute2 => "baz content", published: false)
       @post7 = model_class.create(                                                       published: true)
     end
 
@@ -119,6 +119,10 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
 
     it "returns record without translated attribute value" do
       expect(model_class.i18n.where.not(attribute1 => "foo post")).to match_array([@post5, @post6])
+    end
+
+    it "returns record without set of translated attribute values" do
+      expect(model_class.i18n.where.not(attribute1 => "foo post", attribute2 => "baz content")).to match_array([@post5])
     end
 
     it "works in combination with untranslated attributes" do

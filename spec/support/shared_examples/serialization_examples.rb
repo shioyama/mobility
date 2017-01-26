@@ -136,9 +136,27 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 end
 
 shared_examples_for "Sequel Model with serialized translations" do |model_class_name, attribute1=:title, attribute2=:content|
+  include Helpers
+
   let(:model_class) { model_class_name.constantize }
   let(:format) { backend.options[:format] }
   let(:backend) { instance.send(:"#{attribute1}_translations") }
+
+  def serialize(value)
+    format ? value.send("to_#{format}") : stringify_keys(value)
+  end
+
+  def assign_translations(instance, attribute, value)
+    instance.send(:"#{attribute}_before_mobility=", serialize(value))
+  end
+
+  def get_translations(instance, attribute)
+    if instance.respond_to?(:deserialized_values)
+      instance.deserialized_values[attribute]
+    else
+      instance.send("#{attribute}_before_mobility").to_hash
+    end
+  end
 
   describe "#read" do
     let(:instance) { model_class.new }
@@ -152,7 +170,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
 
     context "serialized column has a translation" do
       it "returns translation from serialized hash" do
-        instance.send(:"#{attribute1}_before_mobility=", { ja: "あああ" }.send("to_#{format}"))
+        assign_translations(instance, attribute1, { ja: "あああ" })
         instance.save
         instance.reload
 
@@ -163,8 +181,8 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
 
     context "multiple serialized columns have translations" do
       it "returns translation from serialized hash" do
-        instance.send(:"#{attribute1}_before_mobility=", { ja: "あああ" }.send("to_#{format}"))
-        instance.send(:"#{attribute2}_before_mobility=", { en: "aaa" }.send("to_#{format}"))
+        assign_translations(instance, attribute1, { ja: "あああ" })
+        assign_translations(instance, attribute2, { en: "aaa" })
         instance.save
         instance.reload
 
@@ -182,26 +200,26 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
 
     it "assigns to serialized hash" do
       backend.write(:en, "foo")
-      expect(instance.deserialized_values[attribute1]).to eq(en: "foo")
+      expect(get_translations(instance, attribute1)).to match_hash({ en: "foo" })
       backend.write(:fr, "bar")
-      expect(instance.deserialized_values[attribute1]).to eq({ en: "foo", fr: "bar" })
+      expect(get_translations(instance, attribute1)).to match_hash({ en: "foo", fr: "bar" })
     end
 
     it "deletes keys with nil values when saving" do
       backend.write(:en, "foo")
-      expect(instance.deserialized_values[attribute1]).to eq({ en: "foo" })
+      expect(get_translations(instance, attribute1)).to match_hash({ en: "foo" })
       backend.write(:en, nil)
-      expect(instance.deserialized_values[attribute1]).to eq({ en: nil })
+      expect(get_translations(instance, attribute1)).to match_hash({ en: nil })
       instance.save
       expect(backend.read(:en)).to eq(nil)
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({}.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({}))
     end
 
     it "deletes keys with blank values when saving" do
       backend.write(:en, "foo")
-      expect(instance.deserialized_values[attribute1]).to eq({ en: "foo" })
+      expect(get_translations(instance, attribute1)).to match_hash({ en: "foo" })
       instance.save
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({ en: "foo" }.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ en: "foo" }))
       backend.write(:en, "")
       instance.save
 
@@ -213,18 +231,25 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       # value is read back, so the backend returns nil.
       # TODO: Make this return nil? (or make AR return a blank string)
       # (In practice this is not an issue since instance.title returns `value.presence`).
-      expect(backend.read(:en)).to eq("")
+      #
+      # Note that for Jsonb backend (when format is nil) this correctly returns
+      # nil.
+      if format.present?
+        expect(backend.read(:en)).to eq("")
+      else
+        expect(backend.read(:en)).to eq(nil)
+      end
 
       expect(instance.send(attribute1)).to eq(nil)
       instance.reload
       expect(backend.read(:en)).to eq(nil)
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({}.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({}))
     end
 
     it "converts non-string types to strings when saving" do
       backend.write(:en, { foo: :bar } )
       instance.save
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({ en: "{:foo=>:bar}" }.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ en: "{:foo=>:bar}" }))
     end
 
     it "correctly stores serialized attributes" do
@@ -235,13 +260,13 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       backend = instance.send(:"#{attribute1}_translations")
       expect(instance.send(attribute1)).to eq("foo")
       Mobility.with_locale(:fr) { expect(instance.send(attribute1)).to eq("bar") }
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({ en: "foo", fr: "bar" }.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ en: "foo", fr: "bar" }))
 
       backend.write(:en, "")
       instance.save
       instance = model_class.first
       expect(instance.send(attribute1)).to eq(nil)
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({ fr: "bar" }.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ fr: "bar" }))
     end
   end
 
@@ -252,14 +277,14 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       expect(instance.send(attribute1)).to eq(nil)
       expect(backend.read(:en)).to eq(nil)
       instance.save
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({}.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({}))
     end
 
     it "saves changes to translations" do
       instance.send(:"#{attribute1}=", "foo")
       instance.save
       instance = model_class.first
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({ en: "foo" }.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ en: "foo" }))
     end
   end
 
@@ -269,10 +294,10 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
     it "updates changes to translations" do
       instance.send(:"#{attribute1}=", "foo")
       instance.save
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({ en: "foo" }.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ en: "foo" }))
       instance = model_class.first
       instance.update(attribute1 => "bar")
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq({ en: "bar" }.send("to_#{format}"))
+      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ en: "bar" }))
     end
   end
 end

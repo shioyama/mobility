@@ -15,14 +15,4 @@ describe Mobility::Backend::ActiveRecord::Jsonb, orm: :active_record, db: :postg
   include_accessor_examples 'JsonbPost'
   include_serialization_examples 'JsonbPost'
   include_querying_examples 'JsonbPost'
-
-  it "raises error if format is present and not :json" do
-    expect {
-      JsonbPost.translates :foo, backend: :jsonb, format: :yaml
-    }.to raise_error(ArgumentError, "Format must be JSON for Jsonb backend.")
-  end
-
-  it "sets options[:format] to json" do
-    expect(backend.options[:format]).to eq(:json)
-  end
 end

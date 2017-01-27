@@ -13,14 +13,6 @@ module Mobility
         translations[locale] = value && value.to_s
       end
 
-      def self.configure!(options)
-        if options[:format].present?
-          raise ArgumentError, "Format must be JSON for Jsonb backend." if options[:format].to_s != "json"
-        else
-          options[:format] = :json
-        end
-      end
-
       setup do |attributes, options|
         attributes.each { |attribute| store attribute, coder: JSONCoder }
         before_validation do

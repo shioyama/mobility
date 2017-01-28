@@ -161,6 +161,36 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     end
   end
 
+  describe "restoring attributes" do
+    it "defines restore_<attribute>! for translated attributes" do
+      article = Article.create
+      article.title = "foo"
+
+      article.restore_title!
+      expect(article.title).to eq(nil)
+      expect(article.changes).to eq({})
+    end
+
+    it "restores attribute when passed to restore_attribute!" do
+      article = Article.create
+      article.title = "foo"
+      article.send :restore_attribute!, :title
+
+      expect(article.title).to eq(nil)
+    end
+
+    it "handles translated attributes when passed to restore_attributes" do
+      article = Article.create(title: "foo")
+
+      expect(article.title).to eq("foo")
+
+      article.title = "bar"
+      expect(article.title).to eq("bar")
+      article.restore_attributes([:title])
+      expect(article.title).to eq("foo")
+    end
+  end
+
   describe "resetting original values hash on actions" do
     shared_examples_for "resets on model action" do |action|
       it "resets changes when model on #{action}" do

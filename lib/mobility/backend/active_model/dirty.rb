@@ -29,6 +29,27 @@ module Mobility
               end
             end
           end
+
+          restore_methods = Module.new do
+            attributes.each do |attribute|
+              locale_accessor = "#{attribute}_#{Mobility.locale}"
+              define_method "restore_#{attribute}!" do
+                if attribute_changed?(locale_accessor)
+                  __send__("#{attribute}=", changed_attributes[locale_accessor])
+                end
+              end
+            end
+
+            define_method :restore_attribute! do |attr|
+              if attributes.include?(attr.to_s)
+                send("restore_#{attr}!")
+              else
+                super(attr)
+              end
+            end
+            private :restore_attribute!
+          end
+          model_class.include restore_methods
         end
       end
     end

@@ -24,9 +24,15 @@ module Mobility
       attributes.each do |attribute|
         define_backend(attribute)
 
-        define_method attribute do |**options|
-          mobility_get(attribute, options)
-        end if %i[accessor reader].include?(method)
+        if %i[accessor reader].include?(method)
+          define_method attribute do |**options|
+            mobility_get(attribute, options)
+          end
+
+          define_method "#{attribute}?" do |**options|
+            mobility_get(attribute, options).present?
+          end
+        end
 
         define_method "#{attribute}=" do |value|
           mobility_set(attribute, value)

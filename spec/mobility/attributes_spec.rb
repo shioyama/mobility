@@ -129,6 +129,11 @@ describe Mobility::Attributes do
           expect(article.title).to eq("foo")
         end
 
+        it "correctly maps presence method for translated attribute to backend" do
+          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+          expect(article.title?).to eq(true)
+        end
+
         it "correctly maps locale through getter options" do
           expect(backend).to receive(:read).with(:fr, {}).and_return("foo")
           expect(article.title(locale: "fr")).to eq("foo")

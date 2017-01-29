@@ -27,7 +27,7 @@ unless orm == 'none'
   DatabaseCleaner.strategy = :transaction
 
   DB = Mobility::Test::Database.connect(orm)
-  DB.extension :pg_json if orm == 'sequel' && db == 'postgres'
+  DB.extension :pg_json, :pg_hstore if orm == 'sequel' && db == 'postgres'
   # for in-memory sqlite database
   Mobility::Test::Database.auto_migrate
 

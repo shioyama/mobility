@@ -75,6 +75,14 @@ module Mobility
               jsonb       :content
               TrueClass   :published
             end
+
+            DB.run "CREATE EXTENSION IF NOT EXISTS hstore"
+            DB.create_table? :hstore_posts do
+              primary_key :id
+              hstore      :title
+              hstore      :content
+              TrueClass   :published
+            end
           end
         end
 

@@ -1,8 +1,8 @@
-require 'mobility/backend/active_record/hash_backend'
+require 'mobility/backend/active_record/hash_valued'
 
 module Mobility
   module Backend
-    class ActiveRecord::Hstore < ActiveRecord::HashBackend
+    class ActiveRecord::Hstore < ActiveRecord::HashValued
       autoload :QueryMethods, 'mobility/backend/active_record/hstore/query_methods'
 
       def write(locale, value, **options)

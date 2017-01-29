@@ -1,8 +1,8 @@
-require 'mobility/backend/active_record/hash_backend'
+require 'mobility/backend/active_record/hash_valued'
 
 module Mobility
   module Backend
-    class ActiveRecord::Jsonb < ActiveRecord::HashBackend
+    class ActiveRecord::Jsonb < ActiveRecord::HashValued
       autoload :QueryMethods, 'mobility/backend/active_record/jsonb/query_methods'
 
       setup do |attributes, options|

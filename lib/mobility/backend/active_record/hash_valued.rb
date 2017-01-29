@@ -1,6 +1,6 @@
 module Mobility
   module Backend
-    class ActiveRecord::HashBackend
+    class ActiveRecord::HashValued
       include Backend
 
       def read(locale, **options)

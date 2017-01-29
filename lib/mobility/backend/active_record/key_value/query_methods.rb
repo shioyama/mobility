@@ -56,7 +56,7 @@ module Mobility
             end
           end
         end
-        relation.model.const_get(:MobilityWhereChain).prepend(mod)
+        relation.model.mobility_where_chain.prepend(mod)
       end
     end
   end

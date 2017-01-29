@@ -11,12 +11,14 @@ module Mobility
 
         def extended(relation)
           model_class = relation.model
-
-          unless model_class.const_defined?(:MobilityWhereChain)
-            relation.define_singleton_method :where do |opts = :chain, *rest|
-              opts == :chain ? self.const_get(:MobilityWhereChain).new(spawn) : super(opts, *rest)
+          unless model_class.respond_to?(:mobility_where_chain)
+            model_class.define_singleton_method(:mobility_where_chain) do
+              @mobility_where_chain ||= Class.new(::ActiveRecord::QueryMethods::WhereChain)
             end
-            model_class.const_set(:MobilityWhereChain, Class.new(::ActiveRecord::QueryMethods::WhereChain))
+
+            relation.define_singleton_method :where do |opts = :chain, *rest|
+              opts == :chain ? mobility_where_chain.new(spawn) : super(opts, *rest)
+            end
           end
         end
       end

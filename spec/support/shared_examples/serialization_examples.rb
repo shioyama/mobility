@@ -79,12 +79,6 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       expect(instance.read_attribute(attribute1)).to eq({})
     end
 
-    it "converts non-string types to strings when saving" do
-      backend.write(:en, { foo: :bar } )
-      instance.save
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "{:foo=>:bar}" })
-    end
-
     it "correctly stores serialized attributes" do
       backend.write(:en, "foo")
       backend.write(:fr, "bar")

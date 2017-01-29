@@ -6,7 +6,7 @@ module Mobility
       end
 
       def write(locale, value, **options)
-        translations[locale] = value && value.to_s
+        translations[locale] = value
       end
 
       def translations

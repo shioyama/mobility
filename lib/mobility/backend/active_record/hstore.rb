@@ -5,6 +5,10 @@ module Mobility
     class ActiveRecord::Hstore < ActiveRecord::HashBackend
       autoload :QueryMethods, 'mobility/backend/active_record/hstore/query_methods'
 
+      def write(locale, value, **options)
+        translations[locale] = value && value.to_s
+      end
+
       setup do |attributes, options|
         query_methods = Module.new do
           define_method :i18n do

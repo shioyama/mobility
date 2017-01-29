@@ -14,6 +14,16 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
       include_accessor_examples 'SerializedPost'
       include_serialization_examples 'SerializedPost'
 
+      describe "non-text values" do
+        it "converts non-string types to strings when saving" do
+          post = SerializedPost.new
+          backend = post.title_translations
+          backend.write(:en, { foo: :bar } )
+          post.save
+          expect(post.read_attribute(:title)).to match_hash({ en: "{:foo=>:bar}" })
+        end
+      end
+
       # SANITY CHECK
       it "serializes as YAML" do
         post = SerializedPost.new

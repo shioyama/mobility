@@ -1,5 +1,4 @@
 require 'mobility/backend/sequel/hash_valued'
-Sequel.extension :pg_hstore, :pg_hstore_ops
 
 module Mobility
   module Backend

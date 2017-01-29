@@ -33,7 +33,15 @@ module Mobility
 
     module Setup
       def setup &block
-        @setup_block = block
+        if @setup_block
+          setup_block = @setup_block
+          @setup_block = lambda do |*args|
+            class_exec(*args, &setup_block)
+            class_exec(*args, &block)
+          end
+        else
+          @setup_block = block
+        end
       end
 
       def inherited(subclass)

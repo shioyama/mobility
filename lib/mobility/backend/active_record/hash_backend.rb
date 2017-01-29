@@ -1,6 +1,8 @@
 module Mobility
   module Backend
     class ActiveRecord::HashBackend
+      include Backend
+
       def read(locale, **options)
         translations[locale]
       end
@@ -18,21 +20,11 @@ module Mobility
         true
       end
 
-      module Setup
-        def setup_model(model_class, attributes, **options)
-          super
-          model_class.class_eval do
-            attributes.each { |attribute| store attribute, coder: Coder }
-            before_validation do
-              attributes.each { |attribute| self.send(:"#{attribute}=", {}) if send(attribute).nil? }
-            end
-          end
+      setup do |attributes, options|
+        attributes.each { |attribute| store attribute, coder: Coder }
+        before_validation do
+          attributes.each { |attribute| self.send(:"#{attribute}=", {}) if send(attribute).nil? }
         end
-      end
-
-      def self.inherited(backend_class)
-        backend_class.include Backend
-        backend_class.extend Setup
       end
 
       class Coder

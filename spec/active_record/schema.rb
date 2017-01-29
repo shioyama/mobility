@@ -64,6 +64,14 @@ module Mobility
               t.jsonb :content
               t.boolean :published
             end
+
+            execute "CREATE EXTENSION IF NOT EXISTS hstore"
+
+            create_table "hstore_posts" do |t|
+              t.hstore :title
+              t.hstore :content
+              t.boolean :published
+            end
           end
         end
       end

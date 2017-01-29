@@ -15,9 +15,9 @@ module Mobility
 
             i18n_query = i18n_keys.inject(::Sequel.expr(!invert)) do |expr, attr|
               value = cond.delete(attr)
-              attr_hstore = ::Sequel.hstore_op(attr.to_sym)
-              contains_value = attr_hstore.contains(::Sequel.hstore({ locale => value.to_s }))
-              has_key = attr_hstore.has_key?(::Sequel.hstore(locale))
+              attr_hstore = ::Sequel.hstore_op(attr)
+              contains_value = attr_hstore.contains({ locale => value.to_s })
+              has_key = attr_hstore.has_key?(locale)
               if invert
                 expr.|(has_key & ~contains_value)
               else

@@ -240,12 +240,6 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({}))
     end
 
-    it "converts non-string types to strings when saving" do
-      backend.write(:en, { foo: :bar } )
-      instance.save
-      expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ en: "{:foo=>:bar}" }))
-    end
-
     it "correctly stores serialized attributes" do
       backend.write(:en, "foo")
       backend.write(:fr, "bar")

@@ -15,6 +15,16 @@ describe Mobility::Backend::Sequel::Serialized, orm: :sequel do
       include_accessor_examples 'SerializedPost'
       include_serialization_examples 'SerializedPost'
 
+      describe "non-text values" do
+        it "converts non-string types to strings when saving" do
+          post = SerializedPost.new
+          backend = post.title_translations
+          backend.write(:en, { foo: :bar } )
+          post.save
+          expect(post.title_before_mobility).to eq({ en: "{:foo=>:bar}" }.to_yaml)
+        end
+      end
+
       it "does not cache reads" do
         post = SerializedPost.new
         backend = post.title_translations
@@ -34,6 +44,17 @@ describe Mobility::Backend::Sequel::Serialized, orm: :sequel do
       before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false }
       include_accessor_examples 'SerializedPost'
       include_serialization_examples 'SerializedPost'
+
+      describe "non-text values" do
+        it "converts non-string types to strings when saving" do
+          post = SerializedPost.new
+          backend = post.title_translations
+          backend.write(:en, { foo: :bar } )
+          post.save
+          expect(post.title_before_mobility).to eq({ en: "{:foo=>:bar}" }.to_json)
+        end
+      end
+
     end
   end
 

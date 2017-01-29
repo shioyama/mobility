@@ -30,7 +30,7 @@ module Mobility
           end
 
           define_method "#{attribute}?" do |**options|
-            mobility_get(attribute, options).present?
+            mobility_present?(attribute, options)
           end
         end
 

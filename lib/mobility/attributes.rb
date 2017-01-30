@@ -6,7 +6,7 @@ module Mobility
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @options = _options
       @attributes = _attributes.map &:to_s
-      model_class = options.delete(:model_class)
+      model_class = options[:model_class]
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,
                                                    model_class: model_class))

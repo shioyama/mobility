@@ -31,11 +31,11 @@ module Mobility
           def write_to_cache?
             false
           end unless method_defined?(:write_to_cache?)
-        end
-      end
 
-      def clear_cache
-        @cache = new_cache
+          def clear_cache
+            @cache = new_cache
+          end unless method_defined?(:clear_cache)
+        end
       end
 
       private

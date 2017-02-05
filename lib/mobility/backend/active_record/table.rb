@@ -29,6 +29,7 @@ module Mobility
         options[:table_name]       ||= "#{table_name.singularize}_translations"
         options[:foreign_key]      ||= table_name.downcase.singularize.camelize.foreign_key
         options[:association_name] ||= :mobility_model_translations
+        %i[foreign_key association_name].each { |key| options[key] = options[key].to_sym }
       end
 
       setup do |attributes, options|

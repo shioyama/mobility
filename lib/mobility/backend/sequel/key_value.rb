@@ -30,17 +30,16 @@ module Mobility
 
       def self.configure!(options)
         raise CacheRequired, "Cache required for Sequel::KeyValue backend" if options[:cache] == false
-        if type = options[:type]
-          case type.to_sym
-          when :text, :string
-            options[:class_name] = Mobility::Sequel.const_get("#{type.capitalize}Translation")
-          else
-            raise ArgumentError, "type must be one of: [text, string]"
-          end
+        options[:type]             ||= :text
+        case type = options[:type].to_sym
+        when :text, :string
+          options[:class_name]     ||= Mobility::Sequel.const_get("#{type.capitalize}Translation")
+        else
+          raise ArgumentError, "type must be one of: [text, string]"
         end
-        options[:class_name]       ||= Mobility::Sequel::TextTranslation
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
         options[:association_name] ||= options[:class_name].table_name.to_sym
+        %i[type association_name].each { |key| options[key] = options[key].to_sym }
       end
 
       setup do |attributes, options|

@@ -297,12 +297,13 @@ describe "Mobility::Backend::Sequel::KeyValue", orm: :sequel do
       expect { described_class.configure!(type: :foo) }.to raise_error(ArgumentError)
     end
 
-    it "sets default association_name and class_name" do
+    it "sets default association_name, class_name and type" do
       options = {}
       described_class.configure!(options)
       expect(options).to eq({
         association_name: :mobility_text_translations,
-        class_name: Mobility::Sequel::TextTranslation
+        class_name: Mobility::Sequel::TextTranslation,
+        type: :text
       })
     end
   end

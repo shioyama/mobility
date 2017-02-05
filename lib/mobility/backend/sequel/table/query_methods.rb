@@ -21,6 +21,9 @@ module Mobility
                      })
         end
 
+        # See note in AR Table QueryMethods class about limitations of
+        # query methods on translated attributes when searching on nil values.
+        #
         define_method :_filter_or_exclude do |invert, clause, *cond, &block|
           if i18n_keys = attributes_extractor.call(cond.first)
             cond = cond.first.dup

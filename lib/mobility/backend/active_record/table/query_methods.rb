@@ -20,6 +20,33 @@ module Mobility
                    and(t[:locale].eq(Mobility.locale))).join_sources)
         end
 
+        # Note that Mobility will try to use inner/outer joins appropriate to the query,
+        # so for example:
+        #
+        # Article.where(title: nil, content: nil)   #=> OUTER JOIN (all nils)
+        # Article.where(title: "foo", content: nil) #=> INNER JOIN (one non-nil)
+        #
+        # In the first case, if we are in (say) the "en" locale, then we should match articles
+        # that have *no* article_translations with English locales (since no translation is
+        # equivalent to a nil value). If we used an inner join in the first case, an article
+        # with no English translations would be filtered out, so we use an outer join.
+        #
+        # However, if you call `where` multiple times, you may end up with an outer join
+        # when a (faster) inner join would have worked fine:
+        #
+        # Article.where(title: nil).where(content: "foo") #=> OUTER JOIN
+        #
+        # In this case, we are searching for a match on the article_translations table
+        # which has a NULL title and a content equal to "foo". Since we need a positive
+        # match for content, there must be an English translation on the article, thus
+        # we can use an inner join. However, Mobility will use an outer join since we don't
+        # want to modify the existing relation which has already been joined.
+        #
+        # To avoid this problem, simply make sure to either order your queries to place nil
+        # values last, or include all queried attributes in a single `where`:
+        #
+        # Article.where(title: nil, content: "foo") #=> INNER JOIN
+        #
         define_method :where! do |opts, *rest|
           if i18n_keys = attributes_extractor.call(opts)
             opts = opts.with_indifferent_access

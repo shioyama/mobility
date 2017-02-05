@@ -3,9 +3,6 @@ require "spec_helper"
 describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
   extend Helpers::ActiveRecord
 
-  let(:title_backend) { article.title_translations }
-  let(:content_backend) { article.content_translations }
-
   before do
     stub_const 'Article', Class.new(ActiveRecord::Base)
     Article.class_eval do
@@ -20,6 +17,8 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
   describe "Backend methods" do
     before { %w[foo bar baz].each { |slug| Article.create!(slug: slug) } }
     let(:article) { Article.find_by(slug: "baz") }
+    let(:title_backend) { article.title_translations }
+    let(:content_backend) { article.content_translations }
 
     subject { article }
 

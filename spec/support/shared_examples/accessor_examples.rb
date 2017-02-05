@@ -5,7 +5,7 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
   let(:instance) { model_class.new }
 
   it "gets and sets translations in one locale" do
-    aggregate_failures do
+    aggregate_failures "before saving" do
       instance.public_send(:"#{attribute1}=", "foo")
       expect(instance.public_send(attribute1)).to eq("foo")
 
@@ -13,6 +13,9 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
       expect(instance.public_send(attribute2)).to eq("bar")
 
       instance.save
+    end
+
+    aggregate_failures "after reload" do
       instance = model_class.first
 
       expect(instance.public_send(attribute1)).to eq("foo")
@@ -21,7 +24,7 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
   end
 
   it "gets and sets translations in multiple locales" do
-    aggregate_failures do
+    aggregate_failures "before saving" do
       instance.public_send(:"#{attribute1}=", "foo")
       instance.public_send(:"#{attribute2}=", "bar")
       Mobility.with_locale(:ja) do
@@ -34,11 +37,12 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
         expect(instance.public_send(attribute1)).to eq("あああ")
         expect(instance.public_send(attribute2)).to eq(nil)
       end
+    end
 
-      instance.save
+    instance.save
+    instance = model_class.first
 
-      instance = model_class.first
-
+    aggregate_failures "after reload" do
       expect(instance.public_send(attribute1)).to eq("foo")
       expect(instance.public_send(attribute2)).to eq("bar")
 

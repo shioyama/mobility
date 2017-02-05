@@ -76,6 +76,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
 
       it "works with nil values" do
         expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => nil)).to eq([@post1])
+        expect(model_class.i18n.where(attribute1 => "foo post").where(attribute2 => nil)).to eq([@post1])
         post = model_class.create
         expect(model_class.i18n.where(attribute1 => nil, attribute2 => nil)).to eq([post])
       end
@@ -86,11 +87,13 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
             @ja_post1 = model_class.create(attribute1 => "foo post ja", attribute2 => "foo content ja")
             @ja_post2 = model_class.create(attribute1 => "foo post",    attribute2 => "foo content"   )
             @ja_post3 = model_class.create(attribute1 => "foo post"                                   )
+            @ja_post4 = model_class.create(                             attribute2 => "foo post"      )
           end
         end
 
         it "returns correct result when querying on same attribute values in different locale" do
           expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => "foo content")).to match_array([@post2, @post3])
+          expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => nil)).to eq([@post1])
 
           Mobility.with_locale(:ja) do
             expect(model_class.i18n.where(attribute1 => "foo post")).to eq([@ja_post2, @ja_post3])
@@ -210,6 +213,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
 
       it "works with nil values" do
         expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => nil).select_all(table_name).all).to eq([@post1])
+        expect(model_class.i18n.where(attribute1 => "foo post").where(attribute2 => nil).select_all(table_name).all).to eq([@post1])
         post = model_class.create
         expect(model_class.i18n.where(attribute1 => nil, attribute2 => nil).select_all(table_name).all).to eq([post])
       end
@@ -220,11 +224,13 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
             @ja_post1 = model_class.create(attribute1 => "foo post ja", attribute2 => "foo content ja")
             @ja_post2 = model_class.create(attribute1 => "foo post",    attribute2 => "foo content"   )
             @ja_post3 = model_class.create(attribute1 => "foo post"                                   )
+            @ja_post4 = model_class.create(                             attribute2 => "foo post"      )
           end
         end
 
         it "returns correct result when querying on same attribute values in different locale" do
           expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => "foo content").select_all(table_name).all).to match_array([@post2, @post3])
+          expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => nil).select_all(table_name).all).to eq([@post1])
 
           Mobility.with_locale(:ja) do
             expect(model_class.i18n.where(attribute1 => "foo post").select_all(table_name).all).to eq([@ja_post2, @ja_post3])

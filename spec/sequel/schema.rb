@@ -24,6 +24,15 @@ module Mobility
           DB.create_table? :articles do
             primary_key :id
             String      :slug
+            TrueClass   :published
+          end
+
+          DB.create_table? :article_translations do
+            primary_key :id
+            Integer     :article_id
+            String      :locale
+            String      :title
+            String      :content, size: 65535
           end
 
           DB.create_table? :mobility_text_translations do

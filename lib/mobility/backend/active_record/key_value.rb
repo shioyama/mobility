@@ -43,7 +43,7 @@ module Mobility
         # attributes assigned to the association in case this setup code is called
         # multiple times, so we don't "forget" earlier attributes.
         #
-        attrs_method_name = :"#{association_name}_attributes"
+        attrs_method_name = :"__#{association_name}_attributes"
         association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
         instance_variable_set(:"@#{attrs_method_name}", association_attributes)
 

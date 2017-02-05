@@ -18,6 +18,14 @@ module Mobility
 
           create_table "articles" do |t|
             t.string :slug
+            t.boolean :published
+          end
+
+          create_table "article_translations" do |t|
+            t.string :locale
+            t.integer :article_id
+            t.string :title
+            t.text :content
           end
 
           create_table "mobility_string_translations" do |t|

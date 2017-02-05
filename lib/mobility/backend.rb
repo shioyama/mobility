@@ -13,6 +13,7 @@ module Mobility
     autoload :OrmDelegator, 'mobility/backend/orm_delegator'
     autoload :Sequel,       'mobility/backend/sequel'
     autoload :Serialized,   'mobility/backend/serialized'
+    autoload :Table,        'mobility/backend/table'
 
     attr_reader :attribute, :model, :options
 

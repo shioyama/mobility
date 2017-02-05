@@ -118,6 +118,8 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
 
     it "works with nil values" do
       expect(model_class.i18n.where.not(attribute1 => nil)).to match_array([@post1, @post2, @post3, @post5, @post6])
+      expect(model_class.i18n.where.not(attribute1 => nil).where.not(attribute2 => nil)).to match_array([@post2, @post3, @post5, @post6])
+      expect(model_class.i18n.where(attribute1 => nil).where.not(attribute2 => nil)).to eq([@post4])
     end
 
     it "returns record without translated attribute value" do
@@ -259,6 +261,8 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
 
     it "works with nil values" do
       expect(model_class.i18n.exclude(attribute1 => "bar post", attribute2 => nil).select_all(table_name).all).to match_array([@post1, @post2, @post3])
+      expect(model_class.i18n.exclude(attribute1 => "bar post").exclude(attribute2 => nil).select_all(table_name).all).to eq([@post2])
+      expect(model_class.i18n.exclude(attribute1 => nil).exclude(attribute2 => nil).select_all(table_name).all).to eq([@post2, @post3])
     end
   end
 

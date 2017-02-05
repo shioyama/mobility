@@ -11,6 +11,7 @@ module Mobility
         @translation_class   = translation_class
 
         define_method :"join_#{association_name}" do |**options|
+          return self if (@__mobility_table_joined || []).include?(association_name)
           (@__mobility_table_joined ||= []) << association_name
           join_type = options[:outer_join] ? :left_outer : :inner
           join_table(join_type,
@@ -29,11 +30,7 @@ module Mobility
             cond = cond.first.dup
             outer_join = i18n_keys.all? { |key| cond[key].nil? }
             i18n_keys.each { |attr| cond[::Sequel[translation_class.table_name][attr]] = cond.delete(attr) }
-            if (@__mobility_table_joined || []).include?(association_name)
-              super(invert, clause, cond, &block)
-            else
-              super(invert, clause, cond, &block).send("join_#{association_name}", outer_join: outer_join)
-            end
+            super(invert, clause, cond, &block).send("join_#{association_name}", outer_join: outer_join)
           else
             super(invert, clause, *cond, &block)
           end

@@ -11,6 +11,7 @@ module Mobility
         @translation_class   = translation_class
 
         define_method :"join_#{association_name}" do |**options|
+          return self if (@__mobility_table_joined || []).include?(association_name)
           (@__mobility_table_joined ||= []) << association_name
           t = translation_class.arel_table
           m = arel_table
@@ -52,11 +53,7 @@ module Mobility
             opts = opts.with_indifferent_access
             options = { outer_join: i18n_keys.all? { |attr| opts[attr].nil? } }
             i18n_keys.each { |attr| opts["#{translation_class.table_name}.#{attr}"] = opts.delete(attr) }
-            if (@__mobility_table_joined || []).include?(association_name)
-              super(opts, *rest)
-            else
-              super(opts, *rest).send("join_#{association_name}", options)
-            end
+            super(opts, *rest).send("join_#{association_name}", options)
           else
             super(opts, *rest)
           end

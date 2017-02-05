@@ -5,20 +5,15 @@ module Mobility
 
       class TranslationsCache
         def initialize(backend)
-          @cache   = {}
-          @backend = backend
-        end
-
-        def cached_translation(locale)
-          @cache[locale] ||= @backend.translation_for(locale)
+          @cache = Hash.new { |hash, locale| hash[locale] = backend.translation_for(locale) }
         end
 
         def [](locale)
-          cached_translation(locale).value
+          @cache[locale].value
         end
 
         def []=(locale, value)
-          cached_translation(locale).value = value
+          @cache[locale].value = value
         end
 
         def each_translation &block

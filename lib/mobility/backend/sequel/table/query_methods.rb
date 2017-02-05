@@ -9,10 +9,11 @@ module Mobility
         attributes_extractor = @attributes_extractor
         translation_class    = options[:model_class].const_get(:Translation)
         @translation_class   = translation_class
+        table_name           = options[:table_name]
 
         define_method :"join_#{association_name}" do |**options|
-          return self if (@__mobility_table_joined || []).include?(association_name)
-          (@__mobility_table_joined ||= []) << association_name
+          return self if (@__mobility_table_joined || []).include?(table_name)
+          (@__mobility_table_joined ||= []) << table_name
           join_type = options[:outer_join] ? :left_outer : :inner
           join_table(join_type,
                      translation_class.table_name,

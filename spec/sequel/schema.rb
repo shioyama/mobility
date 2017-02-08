@@ -35,6 +35,26 @@ module Mobility
             String      :content, size: 65535
           end
 
+          DB.create_table? :multitable_posts do
+            primary_key :id
+            TrueClass   :published
+          end
+
+          DB.create_table? :multitable_post_translations do
+            primary_key :id
+            Integer     :multitable_post_id
+            String      :locale
+            String      :title
+          end
+
+
+          DB.create_table? :multitable_post_foo_translations do
+            primary_key :id
+            Integer     :multitable_post_id
+            String      :locale
+            String      :foo
+          end
+
           DB.create_table? :mobility_text_translations do
             primary_key :id
             String      :locale,            null: false

@@ -20,29 +20,33 @@ module Mobility
         translation_for(locale).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
       end
 
-      def translation_for(locale)
-        model.mobility_translation_for(locale)
-      end
-
       def self.configure!(options)
         raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
         table_name = options[:model_class].table_name
-        options[:table_name]       ||= :"#{table_name.to_s.gsub(/s$/, '')}_translations"
-        options[:foreign_key]      ||= :"#{table_name.downcase.to_s.gsub!(/s$/, '').camelize.foreign_key}"
-        options[:association_name] ||= :mobility_model_translations
-        %i[table_name foreign_key association_name].each { |key| options[key] = options[key].to_sym }
+        options[:table_name]  ||= :"#{table_name.to_s.singularize}_translations"
+        options[:foreign_key] ||= table_name.to_s.downcase.singularize.camelize.foreign_key
+        if (association_name = options[:association_name]).present?
+          options[:subclass_name] ||= association_name.to_s.singularize.camelize
+        else
+          options[:association_name] = :mobility_model_translations
+          options[:subclass_name] ||= :Translation
+        end
+        %i[table_name foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }
       end
 
       setup do |attributes, options|
         association_name = options[:association_name]
+        subclass_name    = options[:subclass_name]
 
-        attr_accessor :mobility_translations_cache
+        cache_accessor_name = :"__#{association_name}_cache"
+
+        attr_accessor cache_accessor_name
 
         translation_class =
-          if self.const_defined?(:Translation, false)
-            const_get(:Translation, false)
+          if self.const_defined?(subclass_name, false)
+            const_get(subclass_name, false)
           else
-            const_set(:Translation, Class.new(::Sequel::Model(options[:table_name]))).tap do |klass|
+            const_set(subclass_name, Class.new(::Sequel::Model(options[:table_name]))).tap do |klass|
               klass.include ::Mobility::Sequel::ModelTranslation
             end
           end
@@ -62,18 +66,12 @@ module Mobility
         callback_methods = Module.new do
           define_method :after_save do
             super()
-            mobility_translations_cache.each_value do |translation|
+            send(cache_accessor_name).each_value do |translation|
               translation.id ? translation.save : send("add_#{association_name.to_s.singularize}", translation)
-            end if mobility_translations_cache
+            end if send(cache_accessor_name)
           end
         end
         include callback_methods
-
-        define_method :mobility_translation_for do |locale|
-          translation = send(association_name).find { |t| t.locale == locale.to_s }
-          translation ||= translation_class.new(locale: locale)
-          translation
-        end
 
         extension = Module.new do
           define_method :i18n do
@@ -86,7 +84,8 @@ module Mobility
       end
 
       def new_cache
-        (model.mobility_translations_cache ||= Table::TranslationsCache.new(model)).for(attribute)
+        reset_model_cache unless model_cache
+        model_cache.for(attribute)
       end
 
       def write_to_cache?
@@ -94,7 +93,32 @@ module Mobility
       end
 
       def clear_cache
-        model.mobility_translations_cache if model.mobility_translations_cache
+        model_cache.clear if model_cache
+      end
+
+      private
+
+      def translation_for(locale)
+        translation = translations.find { |t| t.locale == locale.to_s }
+        translation ||= translation_class.new(locale: locale)
+        translation
+      end
+
+      def translations
+        model.send(association_name)
+      end
+
+      def translation_class
+        @translation_class ||= options[:model_class].const_get(options[:subclass_name])
+      end
+
+      def model_cache
+        model.send(:"__#{association_name}_cache")
+      end
+
+      def reset_model_cache
+        model.send(:"__#{association_name}_cache=",
+                   Table::TranslationsCache.new { |locale| translation_for(locale) })
       end
 
       class CacheRequired < ::StandardError; end

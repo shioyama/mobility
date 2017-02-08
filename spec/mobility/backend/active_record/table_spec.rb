@@ -22,14 +22,23 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       title_backend = article.title_translations
       content_backend = article.content_translations
       title_backend.read(:en)
-      expect(article.mobility_translations_cache.size).to eq(1)
+      expect(article.__mobility_model_translations_cache.size).to eq(1)
       content_backend.read(:en)
-      expect(article.mobility_translations_cache.size).to eq(1)
+      expect(article.__mobility_model_translations_cache.size).to eq(1)
       content_backend.read(:ja)
-      expect(article.mobility_translations_cache.size).to eq(2)
+      expect(article.__mobility_model_translations_cache.size).to eq(2)
       content_backend.clear_cache
-      expect(article.mobility_translations_cache.size).to eq(0)
+      expect(article.__mobility_model_translations_cache.size).to eq(0)
     end
+  end
+
+  # Using Article to test separate backends with separate tables fails
+  # when these specs are run together with other specs, due to code
+  # assigning subclasses (Article::Translation, Article::FooTranslation).
+  # Maybe an issue with RSpec const stubbing.
+  context "attributes defined separately" do
+    include_accessor_examples "MultitablePost", :title, :foo
+    include_querying_examples "MultitablePost", :title, :foo
   end
 
   describe "Backend methods" do

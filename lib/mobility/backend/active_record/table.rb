@@ -20,28 +20,30 @@ module Mobility
         translation_for(locale).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
       end
 
-      def translation_for(locale)
-        model.mobility_translation_for(locale)
-      end
-
       def self.configure!(options)
         table_name = options[:model_class].table_name
-        options[:table_name]       ||= "#{table_name.singularize}_translations"
-        options[:foreign_key]      ||= table_name.downcase.singularize.camelize.foreign_key
-        options[:association_name] ||= :mobility_model_translations
-        %i[foreign_key association_name].each { |key| options[key] = options[key].to_sym }
+        options[:table_name]  ||= "#{table_name.singularize}_translations"
+        options[:foreign_key] ||= table_name.downcase.singularize.camelize.foreign_key
+        if (association_name = options[:association_name]).present?
+          options[:subclass_name] ||= association_name.to_s.singularize.camelize
+        else
+          options[:association_name] = :mobility_model_translations
+          options[:subclass_name] ||= :Translation
+        end
+        %i[foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }
       end
 
       setup do |attributes, options|
         association_name = options[:association_name]
+        subclass_name    = options[:subclass_name]
 
-        attr_accessor :mobility_translations_cache
+        attr_accessor :"__#{association_name}_cache"
 
         translation_class =
-          if self.const_defined?(:Translation, false)
-            const_get(:Translation, false)
+          if self.const_defined?(subclass_name, false)
+            const_get(subclass_name, false)
           else
-            const_set(:Translation, Class.new(Mobility::ActiveRecord::ModelTranslation))
+            const_set(subclass_name, Class.new(Mobility::ActiveRecord::ModelTranslation))
           end
 
         translation_class.table_name = options[:table_name]
@@ -58,12 +60,6 @@ module Mobility
           foreign_key: options[:foreign_key],
           inverse_of:  association_name
 
-        define_method :mobility_translation_for do |locale|
-          translation = send(association_name).find { |t| t.locale == locale.to_s }
-          translation ||= send(association_name).build(locale: locale)
-          translation
-        end
-
         query_methods = Module.new do
           define_method :i18n do
             @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
@@ -73,7 +69,8 @@ module Mobility
       end
 
       def new_cache
-        (model.mobility_translations_cache ||= Table::TranslationsCache.new(model)).for(attribute)
+        reset_model_cache unless model_cache
+        model_cache.for(attribute)
       end
 
       def write_to_cache?
@@ -81,7 +78,28 @@ module Mobility
       end
 
       def clear_cache
-        model.mobility_translations_cache.try(:clear)
+        model_cache.try(:clear)
+      end
+
+      private
+
+      def translation_for(locale)
+        translation = translations.find { |t| t.locale == locale.to_s }
+        translation ||= translations.build(locale: locale)
+        translation
+      end
+
+      def translations
+        model.send(association_name)
+      end
+
+      def model_cache
+        model.send(:"__#{association_name}_cache")
+      end
+
+      def reset_model_cache
+        model.send(:"__#{association_name}_cache=",
+                   Table::TranslationsCache.new { |locale| translation_for(locale) })
       end
     end
   end

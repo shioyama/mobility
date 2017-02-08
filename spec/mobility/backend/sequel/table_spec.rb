@@ -15,6 +15,15 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
 
   include_accessor_examples "Article"
 
+  # Using Article to test separate backends with separate tables fails
+  # when these specs are run together with other specs, due to code
+  # assigning subclasses (Article::Translation, Article::FooTranslation).
+  # Maybe an issue with RSpec const stubbing.
+  context "attributes defined separately" do
+    include_accessor_examples "MultitablePost", :title, :foo
+    include_querying_examples "MultitablePost", :title, :foo
+  end
+
   describe "Backend methods" do
     before { %w[foo bar baz].each { |slug| Article.create(slug: slug) } }
     let(:article) { Article.find(slug: "baz") }
@@ -111,6 +120,7 @@ describe "Mobility::Backend::Sequel::Table", orm: :sequel do
   end
 
   describe "mobility scope (.i18n)" do
+    before { Article.translates :title, :content, backend: :table, cache: true }
     include_querying_examples('Article')
   end
 end

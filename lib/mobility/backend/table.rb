@@ -4,8 +4,9 @@ module Mobility
       include OrmDelegator
 
       class TranslationsCache < Hash
-        def initialize(model)
-          super() { |hash, locale| hash[locale] = model.mobility_translation_for(locale) }
+        def initialize
+          raise ArgumentError, "missing block" unless block_given?
+          super() { |hash, locale| hash[locale] = yield(locale) }
         end
 
         def for(attribute)

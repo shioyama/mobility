@@ -28,6 +28,23 @@ module Mobility
             t.text :content
           end
 
+          create_table "multitable_posts" do |t|
+            t.string :slug
+            t.boolean :published
+          end
+
+          create_table "multitable_post_translations" do |t|
+            t.string :locale
+            t.integer :multitable_post_id
+            t.string :title
+          end
+
+          create_table "multitable_post_foo_translations" do |t|
+            t.string :locale
+            t.integer :multitable_post_id
+            t.string :foo
+          end
+
           create_table "mobility_string_translations" do |t|
             t.string  :locale,            null: false
             t.string  :key,               null: false

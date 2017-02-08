@@ -7,7 +7,7 @@ module Mobility
         @association_name    = association_name
         foreign_key          = options[:foreign_key]
         attributes_extractor = @attributes_extractor
-        translation_class    = options[:model_class].const_get(:Translation)
+        translation_class    = options[:model_class].const_get(options[:subclass_name])
         @translation_class   = translation_class
         table_name           = options[:table_name]
 

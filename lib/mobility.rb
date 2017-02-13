@@ -10,6 +10,27 @@ require 'mobility/version'
   end
 end
 
+=begin
+
+Mobility is a gem for storing and retrieving localized data through attributes
+on a class. The {Mobility} module includes all necessary methods and modules to
+support defining backend accessors on a class.
+
+To enable Mobility on a class, simply include or extend the {Mobility} module,
+and define any attribute accessors using {Translates#mobility_accessor} (aliased to the
+value of {Mobility.accessor_method}, which defaults to +translates+).
+
+  class MyClass
+    include Mobility
+    translates :title, backend: :key_value
+  end
+
+When defining this module, Mobility attempts to +require+ various gems (for
+example, +active_record+ and +sequel+) to evaluate which are loaded. Loaded
+gems are tracked with dynamic subclasses of the {Loaded} module and referenced
+in backends to define gem-dependent behavior.
+
+=end
 module Mobility
   autoload :Attributes,       "mobility/attributes"
   autoload :Backend,          "mobility/backend"
@@ -85,18 +106,30 @@ module Mobility
       end
     end
 
+    # Extends model with this class so that +include Mobility+ is equivalent to
+    # +extend Mobility+
+    # @param model_class
     def included(model_class)
       model_class.extend self
     end
 
+    # @!group Locale Accessors
+    # @return [Symbol] Mobility locale
     def locale
       read_locale || I18n.locale
     end
 
+    # Sets Mobility locale
+    # @param [Symbol] locale Locale to set
+    # @raise [InvalidLocale] if locale is nil or not in +I18n.available_locales
+    # @return [Symbol] Locale
     def locale=(locale)
       set_locale(locale)
     end
 
+    # Sets Mobility locale around block
+    # @param [Symbol] locale Locale to set in block
+    # @yield [Symbol] Locale
     def with_locale(locale)
       previous_locale = read_locale
       begin
@@ -106,24 +139,51 @@ module Mobility
         set_locale(previous_locale)
       end
     end
+    # @!endgroup
 
+    # @return [RequestStore] Request store
     def storage
       RequestStore.store
     end
 
+    # @!group Configuration Methods
+    # @return [Mobility::Configuration] Mobility configuration
     def config
       storage[:mobility_configuration] ||= Mobility::Configuration.new
     end
+
+    # (see Mobility::Configuration#accessor_method)
+    # @!method accessor_method
+
+    # (see Mobility::Configuration#default_fallbacks)
+    # @!method default_fallbacks
+
+    # (see Mobility::Configuration#default_backend)
+    # @!method default_backend
+
+    # (see Mobility::Configuration#default_accessor_locales)
+    # @!method default_accessor_locales
     %w[accessor_method default_fallbacks default_backend default_accessor_locales].each do |method_name|
       define_method method_name do
         config.public_send(method_name)
       end
     end
 
+    # Configure Mobility
+    # @yield [Mobility::Configuration] Mobility configuration
     def configure
       yield config
     end
+    # @!endgroup
 
+    # Return normalized locale
+    # @param [String,Symbol] locale
+    # @return [String] Normalized locale
+    # @example
+    #   Mobility.normalize_locale(:ja)
+    #   #=> "ja"
+    #   Mobility.normalize_locale("pt-BR")
+    #   #=> "pt_br"
     def normalize_locale(locale)
       "#{locale.to_s.downcase.sub("-", "_")}"
     end

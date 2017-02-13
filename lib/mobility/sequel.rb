@@ -1,4 +1,9 @@
 module Mobility
+=begin
+
+Module loading Sequel-specific classes for Mobility models.
+
+=end
   module Sequel
     autoload :BackendResetter,   "mobility/sequel/backend_resetter"
     autoload :ColumnChanges,     "mobility/sequel/column_changes"
@@ -12,6 +17,7 @@ module Mobility
     end
 
     module ClassMethods
+      # @return [Sequel::Dataset] dataset extended with Mobility query methods.
       def i18n
         dataset
       end

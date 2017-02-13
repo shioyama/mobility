@@ -1,15 +1,25 @@
 module Mobility
   module Backend
+=begin
+
+Internal class used by ActiveRecord backends that store values as a hash.
+
+=end
     class ActiveRecord::HashValued
       include Backend
 
+      # @!group Backend Accessors
+      #
+      # @!macro backend_reader
       def read(locale, **options)
         translations[locale]
       end
 
+      # @!macro backend_writer
       def write(locale, value, **options)
         translations[locale] = value
       end
+      # @!endgroup
 
       def translations
         model.read_attribute(attribute)

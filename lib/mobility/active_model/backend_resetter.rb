@@ -1,6 +1,14 @@
 module Mobility
   module ActiveModel
+=begin
+
+Backend resetter for ActiveModel models. Adds hook to reset backend when
++changes_applied+ or +clear_changes_information+ methods are called on model.
+
+=end
     class BackendResetter < Mobility::BackendResetter
+
+      # (see Mobility::BackendResetter#initialize)
       def initialize(backend_reset_method, attributes)
         super
 

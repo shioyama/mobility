@@ -1,6 +1,14 @@
 module Mobility
   module Sequel
+=begin
+
+Backend resetter for Sequel models. Triggers backend reset when +refresh+
+method is called.
+
+=end
     class BackendResetter < Mobility::BackendResetter
+
+      # @param [Class] model_class Class of model to which backend resetter will be applied
       def included(model_class)
         model_reset_method = @model_reset_method
 

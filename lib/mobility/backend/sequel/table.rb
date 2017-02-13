@@ -1,25 +1,42 @@
 module Mobility
   module Backend
+=begin
+
+Implements the {Mobility::Backend::Table} backend for Sequel models.
+
+=end
     class Sequel::Table
       include Backend
 
       autoload :QueryMethods, 'mobility/backend/sequel/table/query_methods'
 
+      # @return [Symbol] name of the association method
       attr_reader :association_name
 
+      # @!macro backend_constructor
+      # @option options [Symbol] association_name Name of association
       def initialize(model, attribute, **options)
         super
         @association_name = options[:association_name]
       end
 
+      # @!group Backend Accessors
+      # @!macro backend_reader
       def read(locale, **options)
         translation_for(locale).send(attribute)
       end
 
+      # @!macro backend_reader
       def write(locale, value, **options)
         translation_for(locale).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
       end
 
+      # @!group Backend Configuration
+      # @option options [Symbol] association_name (:mobility_model_translations) Name of association method
+      # @option options [Symbol] table_name Name of translation table
+      # @option options [Symbol] foreign_key Name of foreign key
+      # @option options [Symbol] subclass_name Name of subclass to append to model class to generate translation class
+      # @raise [CacheRequired] if cache option is false
       def self.configure!(options)
         raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
         table_name = options[:model_class].table_name
@@ -33,6 +50,7 @@ module Mobility
         end
         %i[table_name foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }
       end
+      # @!endgroup
 
       setup do |attributes, options|
         association_name = options[:association_name]
@@ -83,11 +101,14 @@ module Mobility
         include Mobility::Sequel::ColumnChanges.new(attributes)
       end
 
+      # @!group Cache Methods
+      # @return [Table::TranslationsCache]
       def new_cache
         reset_model_cache unless model_cache
         model_cache.for(attribute)
       end
 
+      # @return [Boolean]
       def write_to_cache?
         true
       end
@@ -95,6 +116,7 @@ module Mobility
       def clear_cache
         model_cache.clear if model_cache
       end
+      # @!endgroup
 
       private
 

@@ -1,5 +1,24 @@
 module Mobility
   module Backend
+=begin
+
+Stores translations as serialized attributes in a single text column. This
+implies that the translated values are not searchable, and thus this backend is
+not recommended unless specific constraints prevent use of other solutions.
+
+To use this backend, ensure that the model table has a text column on its table
+with the same name as the translated attribute.
+
+==Backend Options
+
+===+format+
+
+Format for serialization. Either +:yaml+ (default) or +:json+.
+
+@see Mobility::Backend::ActiveRecord::Serialized
+@see Mobility::Backend::Sequel::Serialized
+
+=end
     module Serialized
       include OrmDelegator
 

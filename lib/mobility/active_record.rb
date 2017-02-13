@@ -1,4 +1,9 @@
 module Mobility
+=begin
+
+Module loading ActiveRecord-specific classes for Mobility models.
+
+=end
   module ActiveRecord
     autoload :BackendResetter,   "mobility/active_record/backend_resetter"
     autoload :ModelTranslation,  "mobility/active_record/model_translation"
@@ -25,6 +30,7 @@ module Mobility
     end
 
     module ClassMethods
+      # @return [ActiveRecord::Relation] relation extended with Mobility query methods.
       def i18n
         all
       end

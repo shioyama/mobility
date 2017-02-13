@@ -1,7 +1,15 @@
 module Mobility
   module Backend
     module ActiveRecord
+=begin
+
+Defines query method overrides to handle translated attributes for ActiveRecord
+models. For details see backend-specific subclasses.
+
+=end
       class QueryMethods < Module
+        # @param [Array<String>] attributes Translated attributes
+        # @param [Hash] options Backend options
         def initialize(attributes, **options)
           @attributes = attributes
           @attributes_extractor = lambda do |opts|
@@ -9,6 +17,7 @@ module Mobility
           end
         end
 
+        # @param [ActiveRecord::Relation] relation Relation being extended
         def extended(relation)
           model_class = relation.model
           unless model_class.respond_to?(:mobility_where_chain)

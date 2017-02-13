@@ -1,6 +1,14 @@
 module Mobility
   module ActiveRecord
+=begin
+
+Backend resetter for ActiveRecord models. Adds hook on +reload+ event to
+{Mobility::ActiveModel::BackendResetter}.
+
+=end
     class BackendResetter < Mobility::ActiveModel::BackendResetter
+
+      # @param [Class] model_class Class of model to which backend resetter will be applied
       def included(model_class)
         model_reset_method = @model_reset_method
 

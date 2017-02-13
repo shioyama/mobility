@@ -1,25 +1,111 @@
 module Mobility
   module Backend
+=begin
+
+Implements the {Mobility::Backend::Table} backend for ActiveRecord models.
+
+@example Model with table backend
+  class Post < ActiveRecord::Base
+    translates :title, backend: :table, association_name: :translations
+  end
+
+  post = Post.create(title: "foo")
+  #<Post:0x00... id: 1>
+
+  post.title
+  #=> "foo"
+
+  post.translations
+  #=> [#<Post::Translation:0x00...
+  #  id: 1,
+  #  locale: "en",
+  #  post_id: 1,
+  #  title: "foo">]
+
+  Post::Translation.first
+  #=> #<Post::Translation:0x00...
+  #  id: 1,
+  #  locale: "en",
+  #  post_id: 1,
+  #  title: "foo">
+
+@example Model with multiple translation tables
+  class Post < ActiveRecord::Base
+    translates :title,   backend: :table, table_name: :post_title_translations,   association_name: :title_translations
+    translates :content, backend: :table, table_name: :post_content_translations, association_name: :content_translations
+  end
+
+  post = Post.create(title: "foo", content: "bar")
+  #<Post:0x00... id: 1>
+
+  post.title
+  #=> "foo"
+
+  post.content
+  #=> "bar"
+
+  post.title_translations
+  #=> [#<Post::TitleTranslation:0x00...
+  #  id: 1,
+  #  locale: "en",
+  #  post_id: 1,
+  #  title: "foo">]
+
+  post.content_translations
+  #=> [#<Post::ContentTranslation:0x00...
+  #  id: 1,
+  #  locale: "en",
+  #  post_id: 1,
+  #  content: "bar">]
+
+  Post::TitleTranslation.first
+  #=> #<Post::TitleTranslation:0x00...
+  #  id: 1,
+  #  locale: "en",
+  #  post_id: 1,
+  #  title: "foo">
+
+  Post::ContentTranslation.first
+  #=> #<Post::ContentTranslation:0x00...
+  #  id: 1,
+  #  locale: "en",
+  #  post_id: 1,
+  #  title: "bar">
+=end
     class ActiveRecord::Table
       include Backend
 
       autoload :QueryMethods, 'mobility/backend/active_record/table/query_methods'
 
+      # @return [Symbol] name of the association method
       attr_reader :association_name
 
+      # @!macro backend_constructor
+      # @option options [Symbol] association_name Name of association
       def initialize(model, attribute, **options)
         super
         @association_name = options[:association_name]
       end
 
+      # @!group Backend Accessors
+      # @!macro backend_reader
       def read(locale, **options)
         translation_for(locale).send(attribute)
       end
 
+      # @!macro backend_reader
       def write(locale, value, **options)
         translation_for(locale).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
       end
+      # @!endgroup
 
+      # @!group Backend Configuration
+      # @option options [Symbol] association_name (:mobility_model_translations)
+      #   Name of association method
+      # @option options [Symbol] table_name Name of translation table
+      # @option options [Symbol] foreign_key Name of foreign key
+      # @option options [Symbol] subclass_name (:Translation) Name of subclass
+      #   to append to model class to generate translation class
       def self.configure!(options)
         table_name = options[:model_class].table_name
         options[:table_name]  ||= "#{table_name.singularize}_translations"
@@ -32,6 +118,7 @@ module Mobility
         end
         %i[foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }
       end
+      # @!endgroup
 
       setup do |attributes, options|
         association_name = options[:association_name]
@@ -68,11 +155,14 @@ module Mobility
         extend query_methods
       end
 
+      # @!group Cache Methods
+      # @return [Table::TranslationsCache]
       def new_cache
         reset_model_cache unless model_cache
         model_cache.for(attribute)
       end
 
+      # @return [Boolean]
       def write_to_cache?
         true
       end
@@ -80,6 +170,7 @@ module Mobility
       def clear_cache
         model_cache.try(:clear)
       end
+      # @!endgroup
 
       private
 

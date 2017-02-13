@@ -1,33 +1,52 @@
 module Mobility
   module Backend
+=begin
+
+Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
+
+@note This backend requires the cache to be enabled in order to track
+  and store changed translations, since Sequel does not support +build+-type
+  methods on associations like ActiveRecord.
+
+=end
     class Sequel::KeyValue
       include Backend
 
       autoload :QueryMethods, 'mobility/backend/sequel/key_value/query_methods'
 
-      attr_reader :association_name, :class_name
+      # @return [Symbol] name of the association
+      attr_reader :association_name
 
+      # @return [Class] translation model class
+      attr_reader :class_name
+
+      # @!macro backend_constructor
+      # @option options [Symbol] association_name Name of association
+      # @option options [Class] class_name Translation model class
       def initialize(model, attribute, **options)
         super
         @association_name = options[:association_name]
         @class_name       = options[:class_name]
       end
 
+      # @!group Backend Accessors
+      # @!macro backend_reader
       def read(locale, **options)
         translation_for(locale).value
       end
 
+      # @!macro backend_writer
       def write(locale, value, **options)
         translation_for(locale).tap { |t| t.value = value }.value
       end
+      # @!endgroup
 
-      def save_translations
-        cache.each_translation do |translation|
-          next unless translation.value.present?
-          translation.id ? translation.save : model.send("add_#{association_name.to_s.singularize}", translation)
-        end
-      end
-
+      # @!group Backend Configuration
+      # @option options [Symbol] type (:text) Column type to use
+      # @option options [Symbol] associaiton_name (:mobility_text_translations) Name of association method
+      # @option options [Symbol] class_name ({Mobility::Sequel::TextTranslation}) Translation class
+      # @raise [CacheRequired] if cache is disabled
+      # @raise [ArgumentError] if type is not either :text or :string
       def self.configure!(options)
         raise CacheRequired, "Cache required for Sequel::KeyValue backend" if options[:cache] == false
         options[:type]             ||= :text
@@ -41,6 +60,7 @@ module Mobility
         options[:association_name] ||= options[:class_name].table_name.to_sym
         %i[type association_name].each { |key| options[key] = options[key].to_sym }
       end
+      # @!endgroup
 
       setup do |attributes, options|
         association_name   = options[:association_name]
@@ -84,18 +104,33 @@ module Mobility
         include Mobility::Sequel::ColumnChanges.new(attributes)
       end
 
+      # @!group Cache Methods
+      # @return [KeyValue::TranslationsCache]
       def new_cache
         KeyValue::TranslationsCache.new(self)
       end
 
+      # @return [Boolean]
       def write_to_cache?
         true
       end
+      # @!endgroup
 
+      # Returns translation for a given locale, or initializes one if none is present.
+      # @param [Symbol] locale
+      # @return [Mobility::Sequel::TextTranslation,Mobility::Sequel::StringTranslation]
       def translation_for(locale)
         translation = model.send(association_name).find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= class_name.new(locale: locale, key: attribute)
         translation
+      end
+
+      # Saves translation which have been built and which have non-blank values.
+      def save_translations
+        cache.each_translation do |translation|
+          next unless translation.value.present?
+          translation.id ? translation.save : model.send("add_#{association_name.to_s.singularize}", translation)
+        end
       end
 
       class CacheRequired < ::StandardError; end

@@ -1,25 +1,55 @@
 module Mobility
   module Backend
+=begin
+
+Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
+
+@example
+  class Post < ActiveRecord::Base
+    translates :title, backend: :key_value, association_name: :translations, type: :string
+  end
+
+  post = Post.create(title: "foo")
+  post.translations
+  #=> #<ActiveRecord::Associations::CollectionProxy ... >
+  post.translations.first.value
+  #=> "foo"
+  post.translations.first.class
+  #=> Mobility::ActiveRercord::StringTranslation
+
+=end
     class ActiveRecord::KeyValue
       include Backend
 
       autoload :QueryMethods, 'mobility/backend/active_record/key_value/query_methods'
 
+      # @return [Symbol] Name of the association
       attr_reader :association_name
 
+      # @!macro backend_constructor
+      # @option options [Symbol] association_name Name of association
       def initialize(model, attribute, **options)
         super
         @association_name = options[:association_name]
       end
 
+      # @!group Backend Accessors
+      # @!macro backend_reader
       def read(locale, **options)
         translation_for(locale).value
       end
 
+      # @!macro backend_reader
       def write(locale, value, **options)
         translation_for(locale).tap { |t| t.value = value }.value
       end
+      # @!endgroup
 
+      # @!group Backend Configuration
+      # @option options [Symbol] type (:text) Column type to use
+      # @option options [Symbol] association_name (:mobility_text_translations) Name of association method
+      # @option options [String,Class] class_name ({Mobility::ActiveRecord::TextTranslation}) Translation class
+      # @raise [ArgumentError] if type is not either :text or :string
       def self.configure!(options)
         options[:type]             ||= :text
         case type = options[:type].to_sym
@@ -32,6 +62,7 @@ module Mobility
         options[:association_name] ||= options[:class_name].table_name.to_sym
         %i[type association_name].each { |key| options[key] = options[key].to_sym }
       end
+      # @!endgroup
 
       setup do |attributes, options|
         association_name   = options[:association_name]
@@ -66,14 +97,21 @@ module Mobility
         extend mod
       end
 
+      # @!group Cache Methods
+      # @return [KeyValue::TranslationsCache]
       def new_cache
         KeyValue::TranslationsCache.new(self)
       end
 
+      # @return [Boolean]
       def write_to_cache?
         true
       end
+      # @!endgroup
 
+      # Returns translation for a given locale, or builds one if none is present.
+      # @param [Symbol] locale
+      # @return [Mobility::ActiveRecord::TextTranslation,Mobility::ActiveRecord::StringTranslation]
       def translation_for(locale)
         translation = translations.find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= translations.build(locale: locale, key: attribute)

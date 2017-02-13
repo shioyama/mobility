@@ -1,5 +1,6 @@
 module Mobility
   module ActiveRecord
+    # @abstract Subclass and set +table_name+ to implement for a particular column type.
     class Translation < ::ActiveRecord::Base
       self.abstract_class = true
 

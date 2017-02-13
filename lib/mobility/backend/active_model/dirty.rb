@@ -1,6 +1,28 @@
 module Mobility
   module Backend
+=begin
+
+Dirty tracking for models which include the +ActiveModel::Dirty+ module.
+
+Assuming we have an attribute +title+, this module will add support for the
+following methods:
+- +title_changed?+
+- +title_change+
+- +title_was+
+- +title_will_change!+
+- +title_previously_changed?+
+- +title_previous_change+
+- +restore_title!+
+
+In addition, the private method +restore_attribute!+ will also restore the
+value of the translated attribute if passed to it.
+
+@see http://api.rubyonrails.org/classes/ActiveModel/Dirty.html Rails documentation for Active Model Dirty module
+
+=end
     module ActiveModel::Dirty
+      # @!group Backend Accessors
+      # @!macro backend_writer
       def write(locale, value, **options)
         locale_accessor = "#{attribute}_#{locale}"
         if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
@@ -10,12 +32,17 @@ module Mobility
         end
         super
       end
+      # @!endgroup
 
+      # @param [Class] backend_class Class of backend
       def self.included(backend_class)
         backend_class.extend(ClassMethods)
       end
 
+      # Adds hook after {Backend::Setup#setup_model} to add dirty-tracking
+      # methods for translated attributes onto model class.
       module ClassMethods
+        # (see Mobility::Backend::Setup#setup_model)
         def setup_model(model_class, attributes, **options)
           super
           model_class.class_eval do

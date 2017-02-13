@@ -1,5 +1,5 @@
-# Basic test of translated attribute accessors which can be applied to any backend, and (since there
-# is no ORM-specific code here) to any ORM.
+# Basic test of translated attribute accessors which can be applied to any
+# backend, and (since there is no ORM-specific code here) to any ORM.
 shared_examples_for "model with translated attribute accessors" do |model_class_name, attribute1=:title, attribute2=:content, **options|
   let(:model_class) { model_class_name.constantize }
   let(:instance) { model_class.new }

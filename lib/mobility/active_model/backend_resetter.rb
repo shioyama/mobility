@@ -9,7 +9,7 @@ Backend resetter for ActiveModel models. Adds hook to reset backend when
     class BackendResetter < Mobility::BackendResetter
 
       # (see Mobility::BackendResetter#initialize)
-      def initialize(backend_reset_method, attributes)
+      def initialize(attributes)
         super
 
         model_reset_method = @model_reset_method

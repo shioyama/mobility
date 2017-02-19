@@ -3,20 +3,23 @@ module Mobility
 
 Resets backend cache when reset events occur.
 
+@example Add trigger to call a method +my_backend_reset_method+ on backend instance when reset event(s) occurs on model
+  resetter = Mobility::BackendResetter.for(MyModel).new(attributes) { my_backend_reset_method }
+  MyModel.include(resetter)
+
 @see Mobility::ActiveRecord::BackendResetter
 @see Mobility::ActiveModel::BackendResetter
 @see Mobility::Sequel::BackendResetter
 
 =end
   class BackendResetter < Module
-    # @param [Symbol] backend_reset_method Name of method to be called on
-    #   backend(s) to perform reset
     # @param [Array<String>] attributes Attributes whose backends should be reset
-    def initialize(backend_reset_method, attributes)
+    # @yield Backend to reset as context for block
+    def initialize(attributes, &block)
       @model_reset_method = Proc.new do
         attributes.each do |attribute|
           if @mobility_backends && @mobility_backends[attribute]
-            @mobility_backends[attribute].send(backend_reset_method)
+            @mobility_backends[attribute].instance_eval &block
           end
         end
       end

@@ -59,7 +59,7 @@ this).
         # @param [Hash] options Backend options
         def setup_model(model_class, attributes, **options)
           super
-          model_class.include BackendResetter.for(model_class).new(:clear_cache, attributes)
+          model_class.include BackendResetter.for(model_class).new(attributes) { clear_cache }
         end
       end
 

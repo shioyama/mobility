@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Backend::Sequel::Hstore, orm: :sequel, db: :postgres do
   extend Helpers::Sequel
 
-  let(:backend) { post.title_translations }
+  let(:backend) { post.mobility_backend_for("title") }
 
   before do
     stub_const 'HstorePost', Class.new(Sequel::Model)
@@ -20,7 +20,7 @@ describe Mobility::Backend::Sequel::Hstore, orm: :sequel, db: :postgres do
   describe "non-text values" do
     it "converts non-string types to strings when saving" do
       post = HstorePost.new
-      backend = post.title_translations
+      backend = post.mobility_backend_for("title")
       backend.write(:en, { foo: :bar } )
       post.save
       expect(post.title_before_mobility.to_hash).to eq({ "en" => "{:foo=>:bar}" })

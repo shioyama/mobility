@@ -19,8 +19,8 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
 
     it "resets model translations cache when backend cache is cleared" do
       article = Article.new
-      title_backend = article.title_translations
-      content_backend = article.content_translations
+      title_backend = article.mobility_backend_for("title")
+      content_backend = article.mobility_backend_for("content")
       title_backend.read(:en)
       expect(article.__mobility_model_translations_cache.size).to eq(1)
       content_backend.read(:en)
@@ -47,8 +47,8 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       %w[foo bar baz].each { |slug| Article.create!(slug: slug) }
     end
     let(:article) { Article.find_by(slug: "baz") }
-    let(:title_backend) { article.title_translations }
-    let(:content_backend) { article.content_translations }
+    let(:title_backend) { article.mobility_backend_for("title") }
+    let(:content_backend) { article.mobility_backend_for("content") }
 
     subject { article }
 

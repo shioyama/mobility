@@ -30,7 +30,7 @@ module Mobility
     end
 
     def self.method_name(attribute)
-      "#{attribute}_translations"
+      "#{attribute}_backend"
     end
 
     module Setup

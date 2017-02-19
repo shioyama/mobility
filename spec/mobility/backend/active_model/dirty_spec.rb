@@ -203,7 +203,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
           article.send(action)
 
           # bypass the dirty module and set the variable directly
-          article.title_translations.instance_variable_set(:@values, { :en => "bar" })
+          article.mobility_backend_for("title").instance_variable_set(:@values, { :en => "bar" })
 
           expect(article.title).to eq("bar")
           expect(article.changes).to eq({})

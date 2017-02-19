@@ -17,8 +17,8 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
   describe "Backend methods" do
     before { %w[foo bar baz].each { |slug| Article.create!(slug: slug) } }
     let(:article) { Article.find_by(slug: "baz") }
-    let(:title_backend) { article.title_translations }
-    let(:content_backend) { article.content_translations }
+    let(:title_backend) { article.mobility_backend_for("title") }
+    let(:content_backend) { article.mobility_backend_for("content") }
 
     subject { article }
 

@@ -40,7 +40,7 @@ describe "ActiveRecord compatibility", orm: :active_record do
     end
 
     it "resets cache when model is reloaded" do
-      expect(post.title_translations).to receive(:clear_cache).once
+      expect(post.mobility_backend_for("title")).to receive(:clear_cache).once
       post.reload
     end
   end

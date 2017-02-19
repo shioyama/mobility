@@ -106,12 +106,12 @@ describe Mobility::Attributes do
 
       it "defines <attribute_name>_backend method which returns backend instance" do
         expect(backend_klass).to receive(:new).once.with(article, "title", { foo: "bar" }).and_call_original
-        expect(article.title_translations).to be_a(Mobility::Backend::Null)
+        expect(article.mobility_backend_for("title")).to be_a(Mobility::Backend::Null)
       end
 
       it "memoizes backend instance" do
         expect(backend_klass).to receive(:new).once.with(article, "title", { foo: "bar" }).and_call_original
-        2.times { article.title_translations }
+        2.times { article.mobility_backend_for("title") }
       end
     end
 

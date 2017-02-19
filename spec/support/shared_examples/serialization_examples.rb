@@ -3,7 +3,7 @@
 #
 shared_examples_for "AR Model with serialized translations" do |model_class_name, attribute1=:title, attribute2=:content|
   let(:model_class) { model_class_name.constantize }
-  let(:backend) { instance.send(:"#{attribute1}_translations") }
+  let(:backend) { instance.mobility_backend_for(attribute1) }
 
   describe "#read" do
     let(:instance) { model_class.new }
@@ -35,7 +35,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
         expect(backend.read(:ja)).to eq("あああ")
         expect(backend.read(:en)).to eq(nil)
-        other_backend = instance.send(:"#{attribute2}_translations")
+        other_backend = instance.mobility_backend_for(attribute2)
         expect(other_backend.read(:ja)).to eq(nil)
         expect(other_backend.read(:en)).to eq("aaa")
       end
@@ -84,7 +84,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       backend.write(:fr, "bar")
       instance.save
       instance = model_class.first
-      backend = instance.send(:"#{attribute1}_translations")
+      backend = instance.mobility_backend_for(attribute1)
       expect(instance.send(attribute1)).to eq("foo")
       Mobility.with_locale(:fr) { expect(instance.send(attribute1)).to eq("bar") }
       expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo", fr: "bar" })
@@ -134,7 +134,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
 
   let(:model_class) { model_class_name.constantize }
   let(:format) { backend.options[:format] }
-  let(:backend) { instance.send(:"#{attribute1}_translations") }
+  let(:backend) { instance.mobility_backend_for(attribute1) }
 
   def serialize(value)
     format ? value.send("to_#{format}") : stringify_keys(value)
@@ -182,7 +182,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
 
         expect(backend.read(:ja)).to eq("あああ")
         expect(backend.read(:en)).to eq(nil)
-        other_backend = instance.send(:"#{attribute2}_translations")
+        other_backend = instance.mobility_backend_for(attribute2)
         expect(other_backend.read(:ja)).to eq(nil)
         expect(other_backend.read(:en)).to eq("aaa")
       end
@@ -245,7 +245,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       backend.write(:fr, "bar")
       instance.save
       instance = model_class.first
-      backend = instance.send(:"#{attribute1}_translations")
+      backend = instance.mobility_backend_for(attribute1)
       expect(instance.send(attribute1)).to eq("foo")
       Mobility.with_locale(:fr) { expect(instance.send(attribute1)).to eq("bar") }
       expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({ en: "foo", fr: "bar" }))

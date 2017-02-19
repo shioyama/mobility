@@ -133,7 +133,7 @@ describe Mobility::Backend::Cache do
 
       shared_examples_for "cache that resets on model action" do |action|
         it "updates backend cache on #{action}" do
-          backend = @article.title_translations
+          backend = @article.mobility_backend_for("title")
           backend.write(:en, "foo")
           expect(backend.read(:en)).to eq("foo")
           @article.send action
@@ -155,8 +155,8 @@ describe Mobility::Backend::Cache do
 
       shared_examples_for "cache that resets on model action" do |action|
         it "updates cache on both backends on #{action}" do
-          title_backend = @article.title_translations
-          content_backend = @article.content_translations
+          title_backend = @article.mobility_backend_for("title")
+          content_backend = @article.mobility_backend_for("content")
           title_backend.write(:en, "foo")
           content_backend.write(:en, "bar")
           expect(title_backend.read(:en)).to eq("foo")

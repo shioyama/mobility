@@ -5,8 +5,8 @@ describe "Mobility::Backend::Sequel::KeyValue", orm: :sequel do
 
   let(:described_class) { Mobility::Backend::Sequel::KeyValue }
   let(:translation_class) { Mobility::Sequel::TextTranslation }
-  let(:title_backend) { article.title_translations }
-  let(:content_backend) { article.content_translations }
+  let(:title_backend) { article.mobility_backend_for("title") }
+  let(:content_backend) { article.mobility_backend_for("content") }
 
   before do
     stub_const 'Article', Class.new(::Sequel::Model)

@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Backend::ActiveRecord::Jsonb, orm: :active_record, db: :postgres do
   extend Helpers::ActiveRecord
 
-  let(:backend) { post.title_translations }
+  let(:backend) { post.mobility_backend_for("title") }
 
   before do
     stub_const 'JsonbPost', Class.new(ActiveRecord::Base)
@@ -19,7 +19,7 @@ describe Mobility::Backend::ActiveRecord::Jsonb, orm: :active_record, db: :postg
   describe "non-text values" do
     it "stores non-string types as-is when saving" do
       post = JsonbPost.new
-      backend = post.title_translations
+      backend = post.mobility_backend_for("title")
       backend.write(:en, { foo: :bar } )
       post.save
       expect(post.read_attribute(:title)).to eq({ "en" => { "foo" => "bar" }})

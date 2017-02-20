@@ -39,8 +39,14 @@ will generate an anonymous module looking something like this:
       title_backend.write(Mobility.locale, value.presence)
     end
 
+    # Start Locale Accessors
+    #
     def title_en
       title_backend.read(:en).presence
+    end
+
+    def title_en?
+      title_backend.read(:en).present?
     end
 
     def title_en=(value)
@@ -51,9 +57,14 @@ will generate an anonymous module looking something like this:
       title_backend.read(:ja).presence
     end
 
+    def title_ja?
+      title_backend.read(:ja).present?
+    end
+
     def title_ja=(value)
       title_backend.write(:ja, value.presence)
     end
+    # End Locale Accessors
   end
 
 Including this module into a model class will then add the backend method, the
@@ -180,6 +191,9 @@ with other backends.
         normalized_locale = Mobility.normalize_locale(locale)
         define_method "#{attribute}_#{normalized_locale}" do |**options|
           mobility_get(attribute, options.merge(locale: locale))
+        end
+        define_method "#{attribute}_#{normalized_locale}?" do |**options|
+          mobility_present?(attribute, options.merge(locale: locale))
         end
         define_method "#{attribute}_#{normalized_locale}=" do |value, **options|
           mobility_set(attribute, value, locale: locale)

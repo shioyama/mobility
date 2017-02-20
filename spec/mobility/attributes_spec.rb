@@ -210,7 +210,9 @@ describe Mobility::Attributes do
 
         it "does not define locale accessors" do
           expect { article.title_en }.to raise_error(NoMethodError)
+          expect { article.title_en? }.to raise_error(NoMethodError)
           expect { article.title_de }.to raise_error(NoMethodError)
+          expect { article.title_de? }.to raise_error(NoMethodError)
         end
       end
 
@@ -218,12 +220,18 @@ describe Mobility::Attributes do
         let(:options) { { locale_accessors: true } }
 
         it "defines accessors for locales in I18n.available_locales" do
-          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+          expect(backend).to receive(:read).twice.with(:de, {}).and_return("foo")
           expect(article.title_de).to eq("foo")
+          expect(article.title_de?).to eq(true)
+          expect(backend).to receive(:read).with(:de, {}).and_return("")
+          expect(article.title_de?).to eq(false)
+          expect(backend).to receive(:read).with(:de, {}).and_return(nil)
+          expect(article.title_de?).to eq(false)
         end
 
         it "does not define accessors for other locales" do
           expect { article.title_pt }.to raise_error(NoMethodError)
+          expect { article.title_pt? }.to raise_error(NoMethodError)
         end
       end
 
@@ -231,15 +239,19 @@ describe Mobility::Attributes do
         let(:options) { { locale_accessors: [:en, :pt] } }
 
         it "defines accessors for locales in locale_accessors hash" do
-          expect(backend).to receive(:read).with(:en, {}).and_return("enfoo")
+          expect(backend).to receive(:read).twice.with(:en, {}).and_return("enfoo")
           expect(article.title_en).to eq("enfoo")
-          expect(backend).to receive(:read).with(:pt, {}).and_return("ptfoo")
+          expect(article.title_en?).to eq(true)
+          expect(backend).to receive(:read).twice.with(:pt, {}).and_return("ptfoo")
           expect(article.title_pt).to eq("ptfoo")
+          expect(article.title_pt?).to eq(true)
         end
 
         it "does not define accessors for locales not in locale_accessors hash" do
           expect { article.title_de }.to raise_error(NoMethodError)
+          expect { article.title_de? }.to raise_error(NoMethodError)
           expect { article.title_es }.to raise_error(NoMethodError)
+          expect { article.title_es? }.to raise_error(NoMethodError)
         end
       end
 
@@ -247,8 +259,9 @@ describe Mobility::Attributes do
         let(:options) { { locale_accessors: [:'pt-BR'] } }
 
         it "translates dashes to underscores when defining locale accessors" do
-          expect(backend).to receive(:read).with(:'pt-BR', {}).and_return("foo")
+          expect(backend).to receive(:read).with(:'pt-BR', {}).twice.and_return("foo")
           expect(article.title_pt_br).to eq("foo")
+          expect(article.title_pt_br?).to eq(true)
         end
       end
     end

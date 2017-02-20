@@ -41,24 +41,24 @@ will generate an anonymous module looking something like this:
 
     # Start Locale Accessors
     #
-    def title_en
-      title_backend.read(:en).presence
+    def title_en(**options)
+      title_backend.read(:en, **options).presence
     end
 
-    def title_en?
-      title_backend.read(:en).present?
+    def title_en?(**options)
+      title_backend.read(:en, **options).present?
     end
 
     def title_en=(value)
       title_backend.write(:en, value.presence)
     end
 
-    def title_ja
-      title_backend.read(:ja).presence
+    def title_ja(**options)
+      title_backend.read(:ja, **options).presence
     end
 
-    def title_ja?
-      title_backend.read(:ja).present?
+    def title_ja?(**options)
+      title_backend.read(:ja, **options).present?
     end
 
     def title_ja=(value)

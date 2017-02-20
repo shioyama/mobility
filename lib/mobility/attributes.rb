@@ -108,7 +108,7 @@ with other backends.
     attr_reader :backend_class
 
     # Name of backend
-    # @return [Symbol] Name of backend
+    # @return [Symbol,Class] Name of backend, or backend class
     attr_reader :backend_name
 
     # @param [Symbol] method One of: [reader, writer, accessor]

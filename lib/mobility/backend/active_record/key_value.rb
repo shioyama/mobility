@@ -85,7 +85,7 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
           autosave:   true
         before_save do
           send(association_name).select { |t| t.value.blank? }.each do |translation|
-            send(association_name).delete(translation)
+            send(association_name).destroy(translation)
           end
         end
 

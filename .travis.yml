@@ -11,4 +11,5 @@ env:
     - DB=postgres ORM=sequel
     - DB=mysql    ORM=sequel
     - DB=sqlite   ORM=sequel
+    - DB=none
 before_install: gem install bundler -v 1.12.5

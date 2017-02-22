@@ -37,7 +37,7 @@ features, including:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', git: "https://github.com/shioyama/mobility.git"
+gem 'mobility', '~> 0.1.0'
 ```
 
 To translate attributes on a model, you must include (or extend) `Mobility`,

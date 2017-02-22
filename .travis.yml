@@ -1,5 +1,15 @@
 sudo: false
 language: ruby
 rvm:
-  - 2.2.3
+  - 2.0
+  - 2.1
+  - 2.2
+env:
+  matrix:
+    - DB=postgres ORM=active_record
+    - DB=mysql    ORM=active_record
+    - DB=sqlite   ORM=active_record
+    - DB=postgres ORM=sequel
+    - DB=mysql    ORM=sequel
+    - DB=sqlite   ORM=sequel
 before_install: gem install bundler -v 1.12.5

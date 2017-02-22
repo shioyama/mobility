@@ -15,10 +15,10 @@ end
 namespace :db do
   desc "Create the database"
   task :create => :load_path do
-    exit if ENV["ORM"] == ""
     require "database"
     driver = Mobility::Test::Database.driver
     config = Mobility::Test::Database.config[driver]
+    exit if config["database"] == ":memory:"
     commands = {
       "mysql"    => "mysql -u #{config['username']} -e 'create database #{config["database"]};' >/dev/null",
       "postgres" => "psql -c 'create database #{config['database']};' -U #{config['username']} >/dev/null"
@@ -28,10 +28,10 @@ namespace :db do
 
   desc "Drop the database"
   task :drop => :load_path do
-    exit if ENV["ORM"] == ""
     require "database"
     driver = Mobility::Test::Database.driver
     config = Mobility::Test::Database.config[driver]
+    exit if config["database"] == ":memory:"
     commands = {
       "mysql"    => "mysql -u #{config['username']} -e 'drop database #{config["database"]};' >/dev/null",
       "postgres" => "psql -c 'drop database #{config['database']};' -U #{config['username']} >/dev/null"
@@ -41,7 +41,10 @@ namespace :db do
 
   desc "Set up the database schema"
   task :up => :load_path do
-    exit if ENV["ORM"] == ""
+    require "database"
+    driver = Mobility::Test::Database.driver
+    config = Mobility::Test::Database.config[driver]
+    exit if config["database"] == ":memory:"
     require "spec_helper"
     Mobility::Test::Schema.up
   end

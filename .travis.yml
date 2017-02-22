@@ -12,7 +12,8 @@ env:
     - DB=mysql    ORM=sequel
     - DB=sqlite3  ORM=sequel
     - DB=sqlite3  ORM=
-before_script: bundle exec rake db:create db:up
+before_script:
+  - bundle exec rake db:create db:up
 before_install: gem install bundler -v 1.12.5
 addons:
   postgresql: "9.4"

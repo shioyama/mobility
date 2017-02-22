@@ -15,6 +15,7 @@ end
 namespace :db do
   desc "Create the database"
   task :create => :load_path do
+    exit if ENV["ORM"] == ""
     require "database"
     driver = Mobility::Test::Database.driver
     config = Mobility::Test::Database.config[driver]
@@ -27,6 +28,7 @@ namespace :db do
 
   desc "Drop the database"
   task :drop => :load_path do
+    exit if ENV["ORM"] == ""
     require "database"
     driver = Mobility::Test::Database.driver
     config = Mobility::Test::Database.config[driver]
@@ -39,6 +41,7 @@ namespace :db do
 
   desc "Set up the database schema"
   task :up => :load_path do
+    exit if ENV["ORM"] == ""
     require "spec_helper"
     Mobility::Test::Schema.up
   end

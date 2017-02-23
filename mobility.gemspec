@@ -5,7 +5,7 @@ require 'mobility/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "mobility"
-  spec.version       = "0.1.1"
+  spec.version       = Mobility::VERSION
   spec.authors       = ["Chris Salzberg"]
   spec.email         = ["chris@dejimata.com"]
 

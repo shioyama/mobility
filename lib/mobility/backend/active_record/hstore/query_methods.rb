@@ -7,19 +7,25 @@ module Mobility
 
         define_method :where! do |opts, *rest|
           if i18n_keys = attributes_extractor.call(opts)
-            locale = Mobility.locale
+            m = arel_table
+            locale = Arel::Nodes.build_quoted(Mobility.locale.to_s)
             opts = opts.with_indifferent_access
+            infix = Arel::Nodes::InfixOperation
 
-            result = i18n_keys.inject(all) do |scope, attr|
+            i18n_query = i18n_keys.inject(nil) { |ops, attr|
+              column = m[attr.to_sym]
               value = opts.delete(attr)
-              if value.nil?
-                scope.where.not("#{table_name}.#{attr} ? '#{locale}'")
-              else
-                scope.where!("#{table_name}.#{attr} @> hstore('#{locale}', ?)", value.to_s)
-              end
-            end
-            result = result.where!(opts, *rest) if opts.present?
-            result
+
+              op =
+                if value.nil?
+                  infix.new(:'?', column, locale).not
+                else
+                  infix.new(:'->', m[attr.to_sym], locale).eq(value)
+                end
+              ops ? ops.and(op) : op
+            }
+
+            opts.empty? ? where(i18n_query) : super(opts, *rest).where(i18n_query)
           else
             super(opts, *rest)
           end
@@ -38,7 +44,7 @@ module Mobility
               opts = opts.with_indifferent_access
               infix = Arel::Nodes::InfixOperation
 
-              query = i18n_keys.inject(nil) { |ops, attr|
+              i18n_query = i18n_keys.inject(nil) { |ops, attr|
                 column = m[attr.to_sym]
                 value = Arel::Nodes.build_quoted(opts.delete(attr).to_s)
                 has_key = infix.new(:'?', column, locale)
@@ -47,7 +53,7 @@ module Mobility
                 ops ? ops.and(op) : op
               }
 
-              super(opts, *rest).where(query)
+              super(opts, *rest).where(i18n_query)
             else
               super(opts, *rest)
             end

@@ -57,6 +57,12 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
         @post6 = model_class.create(attribute1 => "bar post",                              published: true )
       end
 
+      # @note Regression spec
+      it "does not modify scope in-place" do
+        model_class.i18n.where(attribute1 => "foo post")
+        expect(model_class.i18n.to_sql).to eq(model_class.all.to_sql)
+      end
+
       it "returns correct results querying on one attribute" do
         expect(model_class.i18n.where(attribute1 => "foo post")).to match_array([@post1, @post2, @post3])
         expect(model_class.i18n.where(attribute2 => "foo content")).to match_array([@post2, @post3, @post4])
@@ -114,6 +120,12 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
       @post5 = model_class.create(attribute1 => "bar post", attribute2 => "bar content", published: true )
       @post6 = model_class.create(attribute1 => "bar post", attribute2 => "baz content", published: false)
       @post7 = model_class.create(                                                       published: true)
+    end
+
+    # @note Regression spec
+    it "does not modify scope in-place" do
+      model_class.i18n.where.not(attribute1 => nil)
+      expect(model_class.i18n.to_sql).to eq(model_class.all.to_sql)
     end
 
     it "works with nil values" do

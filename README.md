@@ -39,7 +39,7 @@ features, including:
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.1.0'
+gem 'mobility', '~> 0.1.2'
 ```
 
 To translate attributes on a model, you must include (or extend) `Mobility`,

@@ -1,4 +1,6 @@
 # Mobility
+![Build Status](https://travis-ci.org/shioyama/mobility.svg?branch=master)
+
 
 Mobility is a gem for storing and retrieving localized data through attributes
 on a class. A variety of different storage strategies are supported through

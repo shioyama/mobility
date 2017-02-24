@@ -51,6 +51,10 @@ Attributes](#attributes) below.)
 Requirements:
 - ActiveRecord >= 5.0
 
+(Support for some backends is also supported with ActiveRecord/Rails 4.2, see
+the [active_record-4.2
+branch](https://github.com/shioyama/mobility/tree/active_record_4.2).)
+
 If using Mobility in a Rails project, you can run the generator to create an
 initializer and (optionally) a migration to create shared tables for the
 default key-value backend:

@@ -1,7 +1,6 @@
 # Mobility
 ![Build Status](https://travis-ci.org/shioyama/mobility.svg?branch=master)
 
-
 Mobility is a gem for storing and retrieving localized data through attributes
 on a class. A variety of different storage strategies are supported through
 pluggable, customizable "backends" implemented via a common interface.
@@ -43,8 +42,9 @@ gem 'mobility', '~> 0.1.2'
 ```
 
 To translate attributes on a model, you must include (or extend) `Mobility`,
-then call `translates` specifying the backend to use and any backend-specific
-options.
+then call `translates` passing in one or more attributes as well as a hash of
+options, including the backend to use. (See [Defining Backend
+Attributes](#attributes) below.)
 
 ### ActiveRecord (Rails)
 
@@ -74,25 +74,33 @@ Mobility.config.default_backend = :key_value
 ```
 
 To set a different default backend, set `default_backend` to another value (see
-possibilities below). Other configuration options can be set using the
+possibilities [below](#backend)). Other configuration options can be set using the
 `configure` method, see: {Mobility::Configuration} for details.
 
-The default key-value backend, which stores attributes and their translations
-as key/value pairs on shared tables, can be included in a model with the
-following two lines:
+To get started quickly, run the generator with tables, and add the following to
+a class to add translated attributes:
 
 ```ruby
 class Post < ActiveRecord::Base
-  include Mobility
-  translates :title, :author, backend: :key_value, type: :string
-  translates :content,        backend: :key_value, type: :text
+  translates :title,   type: :string
+  translates :content, type: :content
 end
 ```
 
-You can now store translations of `title`, `author` and `content` on shared
-translation tables (a string-valued translation table for the first two, and a
-text-valued translation table for the last one). For more information on
-backends, see [Choosing a Backend](#backend).
+You now have translated attributes `title` and `content` on the model:
+
+```ruby
+I18n.locale = :en
+post = Post.create(title: "foo")
+post.title #=> "Mobility"
+I18n.locale = :ja
+post.title #=> nil
+post.title = "モビリティ"
+post.save
+post.title #=> "モビリティ"
+```
+
+Congratulations! Have a look at the [Usage](#usage) section for more details.
 
 ### Sequel
 
@@ -101,22 +109,61 @@ Requirements:
 
 Essentially identical to ActiveRecord, with the exception that there is no
 equivalent to a Rails generator (so you will need to create the migration for
-the translation table(s) yourself, see the API docs for details).
+any translation table(s) yourself, see the API docs for details).
 
-To include translations on a model, simply call `translates`:
+## Usage
+
+### <a name="attributes"></a>Defining Backend Attributes
+
+In order to use Mobility on a class, you will need to `extend` the {Mobility}
+module and call `translates`, passing in one or more attribute names as well as
+a hash of options.
+
+The options hash is used to generate the backend, and has several reserved keys:
+
+- **`backend`** (Symbol or Class)<br>
+  The backend to use (defaults to the value of `Mobility.default_backend`). If
+  its value is a symbol it will be converted to CamelCase and appended to the
+  `Mobility::Backend` module name to get the backend class (so `key_value` will
+  be converted to {Mobility::Backend::KeyValue}). See the list of [backends](#backend).
+- **`cache`** (Boolean)<br>
+  Whether to use a [cache](#cache).
+- **`fallbacks`** (Boolean or Hash)<br>
+  Enable [fallbacks](#fallbacks), and optionally configure them.
+- **`dirty`** (Boolean)<br>
+  Whether to enable [dirty tracking](#dirty).
+- **`accessor_locales`** (Boolean or Array)<br>
+  Enable [locale accessors](#locale_accessors) and optionally configure them.
+
+In addition to these, each backend may have specific configuration options. For
+example, the default key-value backend, which stores attributes and their
+translations as key/value pairs on shared tables, has a `type` option which
+specifies which type of column (string or text) to use for storing
+translations.
+
+Here is an example defining three attributes on an ActiveRecord model:
 
 ```ruby
-class Post < Sequel::Model
+class Post < ActiveRecord::Base
   include Mobility
-  translates :title, :author, backend: :key_value, type: :string
-  translates :content,        backend: :key_value, type: :text
+  translates :title, :author, backend: :key_value, type: :string, cache: false
+  translates :content,        backend: :key_value, type: :text, fallbacks: true
 end
 ```
 
-Note that Mobility will detect the parent class and use an ORM-specific
-backend, in this case the {Mobility::Backend::Sequel::KeyValue} backend.
+`title`, `author` and `content` will use the `KeyValue` backend, which stores
+translations on two shared translation tables (one for string-valued
+translations and one for text-valued translations). The cache (enabled by
+default) is disabled for `title` and `author` (but not `content`).  `title` and
+`author` store their translations as string columns (`type: :string`) whereas
+`content` stores its values as text columns (`type: :text`).  Here, the `type`
+key is a backend-specific option used by the `KeyValue` backend.
 
-## Usage
+Note that Mobility will detect the model class and use this to determine which
+ORM-specific backend to use. In the example above, it will use
+{Mobility::Backend::ActiveRecord::KeyValue}; if the class were a
+`Sequel::Model`, it would have used {Mobility::Backend::Sequel::KeyValue}. In
+general options to configure the backend are ORM-independent.
 
 ### Setting the Locale
 
@@ -232,35 +279,34 @@ backend ([below](#backend)).
 
 Mobility supports six different (database) backends:
 
-- **{Mobility::Backend::Column}**<br>
+- **`:column`** ({Mobility::Backend::Column})<br>
   Store translations as columns on a table with locale as a postfix, of the
   form `title_en`, `title_fr`, etc. for an attribute `title`.
-- **{Mobility::Backend::Table}**<br>
+- **`:table`** ({Mobility::Backend::Table})<br>
   Store translations on a model-specific table, e.g. for a model `Post` with
   table `posts`, store translations on a table `post_translations`, and join
   the translation table when fetching translated values.
-- **{Mobility::Backend::KeyValue}**<br>
+- **`:key_value`** ({Mobility::Backend::KeyValue})<br>
   Store translations on a shared table of locale/attribute translation pairs,
   associated through a polymorphic relation with multiple models.
-- **{Mobility::Backend::Serialized}**<br>
+- **`:serialized`** ({Mobility::Backend::Serialized})<br>
   Store translations as serialized YAML or JSON on a text column.
-- **{Mobility::Backend::Hstore}**<br>
+- **`:hstore`** ({Mobility::Backend::Hstore})<br>
   Store translations as values of a hash stored as a PostgreSQL hstore column.
-- **{Mobility::Backend::Jsonb}**<br>
+- **`:jsonb`** ({Mobility::Backend::Jsonb})<br>
   Store translations as values of a hash stored as a PostgreSQL jsonb column.
 
 Each backend has strengths and weaknesses. If you're unsure of which backend to
 use, a rule of thumb would be:
 
-- If you're using PostgreSQL as your database, use {Mobility::Backend::Jsonb}.
+- If you're using PostgreSQL as your database, use `:jsonb`.
 - If you have a fixed, small set of locales that are not likely to increase,
-  and have a small number of models to translate, consider
-  {Mobility::Backend::Column}.
+  and have a small number of models to translate, consider `:column`.
 - If you have a small set of models to be translated but translation to
-  potentially many different languages, consider {Mobility::Backend::Table}.
+  potentially many different languages, consider `:table`.
 - For all other cases (many locales, many translated models), or if you're just
-  not sure, the recommended solution is {Mobility::Backend::KeyValue} for
-  maximum flexibility and minimum database migrations.
+  not sure, the recommended solution is `:key_value` for maximum flexibility
+  and minimum database migrations.
 
 
 ### <a name="locale-accessors"></a>Locale Accessors

@@ -96,15 +96,18 @@ You now have translated attributes `title` and `content` on the model:
 ```ruby
 I18n.locale = :en
 post = Post.create(title: "foo")
-post.title #=> "Mobility"
+post.title                         #=> "Mobility"
 I18n.locale = :ja
-post.title #=> nil
+post.title                         #=> nil
 post.title = "モビリティ"
 post.save
-post.title #=> "モビリティ"
+post.title                         #=> "モビリティ"
+I18n.locale = :en
+post.title                         #=> "Mobility"
 ```
 
-Congratulations! Have a look at the [Usage](#usage) section for more details.
+Congratulations! Now have a look at the [Usage](#usage) section to see what
+else Mobility can do.
 
 ### Sequel
 
@@ -158,10 +161,14 @@ end
 `title`, `author` and `content` will use the `KeyValue` backend, which stores
 translations on two shared translation tables (one for string-valued
 translations and one for text-valued translations). The cache (enabled by
-default) is disabled for `title` and `author` (but not `content`).  `title` and
-`author` store their translations as string columns (`type: :string`) whereas
-`content` stores its values as text columns (`type: :text`).  Here, the `type`
-key is a backend-specific option used by the `KeyValue` backend.
+default) is disabled for `title` and `author` (but not `content`).
+[Fallbacks](#fallbacks) are enabled for `content` (but not `title` or
+`author`).
+
+Finally, `title` and `author` store their translations as string columns
+(`type: :string`) whereas `content` stores its values as text columns (`type:
+:text`). The `type` key is a backend-specific option used by the `KeyValue`
+backend.
 
 Note that Mobility will detect the model class and use this to determine which
 ORM-specific backend to use. In the example above, it will use

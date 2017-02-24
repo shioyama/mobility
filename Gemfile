@@ -7,6 +7,8 @@ group :development, :test do
   if ENV['ORM'] == 'active_record'
     if ENV['RAILS_VERSION'] == '5.1'
       gem 'activerecord', '>= 5.1', '< 5.2'
+    elsif ENV['RAILS_VERSION'] == '4.2'
+      gem 'activerecord', '>= 4.2.6', '< 5.0'
     else
       gem 'activerecord', '>= 5.0', '< 5.1'
     end

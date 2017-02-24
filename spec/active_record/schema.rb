@@ -1,6 +1,11 @@
 module Mobility
   module Test
-    class Schema < ::ActiveRecord::Migration[[::ActiveRecord::VERSION::MAJOR, ::ActiveRecord::VERSION::MINOR].join(".")]
+    if ENV['RAILS_VERSION'] == '4.2'
+      parent_class = ::ActiveRecord::Migration
+    else
+      parent_class = ::ActiveRecord::Migration[[::ActiveRecord::VERSION::MAJOR, ::ActiveRecord::VERSION::MINOR].join(".")]
+    end
+    class Schema < parent_class
       class << self
         def up
           create_table "posts" do |t|

@@ -48,7 +48,7 @@ module Mobility
 
   begin
     require "active_record"
-    raise VersionNotSupportedError, "Mobility is only compatible with ActiveRecord 5.0 and greater" if ::ActiveRecord::VERSION::MAJOR < 5
+    raise VersionNotSupportedError, "Mobility is only compatible with ActiveRecord 4.2 and greater" if ::ActiveRecord::VERSION::STRING < "4.2"
     autoload :ActiveModel,      "mobility/active_model"
     autoload :ActiveRecord,     "mobility/active_record"
     Loaded::ActiveRecord = true

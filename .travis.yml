@@ -5,6 +5,9 @@ rvm:
   - 2.2.5
   - 2.3.1
 env:
+  - DB=postgres ORM=active_record RAILS_VERSION=4.2
+  - DB=mysql ORM=active_record RAILS_VERSION=4.2
+  - DB=sqlite3 ORM=active_record RAILS_VERSION=4.2
   - DB=postgres ORM=active_record RAILS_VERSION=5.0
   - DB=mysql ORM=active_record RAILS_VERSION=5.0
   - DB=sqlite3 ORM=active_record RAILS_VERSION=5.0
@@ -12,9 +15,9 @@ env:
   - DB=mysql ORM=active_record RAILS_VERSION=5.1
   - DB=sqlite3 ORM=active_record RAILS_VERSION=5.1
   - DB=postgres ORM=sequel
-  - DB=mysql ORM=sequel
-  - DB=sqlite3 ORM=sequel
-  - DB=sqlite3 ORM=
+  - DB=mysql    ORM=sequel
+  - DB=sqlite3  ORM=sequel
+  - DB=sqlite3  ORM=
 matrix:
   exclude:
     - rvm: 2.1.10

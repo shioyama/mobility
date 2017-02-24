@@ -7,14 +7,14 @@ passed to accessors to configure backend (see example below).
 @example Defining backend on a class
   class MyClass
     extend Translates
-    mobility_accessor :foo, option1: :value
+    mobility_accessor :foo, option: :value
   end
 
 @example Passing backend to a block
   class MyClass
     extend Translates
-    mobility_accessor :foo, option1: :value do |backend|
-      # do something with backend
+    mobility_accessor :foo, option: :value do
+      # add custom code to backend class for this attribute only
     end
   end
 
@@ -44,25 +44,25 @@ passed to accessors to configure backend (see example below).
     # Defines mobility accessor on model class.
     # @param [Array<String>] attributes
     # @param [Hash] options
-    # @yield [Object] Backend
+    # @yield Yields to block with backend as context
     # @!method mobility_accessor(*attributes, **options)
 
     # Defines mobility reader and presence method on model class.
     # @param [Array<String>] attributes
     # @param [Hash] options
-    # @yield [Object] Backend
+    # @yield Yields to block with backend as context
     # @!method mobility_reader(*attributes, **options)
 
     # Defines mobility writer on model class.
     # @param [Array<String>] attributes
     # @param [Hash] options
-    # @yield [Object] Backend
+    # @yield Yields to block with backend as context
     # @!method mobility_writer(*attributes, **options)
     %w[accessor reader writer].each do |method|
       class_eval <<-EOM, __FILE__, __LINE__ + 1
-        def mobility_#{method}(*args, **options)
+        def mobility_#{method}(*args, **options, &block)
           attributes = Attributes.new(:#{method}, *args, options.merge(model_class: self))
-          yield(attributes.backend) if block_given?
+          attributes.backend.instance_eval &block if block_given?
           attributes.each do |attribute|
             alias_method "\#{attribute}_before_mobility",  attribute        if method_defined?(attribute)        && #{%w[accessor reader].include? method}
             alias_method "\#{attribute}_before_mobility=", "\#{attribute}=" if method_defined?("\#{attribute}=") && #{%w[accessor writer].include? method}

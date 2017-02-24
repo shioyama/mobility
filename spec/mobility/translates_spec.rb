@@ -15,7 +15,7 @@ describe Mobility::Translates do
       MyClass.mobility_accessor *attribute_names
     end
 
-    it "yields backend to block if block given" do
+    it "yields to block with backend as context if block given" do
       attributes = Module.new do
         def self.backend; end
         def self.each &block; end
@@ -24,8 +24,8 @@ describe Mobility::Translates do
       expect(attributes).to receive(:backend).and_return(backend)
       expect(backend).to receive(:foo).with("bar")
       allow(Mobility::Attributes).to receive(:new).and_return(attributes)
-      MyClass.mobility_accessor :title do |backend|
-        backend.foo("bar")
+      MyClass.mobility_accessor :title do
+        foo("bar")
       end
     end
 

@@ -17,7 +17,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
     context "with serialized column" do
       it "returns translation from serialized hash" do
-        instance.write_attribute(attribute1, { ja: "あああ" })
+        instance.send :write_attribute, attribute1, { ja: "あああ" }
         instance.save
         instance.reload
 
@@ -28,8 +28,8 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
     context "multiple serialized columns have translations" do
       it "returns translation from serialized hash" do
-        instance.write_attribute(attribute1, { ja: "あああ" })
-        instance.write_attribute(attribute2, { en: "aaa" })
+        instance.send :write_attribute, attribute1, { ja: "あああ" }
+        instance.send :write_attribute, attribute2, { en: "aaa" }
         instance.save
         instance.reload
 

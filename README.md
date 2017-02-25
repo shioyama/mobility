@@ -1,10 +1,12 @@
 [gem]: https://rubygems.org/gems/mobility
 [travis]: https://travis-ci.org/shioyama/mobility
+[codeclimate]: https://codeclimate.com/github/shioyama/mobility
 
 # Mobility
 
 [![Gem Version](https://badge.fury.io/rb/mobility.svg)][gem]
 [![Build Status](https://travis-ci.org/shioyama/mobility.svg?branch=master)][travis]
+[![Code Climate](https://codeclimate.com/github/shioyama/mobility/badges/gpa.svg)][codeclimate]
 
 Mobility is a gem for storing and retrieving localized data through attributes
 on a class. A variety of different storage strategies are supported through

@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Pluggable Ruby translation framework}
   spec.description   = %q{Stores and retrieves localized data through attributes on a Ruby class, with flexible support for different storage strategies.}
 
-#  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage     = 'https://github.com/shioyama/mobility'
   spec.license       = "MIT"
 
   spec.files        = Dir['{lib/**/*,[A-Z]*}']

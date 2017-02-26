@@ -4,13 +4,16 @@ module Mobility
       def initialize(attributes, **options)
         super
         attributes_extractor = @attributes_extractor
-
-        define_method :where! do |opts, *rest|
+        @opts_converter = opts_converter = lambda do |opts|
           if i18n_keys = attributes_extractor.call(opts)
             opts = opts.with_indifferent_access
             i18n_keys.each { |attr| opts[Column.column_name_for(attr)] = opts.delete(attr) }
           end
-          super(opts, *rest)
+          return opts
+        end
+
+        define_method :where! do |opts, *rest|
+          super(opts_converter.call(opts), *rest)
         end
 
         attributes.each do |attribute|
@@ -22,15 +25,11 @@ module Mobility
 
       def extended(relation)
         super
-        attributes_extractor = @attributes_extractor
+        opts_converter = @opts_converter
 
         mod = Module.new do
           define_method :not do |opts, *rest|
-            if i18n_keys = attributes_extractor.call(opts)
-              opts = opts.with_indifferent_access
-              i18n_keys.each { |attr| opts[Column.column_name_for(attr)] = opts.delete(attr) }
-            end
-            super(opts, *rest)
+            super(opts_converter.call(opts), *rest)
           end
         end
         relation.model.mobility_where_chain.prepend(mod)

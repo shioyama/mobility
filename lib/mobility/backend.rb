@@ -23,7 +23,7 @@ On top of this, a backend will normally:
 
 @example Defining a Backend
   class MyBackend
-    include Backend
+    include Mobility::Backend
 
     def read(locale, **options)
       # ...

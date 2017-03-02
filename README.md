@@ -105,7 +105,7 @@ You now have translated attributes `title` and `content` on the model:
 
 ```ruby
 I18n.locale = :en
-post = Post.create(title: "foo")
+post = Post.create(title: "Mobility")
 post.title                         #=> "Mobility"
 I18n.locale = :ja
 post.title                         #=> nil

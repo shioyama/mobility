@@ -95,6 +95,7 @@ a class to add translated attributes:
 
 ```ruby
 class Post < ActiveRecord::Base
+  include Mobility
   translates :title,   type: :string
   translates :content, type: :content
 end

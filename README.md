@@ -42,6 +42,9 @@ features, including:
   the form `<attribute>_<locale>` (similar to
   [globalize-accessors](https://github.com/globalize/globalize-accessors))
 
+For a detailed introduction to Mobility, see [Translating with
+Mobility](http://dejimata.com/2017/3/3/translating-with-mobility).
+
 ## Installation
 
 Add this line to your application's Gemfile:

@@ -112,20 +112,20 @@ with other backends.
     attr_reader :backend_name
 
     # @param [Symbol] method One of: [reader, writer, accessor]
-    # @param [Array<String>] _attributes Attributes to define backend for
-    # @param [Hash] _options Backend options hash
-    # @option _options [Class] model_class Class of model
-    # @option _options [Boolean, Array<Symbol>] locale_accessors Enable locale
+    # @param [Array<String>] attributes_ Attributes to define backend for
+    # @param [Hash] options_ Backend options hash
+    # @option options_ [Class] model_class Class of model
+    # @option options_ [Boolean, Array<Symbol>] locale_accessors Enable locale
     #   accessors or specify locales for which accessors should be defined on
     #   this model backend. Will default to +true+ if +dirty+ option is +true+.
-    # @option _options [Boolean] cache (true) Enable cache for this model backend
-    # @option _options [Boolean, Hash] fallbacks Enable fallbacks or specify fallbacks for this model backend
-    # @option _options [Boolean] dirty Enable dirty tracking for this model backend
+    # @option options_ [Boolean] cache (true) Enable cache for this model backend
+    # @option options_ [Boolean, Hash] fallbacks Enable fallbacks or specify fallbacks for this model backend
+    # @option options_ [Boolean] dirty Enable dirty tracking for this model backend
     # @raise [ArgumentError] if method is not reader, writer or accessor
-    def initialize(method, *_attributes, **_options)
+    def initialize(method, *attributes_, **options_)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
-      @options = _options
-      @attributes = _attributes.map &:to_s
+      @options = options_
+      @attributes = attributes_.map &:to_s
       model_class = options[:model_class]
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,

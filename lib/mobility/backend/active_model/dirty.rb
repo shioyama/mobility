@@ -23,7 +23,7 @@ value of the translated attribute if passed to it.
     module ActiveModel::Dirty
       # @!group Backend Accessors
       # @!macro backend_writer
-      def write(locale, value, **options)
+      def write(locale, value, **)
         locale_accessor = "#{attribute}_#{locale}"
         if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
           model.attributes_changed_by_setter.except!(locale_accessor)
@@ -43,7 +43,7 @@ value of the translated attribute if passed to it.
       # methods for translated attributes onto model class.
       module ClassMethods
         # (see Mobility::Backend::Setup#setup_model)
-        def setup_model(model_class, attributes, **options)
+        def setup_model(model_class, attributes, **)
           super
           model_class.class_eval do
             %w[changed? change was will_change! previously_changed? previous_change].each do |suffix|

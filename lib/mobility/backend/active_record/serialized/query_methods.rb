@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     class ActiveRecord::Serialized::QueryMethods < ActiveRecord::QueryMethods
-      def initialize(attributes, **options)
+      def initialize(attributes, **)
         super
         attributes_extractor = @attributes_extractor
         opts_checker = @opts_checker = lambda do |opts|

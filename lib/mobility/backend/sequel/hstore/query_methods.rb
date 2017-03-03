@@ -3,7 +3,7 @@ Sequel.extension :pg_hstore, :pg_hstore_ops
 module Mobility
   module Backend
     class Sequel::Hstore::QueryMethods < Sequel::QueryMethods
-      def initialize(attributes, **options)
+      def initialize(attributes, **)
         super
         attributes_extractor = @attributes_extractor
 

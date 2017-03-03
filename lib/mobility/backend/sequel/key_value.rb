@@ -31,12 +31,12 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **options)
+      def read(locale, **)
         translation_for(locale).value
       end
 
       # @!macro backend_writer
-      def write(locale, value, **options)
+      def write(locale, value, **)
         translation_for(locale).tap { |t| t.value = value }.value
       end
       # @!endgroup

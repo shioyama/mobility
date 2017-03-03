@@ -9,12 +9,12 @@ Internal class used by Sequel backends that store values as a hash.
       include Backend
 
       # @!macro backend_reader
-      def read(locale, **options)
+      def read(locale, **)
         translations[locale.to_s]
       end
 
       # @!macro backend_writer
-      def write(locale, value, **options)
+      def write(locale, value, **)
         translations[locale.to_s] = value
       end
 

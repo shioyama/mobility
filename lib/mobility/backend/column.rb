@@ -22,12 +22,12 @@ be ignored if set, since it would cause a conflict with column accessors.
       # @!group Backend Accessors
       #
       # @!macro backend_reader
-      def read(locale, **options)
+      def read(locale, **)
         model.send(column(locale))
       end
 
       # @!macro backend_writer
-      def write(locale, value, **options)
+      def write(locale, value, **)
         model.send("#{column(locale)}=", value)
       end
       # @!endgroup

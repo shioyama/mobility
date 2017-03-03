@@ -3,7 +3,7 @@ Sequel.extension :pg_json, :pg_json_ops
 module Mobility
   module Backend
     class Sequel::Jsonb::QueryMethods < Sequel::QueryMethods
-      def initialize(attributes, **options)
+      def initialize(attributes, **)
         super
         attributes_extractor = @attributes_extractor
 

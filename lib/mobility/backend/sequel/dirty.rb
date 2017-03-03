@@ -10,7 +10,7 @@ Dirty tracking for Sequel models which use the +Sequel::Plugins::Dirty+ plugin.
     module Sequel::Dirty
       # @!group Backend Accessors
       # @!macro backend_writer
-      def write(locale, value, **options)
+      def write(locale, value, **)
         locale_accessor = "#{attribute}_#{locale}".to_sym
         if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
           super
@@ -31,7 +31,7 @@ Dirty tracking for Sequel models which use the +Sequel::Plugins::Dirty+ plugin.
       # methods for translated attributes onto model class.
       module ClassMethods
         # (see Mobility::Backend::Setup#setup_model)
-        def setup_model(model_class, attributes, **options)
+        def setup_model(model_class, attributes, **)
           super
           model_class.class_eval do
             mod = Module.new do

@@ -28,12 +28,12 @@ Implements {Mobility::Backend::Serialized} backend for ActiveRecord models.
       # @!group Backend Accessors
       #
       # @!macro backend_reader
-      def read(locale, **options)
+      def read(locale, **)
         translations[locale]
       end
 
       # @!macro backend_reader
-      def write(locale, value, **options)
+      def write(locale, value, **)
         translations[locale] = value
       end
       # @!endgroup

@@ -82,19 +82,19 @@ Implements the {Mobility::Backend::Table} backend for ActiveRecord models.
 
       # @!macro backend_constructor
       # @option options [Symbol] association_name Name of association
-      def initialize(model, attribute, **options)
+      def initialize(model, attribute, **)
         super
         @association_name = options[:association_name]
       end
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **options)
+      def read(locale, **)
         translation_for(locale).send(attribute)
       end
 
       # @!macro backend_reader
-      def write(locale, value, **options)
+      def write(locale, value, **)
         translation_for(locale).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
       end
       # @!endgroup

@@ -10,7 +10,7 @@ models. For details see backend-specific subclasses.
       class QueryMethods < Module
         # @param [Array<String>] attributes Translated attributes
         # @param [Hash] options Backend options
-        def initialize(attributes, **options)
+        def initialize(attributes, **)
           @attributes = attributes.map! &:to_sym
           @attributes_extractor = lambda do |cond|
             cond.is_a?(Hash) && (cond.keys & attributes).presence

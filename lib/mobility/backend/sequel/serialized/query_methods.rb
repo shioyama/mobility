@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     class Sequel::Serialized::QueryMethods < Sequel::QueryMethods
-      def initialize(attributes, **options)
+      def initialize(attributes, **)
         super
         attributes_extractor = @attributes_extractor
         cond_checker = @cond_checker = lambda do |cond|

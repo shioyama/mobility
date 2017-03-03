@@ -15,7 +15,7 @@ method is called.
         model_class.class_eval do
           mod = Module.new do
             define_method :refresh do
-              super().tap { instance_eval &model_reset_method }
+              super().tap { instance_eval(&model_reset_method) }
             end
           end
           include mod

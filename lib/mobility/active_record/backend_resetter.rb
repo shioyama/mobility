@@ -15,7 +15,7 @@ Backend resetter for ActiveRecord models. Adds hook on +reload+ event to
         model_class.class_eval do
           mod = Module.new do
             define_method :reload do
-              super().tap { instance_eval &model_reset_method }
+              super().tap { instance_eval(&model_reset_method) }
             end
           end
           include mod

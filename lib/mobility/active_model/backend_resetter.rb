@@ -17,7 +17,7 @@ Backend resetter for ActiveModel models. Adds hook to reset backend when
         %i[changes_applied clear_changes_information].each do |method|
           define_method method do
             super()
-            instance_eval &model_reset_method
+            instance_eval(&model_reset_method)
           end
         end
       end

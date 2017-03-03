@@ -97,7 +97,7 @@ a class to add translated attributes:
 class Post < ActiveRecord::Base
   include Mobility
   translates :title,   type: :string
-  translates :content, type: :content
+  translates :content, type: :text
 end
 ```
 

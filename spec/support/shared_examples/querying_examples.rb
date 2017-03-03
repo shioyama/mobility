@@ -274,7 +274,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
     it "works with nil values" do
       expect(model_class.i18n.exclude(attribute1 => "bar post", attribute2 => nil).select_all(table_name).all).to match_array([@post1, @post2, @post3])
       expect(model_class.i18n.exclude(attribute1 => "bar post").exclude(attribute2 => nil).select_all(table_name).all).to eq([@post2])
-      expect(model_class.i18n.exclude(attribute1 => nil).exclude(attribute2 => nil).select_all(table_name).all).to eq([@post2, @post3])
+      expect(model_class.i18n.exclude(attribute1 => nil).exclude(attribute2 => nil).select_all(table_name).all).to match_array([@post2, @post3])
     end
   end
 

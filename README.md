@@ -16,12 +16,17 @@ pluggable, customizable "backends" implemented via a common interface.
 
 Out of the box, Mobility supports:
 
-- translations as localized columns on the model table (like [Traco](https://github.com/barsoom/traco))
-- translations on a model-specific table (like [Globalize](https://github.com/globalize/globalize), [RailsTranslateModels](https://github.com/francesc/rails-translate-models), [Puret](https://github.com/jo/puret), etc)
+- translations as localized columns on the model table (like [traco](https://rubygems.org/gems/traco))
+- translations on a model-specific table (like [globalize](https://rubygems.org/gems/globalize), [rails-translate-models](https://rubygems.org/gems/rails-translate-models), [puret](https://rubygems.org/gems/puret), etc)
 - translations as values on globally shared key-value tables (the default, see [below](#backend))
-- translations as values of a hash serialized on a text column of the model table (like [Multilang](https://github.com/artworklv/multilang))
-- translations as values of a hash stored as an hstore column on a Postgres model table (like [Trasto](https://github.com/yabawock/trasto), [MultilangHstore](https://github.com/bithavoc/multilang-hstore), [HstoreTranslate](https://github.com/Leadformance/hstore_translate), etc.)
-- translations as values of a hash stored as a jsonb column on a Postgres model table (like [JsonTranslate](https://github.com/cfabianski/json_translate))
+- translations as values of a hash serialized on a text column of the model table (like [multilang](https://rubygems.org/gems/multilang))
+- translations as values of a hash stored as an hstore column on a Postgres
+  model table (like [trasto](https://rubygems.org/gems/trasto),
+  [multilang-hstore](https://rubygems.org/gems/multilang-hstore),
+  [hstore_translate](https://rubygems.org/gems/hstore_translate),
+  [sequel-hstore-translate](https://rubygems.org/gems/sequel-hstore-translate),
+  etc.)
+- translations as values of a hash stored as a jsonb column on a Postgres model table (like [json_translate](https://rubygems.org/gems/json_translate))
 
 Each backend is implemented for both
 [ActiveRecord](http://api.rubyonrails.org/classes/ActiveRecord/Base.html) and

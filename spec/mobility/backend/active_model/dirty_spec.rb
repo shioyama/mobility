@@ -144,10 +144,14 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         article.save
-        expect(article.title_previously_changed?).to eq(true)
-        expect(article.title_previous_change).to eq(["foo", "bar"])
+        if ENV['RAILS_VERSION'] < '5.0'
+          expect(article.title_changed?).to eq(nil)
+        else
+          expect(article.title_previously_changed?).to eq(true)
+          expect(article.title_previous_change).to eq(["foo", "bar"])
+          expect(article.title_changed?).to eq(false)
+        end
 
-        expect(article.title_changed?).to eq(false)
         article.title_will_change!
         expect(article.title_changed?).to eq(true)
       end
@@ -163,7 +167,11 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         Mobility.locale = :fr
-        expect(article.title_changed?).to eq(false)
+        if ENV['RAILS_VERSION'] < '5.0'
+          expect(article.title_changed?).to eq(nil)
+        else
+          expect(article.title_changed?).to eq(false)
+        end
         expect(article.title_change).to eq(nil)
         expect(article.title_was).to eq(nil)
       end

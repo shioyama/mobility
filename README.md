@@ -132,9 +132,20 @@ else Mobility can do.
 Requirements:
 - Sequel >= 4.0
 
-Essentially identical to ActiveRecord, with the exception that there is no
-equivalent to a Rails generator (so you will need to create the migration for
-any translation table(s) yourself, see the API docs for details).
+You can include `Mobility` just like in ActiveRecord, or you can use the
+`mobility` plugin, which does the same thing:
+
+```ruby
+class Post < ::Sequel::Model
+  plugin :mobility
+  translates :title,   type: :string
+  translates :content, type: :text
+end
+```
+
+Otherwise everything is almost identical to AR, with the exception that there
+is no equivalent to a Rails generator (so you will need to create the migration
+for any translation table(s) yourself, see the API docs for details).
 
 ## Usage
 

@@ -47,11 +47,11 @@ value of the translated attribute if passed to it.
         def setup_model(model_class, attributes, **options)
           super
           model_class.class_eval do
-            %w[changed? change was will_change! previously_changed? previous_change].each do |suffix|
+            Mobility::Backend::ActiveModel::Dirty.method_suffixes.each do |suffix|
               attributes.each do |attribute|
                 class_eval <<-EOM, __FILE__, __LINE__ + 1
-                  def #{attribute}_#{suffix}
-                    attribute_#{suffix}(Mobility.normalize_locale_accessor("#{attribute}"))
+                  def #{attribute}#{suffix}
+                    attribute#{suffix}(Mobility.normalize_locale_accessor("#{attribute}"))
                   end
                 EOM
               end
@@ -79,6 +79,15 @@ value of the translated attribute if passed to it.
           end
           model_class.include restore_methods
         end
+      end
+
+      def self.method_suffixes
+        @method_suffixes ||=
+          begin
+            Class.new do
+              include ::ActiveModel::Dirty
+            end.attribute_method_matchers.map { |m| m.suffix }
+          end.select { |m| m =~ /\A_/ }
       end
     end
   end

@@ -144,7 +144,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         article.save
-        if ENV['RAILS_VERSION'] < '5.0'
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
           expect(article.title_changed?).to eq(nil)
         else
           expect(article.title_previously_changed?).to eq(true)
@@ -167,7 +167,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         Mobility.locale = :fr
-        if ENV['RAILS_VERSION'] < '5.0'
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
           expect(article.title_changed?).to eq(nil)
         else
           expect(article.title_changed?).to eq(false)

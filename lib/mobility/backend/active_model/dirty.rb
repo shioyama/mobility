@@ -81,6 +81,9 @@ value of the translated attribute if passed to it.
         end
       end
 
+      # Get method suffixes. Creating an object just to get the list of
+      # suffixes is not very efficient, but the most reliable way given that
+      # they change from Rails version to version.
       def self.method_suffixes
         @method_suffixes ||=
           begin

@@ -17,11 +17,11 @@ pluggable, customizable "backends" implemented via a common interface.
 Out of the box, Mobility supports:
 
 - translations as localized columns on the model table (like [Traco](https://github.com/barsoom/traco))
-- translations on a model-specific table (like [globalize](https://github.com/globalize/globalize), [rails-translate-models](https://github.com/francesc/rails-translate-models), [Puret](https://github.com/jo/puret), etc)
+- translations on a model-specific table (like [Globalize](https://github.com/globalize/globalize), [RailsTranslateModels](https://github.com/francesc/rails-translate-models), [Puret](https://github.com/jo/puret), etc)
 - translations as values on globally shared key-value tables (the default, see [below](#backend))
 - translations as values of a hash serialized on a text column of the model table (like [Multilang](https://github.com/artworklv/multilang))
-- translations as values of a hash stored as an hstore column on a Postgres model table (like [Trasto](https://github.com/yabawock/trasto), [Multilang-hstore](https://github.com/bithavoc/multilang-hstore), [hstore_translate](https://github.com/Leadformance/hstore_translate), etc.)
-- translations as values of a hash stored as a jsonb column on a Postgres model table (like [json_translate](https://github.com/cfabianski/json_translate))
+- translations as values of a hash stored as an hstore column on a Postgres model table (like [Trasto](https://github.com/yabawock/trasto), [MultilangHstore](https://github.com/bithavoc/multilang-hstore), [HstoreTranslate](https://github.com/Leadformance/hstore_translate), etc.)
+- translations as values of a hash stored as a jsonb column on a Postgres model table (like [JsonTranslate](https://github.com/cfabianski/json_translate))
 
 Each backend is implemented for both
 [ActiveRecord](http://api.rubyonrails.org/classes/ActiveRecord/Base.html) and

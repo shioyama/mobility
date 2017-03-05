@@ -150,7 +150,7 @@ module Mobility
     # @!group Configuration Methods
     # @return [Mobility::Configuration] Mobility configuration
     def config
-      storage[:mobility_configuration] ||= Mobility::Configuration.new
+      @configuration ||= Mobility::Configuration.new
     end
 
     # (see Mobility::Configuration#accessor_method)

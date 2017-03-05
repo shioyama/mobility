@@ -2,6 +2,7 @@
 [travis]: https://travis-ci.org/shioyama/mobility
 [gemnasium]: https://gemnasium.com/shioyama/mobility
 [codeclimate]: https://codeclimate.com/github/shioyama/mobility
+[docs]: http://www.rubydoc.info/gems/mobility/0.1.3
 
 # Mobility
 
@@ -587,7 +588,7 @@ To this end, Mobility backends strictly enforce the rule that *no backend
 should modify a parent class in any way which would interfere with other
 backends operating on the same class*. This is done using a heavy dose of
 metaprogramming, details of which can be found in the [API
-documentation](http://www.rubydoc.info/gems/mobility/0.1.3) and in the actual code.
+documentation][docs]
 
 In practice, this means that you can use different backends for different
 attributes *on the same class* without any conflict, e.g. (assuming we
@@ -667,7 +668,7 @@ end
 
 For details on how to define a backend class, see the {Mobility::Backend}
 module and other classes defined in the [API
-documentation](http://www.rubydoc.info/gems/mobility/0.1.3).
+documentation][docs]
 
 ### Testing Backends
 
@@ -712,7 +713,7 @@ particular implementations.
 ## More Information
 
 - [Github repository](https://www.github.com/shioyama/mobility)
-- [API documentation](http://www.rubydoc.info/gems/mobility/0.1.3)
+- [API documentation][docs]
 
 ## License
 

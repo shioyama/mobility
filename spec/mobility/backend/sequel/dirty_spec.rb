@@ -23,7 +23,6 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
     stub_const 'Article', Class.new(Sequel::Model)
     Article.dataset = DB[:articles]
     Article.include Mobility
-    Article.plugin :dirty
     Article.translates :title, backend: backend_class, dirty: true, cache: false
   end
 

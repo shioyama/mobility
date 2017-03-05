@@ -2,7 +2,7 @@
 [travis]: https://travis-ci.org/shioyama/mobility
 [gemnasium]: https://gemnasium.com/shioyama/mobility
 [codeclimate]: https://codeclimate.com/github/shioyama/mobility
-[docs]: http://www.rubydoc.info/gems/mobility/0.1.4
+[docs]: http://www.rubydoc.info/gems/mobility
 
 # Mobility
 

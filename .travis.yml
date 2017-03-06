@@ -1,17 +1,25 @@
 sudo: false
 language: ruby
 rvm:
+  - 2.1.10
   - 2.2.5
   - 2.3.1
 env:
-  matrix:
-    - DB=postgres ORM=active_record
-    - DB=mysql    ORM=active_record
-    - DB=sqlite3  ORM=active_record
-    - DB=postgres ORM=sequel
-    - DB=mysql    ORM=sequel
-    - DB=sqlite3  ORM=sequel
-    - DB=sqlite3  ORM=
+  - DB=postgres ORM=active_record
+  - DB=mysql ORM=active_record
+  - DB=sqlite3 ORM=active_record
+  - DB=postgres ORM=sequel
+  - DB=mysql ORM=sequel
+  - DB=sqlite3 ORM=sequel
+  - DB=sqlite3 ORM=
+matrix:
+  exclude:
+    - rvm: 2.1.10
+      env: DB=postgres ORM=active_record
+    - rvm: 2.1.10
+      env: DB=mysql ORM=active_record
+    - rvm: 2.1.10
+      env: DB=sqlite3 ORM=active_record
 before_script:
   - bundle exec rake db:create db:up
 before_install: gem install bundler -v 1.12.5

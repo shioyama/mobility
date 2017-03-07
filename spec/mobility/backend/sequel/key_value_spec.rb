@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Mobility::Backend::Sequel::KeyValue", orm: :sequel do
+describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
   extend Helpers::Sequel
 
   let(:described_class) { Mobility::Backend::Sequel::KeyValue }

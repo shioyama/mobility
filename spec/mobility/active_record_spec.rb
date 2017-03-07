@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Mobility::ActiveRecord", orm: :active_record do
+describe Mobility::ActiveRecord, orm: :active_record do
   before do
     stub_const 'MyModel', ActiveRecord::Base
     MyModel.include Mobility::ActiveRecord
@@ -14,4 +14,4 @@ describe "Mobility::ActiveRecord", orm: :active_record do
       expect(MyModel.i18n).to eq(scope)
     end
   end
-end
+end if Mobility::Loaded::ActiveRecord

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Mobility::Sequel", orm: :sequel do
+describe Mobility::Sequel, orm: :sequel do
   before do
     stub_const 'MyModel', Sequel::Model
     MyModel.include Mobility::Sequel
@@ -14,4 +14,4 @@ describe "Mobility::Sequel", orm: :sequel do
       expect(MyModel.i18n).to eq(dataset)
     end
   end
-end
+end if Mobility::Loaded::Sequel

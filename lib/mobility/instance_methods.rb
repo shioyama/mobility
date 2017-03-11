@@ -15,7 +15,8 @@ Instance methods attached to all model classes when model includes or extends
     private
 
     def mobility_get(*args)
-      mobility_read(*args).presence
+      value = mobility_read(*args)
+      value == false ? value : value.presence
     end
 
     def mobility_present?(*args)
@@ -23,7 +24,7 @@ Instance methods attached to all model classes when model includes or extends
     end
 
     def mobility_set(attribute, value, locale: Mobility.locale)
-      mobility_backend_for(attribute).write(locale.to_sym, value.presence)
+      mobility_backend_for(attribute).write(locale.to_sym, value == false ? value : value.presence)
     end
 
     def mobility_read(attribute, **options)

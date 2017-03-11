@@ -194,6 +194,20 @@ describe Mobility::Attributes do
         expect(backend).to receive(:write).with(:fr, nil)
         article.title = ""
       end
+
+      it "does not convert false values to nil when receiving from backend getter" do
+        Article.include described_class.new(:reader, "title", { backend: backend_klass })
+        allow(Mobility).to receive(:locale).and_return(:ru)
+        expect(backend).to receive(:read).with(:ru, {}).and_return(false)
+        expect(article.title).to eq(false)
+      end
+
+      it "does not convert false values to nil when sending to backend setter" do
+        Article.include described_class.new(:writer, "title", { backend: backend_klass })
+        allow(Mobility).to receive(:locale).and_return(:fr)
+        expect(backend).to receive(:write).with(:fr, false)
+        article.title = false
+      end
     end
 
     describe "defining locale accessors" do

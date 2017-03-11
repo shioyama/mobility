@@ -8,7 +8,7 @@ describe Mobility::Configuration do
   end
 
   it "initializes default accessor_locales to I18n.available_locales" do
-    expect(subject.default_accessor_locales).to eq(I18n.available_locales)
+    expect(subject.default_accessor_locales.call).to eq(I18n.available_locales)
   end
 
   it "sets default_backend to nil" do

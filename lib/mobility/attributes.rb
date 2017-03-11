@@ -139,7 +139,7 @@ with other backends.
       @backend_class.include Backend::Dirty.for(model_class) if options[:dirty]
       @backend_class.include Backend::Fallbacks if options[:fallbacks]
       @accessor_locales = options[:locale_accessors]
-      @accessor_locales = Mobility.config.default_accessor_locales if options[:locale_accessors] == true
+      @accessor_locales = Mobility.config.default_accessor_locales.call if options[:locale_accessors] == true
 
       attributes.each do |attribute|
         define_backend(attribute)

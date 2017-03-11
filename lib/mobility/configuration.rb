@@ -17,15 +17,15 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Symbol,Class]
     attr_accessor :default_backend
 
-    # Default set of locales to use when defining accessors (defaults to
-    # +I18n.available_locales+)
+    # Proc returning set of default accessor locles to use (defaults to proc
+    # returning +I18n.available_locales+)
     # @return [Array<Symbol>]
     attr_accessor :default_accessor_locales
 
     def initialize
       @accessor_method = :translates
       @default_fallbacks = I18n::Locale::Fallbacks.new
-      @default_accessor_locales = I18n.available_locales
+      @default_accessor_locales = lambda { I18n.available_locales }
     end
   end
 end

@@ -21,7 +21,7 @@ Resets backend cache when reset events occur.
       @model_reset_method = Proc.new do
         attributes.each do |attribute|
           if @mobility_backends && @mobility_backends[attribute]
-            @mobility_backends[attribute].instance_eval &block
+            @mobility_backends[attribute].instance_eval(&block)
           end
         end
       end

@@ -125,7 +125,7 @@ with other backends.
     def initialize(method, *attributes_, **options_)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @options = options_
-      @attributes = attributes_.map &:to_s
+      @attributes = attributes_.map(&:to_s)
       model_class = options[:model_class]
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,
@@ -173,7 +173,7 @@ with other backends.
     # Yield each attribute to block
     # @yield [String] Attribute
     def each &block
-      attributes.each &block
+      attributes.each(&block)
     end
 
     private

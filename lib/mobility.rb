@@ -2,7 +2,7 @@ require 'i18n'
 require 'request_store'
 require 'mobility/version'
 
-%w[object nil string].each do |type|
+%w[object string].each do |type|
   begin
     require "active_support/core_ext/#{type}"
   rescue LoadError

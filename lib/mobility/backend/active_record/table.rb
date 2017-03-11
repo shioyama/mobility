@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Mobility
   module Backend
 =begin
@@ -108,10 +110,10 @@ Implements the {Mobility::Backend::Table} backend for ActiveRecord models.
       #   to append to model class to generate translation class
       def self.configure!(options)
         table_name = options[:model_class].table_name
-        options[:table_name]  ||= "#{table_name.singularize}_translations"
+        options[:table_name]  ||= "#{table_name.singularize}_translations".freeze
         options[:foreign_key] ||= table_name.downcase.singularize.camelize.foreign_key
         if (association_name = options[:association_name]).present?
-          options[:subclass_name] ||= association_name.to_s.singularize.camelize
+          options[:subclass_name] ||= association_name.to_s.singularize.camelize.freeze
         else
           options[:association_name] = :mobility_model_translations
           options[:subclass_name] ||= :Translation

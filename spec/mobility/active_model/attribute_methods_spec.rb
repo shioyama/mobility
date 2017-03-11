@@ -41,4 +41,14 @@ describe Mobility::ActiveModel::AttributeMethods, orm: :active_record do
       )
     end
   end
+
+  describe "#untranslated_attributes" do
+    it "returns original value of attributes method" do
+      expect(subject.untranslated_attributes).to eq(
+        {
+          "untranslated" => "bar"
+        }
+      )
+    end
+  end
 end if Mobility::Loaded::ActiveRecord

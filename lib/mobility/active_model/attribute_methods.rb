@@ -11,8 +11,15 @@ ancestors.
 
       # Adds translated attributes to +attributes+.
       # @return [Array<String>] Model attributes
-      def attributes
-        super.merge(translated_attributes)
+      # @!method attributes
+      def self.included(model)
+        model.class_eval do
+          alias_method :untranslated_attributes, :attributes
+
+          def attributes
+            super.merge(translated_attributes)
+          end
+        end
       end
 
       # Translated attributes defined on model.

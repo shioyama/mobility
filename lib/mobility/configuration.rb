@@ -17,10 +17,17 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Symbol,Class]
     attr_accessor :default_backend
 
-    # Proc returning set of default accessor locles to use (defaults to proc
-    # returning +I18n.available_locales+)
+    # Returns set of default accessor locles to use (defaults to
+    # +I18n.available_locales+)
     # @return [Array<Symbol>]
-    attr_accessor :default_accessor_locales
+    def default_accessor_locales
+      if @default_accessor_locales.is_a?(Proc)
+        @default_accessor_locales.call
+      else
+        @default_accessor_locales
+      end
+    end
+    attr_writer :default_accessor_locales
 
     def initialize
       @accessor_method = :translates

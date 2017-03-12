@@ -23,11 +23,11 @@ value of the translated attribute if passed to it.
     module ActiveModel::Dirty
       # @!group Backend Accessors
       # @!macro backend_writer
-      def write(locale, value, **)
+      def write(locale, value, **options)
         locale_accessor = "#{attribute}_#{locale}"
         if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
           model.attributes_changed_by_setter.except!(locale_accessor)
-        else
+        elsif read(locale, **options) != value
           model.send(:attribute_will_change!, "#{attribute}_#{locale}")
         end
         super

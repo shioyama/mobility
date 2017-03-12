@@ -36,6 +36,14 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
         expect(article.changes).to eq({})
       end
 
+      aggregate_failures "set same value" do
+        article.title = nil
+        expect(article.title).to eq(nil)
+        expect(article.changed?).to eq(false)
+        expect(article.changed).to eq([])
+        expect(article.changes).to eq({})
+      end
+
       article.title = "foo"
 
       aggregate_failures "after change" do

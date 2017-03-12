@@ -38,6 +38,15 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
         expect(article.column_changes).to eq({})
       end
 
+      aggregate_failures "set same value" do
+        article.title = nil
+        expect(article.title).to eq(nil)
+        expect(article.column_changed?(:title)).to eq(false)
+        expect(article.column_change(:title)).to eq(nil)
+        expect(article.changed_columns).to eq([])
+        expect(article.column_changes).to eq({})
+      end
+
       article.title = "foo"
 
       aggregate_failures "after change" do

@@ -11,12 +11,12 @@ Automatically includes dirty plugin in model class when enabled.
     module Sequel::Dirty
       # @!group Backend Accessors
       # @!macro backend_writer
-      def write(locale, value, **)
+      def write(locale, value, **options)
         locale_accessor = "#{attribute}_#{locale}".to_sym
         if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
           super
           [model.changed_columns, model.initial_values].each { |h| h.delete(locale_accessor) }
-        else
+        elsif read(locale, **options) != value
           model.will_change_column("#{attribute}_#{locale}".to_sym)
           super
         end

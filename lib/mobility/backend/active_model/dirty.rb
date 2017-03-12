@@ -27,7 +27,7 @@ value of the translated attribute if passed to it.
         locale_accessor = "#{attribute}_#{locale}"
         if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
           model.attributes_changed_by_setter.except!(locale_accessor)
-        elsif read(locale, **options) != value
+        elsif read(locale, options.merge(fallbacks: false)) != value
           model.send(:attribute_will_change!, "#{attribute}_#{locale}")
         end
         super

@@ -225,4 +225,59 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     it_behaves_like "resets on model action", :save
     it_behaves_like "resets on model action", :reload
   end
+
+  describe "fallbacks compatiblity" do
+    before do
+      stub_const 'ArticleWithFallbacks', Class.new(ActiveRecord::Base)
+      ArticleWithFallbacks.class_eval do
+        self.table_name = :articles
+        include Mobility
+      end
+      ArticleWithFallbacks.translates :title, backend: backend_class, dirty: true, cache: false, fallbacks: { en: 'ja' }
+    end
+
+    it "does not compare with fallback value" do
+      article = ArticleWithFallbacks.new
+
+      aggregate_failures "before change" do
+        expect(article.title).to eq(nil)
+        expect(article.changed?).to eq(false)
+        expect(article.changed).to eq([])
+        expect(article.changes).to eq({})
+      end
+
+      aggregate_failures "set fallback locale value" do
+        Mobility.with_locale(:ja) { article.title = "あああ" }
+        expect(article.title).to eq("あああ")
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to eq(["title_ja"])
+        expect(article.changes).to eq({ "title_ja" => [nil, "あああ"]})
+        Mobility.with_locale(:ja) { expect(article.title).to eq("あああ") }
+      end
+
+      aggregate_failures "set value in current locale to same value" do
+        article.title = nil
+        expect(article.title).to eq("あああ")
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to eq(["title_ja"])
+        expect(article.changes).to eq({ "title_ja" => [nil, "あああ"]})
+      end
+
+      aggregate_failures "set value in fallback locale to different value" do
+        Mobility.with_locale(:ja) { article.title = "ばばば" }
+        expect(article.title).to eq("ばばば")
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to eq(["title_ja"])
+        expect(article.changes).to eq({ "title_ja" => [nil, "ばばば"]})
+      end
+
+      aggregate_failures "set value in current locale to different value" do
+        article.title = "Title"
+        expect(article.title).to eq("Title")
+        expect(article.changed?).to eq(true)
+        expect(article.changed).to match_array(["title_ja", "title_en"])
+        expect(article.changes).to eq({ "title_ja" => [nil, "ばばば"], "title_en" => ["ばばば", "Title"]})
+      end
+    end
+  end
 end

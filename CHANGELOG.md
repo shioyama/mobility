@@ -2,6 +2,16 @@
 
 ## 0.1
 
+### 0.1.5
+* Add `accessor_method` to default initializer ([d4a9da98cae71de2fb9ee3d29c64decef5a16010](https://github.com/shioyama/mobility/commit/d4a9da98cae71de2fb9ee3d29c64decef5a16010))
+* Include AR version in generated migrations ([ac3dfbbc053089b01dcc73d0b617fefaeaaa85cb](https://github.com/shioyama/mobility/commit/ac3dfbbc053089b01dcc73d0b617fefaeaaa85cb))
+* Add `untranslated_attributes` method ([50e97f12ea219321ef9f61792e909299f570ba23](https://github.com/shioyama/mobility/commit/50e97f12ea219321ef9f61792e909299f570ba23))
+* Do not require `active_support/core_ext/nil` ([39e24596482f03302542e524ca6f17275a778644](https://github.com/shioyama/mobility/commit/39e24596482f03302542e524ca6f17275a778644))
+* Handle false values correctly when getting and setting ([bdf6f199aaa8318a73c5aa6332aee8d7aad254f6](https://github.com/shioyama/mobility/commit/bdf6f199aaa8318a73c5aa6332aee8d7aad254f6))
+* Use proc to define accessor locales from `I18n.available_locales` ([3cd786814d8044ae5d64f939c3a7b5c49b322bc6](https://github.com/shioyama/mobility/commit/3cd786814d8044ae5d64f939c3a7b5c49b322bc6))
+* Do not mark attribute as changed if value is the same (fixed in [#2](https://github.com/shioyama/mobility/pull/2))
+* Pass on any args to original reload method when overriding (fixed in [#3](https://github.com/shioyama/mobility/pull/3))
+
 ### 0.1.4
 * Fix configuration reload issue ([#1](https://github.com/shioyama/mobility/issues/1), fixed in [478b669dae90edf9feb7c011ae93e8157dc4e2b4](https://github.com/shioyama/mobility/commit/478b669dae90edf9feb7c011ae93e8157dc4e2b4))
 * Code refactoring/cleanup ([e4dcc791c246e377352b9ac154d2b1c4aec8e98e](https://github.com/shioyama/mobility/commit/e4dcc791c246e377352b9ac154d2b1c4aec8e98e), [64f434ea7a46c9353c3638c58a3258f0fcb81821](https://github.com/shioyama/mobility/commit/64f434ea7a46c9353c3638c58a3258f0fcb81821), [8df2bbdead883725d2c87020f836b644b4d28e5c](https://github.com/shioyama/mobility/commit/8df2bbdead883725d2c87020f836b644b4d28e5c), [326a0977c98348dad85a927c20dd69fe5acb2a9e](https://github.com/shioyama/mobility/commit/326a0977c98348dad85a927c20dd69fe5acb2a9e))

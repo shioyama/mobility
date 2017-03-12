@@ -56,7 +56,7 @@ Mobility](http://dejimata.com/2017/3/3/translating-with-mobility).
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.1.4'
+gem 'mobility', '~> 0.1.5'
 ```
 
 To translate attributes on a model, you must include (or extend) `Mobility`,

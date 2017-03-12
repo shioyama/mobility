@@ -16,7 +16,7 @@ Automatically includes dirty plugin in model class when enabled.
         if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
           super
           [model.changed_columns, model.initial_values].each { |h| h.delete(locale_accessor) }
-        elsif read(locale, **options) != value
+        elsif read(locale, options.merge(fallbacks: false)) != value
           model.will_change_column("#{attribute}_#{locale}".to_sym)
           super
         end

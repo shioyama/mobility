@@ -131,17 +131,18 @@ describe Mobility::Backend::Cache do
         @article = Article.create
       end
 
-      shared_examples_for "cache that resets on model action" do |action|
+      shared_examples_for "cache that resets on model action" do |action, options = nil|
         it "updates backend cache on #{action}" do
           backend = @article.mobility_backend_for("title")
           backend.write(:en, "foo")
           expect(backend.read(:en)).to eq("foo")
-          @article.send action
+          options ? @article.send(action, options) : @article.send(action)
           expect(backend.read(:en)).to eq(nil)
         end
       end
 
       it_behaves_like "cache that resets on model action", :reload
+      it_behaves_like "cache that resets on model action", :reload, { readonly: true, lock: true }
       it_behaves_like "cache that resets on model action", :save
     end
 
@@ -153,7 +154,7 @@ describe Mobility::Backend::Cache do
         @article = Article.create
       end
 
-      shared_examples_for "cache that resets on model action" do |action|
+      shared_examples_for "cache that resets on model action" do |action, options = nil|
         it "updates cache on both backends on #{action}" do
           title_backend = @article.mobility_backend_for("title")
           content_backend = @article.mobility_backend_for("content")
@@ -161,13 +162,14 @@ describe Mobility::Backend::Cache do
           content_backend.write(:en, "bar")
           expect(title_backend.read(:en)).to eq("foo")
           expect(content_backend.read(:en)).to eq("bar")
-          @article.send(action)
+          options ? @article.send(action, options) : @article.send(action)
           expect(title_backend.read(:en)).to eq(nil)
           expect(content_backend.read(:en)).to eq(nil)
         end
       end
 
       it_behaves_like "cache that resets on model action", :reload
+      it_behaves_like "cache that resets on model action", :reload, { readonly: true, lock: true }
       it_behaves_like "cache that resets on model action", :save
     end
   end

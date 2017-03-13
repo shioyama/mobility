@@ -186,7 +186,7 @@ module Mobility
     #   Mobility.normalize_locale("pt-BR")
     #   #=> "pt_br"
     def normalize_locale(locale)
-      "#{locale.to_s.downcase.sub("-", "_")}"
+      "#{locale.to_s.downcase.sub("-", "_")}".freeze
     end
 
     protected

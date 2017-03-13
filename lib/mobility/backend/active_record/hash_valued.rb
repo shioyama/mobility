@@ -11,12 +11,12 @@ Internal class used by ActiveRecord backends that store values as a hash.
       # @!group Backend Accessors
       #
       # @!macro backend_reader
-      def read(locale, **)
+      def read(locale, **_)
         translations[locale]
       end
 
       # @!macro backend_writer
-      def write(locale, value, **)
+      def write(locale, value, **_)
         translations[locale] = value
       end
       # @!endgroup

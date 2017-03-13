@@ -32,7 +32,7 @@ Automatically includes dirty plugin in model class when enabled.
       # methods for translated attributes onto model class.
       module ClassMethods
         # (see Mobility::Backend::Setup#setup_model)
-        def setup_model(model_class, attributes, **)
+        def setup_model(model_class, attributes, **options)
           super
           model_class.plugin :dirty
           model_class.class_eval do

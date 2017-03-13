@@ -35,7 +35,7 @@ this).
     module Cache
       # @group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **)
+      def read(locale, **_)
         if write_to_cache? || cache.has_key?(locale)
           cache[locale]
         else
@@ -44,7 +44,7 @@ this).
       end
 
       # @!macro backend_writer
-      def write(locale, value, **)
+      def write(locale, value, **_)
         cache[locale] = write_to_cache? ? value : super
       end
       # @!endgroup
@@ -56,8 +56,7 @@ this).
       module Setup
         # @param model_class Model class
         # @param [Array<String>] attributes Backend attributes
-        # @param [Hash] options Backend options
-        def setup_model(model_class, attributes, **)
+        def setup_model(model_class, attributes, **_)
           super
           model_class.include BackendResetter.for(model_class).new(attributes) { clear_cache }
         end

@@ -87,13 +87,11 @@ On top of this, a backend will normally:
 
     # @!macro [new] backend_reader
     #   @param [Symbol] locale Locale to read
-    #   @param [Hash] options
     #   @return [Object] Value of translation
     #
     # @!macro [new] backend_writer
     #   @param [Symbol] locale Locale to write
     #   @param [Object] value Value to write
-    #   @param [Hash] options
     #   @return [Object] Updated value
 
     # Extend included class with +setup+ method

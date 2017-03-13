@@ -177,7 +177,7 @@ Implements the {Mobility::Backend::Table} backend for ActiveRecord models.
       private
 
       def translation_for(locale)
-        translation = translations.find { |t| t.locale == locale.to_s }
+        translation = translations.find { |t| t.locale == locale.to_s.freeze }
         translation ||= translations.build(locale: locale)
         translation
       end

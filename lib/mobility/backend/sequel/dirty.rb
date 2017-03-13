@@ -12,12 +12,12 @@ Automatically includes dirty plugin in model class when enabled.
       # @!group Backend Accessors
       # @!macro backend_writer
       def write(locale, value, **options)
-        locale_accessor = "#{attribute}_#{locale}".to_sym
+        locale_accessor = Mobility.normalize_locale_accessor(attribute, locale).to_sym
         if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
           super
           [model.changed_columns, model.initial_values].each { |h| h.delete(locale_accessor) }
         elsif read(locale, options.merge(fallbacks: false)) != value
-          model.will_change_column("#{attribute}_#{locale}".to_sym)
+          model.will_change_column(locale_accessor)
           super
         end
       end
@@ -40,7 +40,7 @@ Automatically includes dirty plugin in model class when enabled.
               %w[initial_value column_change column_changed? reset_column].each do |method_name|
                 define_method method_name do |column|
                   if attributes.map(&:to_sym).include?(column)
-                    super("#{column}_#{Mobility.locale}".to_sym)
+                    super(Mobility.normalize_locale_accessor(column).to_sym)
                   else
                     super(column)
                   end

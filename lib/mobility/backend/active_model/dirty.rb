@@ -24,11 +24,11 @@ value of the translated attribute if passed to it.
       # @!group Backend Accessors
       # @!macro backend_writer
       def write(locale, value, **options)
-        locale_accessor = "#{attribute}_#{locale}"
+        locale_accessor = Mobility.normalize_locale_accessor(attribute, locale)
         if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
           model.attributes_changed_by_setter.except!(locale_accessor)
         elsif read(locale, options.merge(fallbacks: false)) != value
-          model.send(:attribute_will_change!, "#{attribute}_#{locale}")
+          model.send(:attribute_will_change!, locale_accessor)
         end
         super
       end
@@ -50,7 +50,7 @@ value of the translated attribute if passed to it.
               attributes.each do |attribute|
                 class_eval <<-EOM, __FILE__, __LINE__ + 1
                   def #{attribute}_#{suffix}
-                    attribute_#{suffix}("#{attribute}_#\{Mobility.locale\}")
+                    attribute_#{suffix}(Mobility.normalize_locale_accessor("#{attribute}"))
                   end
                 EOM
               end
@@ -59,8 +59,8 @@ value of the translated attribute if passed to it.
 
           restore_methods = Module.new do
             attributes.each do |attribute|
-              locale_accessor = "#{attribute}_#{Mobility.locale}"
               define_method "restore_#{attribute}!" do
+                locale_accessor = Mobility.normalize_locale_accessor(attribute)
                 if attribute_changed?(locale_accessor)
                   __send__("#{attribute}=", changed_attributes[locale_accessor])
                 end

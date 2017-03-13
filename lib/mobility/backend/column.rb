@@ -44,7 +44,7 @@ be ignored if set, since it would cause a conflict with column accessors.
       # @param [Symbol] locale
       # @return [String]
       def self.column_name_for(attribute, locale = Mobility.locale)
-        normalized_locale = locale.to_s.downcase.sub("-", "_")
+        normalized_locale = Mobility.normalize_locale(locale)
         "#{attribute}_#{normalized_locale}".to_sym
       end
     end

@@ -27,6 +27,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
 
   describe "tracking changes" do
     it "tracks changes in one locale" do
+      Mobility.locale = :'pt-BR'
       article = Article.new
 
       aggregate_failures "before change" do
@@ -49,8 +50,8 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
       aggregate_failures "after change" do
         expect(article.title).to eq("foo")
         expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_en"])
-        expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
+        expect(article.changed).to eq(["title_pt_br"])
+        expect(article.changes).to eq({ "title_pt_br" => [nil, "foo"] })
       end
     end
 
@@ -171,6 +172,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
 
   describe "restoring attributes" do
     it "defines restore_<attribute>! for translated attributes" do
+      Mobility.locale = :'pt-BR'
       article = Article.create
       article.title = "foo"
 

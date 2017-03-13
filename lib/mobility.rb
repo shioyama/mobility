@@ -185,9 +185,10 @@ module Mobility
     #   #=> "ja"
     #   Mobility.normalize_locale("pt-BR")
     #   #=> "pt_br"
-    def normalize_locale(locale)
+    def normalize_locale(locale = Mobility.locale)
       "#{locale.to_s.downcase.sub("-", "_")}".freeze
     end
+    alias_method :normalized_locale, :normalize_locale
 
     # Return normalized locale accessor name
     # @param [String,Symbol] attribute

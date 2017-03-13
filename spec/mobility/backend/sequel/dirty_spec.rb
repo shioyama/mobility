@@ -28,6 +28,7 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
 
   describe "tracking changes" do
     it "tracks changes in one locale" do
+      Mobility.locale = :'pt-BR'
       article = Article.new
 
       aggregate_failures "before change" do
@@ -53,8 +54,8 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
         expect(article.title).to eq("foo")
         expect(article.column_changed?(:title)).to eq(true)
         expect(article.column_change(:title)).to eq([nil, "foo"])
-        expect(article.changed_columns).to eq([:title_en])
-        expect(article.column_changes).to eq({ :title_en => [nil, "foo"] })
+        expect(article.changed_columns).to eq([:title_pt_br])
+        expect(article.column_changes).to eq({ :title_pt_br => [nil, "foo"] })
       end
     end
 

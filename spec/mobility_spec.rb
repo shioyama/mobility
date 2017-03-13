@@ -140,6 +140,15 @@ describe Mobility do
     it "normalizes locale to lowercase string underscores" do
       expect(Mobility.normalize_locale(:"pt-BR")).to eq("pt_br")
     end
+
+    it "normalizes current locale if passed no argument" do
+      Mobility.with_locale(:"pt-BR") do
+        aggregate_failures do
+          expect(Mobility.normalize_locale).to eq("pt_br")
+          expect(Mobility.normalized_locale).to eq("pt_br")
+        end
+      end
+    end
   end
 
   describe '.normalize_locale_accessor' do

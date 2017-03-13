@@ -142,6 +142,18 @@ describe Mobility do
     end
   end
 
+  describe '.normalize_locale_accessor' do
+    it "normalizes accessor to use lowercase locale with underscores" do
+      expect(Mobility.normalize_locale_accessor(:foo, :"pt-BR")).to eq("foo_pt_br")
+    end
+
+    it "defaults locale to Mobility.locale" do
+      Mobility.with_locale(:fr) do
+        expect(Mobility.normalize_locale_accessor(:foo)).to eq("foo_fr")
+      end
+    end
+  end
+
   describe '.config' do
     it 'initializes a new configuration' do
       expect(Mobility.config).to be_a(Mobility::Configuration)

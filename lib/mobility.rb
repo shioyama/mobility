@@ -189,6 +189,19 @@ module Mobility
       "#{locale.to_s.downcase.sub("-", "_")}".freeze
     end
 
+    # Return normalized locale accessor name
+    # @param [String,Symbol] attribute
+    # @param [String,Symbol] locale
+    # @return [String] Normalized locale accessor name
+    # @example
+    #   Mobility.normalize_locale_accessor(:foo, :ja)
+    #   #=> "foo_ja"
+    #   Mobility.normalize_locale_accessor(:bar, "pt-BR")
+    #   #=> "bar_pt_br"
+    def normalize_locale_accessor(attribute, locale = Mobility.locale)
+      "#{attribute}_#{normalize_locale(locale)}".freeze
+    end
+
     protected
 
     def read_locale

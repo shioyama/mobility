@@ -97,7 +97,11 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
     end
 
     it "tracks previous changes in multiple locales" do
-      article = Article.create(title_en: "English title 1", title_fr: "Titre en Francais 1")
+      article = Article.new
+      article.title_en = "English title 1"
+      article.title_fr = "Titre en Francais 1"
+      article.save
+
       article.title = "English title 2"
       Mobility.locale = :fr
       article.title = "Titre en Francais 2"

@@ -49,6 +49,8 @@ Automatically includes dirty plugin in model class when enabled.
             end
             include mod
           end
+
+          model_class.include(FallthroughAccessors.new(*attributes))
         end
       end
     end

@@ -119,8 +119,12 @@ with other backends.
     #   accessors or specify locales for which accessors should be defined on
     #   this model backend. Will default to +true+ if +dirty+ option is +true+.
     # @option options_ [Boolean] cache (true) Enable cache for this model backend
-    # @option options_ [Boolean, Hash] fallbacks Enable fallbacks or specify fallbacks for this model backend
-    # @option options_ [Boolean] dirty Enable dirty tracking for this model backend
+    # @option options_ [Boolean, Hash] fallbacks Enable fallbacks or specify
+    #   fallbacks for this model backend
+    # @option options_ [Boolean] dirty Enable dirty tracking for this model
+    #   backend
+    # @option options_ [Boolean] fallthrough_accessors Enable fallthrough
+    #   locale accessors for this model backend
     # @raise [ArgumentError] if method is not reader, writer or accessor
     def initialize(method, *attributes_, **options_)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
@@ -130,14 +134,16 @@ with other backends.
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,
                                                    model_class: model_class))
-
-      options[:locale_accessors] ||= true if options[:dirty]
+      if (options[:dirty] && options[:fallthrough_accessors] != false)
+        options[:fallthrough_accessors] = true
+      end
 
       @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
 
       @backend_class.include Backend::Cache unless options[:cache] == false
       @backend_class.include Backend::Dirty.for(model_class) if options[:dirty]
       @backend_class.include Backend::Fallbacks if options[:fallbacks]
+      @backend_class.include FallthroughAccessors.new(attributes) if options[:fallthrough_accessors]
       @accessor_locales = options[:locale_accessors]
       @accessor_locales = Mobility.config.default_accessor_locales if options[:locale_accessors] == true
 

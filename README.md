@@ -384,6 +384,14 @@ post.title
 Alternatively, just using `locale_accessors: true` will enable all locales in
 `I18n.available_locales`.
 
+An alternative to using the `locale_accessors` option is to use the
+`fallthrough_accessors` option (defined in {Mobility::FallthroughAccessors})
+with `fallthrough_accessors: true`. This uses +method_missing+ to implicitly
+define the same methods as above, but supporting any locale without any method
+definitions. [Dirty tracking](#dirty) enables fallthrough locales for tracking
+attribute changes. (Both locale accessors and fallthrough locales can be used
+together without conflict.)
+
 For more details, see: {Mobility::Attributes} (specifically, the private method
 `define_locale_accessors`).
 

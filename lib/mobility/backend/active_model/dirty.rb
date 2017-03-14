@@ -78,6 +78,8 @@ value of the translated attribute if passed to it.
             private :restore_attribute!
           end
           model_class.include restore_methods
+
+          model_class.include(FallthroughAccessors.new(*attributes))
         end
       end
     end

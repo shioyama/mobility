@@ -59,7 +59,13 @@ describe Mobility::Attributes do
         it "includes Backend::ActiveModel::Dirty into backend when options[:dirty] is truthy and model class includes ActiveModel::Dirty" do
           expect(backend_klass).to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
           Article.include ::ActiveModel::Dirty
-          Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, dirty: true, model_class: Article })
+          Article.include described_class.new(:accessor, "title", {
+            backend: backend_klass,
+            cache: false,
+            dirty: true,
+            fallthrough_accessors: false,
+            model_class: Article
+          })
         end
 
         it "does not include Backend::Model::Dirty into backend when options[:dirty] is falsey" do
@@ -76,7 +82,13 @@ describe Mobility::Attributes do
 
         it "includes Backend::Sequel::Dirty into backend when options[:dirty] is truthy and model class is a ::Sequel::Model" do
           expect(backend_klass).to receive(:include).with(Mobility::Backend::Sequel::Dirty)
-          Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, dirty: true, model_class: Article })
+          Article.include described_class.new(:accessor, "title", {
+            backend: backend_klass,
+            cache: false,
+            dirty: true,
+            fallthrough_accessors: false,
+            model_class: Article
+          })
         end
 
         it "does not include Backend::Sequel::Dirty into backend when options[:dirty] is falsey" do

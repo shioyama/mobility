@@ -473,11 +473,11 @@ dirty tracking is not specific to AR and works for non-persisted models as well)
 ```ruby
 class Post < ActiveRecord::Base
   include Mobility
-  translates :title, locale_accessors: [:en, :ja], dirty: true
+  translates :title, dirty: true
 end
 ```
 
-Now set the attribute in both locales:
+Now set the attribute in two locales:
 
 ```ruby
 post.title
@@ -520,9 +520,9 @@ post.previous_changes
 }
 ```
 
-You will notice that Mobility uses locale accessors to indicate which locale
-has changed; dirty tracking is implemented this way to ensure that it is clear
-what has changed in which locale, avoiding any possible ambiguity.
+You will notice that Mobility uses locale accessor methods to indicate which
+locale has changed; dirty tracking is implemented this way to ensure that it is
+clear what has changed in which locale, avoiding any possible ambiguity.
 
 For more details, see: {Mobility::Backend::Dirty}.
 

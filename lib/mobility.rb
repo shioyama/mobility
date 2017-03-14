@@ -123,7 +123,8 @@ module Mobility
 
     # Sets Mobility locale
     # @param [Symbol] locale Locale to set
-    # @raise [InvalidLocale] if locale is nil or not in +I18n.available_locales
+    # @raise [InvalidLocale] if locale is nil or not in
+    #   +I18n.available_locales+ (if +I18n.enforce_available_locales+ is +true+)
     # @return [Symbol] Locale
     def locale=(locale)
       set_locale(locale)
@@ -212,7 +213,9 @@ module Mobility
 
     def set_locale(locale)
       locale = locale.to_sym if locale
-      raise Mobility::InvalidLocale.new(locale) unless I18n.available_locales.include?(locale) || locale.nil?
+      if I18n.enforce_available_locales
+        raise Mobility::InvalidLocale.new(locale) unless (I18n.available_locales.include?(locale) || locale.nil?)
+      end
       storage[:mobility_locale] = locale
     end
   end

@@ -134,6 +134,20 @@ describe Mobility do
         Mobility.locale = :es
       }.to raise_error(Mobility::InvalidLocale)
     end
+
+    context "I18n.enforce_available_locales = false" do
+      around do |example|
+        I18n.enforce_available_locales = false
+        example.run
+        I18n.enforce_available_locales = true
+      end
+
+      it "does not raise Mobility::InvalidLocale for locale not in I18n.available_locales" do
+        expect {
+          Mobility.locale = :es
+        }.not_to raise_error
+      end
+    end
   end
 
   describe '.normalize_locale' do

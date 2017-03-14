@@ -169,7 +169,7 @@ The options hash is used to generate the backend, and has several reserved keys:
   Enable [fallbacks](#fallbacks), and optionally configure them.
 - **`dirty`** (Boolean)<br>
   Whether to enable [dirty tracking](#dirty).
-- **`accessor_locales`** (Boolean or Array)<br>
+- **`locale_accessors`** (Boolean or Array)<br>
   Enable [locale accessors](#locale_accessors) and optionally configure them.
 
 In addition to these, each backend may have specific configuration options. For

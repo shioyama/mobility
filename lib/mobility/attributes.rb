@@ -140,12 +140,10 @@ with other backends.
 
       @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
 
-      @backend_class.include Backend::Cache unless options[:cache] == false
-      @backend_class.include Backend::Dirty.for(model_class) if options[:dirty]
-      @backend_class.include Backend::Fallbacks if options[:fallbacks]
-      @backend_class.include FallthroughAccessors.new(attributes) if options[:fallthrough_accessors]
+      include_backend_modules(@backend_class, options)
+
       @accessor_locales = options[:locale_accessors]
-      @accessor_locales = Mobility.config.default_accessor_locales if options[:locale_accessors] == true
+      @accessor_locales = Mobility.config.default_accessor_locales if @accessor_locales == true
 
       attributes.each do |attribute|
         define_backend(attribute)
@@ -166,6 +164,13 @@ with other backends.
 
         define_locale_accessors(attribute, @accessor_locales) if @accessor_locales
       end
+    end
+
+    def include_backend_modules(backend_class, options)
+      backend_class.include(Backend::Cache)                            unless options[:cache] == false
+      backend_class.include(Backend::Dirty.for(options[:model_class])) if options[:dirty]
+      backend_class.include(Backend::Fallbacks)                        if options[:fallbacks]
+      backend_class.include(FallthroughAccessors.new(attributes))      if options[:fallthrough_accessors]
     end
 
     # Add this attributes module to shared {Mobility::Wrapper} and setup model

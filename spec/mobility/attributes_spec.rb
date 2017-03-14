@@ -231,7 +231,7 @@ describe Mobility::Attributes do
         Article.include described_class.new(:accessor, "title", options.merge(backend: backend_klass))
       end
 
-      context "with accessor_locales unset" do
+      context "with locale_accessors unset" do
         let(:options) { {} }
 
         it "does not define locale accessors" do
@@ -242,7 +242,7 @@ describe Mobility::Attributes do
         end
       end
 
-      context "with accessor_locales = true" do
+      context "with locale_accessors = true" do
         let(:options) { { locale_accessors: true } }
 
         it "defines accessors for locales in I18n.available_locales" do
@@ -261,7 +261,7 @@ describe Mobility::Attributes do
         end
       end
 
-      context "with accessor_locales a hash" do
+      context "with locale_accessors a hash" do
         let(:options) { { locale_accessors: [:en, :pt] } }
 
         it "defines accessors for locales in locale_accessors hash" do

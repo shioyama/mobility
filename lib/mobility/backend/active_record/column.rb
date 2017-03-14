@@ -4,7 +4,7 @@ module Mobility
 
 Implements the {Mobility::Backend::Column} backend for ActiveRecord models.
 
-@note This backend disables the +accessor_locales+ option, which would
+@note This backend disables the +locale_accessors+ option, which would
   otherwise interfere with column methods.
 
 @example

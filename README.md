@@ -170,7 +170,7 @@ The options hash is used to generate the backend, and has several reserved keys:
 - **`dirty`** (Boolean)<br>
   Whether to enable [dirty tracking](#dirty).
 - **`locale_accessors`** (Boolean or Array)<br>
-  Enable [locale accessors](#locale_accessors) and optionally configure them.
+  Enable [locale accessors](#locale-accessors) and optionally configure them.
 
 In addition to these, each backend may have specific configuration options. For
 example, the default key-value backend, which stores attributes and their

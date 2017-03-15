@@ -87,13 +87,13 @@ Sequel serialization plugin.
       # Returns deserialized column value
       # @return [Hash]
       def translations
-        _attribute = attribute.to_sym
-        if model.deserialized_values.has_key?(_attribute)
-          model.deserialized_values[_attribute]
+        attribute_ = attribute.to_sym
+        if model.deserialized_values.has_key?(attribute_)
+          model.deserialized_values[attribute_]
         elsif model.frozen?
-          deserialize_value(_attribute, serialized_value)
+          deserialize_value(attribute_, serialized_value)
         else
-          model.deserialized_values[_attribute] = deserialize_value(_attribute, serialized_value)
+          model.deserialized_values[attribute_] = deserialize_value(attribute_, serialized_value)
         end
       end
 

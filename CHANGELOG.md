@@ -2,6 +2,16 @@
 
 ## 0.1
 
+### 0.1.6
+* Return accessor locales instead of Proc from default_accessor_locales
+  ([825f75de6107287a5de70db439d8aec5e4a47977](https://github.com/shioyama/mobility/commit/825f75de6107287a5de70db439d8aec5e4a47977))
+* Fix support for locales in dirty modules
+  ([0b40d66ea0c816d4fb57deceff9344f5128a593f](https://github.com/shioyama/mobility/commit/0b40d66ea0c816d4fb57deceff9344f5128a593f))
+* Add FallthroughAccessors for use in dirty modules
+  ([#4](https://github.com/shioyama/mobility/pull/4))
+* Only raise InvalidLocale exception if I18n.enforce_available_locales is true
+  ([979c365794d3df90a2d23ad50519ff354686a493](https://github.com/shioyama/mobility/commit/979c365794d3df90a2d23ad50519ff354686a493))
+
 ### 0.1.5
 * Add `accessor_method` to default initializer ([d4a9da98cae71de2fb9ee3d29c64decef5a16010](https://github.com/shioyama/mobility/commit/d4a9da98cae71de2fb9ee3d29c64decef5a16010))
 * Include AR version in generated migrations ([ac3dfbbc053089b01dcc73d0b617fefaeaaa85cb](https://github.com/shioyama/mobility/commit/ac3dfbbc053089b01dcc73d0b617fefaeaaa85cb))

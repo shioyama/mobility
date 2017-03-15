@@ -3,9 +3,9 @@ module Mobility
     class Sequel::KeyValue::QueryMethods < Sequel::QueryMethods
       def initialize(attributes, **options)
         super
-        association_name, translations_class = options[:association_name], options[:class_name]
+        association_name, translation_class = options[:association_name], options[:class_name]
 
-        define_join_method(association_name, translations_class)
+        define_join_method(association_name, translation_class)
         define_query_methods(association_name)
 
         attributes.each do |attribute|
@@ -17,12 +17,12 @@ module Mobility
 
       private
 
-      def define_join_method(association_name, translations_class)
+      def define_join_method(association_name, translation_class)
         define_method :"join_#{association_name}" do |*attributes, **options|
           attributes.inject(self) do |relation, attribute|
             join_type = options[:outer_join] ? :left_outer : :inner
             relation.join_table(join_type,
-                                translations_class.table_name,
+                                translation_class.table_name,
                                 {
                                   key: attribute.to_s,
                                   locale: Mobility.locale.to_s,

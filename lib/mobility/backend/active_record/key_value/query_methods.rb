@@ -3,10 +3,10 @@ module Mobility
     class ActiveRecord::KeyValue::QueryMethods < ActiveRecord::QueryMethods
       def initialize(attributes, **options)
         super
-        association_name, translations_class = options[:association_name], options[:class_name]
+        association_name, translation_class = options[:association_name], options[:class_name]
         @association_name    = association_name
 
-        define_join_method(association_name, translations_class)
+        define_join_method(association_name, translation_class)
         define_query_methods(association_name)
 
         attributes.each do |attribute|
@@ -37,10 +37,10 @@ module Mobility
 
       private
 
-      def define_join_method(association_name, translations_class)
+      def define_join_method(association_name, translation_class)
         define_method :"join_#{association_name}" do |*attributes, **options|
           attributes.inject(self) do |relation, attribute|
-            t = translations_class.arel_table.alias(:"#{attribute}_#{association_name}")
+            t = translation_class.arel_table.alias(:"#{attribute}_#{association_name}")
             m = arel_table
             join_type = options[:outer_join] ? Arel::Nodes::OuterJoin : Arel::Nodes::InnerJoin
             relation.joins(m.join(t, join_type).

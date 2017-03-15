@@ -58,10 +58,9 @@ module Mobility
 
   begin
     require "rails"
-    autoload :InstallGenerator, "generators/mobility/install_generator"
     Loaded::Rails = true
+    require "mobility/rails"
   rescue LoadError
-    class InstallGenerator; end
     Loaded::Rails = false
   end
 

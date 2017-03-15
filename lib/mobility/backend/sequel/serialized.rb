@@ -60,8 +60,8 @@ Sequel serialization plugin.
         plugin :serialization
         plugin :serialization_modification_detection
 
-        attributes.each do |_attribute|
-          attribute = _attribute.to_sym
+        attributes.each do |attribute_|
+          attribute = attribute_.to_sym
           self.serialization_map[attribute] = Serialized.serializer_for(format)
           self.deserialization_map[attribute] = Serialized.deserializer_for(format)
         end

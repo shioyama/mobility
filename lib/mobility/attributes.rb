@@ -215,7 +215,7 @@ with other backends.
 
     def get_backend_class(backend: nil, model_class: nil)
       raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
-      klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''))
+      klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''.freeze).freeze)
       model_class.nil? ? klass : klass.for(model_class)
     end
   end

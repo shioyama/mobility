@@ -102,7 +102,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
           expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => nil)).to eq([@post1])
 
           Mobility.with_locale(:ja) do
-            expect(model_class.i18n.where(attribute1 => "foo post")).to eq([@ja_post2, @ja_post3])
+            expect(model_class.i18n.where(attribute1 => "foo post")).to match_array([@ja_post2, @ja_post3])
             expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => "foo content")).to eq([@ja_post2])
             expect(model_class.i18n.where(attribute1 => "foo post ja", attribute2 => "foo content ja")).to eq([@ja_post1])
           end
@@ -247,7 +247,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
           expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => nil).select_all(table_name).all).to eq([@post1])
 
           Mobility.with_locale(:ja) do
-            expect(model_class.i18n.where(attribute1 => "foo post").select_all(table_name).all).to eq([@ja_post2, @ja_post3])
+            expect(model_class.i18n.where(attribute1 => "foo post").select_all(table_name).all).to match_array([@ja_post2, @ja_post3])
             expect(model_class.i18n.where(attribute1 => "foo post", attribute2 => "foo content").select_all(table_name).all).to eq([@ja_post2])
             expect(model_class.i18n.where(attribute1 => "foo post ja", attribute2 => "foo content ja").select_all(table_name).all).to eq([@ja_post1])
           end

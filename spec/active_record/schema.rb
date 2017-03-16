@@ -65,7 +65,6 @@ module Mobility
           end
           add_index :mobility_text_translations, [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_text_translations_on_keys
           add_index :mobility_text_translations, [:translatable_id, :translatable_type, :key], name: :index_mobility_text_translations_on_translatable_attribute
-          add_index :mobility_text_translations, [:translatable_type, :key, :value, :locale], name: :index_mobility_text_translations_on_query_keys
 
           create_table "comments" do |t|
             t.text :content_en

@@ -44,7 +44,11 @@ describe Mobility::Backend::Fallbacks do
     expect(subject.read(:"en-US", fallback: false)).to eq(nil)
   end
 
-  it "uses fallbacks passed in as options when present" do
+  it "uses locale passed in as value of fallback option when present" do
     expect(subject.read(:"en-US", fallback: :jp)).to eq("フー")
+  end
+
+  it "uses array of locales passed in as value of fallback options when present" do
+    expect(subject.read(:"en-US", fallback: [:es, :'de-DE'])).to eq("foo")
   end
 end

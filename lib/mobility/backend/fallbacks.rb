@@ -16,9 +16,11 @@ created for the model with the hash defining additional fallbacks.
 In addition, fallbacks can be disabled when reading by passing <tt>fallback:
 false</tt> to the reader method. This can be useful to determine the actual
 value of the translated attribute, including a possible +nil+ value. You can
-also pass a locale to the +fallback+ option to force a given fallback for that
-read, e.g. <tt>fallback: :fr</tt> would fetch the French translation if the
-value in the current locale was +nil+.
+also pass a locale or array of locales to the +fallback+ option to use that
+locale or locales that read, e.g. <tt>fallback: :fr</tt> would fetch the French
+translation if the value in the current locale was +nil+, whereas <tt>fallback:
+[:fr, :es]</tt> would try French, then Spanish if the value in the current
+locale was +nil+.
 
 @see https://github.com/svenfuchs/i18n/wiki/Fallbacks I18n Fallbacks
 
@@ -79,7 +81,7 @@ value in the current locale was +nil+.
       # @option options [Boolean] fallbacks +false+ to disable fallbacks on lookup
       def read(locale, fallback: nil, **_)
         return super if fallback == false
-        (fallback ? [locale, fallback] : fallbacks[locale]).detect do |locale|
+        (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |locale|
           value = super(locale)
           break value if value.present?
         end

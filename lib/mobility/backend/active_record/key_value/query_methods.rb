@@ -4,7 +4,7 @@ module Mobility
       def initialize(attributes, **options)
         super
         association_name, translation_class = options[:association_name], options[:class_name]
-        @association_name    = association_name
+        @association_name = association_name
 
         define_join_method(association_name, translation_class)
         define_query_methods(association_name)

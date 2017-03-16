@@ -53,7 +53,8 @@ module Mobility
             t.string  :translatable_type, null: false
           end
           add_index :mobility_string_translations, [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_string_translations_on_keys
-          add_index :mobility_string_translations, [:translatable_id, :translatable_type], name: :index_mobility_string_translations_on_translatable
+          add_index :mobility_string_translations, [:translatable_id, :translatable_type, :key], name: :index_mobility_string_translations_on_translatable_attribute
+          add_index :mobility_string_translations, [:translatable_type, :key, :value, :locale], name: :index_mobility_string_translations_on_query_keys
 
           create_table "mobility_text_translations" do |t|
             t.string  :locale,            null: false
@@ -63,7 +64,8 @@ module Mobility
             t.string  :translatable_type, null: false
           end
           add_index :mobility_text_translations, [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_text_translations_on_keys
-          add_index :mobility_text_translations, [:translatable_id, :translatable_type], name: :index_mobility_text_translations_on_translatable
+          add_index :mobility_text_translations, [:translatable_id, :translatable_type, :key], name: :index_mobility_text_translations_on_translatable_attribute
+          add_index :mobility_text_translations, [:translatable_type, :key, :value, :locale], name: :index_mobility_text_translations_on_query_keys
 
           create_table "comments" do |t|
             t.text :content_en

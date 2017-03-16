@@ -63,7 +63,8 @@ module Mobility
             Integer     :translatable_id,   null: false
             String      :translatable_type, null: false
             index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_text_translations_on_keys
-            index [:translatable_id, :translatable_type], name: :index_mobility_text_translations_on_translatable
+            index [:translatable_id, :translatable_type, :key], name: :index_mobility_text_translations_on_translatable_attribute
+            index [:translatable_type, :key, :value, :locale], name: :index_mobility_text_translations_on_query_keys
           end
 
           DB.create_table? :mobility_string_translations do
@@ -74,7 +75,8 @@ module Mobility
             Integer     :translatable_id,   null: false
             String      :translatable_type, null: false
             index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_string_translations_on_keys
-            index [:translatable_id, :translatable_type], name: :index_mobility_string_translations_on_translatable
+            index [:translatable_id, :translatable_type, :key], name: :index_mobility_string_translations_on_translatable_attribute
+            index [:translatable_type, :key, :value, :locale], name: :index_mobility_string_translations_on_query_keys
           end
 
           DB.create_table? :comments do

@@ -41,6 +41,10 @@ describe Mobility::Backend::Fallbacks do
   end
 
   it "returns nil when fallbacks: false option is passed" do
-    expect(subject.read(:"en-US", fallbacks: false)).to eq(nil)
+    expect(subject.read(:"en-US", fallback: false)).to eq(nil)
+  end
+
+  it "uses fallbacks passed in as options when present" do
+    expect(subject.read(:"en-US", fallback: :jp)).to eq("フー")
   end
 end

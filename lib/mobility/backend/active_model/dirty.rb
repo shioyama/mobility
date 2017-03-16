@@ -28,7 +28,7 @@ value of the translated attribute if passed to it.
         locale_accessor = Mobility.normalize_locale_accessor(attribute, locale)
         if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
           model.attributes_changed_by_setter.except!(locale_accessor)
-        elsif read(locale, options.merge(fallbacks: false)) != value
+        elsif read(locale, options.merge(fallback: false)) != value
           model.send(:attribute_will_change!, locale_accessor)
         end
         super

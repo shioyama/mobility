@@ -80,6 +80,10 @@ locale was +nil+.
       # @!macro backend_reader
       # @option options [Boolean] fallbacks +false+ to disable fallbacks on lookup
       def read(locale, fallback: nil, **_)
+        if !options[:fallbacks].nil?
+          warn "You passed an option with key 'fallbacks', which will be
+            ignored. Did you mean 'fallback'?"
+        end
         return super if fallback == false
         (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |locale|
           value = super(locale)

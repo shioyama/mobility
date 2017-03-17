@@ -9,7 +9,7 @@ Implements the {Mobility::Backend::Column} backend for Sequel models.
 =end
     class Sequel::Column
       include Backend
-      include Mobility::Backend::Column
+      include Backend::Column
 
       autoload :QueryMethods, 'mobility/backend/sequel/column/query_methods'
 

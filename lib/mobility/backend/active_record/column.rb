@@ -21,7 +21,7 @@ Implements the {Mobility::Backend::Column} backend for ActiveRecord models.
 =end
     class ActiveRecord::Column
       include Backend
-      include Mobility::Backend::Column
+      include Backend::Column
 
       autoload :QueryMethods, 'mobility/backend/active_record/column/query_methods'
 

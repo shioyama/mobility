@@ -1,16 +1,45 @@
 module Mobility
   module Backend
     class ActiveRecord::Table::QueryMethods < ActiveRecord::QueryMethods
-      def initialize(attributes, **options)
+      def initialize(attributes, association_name: nil, model_class: nil, subclass_name: nil, **options)
         super
-        association_name     = options[:association_name]
-        foreign_key          = options[:foreign_key]
-        @association_name    = association_name
-        attributes_extractor = @attributes_extractor
-        translation_class    = options[:model_class].const_get(options[:subclass_name])
-        @translation_class   = translation_class
-        table_name           = options[:table_name]
 
+        @association_name  = association_name
+        @translation_class = translation_class = model_class.const_get(subclass_name)
+
+        define_join_method(association_name, translation_class, **options)
+        define_query_methods(association_name, translation_class, **options)
+
+        attributes.each do |attribute|
+          define_method :"find_by_#{attribute}" do |value|
+            find_by(attribute.to_sym => value)
+          end
+        end
+      end
+
+      def extended(relation)
+        super
+        association_name     = @association_name
+        attributes_extractor = @attributes_extractor
+        translation_class    = @translation_class
+
+        mod = Module.new do
+          define_method :not do |opts, *rest|
+            if i18n_keys = attributes_extractor.call(opts)
+              opts = opts.with_indifferent_access
+              i18n_keys.each { |attr| opts["#{translation_class.table_name}.#{attr}"] = opts.delete(attr) }
+              super(opts, *rest).send("join_#{association_name}")
+            else
+              super(opts, *rest)
+            end
+          end
+        end
+        relation.model.mobility_where_chain.prepend(mod)
+      end
+
+      private
+
+      def define_join_method(association_name, translation_class, foreign_key: nil, table_name: nil, **_)
         define_method :"join_#{association_name}" do |**options|
           return self if (@__mobility_table_joined || []).include?(table_name)
           (@__mobility_table_joined ||= []) << table_name
@@ -21,6 +50,10 @@ module Mobility
                 on(t[foreign_key].eq(m[:id]).
                    and(t[:locale].eq(Mobility.locale))).join_sources)
         end
+      end
+
+      def define_query_methods(association_name, translation_class, **_)
+        attributes_extractor = @attributes_extractor
 
         # Note that Mobility will try to use inner/outer joins appropriate to the query,
         # so for example:
@@ -59,32 +92,6 @@ module Mobility
             super(opts, *rest)
           end
         end
-
-        attributes.each do |attribute|
-          define_method :"find_by_#{attribute}" do |value|
-            find_by(attribute.to_sym => value)
-          end
-        end
-      end
-
-      def extended(relation)
-        super
-        association_name     = @association_name
-        attributes_extractor = @attributes_extractor
-        translation_class    = @translation_class
-
-        mod = Module.new do
-          define_method :not do |opts, *rest|
-            if i18n_keys = attributes_extractor.call(opts)
-              opts = opts.with_indifferent_access
-              i18n_keys.each { |attr| opts["#{translation_class.table_name}.#{attr}"] = opts.delete(attr) }
-              super(opts, *rest).send("join_#{association_name}")
-            else
-              super(opts, *rest)
-            end
-          end
-        end
-        relation.model.mobility_where_chain.prepend(mod)
       end
     end
   end

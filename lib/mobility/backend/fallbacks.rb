@@ -78,7 +78,9 @@ locale was +nil+.
     module Fallbacks
       # @!group Backend Accessors
       # @!macro backend_reader
-      # @option options [Boolean] fallbacks +false+ to disable fallbacks on lookup
+      # @param [Boolean,Symbol,Array] fallback
+      #   +false+ to disable fallbacks on lookup, or a locale or array of
+      #   locales to set fallback(s) for this lookup.
       def read(locale, fallback: nil, **_)
         if !options[:fallbacks].nil?
           warn "You passed an option with key 'fallbacks', which will be

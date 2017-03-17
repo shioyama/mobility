@@ -1,12 +1,11 @@
 module Mobility
   module Backend
     class ActiveRecord::KeyValue::QueryMethods < ActiveRecord::QueryMethods
-      def initialize(attributes, **options)
+      def initialize(attributes, association_name: nil, class_name: nil, **_)
         super
-        association_name, translation_class = options[:association_name], options[:class_name]
         @association_name = association_name
 
-        define_join_method(association_name, translation_class)
+        define_join_method(association_name, class_name)
         define_query_methods(association_name)
 
         attributes.each do |attribute|

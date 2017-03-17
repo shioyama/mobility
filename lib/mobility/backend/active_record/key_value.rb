@@ -20,6 +20,7 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
 =end
     class ActiveRecord::KeyValue
       include Backend
+      include Backend::KeyValue
 
       autoload :QueryMethods, 'mobility/backend/active_record/key_value/query_methods'
 
@@ -51,13 +52,9 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
       # @option options [String,Class] class_name ({Mobility::ActiveRecord::TextTranslation}) Translation class
       # @raise [ArgumentError] if type is not either :text or :string
       def self.configure!(options)
-        options[:type]             ||= :text
-        case type = options[:type].to_sym
-        when :text, :string
-          options[:class_name]     ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
-        else
-          raise ArgumentError, "type must be one of: [text, string]"
-        end
+        super
+        type = options[:type]
+        options[:class_name] ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
         options[:association_name] ||= options[:class_name].table_name.to_sym
         %i[type association_name].each { |key| options[key] = options[key].to_sym }

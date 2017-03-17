@@ -11,6 +11,7 @@ Automatically includes dirty plugin in model class when enabled.
     module Sequel::Dirty
       # @!group Backend Accessors
       # @!macro backend_writer
+      # @param [Hash] options
       def write(locale, value, **options)
         locale_accessor = Mobility.normalize_locale_accessor(attribute, locale).to_sym
         if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value

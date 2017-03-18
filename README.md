@@ -427,6 +427,9 @@ class Post < ActiveRecord::Base
 end
 ```
 
+Internally, Mobility assigns the fallbacks hash to an instance of
+`I18n::Locale::Fallbacks.new`.
+
 By setting fallbacks for English and French to Japanese, values will fall
 through to the Japanese value if none is present for either of these locales:
 
@@ -445,17 +448,29 @@ post.title_fr
 
 You can optionally disable fallbacks to get the real value for a given locale
 (for example, to check if a value in a particular locale is set or not) by
-passing `fallbacks: false` to the getter method:
+passing `fallback: false` (note that the key is the *singular*, not plural) to
+the getter method:
 
 ```ruby
-post.title(fallbacks: false)
+post.title(fallback: false)
 #=> nil
-post.title_fr(fallbacks: false)
+post.title(locale: :fr, fallback: false)
 #=> nil
 ```
 
-(Mobility assigns the fallbacks hash to an instance of
-`I18n::Locale::Fallbacks.new`.)
+You can also set the fallback locales for a single read by passing one or more
+locales, like this:
+
+```ruby
+post.title_fr = "mobilité: aptitude à bouger, à se déplacer, à changer, à évoluer"
+post.save
+post.title
+#=> nil
+post.title(fallback: :fr)
+#=> "mobilité: aptitude à bouger, à se déplacer, à changer, à évoluer"
+post.title(fallback: [:ja, :fr])
+#=> "Mobility(名詞):動きやすさ、可動性"
+```
 
 For more details, see: {Mobility::Backend::Fallbacks}.
 

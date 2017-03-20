@@ -6,6 +6,7 @@ describe Mobility::Backend::Fallbacks do
     backend_class.include(Mobility::Backend)
     backend_class.class_eval do
       def read(locale, **options)
+        return "bar" if options[:bar]
         {
           "title" => {
             :'de-DE' => "foo",
@@ -50,5 +51,9 @@ describe Mobility::Backend::Fallbacks do
 
   it "uses array of locales passed in as value of fallback options when present" do
     expect(subject.read(:"en-US", fallback: [:es, :'de-DE'])).to eq("foo")
+  end
+
+  it "passes options to getter in fallback locale" do
+    expect(subject.read(:'en-US', bar: true)).to eq("bar")
   end
 end

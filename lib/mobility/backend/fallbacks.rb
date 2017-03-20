@@ -81,14 +81,14 @@ locale was +nil+.
       # @param [Boolean,Symbol,Array] fallback
       #   +false+ to disable fallbacks on lookup, or a locale or array of
       #   locales to set fallback(s) for this lookup.
-      def read(locale, fallback: nil, **_)
+      def read(locale, fallback: nil, **options)
         if !options[:fallbacks].nil?
           warn "You passed an option with key 'fallbacks', which will be
             ignored. Did you mean 'fallback'?"
         end
         return super if fallback == false
         (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |locale|
-          value = super(locale)
+          value = super(locale, **options)
           break value if value.present?
         end
       end

@@ -77,10 +77,11 @@ On top of this, a backend will normally:
     #   @param model Model on which backend is defined
     #   @param [String] attribute Backend attribute
     #   @param [Hash] fallbacks Fallbacks hash
-    def initialize(model, attribute, fallbacks: nil, **options)
+    def initialize(model, attribute, **options)
       @model = model
       @attribute = attribute
       @options = options
+      fallbacks = options[:fallbacks]
       @fallbacks = I18n::Locale::Fallbacks.new(fallbacks) if fallbacks.is_a?(Hash)
     end
 

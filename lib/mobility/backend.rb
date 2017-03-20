@@ -76,7 +76,7 @@ On top of this, a backend will normally:
     # @!macro [new] backend_constructor
     #   @param model Model on which backend is defined
     #   @param [String] attribute Backend attribute
-    #   @param [Hash] fallbacks Fallbacks hash
+    #   @option options [Hash] fallbacks Fallbacks hash
     def initialize(model, attribute, **options)
       @model = model
       @attribute = attribute

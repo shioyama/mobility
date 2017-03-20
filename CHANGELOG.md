@@ -2,6 +2,13 @@
 
 ## 0.1
 
+### 0.1.7
+* Allow passing fallback locale or locales to getter method
+  ([#9](https://github.com/shioyama/mobility/pull/9))
+* Add missing indices on key-value string/text translation tables
+  ([1e00e0](https://github.com/shioyama/mobility/commit/1e00e0d957478f2408fbac1ee853f829489263e2),
+  [574172](https://github.com/shioyama/mobility/commit/574172dc88823a35c60ff963ff9c40b7c05771d7))
+
 ### 0.1.6
 * Return accessor locales instead of Proc from default_accessor_locales
   ([825f75](https://github.com/shioyama/mobility/commit/825f75de6107287a5de70db439d8aec5e4a47977))

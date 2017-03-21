@@ -133,7 +133,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
   include Helpers
 
   let(:model_class) { model_class_name.constantize }
-  let(:format) { backend.options[:format] }
+  let(:format) { model_class.mobility.modules.first.options[:format] }
   let(:backend) { instance.mobility_backend_for(attribute1) }
 
   def serialize(value)

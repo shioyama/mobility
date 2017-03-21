@@ -21,19 +21,6 @@ describe Mobility::Backend do
       end
     end
 
-    context "with options" do
-      subject { MyBackend.new(model, attribute, options) }
-      let(:options) { { foo: "bar" } }
-
-      context "with fallbacks" do
-        let(:options) { { fallbacks: { :'en-US' => 'de-DE' } } }
-
-        it "sets @fallbacks variable" do
-          expect(subject.instance_variable_get(:'@fallbacks')).to eq(I18n::Locale::Fallbacks.new(:'en-US' => 'de-DE'))
-        end
-      end
-    end
-
     describe ".setup" do
       before do
         MyBackend.class_eval do

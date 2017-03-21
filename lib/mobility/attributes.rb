@@ -166,13 +166,6 @@ with other backends.
       end
     end
 
-    def include_backend_modules(backend_class, options)
-      backend_class.include(Backend::Cache)                            unless options[:cache] == false
-      backend_class.include(Backend::Dirty.for(options[:model_class])) if options[:dirty]
-      backend_class.include(Backend::Fallbacks)                        if options[:fallbacks]
-      backend_class.include(FallthroughAccessors.new(attributes))      if options[:fallthrough_accessors]
-    end
-
     # Add this attributes module to shared {Mobility::Wrapper} and setup model
     # with backend setup block (see {Mobility::Backend::Setup#setup_model}).
     # @param model_class [Class] Class of model
@@ -188,6 +181,14 @@ with other backends.
     end
 
     private
+
+    # Include backend modules depending on value of options.
+    def include_backend_modules(backend_class, options)
+      backend_class.include(Backend::Cache)                            unless options[:cache] == false
+      backend_class.include(Backend::Dirty.for(options[:model_class])) if options[:dirty]
+      backend_class.include(Backend::Fallbacks)                        unless options[:fallbacks] == false
+      backend_class.include(FallthroughAccessors.new(attributes))      if options[:fallthrough_accessors]
+    end
 
     def define_backend(attribute)
       _backend_class, _options = backend_class, options

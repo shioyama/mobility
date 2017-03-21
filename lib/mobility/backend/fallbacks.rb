@@ -76,6 +76,20 @@ locale was +nil+.
   #=> "Mobilité"
 =end
     module Fallbacks
+      # @!macro [new] backend_constructor
+      #   @param model Model on which backend is defined
+      #   @param [String] attribute Backend attribute
+      #   @option backend_options [Hash] fallbacks Fallbacks hash
+      def initialize(model, attributes, **backend_options)
+        super
+        @fallbacks =
+          if (fallbacks = backend_options[:fallbacks]).is_a?(Hash)
+            I18n::Locale::Fallbacks.new(fallbacks)
+          elsif fallbacks == true
+            Mobility.default_fallbacks
+          end
+      end
+
       # @!group Backend Accessors
       # @!macro backend_reader
       # @param [Boolean,Symbol,Array] fallback
@@ -86,18 +100,15 @@ locale was +nil+.
           warn "You passed an option with key 'fallbacks', which will be
             ignored. Did you mean 'fallback'?"
         end
-        return super if fallback == false
-        (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |locale|
-          value = super(locale, **options)
+        return super if fallback == false || fallbacks.nil?
+        (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
+          value = super(fallback_locale, **options)
           break value if value.present?
         end
       end
 
       private
-
-      def fallbacks
-        @fallbacks ||= Mobility.default_fallbacks
-      end
+      attr_reader :fallbacks
     end
   end
 end

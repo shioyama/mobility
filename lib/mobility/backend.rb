@@ -73,12 +73,9 @@ On top of this, a backend will normally:
     # @!macro [new] backend_constructor
     #   @param model Model on which backend is defined
     #   @param [String] attribute Backend attribute
-    #   @option backend_options [Hash] fallbacks Fallbacks hash
-    def initialize(model, attribute, **backend_options)
+    def initialize(model, attribute, **_)
       @model = model
       @attribute = attribute
-      fallbacks = backend_options[:fallbacks]
-      @fallbacks = I18n::Locale::Fallbacks.new(fallbacks) if fallbacks.is_a?(Hash)
     end
 
     # @!macro [new] backend_reader

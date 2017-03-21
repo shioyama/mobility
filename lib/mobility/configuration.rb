@@ -11,7 +11,10 @@ Stores shared Mobility configuration referenced by all backends.
 
     # Default fallbacks instance
     # @return [I18n::Locale::Fallbacks]
-    attr_accessor :default_fallbacks
+    def default_fallbacks(fallbacks = {})
+      @default_fallbacks.call(fallbacks)
+    end
+    attr_writer :default_fallbacks
 
     # Default backend to use (can be symbol or actual backend class)
     # @return [Symbol,Class]
@@ -31,7 +34,7 @@ Stores shared Mobility configuration referenced by all backends.
 
     def initialize
       @accessor_method = :translates
-      @default_fallbacks = I18n::Locale::Fallbacks.new
+      @default_fallbacks = lambda { |fallbacks| I18n::Locale::Fallbacks.new(fallbacks) }
       @default_accessor_locales = lambda { I18n.available_locales }
     end
   end

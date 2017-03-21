@@ -100,7 +100,7 @@ locale was +nil+.
           warn "You passed an option with key 'fallbacks', which will be
             ignored. Did you mean 'fallback'?"
         end
-        return super if fallback == false || fallbacks.nil?
+        return super if fallback == false || (fallback.nil? && fallbacks.nil?)
         (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
           value = super(fallback_locale, **options)
           break value if value.present?

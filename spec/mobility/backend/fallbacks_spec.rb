@@ -42,7 +42,7 @@ describe Mobility::Backend::Fallbacks do
       expect(subject.read(:"fr")).to eq(nil)
     end
 
-    it "returns nil when fallbacks: false option is passed" do
+    it "returns nil when fallback: false option is passed" do
       expect(subject.read(:"en-US", fallback: false)).to eq(nil)
     end
 
@@ -75,11 +75,17 @@ describe Mobility::Backend::Fallbacks do
   context "fallbacks is falsey" do
     subject { backend_class.new(object, "title") }
 
-    it "does not use fallbacks" do
+    it "does not use fallbacks when fallback option is false or nil" do
       original_default_locale = I18n.default_locale
       I18n.default_locale = :ja
       expect(subject.read(:"en-US")).to eq(nil)
       I18n.default_locale = original_default_locale
+      expect(subject.read(:"en-US", fallback: false)).to eq(nil)
+      I18n.default_locale = original_default_locale
+    end
+
+    it "uses locale passed in as value of fallback option when present" do
+      expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
     end
   end
 end

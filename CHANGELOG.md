@@ -2,6 +2,21 @@
 
 ## 0.1
 
+### 0.1.10
+* Fix fallback options ([#12](https://github.com/shioyama/mobility/pull/12) and
+  ([09a163](https://github.com/shioyama/mobility/commit/09a1636bc743633fd13dc6c59ebf1e2366a0e2c4))
+* Include fallbacks module by default
+  ([#13](https://github.com/shioyama/mobility/pull/13/files))
+
+
+### 0.1.9
+
+(yanked)
+
+### 0.1.8
+
+(yanked)
+
 ### 0.1.7
 * Allow passing fallback locale or locales to getter method
   ([#9](https://github.com/shioyama/mobility/pull/9))

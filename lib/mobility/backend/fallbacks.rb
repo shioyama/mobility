@@ -84,7 +84,7 @@ locale was +nil+.
         super
         @fallbacks =
           if (fallbacks = backend_options[:fallbacks]).is_a?(Hash)
-            I18n::Locale::Fallbacks.new(fallbacks)
+            Mobility.default_fallbacks(fallbacks)
           elsif fallbacks == true
             Mobility.default_fallbacks
           end

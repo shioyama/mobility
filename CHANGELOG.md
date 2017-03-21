@@ -4,7 +4,7 @@
 
 ### 0.1.10
 * Fix fallback options ([#12](https://github.com/shioyama/mobility/pull/12) and
-  ([09a163](https://github.com/shioyama/mobility/commit/09a1636bc743633fd13dc6c59ebf1e2366a0e2c4))
+  [09a163](https://github.com/shioyama/mobility/commit/09a1636bc743633fd13dc6c59ebf1e2366a0e2c4))
 * Include fallbacks module by default
   ([#13](https://github.com/shioyama/mobility/pull/13/files))
 

@@ -31,8 +31,14 @@ module Mobility
 
       private
 
-      def table_exists?
-        connection.table_exists?(table_name)
+      def check_data_source!
+        unless data_source_exists?
+          raise NoTableDefined, "The table #{table_name} does not exist. Create it first before generating translated columns."
+        end
+      end
+
+      def data_source_exists?
+        connection.data_source_exists?(table_name)
       end
 
       delegate :connection, to: ::ActiveRecord::Base
@@ -57,5 +63,7 @@ module Mobility
         "create_#{file_name}_#{attributes.map(&:name).join('_and_')}_translations_for_mobility_#{backend}_backend".freeze
       end
     end
+
+    class NoTableDefined < StandardError; end
   end
 end

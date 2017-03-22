@@ -7,7 +7,7 @@ module Mobility
       source_root File.expand_path("../../templates", __FILE__)
 
       def create_migration_file
-        if table_exists? && !self.class.migration_exists?(migration_dir, migration_file)
+        if data_source_exists? && !self.class.migration_exists?(migration_dir, migration_file)
           migration_template "#{backend}_migration.rb", "db/migrate/#{migration_file}.rb"
         else
           super

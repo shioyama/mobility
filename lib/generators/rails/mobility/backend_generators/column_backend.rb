@@ -8,16 +8,8 @@ module Mobility
 
       def initialize(*args)
         super
-        unless table_exists?
-          raise NoTableDefined, "The table #{table_name} does not exist. Create it first before generating translated columns."
-        end
-        unless I18n.available_locales.present?
-          raise NoAvailableLocales, "You must set I18n.available_locales to use the column backend generator."
-        end
+        check_data_source!
       end
     end
-
-    class NoTableDefined < StandardError; end
-    class NoAvailableLocales < StandardError; end
   end
 end

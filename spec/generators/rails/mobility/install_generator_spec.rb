@@ -1,8 +1,6 @@
 require "spec_helper"
 
 describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
-  break unless Mobility::Loaded::Rails
-
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase
 

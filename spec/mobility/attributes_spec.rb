@@ -165,8 +165,13 @@ describe Mobility::Attributes do
 
       shared_examples_for "writer" do
         it "correctly maps setter method for translated attribute to backend" do
-          expect(backend).to receive(:write).with(:de, "foo")
+          expect(backend).to receive(:write).with(:de, "foo", {})
           article.title = "foo"
+        end
+
+        it "correctly maps other options to setter" do
+          expect(backend).to receive(:write).with(:de, "foo", fallback: false).and_return("foo")
+          expect(article.send(:title=, "foo", fallback: false)).to eq("foo")
         end
       end
 
@@ -209,7 +214,7 @@ describe Mobility::Attributes do
       it "converts blanks to nil when sending to backend setter" do
         Article.include described_class.new(:writer, "title", { backend: backend_klass })
         allow(Mobility).to receive(:locale).and_return(:fr)
-        expect(backend).to receive(:write).with(:fr, nil)
+        expect(backend).to receive(:write).with(:fr, nil, {})
         article.title = ""
       end
 
@@ -223,7 +228,7 @@ describe Mobility::Attributes do
       it "does not convert false values to nil when sending to backend setter" do
         Article.include described_class.new(:writer, "title", { backend: backend_klass })
         allow(Mobility).to receive(:locale).and_return(:fr)
-        expect(backend).to receive(:write).with(:fr, false)
+        expect(backend).to receive(:write).with(:fr, false, {})
         article.title = false
       end
     end

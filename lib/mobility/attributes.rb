@@ -158,8 +158,8 @@ with other backends.
           end
         end
 
-        define_method "#{attribute}=" do |value|
-          mobility_set(attribute, value)
+        define_method "#{attribute}=" do |value, **options|
+          mobility_set(attribute, value, **options)
         end if %i[accessor writer].include?(method)
 
         define_locale_accessors(attribute, @accessor_locales) if @accessor_locales

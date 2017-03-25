@@ -23,13 +23,12 @@ Instance methods attached to all model classes when model includes or extends
       mobility_read(*args).present?
     end
 
-    def mobility_set(attribute, value, locale: Mobility.locale)
+    def mobility_set(attribute, value, locale: Mobility.locale, **options)
       Mobility.enforce_available_locales!(locale)
-      mobility_backend_for(attribute).write(locale.to_sym, value == false ? value : value.presence)
+      mobility_backend_for(attribute).write(locale.to_sym, value == false ? value : value.presence, **options)
     end
 
-    def mobility_read(attribute, **options)
-      locale = options.delete(:locale) || Mobility.locale
+    def mobility_read(attribute, locale: Mobility.locale, **options)
       Mobility.enforce_available_locales!(locale)
       mobility_backend_for(attribute).read(locale.to_sym, options)
     end

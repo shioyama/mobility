@@ -158,8 +158,8 @@ describe Mobility::Attributes do
         end
 
         it "correctly maps other options to getter" do
-          expect(backend).to receive(:read).with(:de, fallbacks: false).and_return("foo")
-          expect(article.title(fallbacks: false)).to eq("foo")
+          expect(backend).to receive(:read).with(:de, fallback: false).and_return("foo")
+          expect(article.title(fallback: false)).to eq("foo")
         end
       end
 

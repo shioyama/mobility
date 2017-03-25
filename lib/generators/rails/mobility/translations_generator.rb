@@ -1,6 +1,38 @@
 # frozen-string-literal: true
 
 module Mobility
+=begin
+
+Generator to create translation tables or add translation columns to a model
+table, for either Table or Column backends.
+
+==Usage
+
+To add translations for a string attribute +title+ to a model +Post+, call the
+generator with:
+
+  rails generate mobility:translations post title:string
+
+Here, the backend is implicit in the value of +Mobility.default_backend+, but
+it can be explicitly set using the +backend+ option:
+
+  rails generate mobility:translations post title:string --backend=table
+
+For the +table+ backend, the generator will either create a translation table
+(in this case, +post_translations+) or add columns to the table if it already
+exists.
+
+For the +column+ backend, the generator will add columns for all locales in
++I18n.available_locales+. If some columns already exist, they will simply be
+skipped.
+
+Other backends are not supported, for obvious reasons:
+* the +key_value+ backend does not need any model-specific migrations, simply
+  run the install generator.
+* +jsonb+, +hstore+ and +serialized+ backends simply require a single column on
+  a model table, which can be added with the normal Rails migration generator.
+
+=end
   class TranslationsGenerator < ::Rails::Generators::NamedBase
     SUPPORTED_BACKENDS = %w[column table]
     BACKEND_OPTIONS = { type: :string, desc: "Backend to use for translations (defaults to Mobility.default_backend)".freeze }

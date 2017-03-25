@@ -153,6 +153,10 @@ describe Mobility::Attributes do
           expect(article.title(locale: "fr")).to eq("foo")
         end
 
+        it "raises InvalidLocale exception if locale is not in I18n.available_locales" do
+          expect { article.title(locale: :it) }.to raise_error(Mobility::InvalidLocale)
+        end
+
         it "correctly maps other options to getter" do
           expect(backend).to receive(:read).with(:de, fallbacks: false).and_return("foo")
           expect(article.title(fallbacks: false)).to eq("foo")
@@ -197,8 +201,8 @@ describe Mobility::Attributes do
       # to consider storing blank values.
       it "converts blanks to nil when receiving from backend getter" do
         Article.include described_class.new(:reader, "title", { backend: backend_klass })
-        allow(Mobility).to receive(:locale).and_return(:ru)
-        expect(backend).to receive(:read).with(:ru, {}).and_return("")
+        allow(Mobility).to receive(:locale).and_return(:cz)
+        expect(backend).to receive(:read).with(:cz, {}).and_return("")
         expect(article.title).to eq(nil)
       end
 
@@ -211,8 +215,8 @@ describe Mobility::Attributes do
 
       it "does not convert false values to nil when receiving from backend getter" do
         Article.include described_class.new(:reader, "title", { backend: backend_klass })
-        allow(Mobility).to receive(:locale).and_return(:ru)
-        expect(backend).to receive(:read).with(:ru, {}).and_return(false)
+        allow(Mobility).to receive(:locale).and_return(:cz)
+        expect(backend).to receive(:read).with(:cz, {}).and_return(false)
         expect(article.title).to eq(false)
       end
 
@@ -264,15 +268,15 @@ describe Mobility::Attributes do
       end
 
       context "with locale_accessors a hash" do
-        let(:options) { { locale_accessors: [:en, :pt] } }
+        let(:options) { { locale_accessors: [:en, :'pt-BR'] } }
 
         it "defines accessors for locales in locale_accessors hash" do
           expect(backend).to receive(:read).twice.with(:en, {}).and_return("enfoo")
           expect(article.title_en).to eq("enfoo")
           expect(article.title_en?).to eq(true)
-          expect(backend).to receive(:read).twice.with(:pt, {}).and_return("ptfoo")
-          expect(article.title_pt).to eq("ptfoo")
-          expect(article.title_pt?).to eq(true)
+          expect(backend).to receive(:read).twice.with(:'pt-BR', {}).and_return("ptfoo")
+          expect(article.title_pt_br).to eq("ptfoo")
+          expect(article.title_pt_br?).to eq(true)
         end
 
         it "does not define accessors for locales not in locale_accessors hash" do

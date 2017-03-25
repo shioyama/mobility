@@ -208,6 +208,15 @@ module Mobility
       "#{attribute}_#{normalize_locale(locale)}".freeze
     end
 
+    # Raises InvalidLocale exception if the locale passed in is present but not available.
+    # @param [String,Symbol] locale
+    # @raise [InvalidLocale] if locale is present but not available
+    def enforce_available_locales!(locale)
+      if I18n.enforce_available_locales
+        raise Mobility::InvalidLocale.new(locale) unless (I18n.locale_available?(locale) || locale.nil?)
+      end
+    end
+
     protected
 
     def read_locale
@@ -216,9 +225,7 @@ module Mobility
 
     def set_locale(locale)
       locale = locale.to_sym if locale
-      if I18n.enforce_available_locales
-        raise Mobility::InvalidLocale.new(locale) unless (I18n.available_locales.include?(locale) || locale.nil?)
-      end
+      enforce_available_locales!(locale)
       storage[:mobility_locale] = locale
     end
   end

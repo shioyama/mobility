@@ -100,4 +100,19 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
       end
     end
   end
+
+  shared_examples_for "backend with no translations generator" do |backend_name|
+    before { prepare_destination }
+
+    it "returns correct message" do
+      out = capture(:stderr) { run_generator ["Foo", "--backend=#{backend_name}"] }
+      expect(out.chomp).to eq("The #{backend_name} backend does not have a translations generator.")
+    end
+  end
+
+  %w[hstore jsonb serialized key_value].each do |backend_name|
+    describe "--backend=#{backend_name}" do
+      it_behaves_like "backend with no translations generator", backend_name
+    end
+  end
 end if Mobility::Loaded::Rails

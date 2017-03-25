@@ -63,6 +63,41 @@ describe Mobility::Backend::Sequel::Column, orm: :sequel do
     end
   end
 
+  describe "with dirty" do
+    it "still works as usual" do
+      Comment.translates *attributes, backend: :column, cache: false, dirty: true
+      backend.write(:en, "Crappy post!")
+      expect(comment.content_en).to eq("Crappy post!")
+    end
+
+    it "tracks changed attributes" do
+      Comment.translates *attributes, backend: :column, cache: false, dirty: true
+      comment = Comment.new
+
+      aggregate_failures do
+        expect(comment.content).to eq(nil)
+        expect(comment.column_changed?(:content)).to eq(false)
+        expect(comment.column_change(:title)).to eq(nil)
+        expect(comment.changed_columns).to eq([])
+        expect(comment.column_changes).to eq({})
+
+        comment.content = "foo"
+        expect(comment.content).to eq("foo")
+        expect(comment.column_changed?(:content)).to eq(true)
+        expect(comment.column_change(:content)).to eq([nil, "foo"])
+        expect(comment.changed_columns).to eq([:content_en])
+        expect(comment.column_changes).to eq({ :content_en => [nil, "foo"] })
+      end
+    end
+
+    it "returns nil for locales with no column defined" do
+      Comment.translates *attributes, backend: :column, cache: false, dirty: true
+      comment = Comment.new
+
+      expect(comment.content(locale: :fr)).to eq(nil)
+    end
+  end
+
   describe "mobility dataset (.i18n)" do
     include_querying_examples 'Comment', :content, :author
   end

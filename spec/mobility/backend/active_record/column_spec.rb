@@ -86,6 +86,13 @@ describe Mobility::Backend::ActiveRecord::Column, orm: :active_record do
         expect(comment.changes).to eq({ "content_en" => [nil, "foo"] })
       end
     end
+
+    it "returns nil for locales with no column defined" do
+      Comment.translates *attributes, backend: :column, cache: false, dirty: true
+      comment = Comment.new
+
+      expect(comment.content(locale: :fr)).to eq(nil)
+    end
   end
 
   describe "mobility scope (.i18n)" do

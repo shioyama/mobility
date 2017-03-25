@@ -27,19 +27,6 @@ be ignored if set, since it would cause a conflict with column accessors.
     module Column
       include OrmDelegator
 
-      # @!group Backend Accessors
-      #
-      # @!macro backend_reader
-      def read(locale, **_)
-        model.send(column(locale))
-      end
-
-      # @!macro backend_writer
-      def write(locale, value, **_)
-        model.send("#{column(locale)}=", value)
-      end
-      # @!endgroup
-
       # Returns name of column where translated attribute is stored
       # @param [Symbol] locale
       # @return [String]

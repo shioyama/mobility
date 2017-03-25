@@ -36,11 +36,15 @@ or locales.)
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      # @!method read(locale, **options)
+      def read(locale, **_)
+        model.read_attribute(column(locale))
+      end
 
       # @!group Backend Accessors
       # @!macro backend_writer
-      # @!method write(locale, value, **options)
+      def write(locale, value, **_)
+        model.write_attribute(column(locale), value)
+      end
 
       # @!group Backend Configuration
       def self.configure!(options)

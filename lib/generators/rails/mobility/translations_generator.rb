@@ -2,7 +2,7 @@
 
 module Mobility
   class TranslationsGenerator < ::Rails::Generators::NamedBase
-    BACKENDS = %w[column key_value hstore jsonb serialized table]
+    BACKENDS = %w[column table]
     BACKEND_OPTIONS = { type: :string, desc: "Backend to use for translations (defaults to Mobility.default_backend)".freeze }
     argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
 

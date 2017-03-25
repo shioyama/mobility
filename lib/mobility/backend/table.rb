@@ -17,6 +17,11 @@ The backend expects the translations table (+post_translations+) to have:
   will be all attributes of the model)
 - an integer column with name +post_id+ (where +post+ is the name of the model class)
 
+If you are using Rails, you can use the +mobility:translations+ generator to
+create a migration generating this table with:
+
+  rails generate mobility:translations post title:string content:text
+
 Unlike Globalize, attributes need not all be on one table. Mobility supports
 any number of translation tables for a given model class (all of the structure
 described above), provided the +association_name+ option is different for each.

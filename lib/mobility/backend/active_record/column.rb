@@ -4,6 +4,15 @@ module Mobility
 
 Implements the {Mobility::Backend::Column} backend for ActiveRecord models.
 
+You can use the +mobility:translations+ generator to create a migration adding
+translatable columns to the model table with:
+
+  rails generate mobility:translations post title:string
+
+The generated migration will add columns +title_<locale>+ for every locale in
++I18n.available_locales+. (The generator can be run again to add new attributes
+or locales.)
+
 @note This backend disables the +locale_accessors+ option, which would
   otherwise interfere with column methods.
 

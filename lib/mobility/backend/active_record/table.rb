@@ -6,6 +6,15 @@ module Mobility
 
 Implements the {Mobility::Backend::Table} backend for ActiveRecord models.
 
+To generate a translation table for a model +Post+, you can use the included
++mobility:translations+ generator:
+
+  rails generate mobility:translations post title:string content:text
+
+This will create a migration which can be run to create the translation table.
+If the translation table already exists, it will create a migration adding
+columns to that table.
+
 @example Model with table backend
   class Post < ActiveRecord::Base
     translates :title, backend: :table, association_name: :translations

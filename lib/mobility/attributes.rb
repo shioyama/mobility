@@ -137,6 +137,7 @@ with other backends.
       if (options[:dirty] && options[:fallthrough_accessors] != false)
         options[:fallthrough_accessors] = true
       end
+      include FallthroughAccessors.new(attributes) if options[:fallthrough_accessors]
 
       @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
 
@@ -187,7 +188,6 @@ with other backends.
       backend_class.include(Backend::Cache)                            unless options[:cache] == false
       backend_class.include(Backend::Dirty.for(options[:model_class])) if options[:dirty]
       backend_class.include(Backend::Fallbacks)                        unless options[:fallbacks] == false
-      backend_class.include(FallthroughAccessors.new(attributes))      if options[:fallthrough_accessors]
     end
 
     def define_backend(attribute)

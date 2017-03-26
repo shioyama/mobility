@@ -64,7 +64,6 @@ describe Mobility::Attributes do
             cache: false,
             fallbacks: false,
             dirty: true,
-            fallthrough_accessors: false,
             model_class: Article
           })
         end
@@ -88,7 +87,6 @@ describe Mobility::Attributes do
             cache: false,
             fallbacks: false,
             dirty: true,
-            fallthrough_accessors: false,
             model_class: Article
           })
         end
@@ -299,6 +297,33 @@ describe Mobility::Attributes do
           expect(backend).to receive(:read).with(:'pt-BR', {}).twice.and_return("foo")
           expect(article.title_pt_br).to eq("foo")
           expect(article.title_pt_br?).to eq(true)
+        end
+      end
+    end
+
+    describe "fallthrough accessors" do
+      let(:article) { Article.new }
+      let(:backend) { backend_klass.new(article, "title", options) }
+      before do
+        allow(backend_klass).to receive(:new).with(article, "title", options).and_return(backend)
+        Article.include described_class.new(:accessor, "title", options.merge(backend: backend_klass))
+      end
+
+      context "with fallthrough_accessors = true" do
+        let(:options) { { fallthrough_accessors: true } }
+
+        it "overrides method_missing to handle getters for any locale" do
+          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+          expect(article.title_de).to eq("foo")
+          expect(backend).to receive(:read).with(:fr, {}).and_return("bar")
+          expect(article.title_fr).to eq("bar")
+        end
+
+        it "overrides method_missing to handle setters for any locale" do
+          expect(backend).to receive(:write).with(:de, "foo", {}).and_return("foo")
+          expect(article.title_de="foo").to eq("foo")
+          expect(backend).to receive(:write).with(:fr, "bar", {}).and_return("bar")
+          expect(article.title_fr="bar").to eq("bar")
         end
       end
     end

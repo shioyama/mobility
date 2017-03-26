@@ -2,6 +2,24 @@
 
 ## 0.1
 
+### 0.1.11
+* Add backend-specific translations generator (`rails generate
+  mobility:translations`)
+  ([9dbe4d](https://github.com/shioyama/mobility/commit/9dbe4d2221f3c97ec265c297ad2be201a5180151),
+  [583a51](https://github.com/shioyama/mobility/commit/583a51c9945615460079a1f81ffbd7a69d91a581),
+  [6b9605](https://github.com/shioyama/mobility/commit/6b9605ed6fa599578fd36065ac17e6b2b93a8378),
+  [e2e807](https://github.com/shioyama/mobility/commit/e2e807494bd1f642c67a0dbd678cea49b16f11b0))
+* Fix bug with combination of Column backend and fallthrough accessors
+  ([212f07](https://github.com/shioyama/mobility/commit/212f078145f613ab85faf7dbf993c7da9a91bcdd))
+* Raise `InvalidLocale` when getting a locale that is not available
+  ([d4f0ee](https://github.com/shioyama/mobility/commit/d4f0ee20d5507ba147f31aa03081f685e31ab46a))
+* Pass options to backend write from setter
+  ([5d224f](https://github.com/shioyama/mobility/commit/5d224fa7bb877d9dc1f6c3983b096b22aeea5bc7))
+* Correctly include `FallthroughAccessors` module in module, not backend
+  ([d9471d](https://github.com/shioyama/mobility/commit/d9471db7ab71766a98e4e411b476d2197fbf7f51))
+* Handle presence methods in `FallthroughAccessors`
+  ([66f630](https://github.com/shioyama/mobility/commit/66f630548c01b8d380c6aeeab4c32b085133c754))
+
 ### 0.1.10
 * Fix fallback options ([#12](https://github.com/shioyama/mobility/pull/12) and
   [09a163](https://github.com/shioyama/mobility/commit/09a1636bc743633fd13dc6c59ebf1e2366a0e2c4))

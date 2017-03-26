@@ -45,7 +45,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.1.10'
+gem 'mobility', '~> 0.1.11'
 ```
 
 To translate attributes on a model, include (or extend) `Mobility`, then call

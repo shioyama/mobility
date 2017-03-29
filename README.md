@@ -653,7 +653,7 @@ class](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Table).
 
 ### Column Backend (like Traco)
 
-The `Column` backend stores translationsi as columns with locale suffixes on
+The `Column` backend stores translations as columns with locale suffixes on
 the model table. For an attribute `title`, these would be of the form
 `title_en`, `title_fr`, etc.
 

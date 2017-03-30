@@ -6,7 +6,23 @@ describe Mobility::Attributes do
     Article.include Mobility
   end
 
-  let(:backend_klass) { Mobility::Backend::Null }
+  # In order to be able to stub methods on backend instance methods, which will be
+  # hidden when the backend class is subclassed in Attributes, we inject a double
+  # and delegate read and write to the double. (Nice trick, eh?)
+  #
+  let(:backend) { double("backend", read: nil, write: nil) }
+  let(:backend_klass) do
+    backend_double = backend
+    Class.new(Mobility::Backend::Null) do
+      define_method :read do |*args|
+        backend_double.read(*args)
+      end
+
+      define_method :write do |*args|
+        backend_double.write(*args)
+      end
+    end
+  end
 
   describe "initializing" do
     it "raises ArgumentError if method is not reader, writer or accessor" do
@@ -93,7 +109,12 @@ describe Mobility::Attributes do
 
         it "does not include Backend::Sequel::Dirty into backend when options[:dirty] is falsey" do
           expect(backend_klass).not_to receive(:include).with(Mobility::Backend::Sequel::Dirty)
-          Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, fallbacks: false, model_class: Article })
+          Article.include described_class.new(:accessor, "title", {
+            backend: backend_klass,
+            cache: false,
+            fallbacks: false,
+            model_class: Article
+          })
         end
       end
     end
@@ -129,9 +150,7 @@ describe Mobility::Attributes do
 
     describe "defining getters and setters" do
       let(:article) { Article.new }
-      let(:backend) { backend_klass.new(article, "title") }
       before do
-        allow(backend_klass).to receive(:new).with(article, "title", {}).and_return(backend)
         allow(Mobility).to receive(:locale).and_return(:de)
       end
 
@@ -156,8 +175,8 @@ describe Mobility::Attributes do
         end
 
         it "correctly maps other options to getter" do
-          expect(backend).to receive(:read).with(:de, fallback: false).and_return("foo")
-          expect(article.title(fallback: false)).to eq("foo")
+          expect(backend).to receive(:read).with(:de, someopt: "someval").and_return("foo")
+          expect(article.title(someopt: "someval")).to eq("foo")
         end
       end
 
@@ -168,8 +187,8 @@ describe Mobility::Attributes do
         end
 
         it "correctly maps other options to setter" do
-          expect(backend).to receive(:write).with(:de, "foo", fallback: false).and_return("foo")
-          expect(article.send(:title=, "foo", fallback: false)).to eq("foo")
+          expect(backend).to receive(:write).with(:de, "foo", someopt: "someval").and_return("foo")
+          expect(article.send(:title=, "foo", someopt: "someval")).to eq("foo")
         end
       end
 
@@ -233,9 +252,7 @@ describe Mobility::Attributes do
 
     describe "defining locale accessors" do
       let(:article) { Article.new }
-      let(:backend) { backend_klass.new(article, "title", options) }
       before do
-        allow(backend_klass).to receive(:new).with(article, "title", options).and_return(backend)
         allow(Mobility).to receive(:locale).and_return(:de)
         Article.include described_class.new(:accessor, "title", options.merge(backend: backend_klass))
       end
@@ -252,7 +269,7 @@ describe Mobility::Attributes do
       end
 
       context "with locale_accessors = true" do
-        let(:options) { { locale_accessors: true } }
+        let(:options) { { locale_accessors: true, cache: false } }
 
         it "defines accessors for locales in I18n.available_locales" do
           expect(backend).to receive(:read).twice.with(:de, {}).and_return("foo")
@@ -271,7 +288,7 @@ describe Mobility::Attributes do
       end
 
       context "with locale_accessors a hash" do
-        let(:options) { { locale_accessors: [:en, :'pt-BR'] } }
+        let(:options) { { locale_accessors: [:en, :'pt-BR'], cache: false } }
 
         it "defines accessors for locales in locale_accessors hash" do
           expect(backend).to receive(:read).twice.with(:en, {}).and_return("enfoo")
@@ -291,7 +308,7 @@ describe Mobility::Attributes do
       end
 
       context "accessor locale includes dash" do
-        let(:options) { { locale_accessors: [:'pt-BR'] } }
+        let(:options) { { locale_accessors: [:'pt-BR'], cache: false } }
 
         it "translates dashes to underscores when defining locale accessors" do
           expect(backend).to receive(:read).with(:'pt-BR', {}).twice.and_return("foo")
@@ -303,14 +320,12 @@ describe Mobility::Attributes do
 
     describe "fallthrough accessors" do
       let(:article) { Article.new }
-      let(:backend) { backend_klass.new(article, "title", options) }
       before do
-        allow(backend_klass).to receive(:new).with(article, "title", options).and_return(backend)
         Article.include described_class.new(:accessor, "title", options.merge(backend: backend_klass))
       end
 
       context "with fallthrough_accessors = true" do
-        let(:options) { { fallthrough_accessors: true } }
+        let(:options) { { fallthrough_accessors: true, cache: false } }
 
         it "handle getters for any locale" do
           expect(backend).to receive(:read).with(:de, {}).and_return("foo")

@@ -150,17 +150,16 @@ describe Mobility::Attributes do
 
     describe "defining getters and setters" do
       let(:article) { Article.new }
-      before do
-        allow(Mobility).to receive(:locale).and_return(:de)
-      end
 
       shared_examples_for "reader" do
         it "correctly maps getter method for translated attribute to backend" do
+          expect(Mobility).to receive(:locale).and_return(:de)
           expect(backend).to receive(:read).with(:de, {}).and_return("foo")
           expect(article.title).to eq("foo")
         end
 
         it "correctly maps presence method for translated attribute to backend" do
+          expect(Mobility).to receive(:locale).and_return(:de)
           expect(backend).to receive(:read).with(:de, {}).and_return("foo")
           expect(article.title?).to eq(true)
         end
@@ -175,6 +174,7 @@ describe Mobility::Attributes do
         end
 
         it "correctly maps other options to getter" do
+          expect(Mobility).to receive(:locale).and_return(:de)
           expect(backend).to receive(:read).with(:de, someopt: "someval").and_return("foo")
           expect(article.title(someopt: "someval")).to eq("foo")
         end
@@ -182,11 +182,13 @@ describe Mobility::Attributes do
 
       shared_examples_for "writer" do
         it "correctly maps setter method for translated attribute to backend" do
+          expect(Mobility).to receive(:locale).and_return(:de)
           expect(backend).to receive(:write).with(:de, "foo", {})
           article.title = "foo"
         end
 
         it "correctly maps other options to setter" do
+          expect(Mobility).to receive(:locale).and_return(:de)
           expect(backend).to receive(:write).with(:de, "foo", someopt: "someval").and_return("foo")
           expect(article.send(:title=, "foo", someopt: "someval")).to eq("foo")
         end
@@ -253,7 +255,6 @@ describe Mobility::Attributes do
     describe "defining locale accessors" do
       let(:article) { Article.new }
       before do
-        allow(Mobility).to receive(:locale).and_return(:de)
         Article.include described_class.new(:accessor, "title", options.merge(backend: backend_klass))
       end
 

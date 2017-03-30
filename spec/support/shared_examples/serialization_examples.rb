@@ -234,7 +234,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
         expect(backend.read(:en)).to eq(nil)
       end
 
-      expect(instance.send(attribute1)).to eq(nil)
+      expect(instance.send(attribute1)).to eq("")
       instance.reload
       expect(backend.read(:en)).to eq(nil)
       expect(instance.send(:"#{attribute1}_before_mobility")).to eq(serialize({}))

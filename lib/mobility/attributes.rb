@@ -188,6 +188,7 @@ with other backends.
       backend_class.include(Backend::Cache)                            unless options[:cache] == false
       backend_class.include(Backend::Dirty.for(options[:model_class])) if options[:dirty]
       backend_class.include(Backend::Fallbacks)                        unless options[:fallbacks] == false
+      backend_class.include(Backend::Presence)                         unless options[:presence] == false
     end
 
     def define_backend(attribute)

@@ -14,23 +14,18 @@ Instance methods attached to all model classes when model includes or extends
 
     private
 
-    def mobility_get(*args)
-      value = mobility_read(*args)
-      value == false ? value : value.presence
+    def mobility_get(attribute, locale: Mobility.locale, **options)
+      Mobility.enforce_available_locales!(locale)
+      mobility_backend_for(attribute).read(locale.to_sym, options)
     end
 
     def mobility_present?(*args)
-      mobility_read(*args).present?
+      mobility_get(*args).present?
     end
 
     def mobility_set(attribute, value, locale: Mobility.locale, **options)
       Mobility.enforce_available_locales!(locale)
-      mobility_backend_for(attribute).write(locale.to_sym, value == false ? value : value.presence, **options)
-    end
-
-    def mobility_read(attribute, locale: Mobility.locale, **options)
-      Mobility.enforce_available_locales!(locale)
-      mobility_backend_for(attribute).read(locale.to_sym, options)
+      mobility_backend_for(attribute).write(locale.to_sym, value, **options)
     end
   end
 end

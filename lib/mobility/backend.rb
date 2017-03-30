@@ -60,6 +60,7 @@ On top of this, a backend will normally:
     autoload :KeyValue,     'mobility/backend/key_value'
     autoload :Null,         'mobility/backend/null'
     autoload :OrmDelegator, 'mobility/backend/orm_delegator'
+    autoload :Presence,     'mobility/backend/presence'
     autoload :Sequel,       'mobility/backend/sequel'
     autoload :Serialized,   'mobility/backend/serialized'
     autoload :Table,        'mobility/backend/table'

@@ -11,7 +11,7 @@ describe Mobility::Backend::Sequel::Serialized, orm: :sequel do
 
   describe "serialized backend without cache" do
     context "yaml format" do
-      before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false }
+      before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, presence: false }
       include_accessor_examples 'SerializedPost'
       include_serialization_examples 'SerializedPost'
 
@@ -41,7 +41,7 @@ describe Mobility::Backend::Sequel::Serialized, orm: :sequel do
     end
 
     context "json format" do
-      before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false }
+      before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false, presence: false }
       include_accessor_examples 'SerializedPost'
       include_serialization_examples 'SerializedPost'
 
@@ -59,7 +59,7 @@ describe Mobility::Backend::Sequel::Serialized, orm: :sequel do
   end
 
   describe "serialized backend with cache" do
-    before { SerializedPost.translates :title, :content, backend: :serialized }
+    before { SerializedPost.translates :title, :content, backend: :serialized, presence: false }
     include_accessor_examples 'SerializedPost'
     include_serialization_examples 'SerializedPost'
 

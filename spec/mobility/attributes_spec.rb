@@ -10,7 +10,7 @@ describe Mobility::Attributes do
   # hidden when the backend class is subclassed in Attributes, we inject a double
   # and delegate read and write to the double. (Nice trick, eh?)
   #
-  let(:backend) { double("backend", read: nil, write: nil) }
+  let(:backend) { double("backend") }
   let(:backend_klass) do
     backend_double = backend
     Class.new(Mobility::Backend::Null) do
@@ -23,6 +23,10 @@ describe Mobility::Attributes do
       end
     end
   end
+
+  # These options disable all inclusion of modules into backend, which is useful
+  # for many specs in this suite.
+  let(:clean_options) { { cache: false, fallbacks: false, presence: false } }
 
   describe "initializing" do
     it "raises ArgumentError if method is not reader, writer or accessor" do
@@ -61,12 +65,13 @@ describe Mobility::Attributes do
     describe "cache" do
       it "includes Backend::Cache into backend when options[:cache] is not false" do
         expect(backend_klass).to receive(:include).with(Mobility::Backend::Cache)
-        Article.include described_class.new(:accessor, "title", { backend: backend_klass, fallbacks: false })
+        clean_options.delete(:cache)
+        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_klass))
       end
 
       it "does not include Backend::Cache into backend when options[:cache] is false" do
         expect(backend_klass).not_to receive(:include).with(Mobility::Backend::Cache)
-        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, fallbacks: false })
+        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_klass))
       end
     end
 
@@ -75,18 +80,16 @@ describe Mobility::Attributes do
         it "includes Backend::ActiveModel::Dirty into backend when options[:dirty] is truthy and model class includes ActiveModel::Dirty" do
           expect(backend_klass).to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
           Article.include ::ActiveModel::Dirty
-          Article.include described_class.new(:accessor, "title", {
+          Article.include described_class.new(:accessor, "title", clean_options.merge(
             backend: backend_klass,
-            cache: false,
-            fallbacks: false,
             dirty: true,
             model_class: Article
-          })
+          ))
         end
 
         it "does not include Backend::Model::Dirty into backend when options[:dirty] is falsey" do
           expect(backend_klass).not_to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
-          Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, fallbacks: false, model_class: Article })
+          Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_klass, model_class: Article))
         end
       end
 
@@ -98,13 +101,11 @@ describe Mobility::Attributes do
 
         it "includes Backend::Sequel::Dirty into backend when options[:dirty] is truthy and model class is a ::Sequel::Model" do
           expect(backend_klass).to receive(:include).with(Mobility::Backend::Sequel::Dirty)
-          Article.include described_class.new(:accessor, "title", {
+          Article.include described_class.new(:accessor, "title", clean_options.merge(
             backend: backend_klass,
-            cache: false,
-            fallbacks: false,
             dirty: true,
             model_class: Article
-          })
+          ))
         end
 
         it "does not include Backend::Sequel::Dirty into backend when options[:dirty] is falsey" do
@@ -122,12 +123,13 @@ describe Mobility::Attributes do
     describe "fallbacks" do
       it "includes Backend::Fallbacks into backend when options[:fallbacks] is not false" do
         expect(backend_klass).to receive(:include).with(Mobility::Backend::Fallbacks)
-        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false })
+        clean_options.delete(:fallbacks)
+        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_klass))
       end
 
       it "does not include Backend::Fallbacks into backend when options[:fallbacks] is false" do
         expect(backend_klass).not_to receive(:include).with(Mobility::Backend::Fallbacks)
-        Article.include described_class.new(:accessor, "title", { backend: backend_klass, cache: false, fallbacks: false })
+        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_klass))
       end
     end
 
@@ -270,7 +272,7 @@ describe Mobility::Attributes do
       end
 
       context "with locale_accessors = true" do
-        let(:options) { { locale_accessors: true, cache: false } }
+        let(:options) { clean_options.merge(locale_accessors: true) }
 
         it "defines accessors for locales in I18n.available_locales" do
           expect(backend).to receive(:read).twice.with(:de, {}).and_return("foo")
@@ -289,7 +291,7 @@ describe Mobility::Attributes do
       end
 
       context "with locale_accessors a hash" do
-        let(:options) { { locale_accessors: [:en, :'pt-BR'], cache: false } }
+        let(:options) { clean_options.merge(locale_accessors: [:en, :'pt-BR']) }
 
         it "defines accessors for locales in locale_accessors hash" do
           expect(backend).to receive(:read).twice.with(:en, {}).and_return("enfoo")
@@ -309,7 +311,7 @@ describe Mobility::Attributes do
       end
 
       context "accessor locale includes dash" do
-        let(:options) { { locale_accessors: [:'pt-BR'], cache: false } }
+        let(:options) { clean_options.merge(locale_accessors: [:'pt-BR']) }
 
         it "translates dashes to underscores when defining locale accessors" do
           expect(backend).to receive(:read).with(:'pt-BR', {}).twice.and_return("foo")
@@ -326,7 +328,7 @@ describe Mobility::Attributes do
       end
 
       context "with fallthrough_accessors = true" do
-        let(:options) { { fallthrough_accessors: true, cache: false } }
+        let(:options) { clean_options.merge(fallthrough_accessors: true) }
 
         it "handle getters for any locale" do
           expect(backend).to receive(:read).with(:de, {}).and_return("foo")

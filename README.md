@@ -108,7 +108,7 @@ Otherwise everything is (almost) identical to AR, with the exception that there
 is no equivalent to a Rails generator (so you will need to create the migration
 for any translation table(s) yourself, using Rails generators as a reference).
 
-The models in examples below all inherit from `ActiveRecord::Base`, but
+The models in examples below all inherit from `ApplicationRecord`, but
 everything works exactly the same if the parent class is `Sequel::Model`.
 
 Usage
@@ -120,7 +120,7 @@ Once the install generator has been run to generate translation tables, using
 Mobility is as easy as adding a few lines to any class you want to translate:
 
 ```ruby
-class Word < ActiveRecord::Base
+class Word < ApplicationRecord
   include Mobility
   translates :name,    type: :string
   translates :meaning, type: :text
@@ -221,7 +221,7 @@ accessors" in Mobility, and they can be defined by passing a `locale_accessors`
 option when defining translated attributes on the model class:
 
 ```ruby
-class Word < ActiveRecord::Base
+class Word < ApplicationRecord
   include Mobility
   translates :name, type: :string, locale_accessors: [:en, :ja]
 end
@@ -261,7 +261,7 @@ precedence if defined for a given locale.)
 For example, if we define `Word` this way:
 
 ```ruby
-class Word < ActiveRecord::Base
+class Word < ApplicationRecord
   include Mobility
   translates :name, type: :string, fallthrough_accessors: true
 end
@@ -366,7 +366,7 @@ pass a hash with fallbacks for each locale as an option when defining
 translated attributes on a class:
 
 ```ruby
-class Word < ActiveRecord::Base
+class Word < ApplicationRecord
   include Mobility
   translates :name,    type: :string, fallbacks: { de: :ja, fr: :ja }
   translates :meaning, type: :text,   fallbacks: { de: :ja, fr: :ja }
@@ -451,7 +451,7 @@ First, enable dirty tracking (note that this is a persisted AR model, although
 dirty tracking is not specific to AR and works for non-persisted models as well):
 
 ```ruby
-class Post < ActiveRecord::Base
+class Post < ApplicationRecord
   include Mobility
   translates :title, type: :string, dirty: true
 end
@@ -525,7 +525,7 @@ generally only be disabled when debugging; this can be done by passing `cache:
 false` when defining an attribute, like this:
 
 ```ruby
-class Word < ActiveRecord::Base
+class Word < ApplicationRecord
   include Mobility
   translates :name, type: :string, cache: false
 end
@@ -546,7 +546,7 @@ Mobility-specific query method overrides.
 So assuming a model:
 
 ```ruby
-class Post < ActiveRecord::Base
+class Post < ApplicationRecord
   include Mobility
   translates :title,   type: :string
   translates :content, type: :text
@@ -590,7 +590,7 @@ If you would prefer to avoid the `i18n` scope everywhere, define it as a
 default scope on your model:
 
 ```ruby
-class Post < ActiveRecord::Base
+class Post < ApplicationRecord
   include Mobility
   translates :title,   type: :string
   translates :content, type: :text
@@ -617,7 +617,7 @@ configuration, or you can set it explicitly when defining a translated
 attribute, like this:
 
 ```ruby
-class Word < ActiveRecord::Base
+class Word < ApplicationRecord
   translates :name, backend: :table
 end
 ```

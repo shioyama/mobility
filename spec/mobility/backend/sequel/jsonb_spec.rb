@@ -9,7 +9,7 @@ describe Mobility::Backend::Sequel::Jsonb, orm: :sequel, db: :postgres do
     stub_const 'JsonbPost', Class.new(Sequel::Model)
     JsonbPost.dataset = DB[:jsonb_posts]
     JsonbPost.include Mobility
-    JsonbPost.translates :title, :content, backend: :jsonb, cache: false
+    JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false
   end
   let(:post) { JsonbPost.new }
 

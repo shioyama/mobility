@@ -32,6 +32,11 @@ describe Mobility::Backend::Presence do
       expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(nil)
       expect(backend.read(:fr)).to eq(nil)
     end
+
+    it "passes through false values unchanged" do
+      expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(false)
+      expect(backend.read(:fr)).to eq(false)
+    end
   end
 
   describe "#write" do
@@ -48,6 +53,11 @@ describe Mobility::Backend::Presence do
     it "passes through nil values unchanged" do
       expect(backend_double).to receive(:write).once.with(:fr, nil, {}).and_return(nil)
       expect(backend.write(:fr, nil)).to eq(nil)
+    end
+
+    it "passes through false values unchanged" do
+      expect(backend_double).to receive(:write).once.with(:fr, false, {}).and_return(false)
+      expect(backend.write(:fr, false)).to eq(false)
     end
   end
 end

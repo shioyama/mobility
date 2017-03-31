@@ -115,16 +115,18 @@ with other backends.
     # @param [Array<String>] attributes_ Attributes to define backend for
     # @param [Hash] options_ Backend options hash
     # @option options_ [Class] model_class Class of model
+    # @option options_ [Boolean] cache (true) Enable cache for this model backend
+    # @option options_ [Boolean] dirty Enable dirty tracking for this model
+    #   backend
+    # @option options_ [Boolean, Hash] fallbacks Enable fallbacks or specify
+    #   fallbacks for this model backend
+    # @option options_ [Boolean] fallthrough_accessors Enable fallthrough
+    #   locale accessors for this model backend
     # @option options_ [Boolean, Array<Symbol>] locale_accessors Enable locale
     #   accessors or specify locales for which accessors should be defined on
     #   this model backend. Will default to +true+ if +dirty+ option is +true+.
-    # @option options_ [Boolean] cache (true) Enable cache for this model backend
-    # @option options_ [Boolean, Hash] fallbacks Enable fallbacks or specify
-    #   fallbacks for this model backend
-    # @option options_ [Boolean] dirty Enable dirty tracking for this model
-    #   backend
-    # @option options_ [Boolean] fallthrough_accessors Enable fallthrough
-    #   locale accessors for this model backend
+    # @option options_ [Boolean] presence (true) Enable presence filter on
+    #   reads and writes
     # @raise [ArgumentError] if method is not reader, writer or accessor
     def initialize(method, *attributes_, **options_)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)

@@ -37,6 +37,11 @@ describe Mobility::Backend::Presence do
       expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(false)
       expect(backend.read(:fr)).to eq(false)
     end
+
+    it "does not convert blank string to nil if presence: false passed as option" do
+      expect(backend_double).to receive(:read).once.with(:fr, {}).and_return("")
+      expect(backend.read(:fr, presence: false)).to eq("")
+    end
   end
 
   describe "#write" do
@@ -58,6 +63,11 @@ describe Mobility::Backend::Presence do
     it "passes through false values unchanged" do
       expect(backend_double).to receive(:write).once.with(:fr, false, {}).and_return(false)
       expect(backend.write(:fr, false)).to eq(false)
+    end
+
+    it "does not convert blank string to nil if presence: false passed as option" do
+      expect(backend_double).to receive(:write).once.with(:fr, "", {}).and_return("")
+      expect(backend.write(:fr, "", presence: false)).to eq("")
     end
   end
 end

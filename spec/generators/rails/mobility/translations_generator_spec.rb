@@ -72,10 +72,12 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
     context "model table exists" do
       before do
         ActiveRecord::Base.connection.create_table :foos
-        available_locales = I18n.available_locales
+        @available_locales = I18n.available_locales
         I18n.available_locales = [:en, :ja, :de]
         run_generator %w(Foo title:string:index content:text --backend=column)
-        I18n.available_locales = available_locales
+      end
+      after do
+        I18n.available_locales = @available_locales
       end
 
       it "generates column translations migration adding columns for each locale to model table" do

@@ -37,7 +37,8 @@ platforms planned.
 For a detailed introduction to Mobility, see [Translating with
 Mobility](http://dejimata.com/2017/3/3/translating-with-mobility). See also the
 [Roadmap](https://github.com/shioyama/mobility/wiki/Roadmap) for what's in the
-works for future releases.
+works for future releases, and other pages of the [wiki][wiki] for more detail
+on usage.
 
 Installation
 ------------
@@ -628,7 +629,8 @@ This would set the `name` attribute to use the `Table` backend (see below).
 The `type` option (`type: :string` or `type: :text`) is missing here because
 this is an option specific to the KeyValue backend (specifying which shared
 table to store translations on). Backends have their own specific options; see
-the API documentation for which options are available for each.
+the [Wiki][wiki] and [API documentation][api] for which options are available
+for each.
 
 Everything else described above (fallbacks, dirty tracking, locale accessors,
 caching, querying, etc) is the same regardless of which backend you use.
@@ -650,7 +652,9 @@ rails generate mobility:translations post title:string content:text
 
 This will generate the `post_translations` table with columns `title` and
 `content`, and all other necessary columns and indices. For more details see
-the API documentation on the [`Mobility::Backend::Table`
+the [Table
+Backend](https://github.com/shioyama/mobility/wiki/Table-Backend) page of the
+wiki and API documentation on the [`Mobility::Backend::Table`
 class](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Table).
 
 ### Column Backend (like Traco)
@@ -666,7 +670,9 @@ Use the `mobility:translations` generator to add columns for locales in
 rails generate mobility:translations post title:string content:text
 ```
 
-For more details, see the API documentation on the [`Mobility::Backend::Column`
+For more details, see the [Column
+Backend](https://github.com/shioyama/mobility/wiki/Column-Backend) page of the
+wiki and API documentation on the [`Mobility::Backend::Column`
 class](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Column).
 
 ### PostgreSQL-specific Backends
@@ -674,7 +680,9 @@ class](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Column).
 Mobility also supports jsonb and Hstore storage options, if you are using
 PostgreSQL as your database. To use this option, create column(s) on the model
 table for each translated attribute, and set your backend to `:jsonb` or
-`:hstore`. Other details are covered in the API documentation
+`:hstore`. Other details are covered in the [Postgres
+Backend](https://github.com/shioyama/mobility/wiki/Postgres-Backends) page of
+the wiki and in the API documentation
 ([`Mobility::Backend::Jsonb`](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Jsonb)
 and
 [`Mobility::Backend::Hstore`](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Hstore)).
@@ -705,8 +713,9 @@ class MyClass
 end
 ```
 
-For details on how to define a backend class, see the [API documentation on the
-`Mobility::Backend`
+For details on how to define a backend class, see the [Introduction to Mobility
+Backends](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-Backends)
+page of the wiki and the [API documentation on the `Mobility::Backend`
 module](http://www.rubydoc.info/gems/mobility/Mobility/Backend).
 
 ### Testing Backends

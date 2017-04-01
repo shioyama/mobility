@@ -43,7 +43,7 @@ or locales.)
       # @!group Backend Accessors
       # @!macro backend_writer
       def write(locale, value, **_)
-        model.write_attribute(column(locale), value)
+        model.send(:write_attribute, column(locale), value)
       end
 
       # @!group Backend Configuration

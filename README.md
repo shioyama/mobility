@@ -97,10 +97,10 @@ You can include `Mobility` just like in ActiveRecord, or you can use the
 `mobility` plugin, which does the same thing:
 
 ```ruby
-class Post < ::Sequel::Model
+class Word < ::Sequel::Model
   plugin :mobility
-  translates :title,   type: :string
-  translates :content, type: :text
+  translates :name,    type: :string
+  translates :meaning, type: :text
 end
 ```
 

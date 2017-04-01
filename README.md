@@ -117,7 +117,9 @@ Usage
 ### <a name="quickstart"></a>Getting Started
 
 Once the install generator has been run to generate translation tables, using
-Mobility is as easy as adding a few lines to any class you want to translate:
+Mobility is as easy as adding a few lines to any class you want to translate.
+Simply pass one or more attribute names to the `translates` method with a hash
+of options, like this:
 
 ```ruby
 class Word < ApplicationRecord

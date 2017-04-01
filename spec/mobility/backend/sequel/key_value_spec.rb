@@ -272,6 +272,36 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
     end
   end
 
+  describe "after destroy" do
+    # In case we change the translated attributes on a model, we need to make
+    # sure we clean them up when the model is destroyed.
+    it "cleans up all associated translations, regardless of key" do
+      article = Article.create(title: "foo title", content: "foo content")
+      Mobility.with_locale(:ja) { article.update(title: "あああ", content: "ばばば") }
+      article.save
+      expect(Mobility::Sequel::TextTranslation.count).to eq(4)
+
+      Mobility::Sequel::TextTranslation.create(translatable: article, key: "key1", value: "value1", locale: "de")
+      Mobility::Sequel::StringTranslation.create(translatable: article, key: "key2", value: "value2", locale: "fr")
+      expect(Mobility::Sequel::TextTranslation.count).to eq(5)
+      expect(Mobility::Sequel::StringTranslation.count).to eq(1)
+
+      article.destroy
+      expect(Mobility::Sequel::TextTranslation.count).to eq(0)
+      expect(Mobility::Sequel::StringTranslation.count).to eq(0)
+    end
+
+    it "only destroys translations once when cleaning up" do
+      article = Article.create(title: "foo title", content: "foo content")
+      # This is an ugly way to check that we are not destroying all
+      # translations twice. Since the actual callback is included in a module,
+      # it's hard to get at this directly.
+      expect(Mobility::Sequel::TextTranslation).to receive(:where).once.and_call_original
+      expect(Mobility::Sequel::StringTranslation).to receive(:where).once.and_call_original
+      article.destroy
+    end
+  end
+
   describe ".configure!" do
     it "sets association_name and class_name from string type" do
       options = { type: :string }

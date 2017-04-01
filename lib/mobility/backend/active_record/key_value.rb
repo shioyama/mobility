@@ -85,6 +85,7 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
             send(association_name).destroy(translation)
           end
         end
+        after_destroy :mobility_destroy_key_value_translations
 
         mod = Module.new do
           define_method :i18n do
@@ -92,6 +93,16 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
           end
         end
         extend mod
+
+        private
+
+        # Clean up *all* leftover translations of this model, only once.
+        def mobility_destroy_key_value_translations
+          [:string, :text].freeze.each do |type|
+            Mobility::ActiveRecord.const_get("#{type.capitalize}Translation".freeze).
+              where(translatable: self).destroy_all
+          end
+        end unless private_instance_methods(false).include?(:mobility_destroy_key_value_translations)
       end
 
       # @!group Cache Methods

@@ -236,6 +236,32 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
     end
   end
 
+  describe "after destroy" do
+    # In case we change the translated attributes on a model, we need to make
+    # sure we clean them up when the model is destroyed.
+    it "cleans up all associated translations, regardless of key" do
+      article = Article.create(title: "foo title", content: "foo content")
+      Mobility.with_locale(:ja) { article.update_attributes(title: "あああ", content: "ばばば") }
+      article.save
+      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
+
+      Mobility::ActiveRecord::TextTranslation.create!(translatable: article, key: "key1", value: "value1", locale: "de")
+      Mobility::ActiveRecord::StringTranslation.create!(translatable: article, key: "key2", value: "value2", locale: "fr")
+      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(5)
+      expect(Mobility::ActiveRecord::StringTranslation.count).to eq(1)
+
+      article.destroy!
+      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(0)
+      expect(Mobility::ActiveRecord::StringTranslation.count).to eq(0)
+    end
+
+    it "only destroys translations once when cleaning up" do
+      article = Article.create(title: "foo title", content: "foo content")
+      expect(article).to receive(:mobility_destroy_key_value_translations).once.and_call_original
+      article.destroy!
+    end
+  end
+
   describe ".configure!" do
     it "sets association_name and class_name from string type" do
       options = { type: :string }

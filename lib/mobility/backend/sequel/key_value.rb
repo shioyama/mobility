@@ -99,6 +99,22 @@ options[:class_name] ||= Mobility::Sequel.const_get("#{type.capitalize}Translati
         extend extension
 
         include Mobility::Sequel::ColumnChanges.new(attributes)
+
+        private
+
+        # Clean up *all* leftover translations of this model, only once.
+        def self.mobility_key_value_callbacks_module
+          @mobility_key_value_destroy_callbacks_module ||= Module.new do
+            def after_destroy
+              super
+              [:string, :text].freeze.each do |type|
+                Mobility::Sequel.const_get("#{type.capitalize}Translation".freeze).
+                  where(translatable_id: id, translatable_type: self.class.name).destroy
+              end
+            end
+          end
+        end unless respond_to?(:mobility_key_value_callbacks_module, true)
+        include mobility_key_value_callbacks_module
       end
 
       # @!group Cache Methods

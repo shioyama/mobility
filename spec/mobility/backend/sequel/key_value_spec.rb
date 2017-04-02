@@ -279,16 +279,21 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
       article = Article.create(title: "foo title", content: "foo content")
       Mobility.with_locale(:ja) { article.update(title: "あああ", content: "ばばば") }
       article.save
-      expect(Mobility::Sequel::TextTranslation.count).to eq(4)
+
+      # Create translations on another model, to check they do not get destroyed
+      Post.create(title: "post title", content: "post content")
+
+      expect(Mobility::Sequel::StringTranslation.count).to eq(1)
+      expect(Mobility::Sequel::TextTranslation.count).to eq(5)
 
       Mobility::Sequel::TextTranslation.create(translatable: article, key: "key1", value: "value1", locale: "de")
       Mobility::Sequel::StringTranslation.create(translatable: article, key: "key2", value: "value2", locale: "fr")
-      expect(Mobility::Sequel::TextTranslation.count).to eq(5)
-      expect(Mobility::Sequel::StringTranslation.count).to eq(1)
+      expect(Mobility::Sequel::TextTranslation.count).to eq(6)
+      expect(Mobility::Sequel::StringTranslation.count).to eq(2)
 
       article.destroy
-      expect(Mobility::Sequel::TextTranslation.count).to eq(0)
-      expect(Mobility::Sequel::StringTranslation.count).to eq(0)
+      expect(Mobility::Sequel::TextTranslation.count).to eq(1)
+      expect(Mobility::Sequel::StringTranslation.count).to eq(1)
     end
 
     it "only destroys translations once when cleaning up" do

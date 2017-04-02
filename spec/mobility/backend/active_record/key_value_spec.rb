@@ -243,16 +243,21 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
       article = Article.create(title: "foo title", content: "foo content")
       Mobility.with_locale(:ja) { article.update_attributes(title: "あああ", content: "ばばば") }
       article.save
-      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
+
+      # Create translations on another model, to check they do not get destroyed
+      Post.create(title: "post title", content: "post content")
+
+      expect(Mobility::ActiveRecord::StringTranslation.count).to eq(1)
+      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(5)
 
       Mobility::ActiveRecord::TextTranslation.create!(translatable: article, key: "key1", value: "value1", locale: "de")
       Mobility::ActiveRecord::StringTranslation.create!(translatable: article, key: "key2", value: "value2", locale: "fr")
-      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(5)
-      expect(Mobility::ActiveRecord::StringTranslation.count).to eq(1)
+      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(6)
+      expect(Mobility::ActiveRecord::StringTranslation.count).to eq(2)
 
       article.destroy!
-      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(0)
-      expect(Mobility::ActiveRecord::StringTranslation.count).to eq(0)
+      expect(Mobility::ActiveRecord::TextTranslation.count).to eq(1)
+      expect(Mobility::ActiveRecord::StringTranslation.count).to eq(1)
     end
 
     it "only destroys translations once when cleaning up" do

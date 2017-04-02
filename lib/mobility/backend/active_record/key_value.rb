@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Mobility
   module Backend
 =begin
@@ -54,7 +56,7 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
       def self.configure!(options)
         super
         type = options[:type]
-        options[:class_name] ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
+        options[:class_name] ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation".freeze)
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
         options[:association_name] ||= options[:class_name].table_name.to_sym
         %i[type association_name].each { |key| options[key] = options[key].to_sym }

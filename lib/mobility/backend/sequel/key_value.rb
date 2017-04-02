@@ -79,8 +79,6 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
           clearer:         proc { send(:"#{association_name}_dataset").update(translatable_id: nil, translatable_type: nil) },
           class:           translations_class
 
-        plugin :association_dependencies, association_name => :destroy
-
         callback_methods = Module.new do
           define_method :before_save do
             super()

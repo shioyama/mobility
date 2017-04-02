@@ -79,7 +79,6 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
         has_many association_name, ->{ where key: association_attributes },
           as: :translatable,
           class_name: translations_class,
-          dependent:  :destroy,
           inverse_of: :translatable,
           autosave:   true
         before_save do

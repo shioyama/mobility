@@ -147,6 +147,7 @@ with other backends.
 
       @accessor_locales = options[:locale_accessors]
       @accessor_locales = Mobility.config.default_accessor_locales if @accessor_locales == true
+      include LocaleAccessors.new(*attributes, locales: @accessor_locales) if @accessor_locales
 
       attributes.each do |attribute|
         define_backend(attribute)
@@ -167,8 +168,6 @@ with other backends.
           Mobility.enforce_available_locales!(locale)
           mobility_backend_for(attribute).write(locale.to_sym, value, options)
         end if %i[accessor writer].include?(method)
-
-        define_locale_accessors(attribute, @accessor_locales) if @accessor_locales
       end
     end
 
@@ -201,25 +200,6 @@ with other backends.
       define_method Backend.method_name(attribute) do
         @mobility_backends ||= {}
         @mobility_backends[attribute] ||= _backend_class.new(self, attribute, _options)
-      end
-    end
-
-    def define_locale_accessors(attribute, locales)
-      warning_message = "locale passed as option to locale accessor will be ignored".freeze
-      locales.each do |locale|
-        normalized_locale = Mobility.normalize_locale(locale)
-        define_method "#{attribute}_#{normalized_locale}" do |**options|
-          warn warning_message if options.delete(:locale)
-          Mobility.with_locale(locale) { send(attribute, options) }
-        end
-        define_method "#{attribute}_#{normalized_locale}?" do |**options|
-          warn warning_message if options.delete(:locale)
-          Mobility.with_locale(locale) { send("#{attribute}?", options) }
-        end
-        define_method "#{attribute}_#{normalized_locale}=" do |value, **options|
-          warn warning_message if options.delete(:locale)
-          Mobility.with_locale(locale) { send("#{attribute}=", value, options) }
-        end
       end
     end
 

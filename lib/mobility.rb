@@ -37,6 +37,7 @@ module Mobility
   autoload :BackendResetter,      "mobility/backend_resetter"
   autoload :Configuration,        "mobility/configuration"
   autoload :FallthroughAccessors, "mobility/fallthrough_accessors"
+  autoload :LocaleAccessors,      "mobility/locale_accessors"
   autoload :InstanceMethods,      "mobility/instance_methods"
   autoload :Translates,           "mobility/translates"
   autoload :Wrapper,              "mobility/wrapper"

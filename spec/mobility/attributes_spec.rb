@@ -110,12 +110,10 @@ describe Mobility::Attributes do
 
         it "does not include Backend::Sequel::Dirty into backend when options[:dirty] is falsey" do
           expect(backend_class).not_to receive(:include).with(Mobility::Backend::Sequel::Dirty)
-          Article.include described_class.new(:accessor, "title", {
+          Article.include described_class.new(:accessor, "title", clean_options.merge(
             backend: backend_class,
-            cache: false,
-            fallbacks: false,
             model_class: Article
-          })
+          ))
         end
       end
     end

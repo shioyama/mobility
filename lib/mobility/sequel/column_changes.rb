@@ -11,18 +11,18 @@ is called.
       def initialize(attributes)
         @attributes = attributes
 
-        define_method :mobility_set do |attribute, value, locale: Mobility.locale|
-          if attributes.include?(attribute)
-            column = attribute.to_sym
-            column_with_locale = :"#{attribute}_#{Mobility.normalize_locale(locale)}"
-            if mobility_get(attribute) != value
+        attributes.each do |attribute|
+          define_method "#{attribute}=" do |value, **options|
+            if send(attribute) != value
+              locale = options[:locale] || Mobility.locale
+              column = attribute.to_sym
+              column_with_locale = :"#{attribute}_#{Mobility.normalize_locale(locale)}"
               @changed_columns << column_with_locale if !changed_columns.include?(column_with_locale)
               @changed_columns << column             if !changed_columns.include?(column)
             end
+            super(value, **options)
           end
-          super(attribute, value, locale: locale)
         end
-        private :mobility_set
       end
     end
   end

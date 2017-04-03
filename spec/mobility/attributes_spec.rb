@@ -319,6 +319,24 @@ describe Mobility::Attributes do
           expect(article.title_pt_br?).to eq(true)
         end
       end
+
+      context "locale accessor called with locale option" do
+        let(:options) { clean_options.merge(locale_accessors: true) }
+        let(:warning_message) { /locale passed as option to locale accessor will be ignored/ }
+
+        it "warns locale will be ignored" do
+          aggregate_failures do
+            expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+            expect { expect(article.title_de(locale: :en)).to eq("foo") }.to output(warning_message).to_stderr
+
+            expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+            expect { expect(article.title_de?(locale: :en)).to eq(true) }.to output(warning_message).to_stderr
+
+            expect(backend).to receive(:write).with(:de, "foo", {}).and_return("foo")
+            expect { expect(article.send(:title_de=, "foo", locale: :en)).to eq("foo") }.to output(warning_message).to_stderr
+          end
+        end
+      end
     end
 
     describe "fallthrough accessors" do

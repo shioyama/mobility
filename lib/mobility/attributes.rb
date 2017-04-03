@@ -152,17 +152,20 @@ with other backends.
         define_backend(attribute)
 
         if %i[accessor reader].include?(method)
-          define_method attribute do |**options|
-            mobility_get(attribute, options)
+          define_method attribute do |locale: Mobility.locale, **options|
+            Mobility.enforce_available_locales!(locale)
+            mobility_backend_for(attribute).read(locale.to_sym, options)
           end
 
-          define_method "#{attribute}?" do |**options|
-            mobility_present?(attribute, options)
+          define_method "#{attribute}?" do |locale: Mobility.locale, **options|
+            Mobility.enforce_available_locales!(locale)
+            mobility_backend_for(attribute).read(locale.to_sym, options).present?
           end
         end
 
-        define_method "#{attribute}=" do |value, **options|
-          mobility_set(attribute, value, **options)
+        define_method "#{attribute}=" do |value, locale: Mobility.locale, **options|
+          Mobility.enforce_available_locales!(locale)
+          mobility_backend_for(attribute).write(locale.to_sym, value, options)
         end if %i[accessor writer].include?(method)
 
         define_locale_accessors(attribute, @accessor_locales) if @accessor_locales
@@ -202,16 +205,20 @@ with other backends.
     end
 
     def define_locale_accessors(attribute, locales)
+      warning_message = "locale passed as option to locale accessor will be ignored".freeze
       locales.each do |locale|
         normalized_locale = Mobility.normalize_locale(locale)
         define_method "#{attribute}_#{normalized_locale}" do |**options|
-          mobility_get(attribute, options.merge(locale: locale))
+          warn warning_message if options.delete(:locale)
+          Mobility.with_locale(locale) { send(attribute, options) }
         end
         define_method "#{attribute}_#{normalized_locale}?" do |**options|
-          mobility_present?(attribute, options.merge(locale: locale))
+          warn warning_message if options.delete(:locale)
+          Mobility.with_locale(locale) { send("#{attribute}?", options) }
         end
         define_method "#{attribute}_#{normalized_locale}=" do |value, **options|
-          mobility_set(attribute, value, locale: locale)
+          warn warning_message if options.delete(:locale)
+          Mobility.with_locale(locale) { send("#{attribute}=", value, options) }
         end
       end
     end

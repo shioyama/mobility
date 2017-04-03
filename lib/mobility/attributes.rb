@@ -151,23 +151,8 @@ with other backends.
 
       attributes.each do |attribute|
         define_backend(attribute)
-
-        if %i[accessor reader].include?(method)
-          define_method attribute do |locale: Mobility.locale, **options|
-            Mobility.enforce_available_locales!(locale)
-            mobility_backend_for(attribute).read(locale.to_sym, options)
-          end
-
-          define_method "#{attribute}?" do |locale: Mobility.locale, **options|
-            Mobility.enforce_available_locales!(locale)
-            mobility_backend_for(attribute).read(locale.to_sym, options).present?
-          end
-        end
-
-        define_method "#{attribute}=" do |value, locale: Mobility.locale, **options|
-          Mobility.enforce_available_locales!(locale)
-          mobility_backend_for(attribute).write(locale.to_sym, value, options)
-        end if %i[accessor writer].include?(method)
+        define_reader(attribute) if %i[accessor reader].include?(method)
+        define_writer(attribute) if %i[accessor writer].include?(method)
       end
     end
 
@@ -200,6 +185,25 @@ with other backends.
       define_method Backend.method_name(attribute) do
         @mobility_backends ||= {}
         @mobility_backends[attribute] ||= _backend_class.new(self, attribute, _options)
+      end
+    end
+
+    def define_reader(attribute)
+      define_method attribute do |locale: Mobility.locale, **options|
+        Mobility.enforce_available_locales!(locale)
+        mobility_backend_for(attribute).read(locale.to_sym, options)
+      end
+
+      define_method "#{attribute}?" do |locale: Mobility.locale, **options|
+        Mobility.enforce_available_locales!(locale)
+        mobility_backend_for(attribute).read(locale.to_sym, options).present?
+      end
+    end
+
+    def define_writer(attribute)
+      define_method "#{attribute}=" do |value, locale: Mobility.locale, **options|
+        Mobility.enforce_available_locales!(locale)
+        mobility_backend_for(attribute).write(locale.to_sym, value, options)
       end
     end
 

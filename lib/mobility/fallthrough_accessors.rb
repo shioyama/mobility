@@ -34,7 +34,7 @@ model class is generated.
 
 =end
   class FallthroughAccessors < Module
-    # @param [Array<String>] Array of attributes
+    # @param [String] One or more attributes
     def initialize(*attributes)
       method_name_regex = /\A(#{attributes.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
 

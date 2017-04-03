@@ -139,7 +139,7 @@ with other backends.
       if (options[:dirty] && options[:fallthrough_accessors] != false)
         options[:fallthrough_accessors] = true
       end
-      include FallthroughAccessors.new(attributes) if options[:fallthrough_accessors]
+      include FallthroughAccessors.new(*attributes) if options[:fallthrough_accessors]
 
       @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
 

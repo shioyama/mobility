@@ -1,5 +1,5 @@
 shared_examples_for "locale accessor" do |attribute, locale|
-  it "handles getters and setters in any locale in I18n.available_locales" do
+  it "handles getters and setters" do
     instance = model_class.new
 
     aggregate_failures "getter" do

@@ -9,7 +9,6 @@ db = ENV['DB'] || 'none'
 require 'pry-byebug'
 require 'i18n'
 require 'rspec'
-require 'rspec/its'
 require 'json'
 
 require 'mobility'

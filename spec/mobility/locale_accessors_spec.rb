@@ -23,7 +23,7 @@ describe Mobility::LocaleAccessors do
       base_model_class
     end
 
-    it_behaves_like "locale accessor", :pt
+    it_behaves_like "locale accessor", :title, :pt
 
     it "raises NoMethodError if locale not in I18n.available_locales" do
       model_class.include(described_class.new(:title))
@@ -41,8 +41,8 @@ describe Mobility::LocaleAccessors do
       base_model_class.include described_class.new(:title, locales: [:cz, :de])
     end
 
-    it_behaves_like "locale accessor", :cz
-    it_behaves_like "locale accessor", :de
+    it_behaves_like "locale accessor", :title, :cz
+    it_behaves_like "locale accessor", :title, :de
 
     it "raises NoMethodError if locale not in locales" do
       instance = model_class.new

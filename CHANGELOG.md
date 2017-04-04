@@ -2,6 +2,17 @@
 
 ## 0.1
 
+### 0.1.12
+* Extract presence filter into `Mobility::Backend::Presence` class
+  ([7d654](https://github.com/shioyama/mobility/commit/7d65479c832ca154a45a548b64d27016486d34df),
+  [e42ee6](https://github.com/shioyama/mobility/commit/e42ee6123197594f3a8d694bff68c2ef4044562e))
+* Get suffix methods from ActiveModel (for compatibility with Rails 4.2)
+  ([9685d1](https://github.com/shioyama/mobility/commit/9685d182f285bddd2f5739a655f7c9e18998a5a1))
+* Destroy all translations after model is destroyed (KeyValue backend)
+  ([#15](https://github.com/shioyama/mobility/pull/15))
+* Refactor to remove `mobility_get`, `mobility_set`. `mobility_present?` models
+  from model class ([#16](https://github.com/shioyama/mobility/pull/16))
+
 ### 0.1.11
 * Add backend-specific translations generator (`rails generate
   mobility:translations`)

@@ -10,10 +10,10 @@ describe Mobility::LocaleAccessors do
   end
   let(:options) { { these: "options" } }
 
-  context "locales unset" do
+  context "locales unset, uses I18n.available_locales" do
     before do
       @available_locales = I18n.available_locales
-      I18n.available_locales = [:en, :ko, :pt]
+      I18n.available_locales = [:en, :pt]
     end
     after do
       I18n.available_locales = @available_locales

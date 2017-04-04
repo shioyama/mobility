@@ -38,7 +38,6 @@ module Mobility
   autoload :Configuration,        "mobility/configuration"
   autoload :FallthroughAccessors, "mobility/fallthrough_accessors"
   autoload :LocaleAccessors,      "mobility/locale_accessors"
-  autoload :InstanceMethods,      "mobility/instance_methods"
   autoload :Translates,           "mobility/translates"
   autoload :Wrapper,              "mobility/wrapper"
 
@@ -81,22 +80,28 @@ module Mobility
     def extended(model_class)
       return if model_class.respond_to? :mobility_accessor
       model_class.class_eval do
-        def self.mobility
-          @mobility ||= Mobility::Wrapper.new(self)
-        end
-        def self.translated_attribute_names
-          mobility.translated_attribute_names
+        # Fetch backend for an attribute
+        # @param [String] attribute Attribute
+        def mobility_backend_for(attribute)
+          send(Backend.method_name(attribute))
         end
 
         class << self
           include Translates
+
           if translates = Mobility.config.accessor_method
             alias_method translates, :mobility_accessor
           end
+
+          def mobility
+            @mobility ||= Mobility::Wrapper.new(self)
+          end
+
+          def translated_attribute_names
+            mobility.translated_attribute_names
+          end
         end
       end
-
-      model_class.include(InstanceMethods)
 
       if Loaded::ActiveRecord
         model_class.include(ActiveRecord)                   if model_class < ::ActiveRecord::Base

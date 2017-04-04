@@ -18,7 +18,9 @@ describe Mobility::ActiveModel::AttributeMethods, orm: :active_record do
   subject { MobilityModel.new }
 
   describe "#translated_attribute_names" do
-    its(:translated_attribute_names) { should == ["title"] }
+    it 'returns a title' do
+      expect(subject.translated_attribute_names).to include('title')
+    end
   end
 
   describe "#translated_attributes" do

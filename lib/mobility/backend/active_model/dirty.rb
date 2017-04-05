@@ -86,11 +86,9 @@ value of the translated attribute if passed to it.
       # they change from Rails version to version.
       def self.method_suffixes
         @method_suffixes ||=
-          begin
-            Class.new do
-              include ::ActiveModel::Dirty
-            end.attribute_method_matchers.map { |m| m.suffix }
-          end.select { |m| m =~ /\A_/ }
+          Class.new do
+            include ::ActiveModel::Dirty
+          end.attribute_method_matchers.map(&:suffix).select { |m| m =~ /\A_/ }
       end
     end
   end

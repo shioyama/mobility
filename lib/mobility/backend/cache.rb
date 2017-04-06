@@ -35,7 +35,8 @@ this).
     module Cache
       # @group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **_)
+      def read(locale, **options)
+        return super if options[:cache] == false
         if write_to_cache? || cache.has_key?(locale)
           cache[locale]
         else

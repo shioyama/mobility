@@ -26,6 +26,12 @@ describe Mobility::Backend::Cache do
       2.times { expect(backend.read(:fr, options)).to eq("foo") }
     end
 
+    it "does not cache reads with cache: false option" do
+      backend = cached_backend_class.new("model", "attribute")
+      expect(backend.backend_double).to receive(:read).twice.with(:fr, options.merge(cache: false)).and_return("foo")
+      2.times { expect(backend.read(:fr, options.merge(cache: false))).to eq("foo") }
+    end
+
     it "always returns from cache if backend defines write_to_cache? to return true" do
       cache = double("cache")
       backend_class.class_eval do

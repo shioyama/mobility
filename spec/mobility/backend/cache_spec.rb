@@ -29,7 +29,7 @@ describe Mobility::Backend::Cache do
 
     it "does not cache reads with cache: false option" do
       backend = cached_backend_class.new("model", "attribute")
-      expect(backend.backend_double).to receive(:read).twice.with(locale, options.merge(cache: false)).and_return("foo")
+      expect(backend.backend_double).to receive(:read).twice.with(locale, options).and_return("foo")
       2.times { expect(backend.read(locale, options.merge(cache: false))).to eq("foo") }
     end
 

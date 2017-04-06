@@ -36,7 +36,7 @@ this).
       # @group Backend Accessors
       # @!macro backend_reader
       def read(locale, **options)
-        return super if options[:cache] == false
+        return super if options.delete(:cache) == false
         if write_to_cache? || cache.has_key?(locale)
           cache[locale]
         else

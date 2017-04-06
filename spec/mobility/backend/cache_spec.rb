@@ -86,76 +86,104 @@ describe Mobility::Backend::Cache do
     end
   end
 
-  context "ActiveRecord model", orm: :active_record do
-    before do
-      stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.include Mobility
-    end
+  describe "resetting cache on actions" do
+    shared_examples_for "cache that resets on model action" do |action, options = nil|
+      it "updates backend cache on #{action}" do
+        backend = @article.mobility_backend_for("title")
 
-    context "with one backend" do
-      before do
-        Article.translates :title, backend: backend_class, cache: true
-        @article = Article.create
-      end
+        aggregate_failures "reading and writing" do
+          expect(backend.backend_double).to receive(:write).with(:en, "foo", {}).and_return("foo set")
+          backend.write(:en, "foo")
+          expect(backend.read(:en)).to eq("foo set")
+        end
 
-      shared_examples_for "cache that resets on model action" do |action, options = nil|
-        it "updates backend cache on #{action}" do
-          backend = @article.mobility_backend_for("title")
-
-          aggregate_failures "reading and writing" do
-            expect(backend.backend_double).to receive(:write).with(:en, "foo", {}).and_return("foo set")
-            backend.write(:en, "foo")
-            expect(backend.read(:en)).to eq("foo set")
-          end
-
-          aggregate_failures "resetting model" do
-            options ? @article.send(action, options) : @article.send(action)
-            expect(backend.backend_double).to receive(:read).with(:en, {}).and_return("from backend")
-            expect(backend.read(:en)).to eq("from backend")
-          end
+        aggregate_failures "resetting model" do
+          options ? @article.send(action, options) : @article.send(action)
+          expect(backend.backend_double).to receive(:read).with(:en, {}).and_return("from backend")
+          expect(backend.read(:en)).to eq("from backend")
         end
       end
-
-      it_behaves_like "cache that resets on model action", :reload
-      it_behaves_like "cache that resets on model action", :reload, { readonly: true, lock: true }
-      it_behaves_like "cache that resets on model action", :save
     end
 
-    context "with multiple backends" do
-      before do
-        other_backend = Class.new(backend_class)
-        Article.translates :title,   backend: backend_class, cache: true
-        Article.translates :content, backend: other_backend, cache: true
-        @article = Article.create
-      end
+    shared_examples_for "cache that resets on model action with multiple backends" do |action, options = nil|
+      it "updates cache on both backends on #{action}" do
+        title_backend = @article.mobility_backend_for("title")
+        content_backend = @article.mobility_backend_for("content")
 
-      shared_examples_for "cache that resets on model action" do |action, options = nil|
-        it "updates cache on both backends on #{action}" do
-          title_backend = @article.mobility_backend_for("title")
-          content_backend = @article.mobility_backend_for("content")
+        aggregate_failures "reading and writing" do
+          expect(title_backend.backend_double).to receive(:write).with(:en, "foo", {}).and_return("foo set")
+          expect(content_backend.backend_double).to receive(:write).with(:en, "bar", {}).and_return("bar set")
+          title_backend.write(:en, "foo")
+          content_backend.write(:en, "bar")
+          expect(title_backend.read(:en)).to eq("foo set")
+          expect(content_backend.read(:en)).to eq("bar set")
+        end
 
-          aggregate_failures "reading and writing" do
-            expect(title_backend.backend_double).to receive(:write).with(:en, "foo", {}).and_return("foo set")
-            expect(content_backend.backend_double).to receive(:write).with(:en, "bar", {}).and_return("bar set")
-            title_backend.write(:en, "foo")
-            content_backend.write(:en, "bar")
-            expect(title_backend.read(:en)).to eq("foo set")
-            expect(content_backend.read(:en)).to eq("bar set")
-          end
-
-          aggregate_failures "resetting model" do
-            options ? @article.send(action, options) : @article.send(action)
-            expect(title_backend.backend_double).to receive(:read).with(:en, {}).and_return("from title backend")
-            expect(title_backend.read(:en)).to eq("from title backend")
-            expect(content_backend.backend_double).to receive(:read).with(:en, {}).and_return("from content backend")
-            expect(content_backend.read(:en)).to eq("from content backend")
-          end
+        aggregate_failures "resetting model" do
+          options ? @article.send(action, options) : @article.send(action)
+          expect(title_backend.backend_double).to receive(:read).with(:en, {}).and_return("from title backend")
+          expect(title_backend.read(:en)).to eq("from title backend")
+          expect(content_backend.backend_double).to receive(:read).with(:en, {}).and_return("from content backend")
+          expect(content_backend.read(:en)).to eq("from content backend")
         end
       end
+    end
 
-      it_behaves_like "cache that resets on model action", :reload
-      it_behaves_like "cache that resets on model action", :reload, { readonly: true, lock: true }
-      it_behaves_like "cache that resets on model action", :save
+    context "ActiveRecord model", orm: :active_record do
+      before do
+        stub_const 'Article', Class.new(ActiveRecord::Base)
+        Article.include Mobility
+      end
+
+      context "with one backend" do
+        before do
+          Article.translates :title, backend: backend_class, cache: true
+          @article = Article.create
+        end
+
+        it_behaves_like "cache that resets on model action", :reload
+        it_behaves_like "cache that resets on model action", :reload, { readonly: true, lock: true }
+        it_behaves_like "cache that resets on model action", :save
+      end
+
+      context "with multiple backends" do
+        before do
+          other_backend = Class.new(backend_class)
+          Article.translates :title,   backend: backend_class, cache: true
+          Article.translates :content, backend: other_backend, cache: true
+          @article = Article.create
+        end
+        it_behaves_like "cache that resets on model action with multiple backends", :reload
+        it_behaves_like "cache that resets on model action with multiple backends", :reload, { readonly: true, lock: true }
+        it_behaves_like "cache that resets on model action with multiple backends", :save
+      end
+    end
+
+    context "Sequel model", orm: :sequel do
+      before do
+        stub_const 'Article', Class.new(Sequel::Model)
+        Article.dataset = DB[:articles]
+        Article.include Mobility
+      end
+
+      context "with one backend" do
+        before do
+          Article.translates :title, backend: backend_class, cache: true
+          @article = Article.create
+        end
+
+        it_behaves_like "cache that resets on model action", :refresh
+      end
+
+      context "with multiple backends" do
+        before do
+          other_backend = Class.new(backend_class)
+          Article.translates :title,   backend: backend_class, cache: true
+          Article.translates :content, backend: other_backend, cache: true
+          @article = Article.create
+        end
+        it_behaves_like "cache that resets on model action with multiple backends", :refresh
+      end
     end
   end
 end

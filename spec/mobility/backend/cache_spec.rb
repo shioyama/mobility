@@ -3,119 +3,79 @@ require "spec_helper"
 describe Mobility::Backend::Cache do
   let(:backend_class) do
     Class.new(Mobility::Backend::Null) do
-      attr_reader :reads, :writes
-
-      def initialize(*)
-        @reads = @writes = 0
+      def read(*args)
+        backend_double.read(*args)
       end
 
-      def read(*)
-        @reads += 1
-        nil
+      def write(*args)
+        backend_double.write(*args)
       end
 
-      def write(locale, value, **options)
-        @writes += 1
-        value
+      def backend_double
+        @backend_double ||= RSpec::Mocks::Double.new("backend")
       end
     end
   end
+  let(:cached_backend_class) { Class.new(backend_class).include(described_class) }
+  let(:options) { { these: "options" } }
 
-  let(:cached_backend_class) do
-    Class.new(backend_class).include(described_class)
+  describe "#read" do
+    it "caches reads" do
+      backend = cached_backend_class.new("model", "attribute")
+      expect(backend.backend_double).to receive(:read).once.with(:fr, options).and_return("foo")
+      2.times { expect(backend.read(:fr, options)).to eq("foo") }
+    end
+
+    it "always returns from cache if backend defines write_to_cache? to return true" do
+      cache = double("cache")
+      backend_class.class_eval do
+        def write_to_cache?
+          true
+        end
+
+        define_method :new_cache do
+          cache
+        end
+      end
+      backend = cached_backend_class.new("model", "attribute")
+      expect(backend.backend_double).not_to receive(:read)
+      expect(cache).to receive(:[]).twice.with(:fr).and_return("foo")
+      2.times { expect(backend.read(:fr, options)).to eq("foo") }
+    end
   end
 
-  context "non-ActiveRecord model" do
-    let(:model_class) do
-      Class.new do
-        def title; end
-        def title=(value); value; end
-      end
-    end
-    let(:model) { model_class.new }
-
-    describe "caching reads" do
-      it "retrieves value from backend every time with no cache" do
-        backend = backend_class.new(model, "title")
-        3.times { backend.read(:en) }
-        expect(backend.reads).to eq(3)
-        expect(backend.writes).to eq(0)
-      end
-
-      it "retrieves value from backend on first read only with cache" do
-        backend = cached_backend_class.new(model, "title")
-        3.times { backend.read(:en) }
-        expect(backend.reads).to eq(1)
-        expect(backend.writes).to eq(0)
-      end
+  describe "#write" do
+    it "returns value fetched from backend" do
+      backend = cached_backend_class.new("model", "attribute")
+      expect(backend.backend_double).to receive(:write).twice.with(:fr, "foo", options).and_return("bar")
+      2.times { expect(backend.write(:fr, "foo", options)).to eq("bar") }
     end
 
-    describe "updating on writes" do
-      it "writes to backend and updates cache" do
-        backend = cached_backend_class.new(model, "title")
-        expect(backend.read(:en)).to eq(nil)
-        expect(backend.write(:en, "foo")).to eq("foo")
-        expect(backend.read(:en)).to eq("foo")
-        expect(backend.write(:en, "bar")).to eq("bar")
-        expect(backend.read(:en)).to eq("bar")
-        expect(backend.reads).to eq(1)
-        expect(backend.writes).to eq(2)
-      end
+    it "stores value fetched from backend in cache" do
+      cache = double("cache")
+      backend_class.class_eval do
+        def write_to_cache?
+          true
+        end
 
-      context "with write_to_cache enabled" do
-        it "updates cache but does not write to or read from backend" do
-          klass = Class.new(backend_class) do
-            def write_to_cache?; true; end
-          end
-          backend = Class.new(klass).include(described_class).new(model, "title")
-          expect(backend.read(:en)).to eq(nil)
-          expect(backend.write(:en, "foo")).to eq("foo")
-          expect(backend.read(:en)).to eq("foo")
-          expect(backend.write(:en, "bar")).to eq("bar")
-          expect(backend.read(:en)).to eq("bar")
-          expect(backend.reads).to eq(0)
-          expect(backend.writes).to eq(0)
+        define_method :new_cache do
+          cache
         end
       end
+      backend = cached_backend_class.new("model", "attribute")
+      expect(backend.backend_double).not_to receive(:write)
+      expect(cache).to receive(:[]=).twice.with(:fr, "foo")
+      2.times { expect(backend.write(:fr, "foo", options)).to eq("foo") }
     end
+  end
 
-    describe "with custom cache class" do
-      it "uses custom class" do
-        hash = {}
-        klass = Class.new(backend_class) do
-          define_method :new_cache do
-            hash
-          end
-        end
-        backend = Class.new(klass).include(described_class).new(model, "title")
-        expect(hash).to receive(:has_key?).with(:en).and_return(true)
-        expect(hash).to receive(:[]).with(:en).and_return("foo")
-        expect(backend.read(:en)).to eq("foo")
-      end
-    end
-
-    describe "with two instances" do
-      it "does not share cache between instances" do
-        backend = cached_backend_class.new(model, "title")
-        other_backend = cached_backend_class.new(model_class.new, "title")
-        expect(backend.read(:en)).to eq(nil)
-        expect(other_backend.read(:en)).to eq(nil)
-        backend.write(:en, "foo")
-        other_backend.write(:en, "bar")
-        expect(backend.read(:en)).to eq("foo")
-        expect(other_backend.read(:en)).to eq("bar")
-      end
-    end
-
-    describe "#clear_cache" do
-      it "clears cache" do
-        backend = cached_backend_class.new(model, "title")
-        expect(backend.read(:en)).to eq(nil)
-        backend.write(:en, "foo")
-        expect(backend.read(:en)).to eq("foo")
-        backend.clear_cache
-        expect(backend.read(:en)).to eq(nil)
-      end
+  describe "#clear_cache" do
+    it "reads from backend after cache cleared" do
+      backend = cached_backend_class.new("model", "attribute")
+      expect(backend.backend_double).to receive(:read).twice.with(:fr, options).and_return("foo")
+      2.times { expect(backend.read(:fr, options)).to eq("foo") }
+      backend.clear_cache
+      expect(backend.read(:fr, options)).to eq("foo")
     end
   end
 
@@ -134,10 +94,18 @@ describe Mobility::Backend::Cache do
       shared_examples_for "cache that resets on model action" do |action, options = nil|
         it "updates backend cache on #{action}" do
           backend = @article.mobility_backend_for("title")
-          backend.write(:en, "foo")
-          expect(backend.read(:en)).to eq("foo")
-          options ? @article.send(action, options) : @article.send(action)
-          expect(backend.read(:en)).to eq(nil)
+
+          aggregate_failures "reading and writing" do
+            expect(backend.backend_double).to receive(:write).with(:en, "foo", {}).and_return("foo set")
+            backend.write(:en, "foo")
+            expect(backend.read(:en)).to eq("foo set")
+          end
+
+          aggregate_failures "resetting model" do
+            options ? @article.send(action, options) : @article.send(action)
+            expect(backend.backend_double).to receive(:read).with(:en, {}).and_return("from backend")
+            expect(backend.read(:en)).to eq("from backend")
+          end
         end
       end
 
@@ -158,13 +126,23 @@ describe Mobility::Backend::Cache do
         it "updates cache on both backends on #{action}" do
           title_backend = @article.mobility_backend_for("title")
           content_backend = @article.mobility_backend_for("content")
-          title_backend.write(:en, "foo")
-          content_backend.write(:en, "bar")
-          expect(title_backend.read(:en)).to eq("foo")
-          expect(content_backend.read(:en)).to eq("bar")
-          options ? @article.send(action, options) : @article.send(action)
-          expect(title_backend.read(:en)).to eq(nil)
-          expect(content_backend.read(:en)).to eq(nil)
+
+          aggregate_failures "reading and writing" do
+            expect(title_backend.backend_double).to receive(:write).with(:en, "foo", {}).and_return("foo set")
+            expect(content_backend.backend_double).to receive(:write).with(:en, "bar", {}).and_return("bar set")
+            title_backend.write(:en, "foo")
+            content_backend.write(:en, "bar")
+            expect(title_backend.read(:en)).to eq("foo set")
+            expect(content_backend.read(:en)).to eq("bar set")
+          end
+
+          aggregate_failures "resetting model" do
+            options ? @article.send(action, options) : @article.send(action)
+            expect(title_backend.backend_double).to receive(:read).with(:en, {}).and_return("from title backend")
+            expect(title_backend.read(:en)).to eq("from title backend")
+            expect(content_backend.backend_double).to receive(:read).with(:en, {}).and_return("from content backend")
+            expect(content_backend.read(:en)).to eq("from content backend")
+          end
         end
       end
 

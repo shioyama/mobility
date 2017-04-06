@@ -74,6 +74,19 @@ describe Mobility::Backend::Cache do
       expect(cache).to receive(:[]=).twice.with(locale, "foo")
       2.times { expect(backend.write(locale, "foo", options)).to eq("foo") }
     end
+
+    it "does not store value in cache with cache: false option" do
+      cache = double("cache")
+      backend_class.class_eval do
+        define_method :new_cache do
+          cache
+        end
+      end
+      backend = cached_backend_class.new("model", "attribute")
+      expect(backend.backend_double).to receive(:write).once.with(locale, "foo", options).and_return("bar")
+      expect(backend).not_to receive(:write_to_cache?)
+      expect(backend.write(locale, "foo", options.merge(cache: false))).to eq("bar")
+    end
   end
 
   describe "#clear_cache" do

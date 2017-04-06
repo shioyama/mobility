@@ -35,6 +35,7 @@ this).
     module Cache
       # @group Backend Accessors
       # @!macro backend_reader
+      # @param [Hash] options
       # @param [Boolean] cache
       #   *false* to disable cache.
       def read(locale, **options)
@@ -47,7 +48,11 @@ this).
       end
 
       # @!macro backend_writer
-      def write(locale, value, **_)
+      # @param [Hash] options
+      # @param [Boolean] cache
+      #   *false* to disable cache.
+      def write(locale, value, **options)
+        return super if options.delete(:cache) == false
         cache[locale] = write_to_cache? ? value : super
       end
       # @!endgroup

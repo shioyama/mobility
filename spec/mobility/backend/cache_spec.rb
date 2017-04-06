@@ -18,18 +18,19 @@ describe Mobility::Backend::Cache do
   end
   let(:cached_backend_class) { Class.new(backend_class).include(described_class) }
   let(:options) { { these: "options" } }
+  let(:locale) { :cz }
 
   describe "#read" do
     it "caches reads" do
       backend = cached_backend_class.new("model", "attribute")
-      expect(backend.backend_double).to receive(:read).once.with(:fr, options).and_return("foo")
-      2.times { expect(backend.read(:fr, options)).to eq("foo") }
+      expect(backend.backend_double).to receive(:read).once.with(locale, options).and_return("foo")
+      2.times { expect(backend.read(locale, options)).to eq("foo") }
     end
 
     it "does not cache reads with cache: false option" do
       backend = cached_backend_class.new("model", "attribute")
-      expect(backend.backend_double).to receive(:read).twice.with(:fr, options.merge(cache: false)).and_return("foo")
-      2.times { expect(backend.read(:fr, options.merge(cache: false))).to eq("foo") }
+      expect(backend.backend_double).to receive(:read).twice.with(locale, options.merge(cache: false)).and_return("foo")
+      2.times { expect(backend.read(locale, options.merge(cache: false))).to eq("foo") }
     end
 
     it "always returns from cache if backend defines write_to_cache? to return true" do
@@ -45,16 +46,16 @@ describe Mobility::Backend::Cache do
       end
       backend = cached_backend_class.new("model", "attribute")
       expect(backend.backend_double).not_to receive(:read)
-      expect(cache).to receive(:[]).twice.with(:fr).and_return("foo")
-      2.times { expect(backend.read(:fr, options)).to eq("foo") }
+      expect(cache).to receive(:[]).twice.with(locale).and_return("foo")
+      2.times { expect(backend.read(locale, options)).to eq("foo") }
     end
   end
 
   describe "#write" do
     it "returns value fetched from backend" do
       backend = cached_backend_class.new("model", "attribute")
-      expect(backend.backend_double).to receive(:write).twice.with(:fr, "foo", options).and_return("bar")
-      2.times { expect(backend.write(:fr, "foo", options)).to eq("bar") }
+      expect(backend.backend_double).to receive(:write).twice.with(locale, "foo", options).and_return("bar")
+      2.times { expect(backend.write(locale, "foo", options)).to eq("bar") }
     end
 
     it "stores value fetched from backend in cache" do
@@ -70,18 +71,18 @@ describe Mobility::Backend::Cache do
       end
       backend = cached_backend_class.new("model", "attribute")
       expect(backend.backend_double).not_to receive(:write)
-      expect(cache).to receive(:[]=).twice.with(:fr, "foo")
-      2.times { expect(backend.write(:fr, "foo", options)).to eq("foo") }
+      expect(cache).to receive(:[]=).twice.with(locale, "foo")
+      2.times { expect(backend.write(locale, "foo", options)).to eq("foo") }
     end
   end
 
   describe "#clear_cache" do
     it "reads from backend after cache cleared" do
       backend = cached_backend_class.new("model", "attribute")
-      expect(backend.backend_double).to receive(:read).twice.with(:fr, options).and_return("foo")
-      2.times { expect(backend.read(:fr, options)).to eq("foo") }
+      expect(backend.backend_double).to receive(:read).twice.with(locale, options).and_return("foo")
+      2.times { expect(backend.read(locale, options)).to eq("foo") }
       backend.clear_cache
-      expect(backend.read(:fr, options)).to eq("foo")
+      expect(backend.read(locale, options)).to eq("foo")
     end
   end
 

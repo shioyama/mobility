@@ -534,6 +534,9 @@ class Word < ApplicationRecord
 end
 ```
 
+You can also turn off the cache for a single fetch by passing `cache: false` to
+the getter method, i.e. `post.title(cache: false)`.
+
 The cache is normally just a hash with locale keys and string (translation)
 values, but some backends (e.g. KeyValue and Table backends) have slightly more
 complex implementations.

@@ -35,6 +35,8 @@ this).
     module Cache
       # @group Backend Accessors
       # @!macro backend_reader
+      # @param [Boolean] cache
+      #   *false* to disable cache.
       def read(locale, **options)
         return super if options.delete(:cache) == false
         if write_to_cache? || cache.has_key?(locale)

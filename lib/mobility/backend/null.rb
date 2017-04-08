@@ -17,7 +17,7 @@ Backend which does absolutely nothing. Mostly for testing purposes.
       # @!endgroup
 
       # @!group Backend Configuration
-      def self.configure!(*); end
+      def self.configure(*); end
       # @!endgroup
     end
   end

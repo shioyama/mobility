@@ -50,7 +50,7 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
       # @option options [Symbol] class_name ({Mobility::Sequel::TextTranslation}) Translation class
       # @raise [CacheRequired] if cache is disabled
       # @raise [ArgumentError] if type is not either :text or :string
-      def self.configure!(options)
+      def self.configure(options)
         super
         raise CacheRequired, "Cache required for Sequel::KeyValue backend" if options[:cache] == false
         type = options[:type]

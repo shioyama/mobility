@@ -117,7 +117,7 @@ columns to that table.
       # @option options [Symbol] foreign_key Name of foreign key
       # @option options [Symbol] subclass_name (:Translation) Name of subclass
       #   to append to model class to generate translation class
-      def self.configure!(options)
+      def self.configure(options)
         table_name = options[:model_class].table_name
         options[:table_name]  ||= "#{table_name.singularize}_translations".freeze
         options[:foreign_key] ||= table_name.downcase.singularize.camelize.foreign_key

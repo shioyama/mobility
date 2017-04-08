@@ -28,7 +28,7 @@ Implements the {Mobility::Backend::Column} backend for Sequel models.
       end
 
       # @!group Backend Configuration
-      def self.configure!(options)
+      def self.configure(options)
         options[:locale_accessors] = false
       end
       # @!endgroup

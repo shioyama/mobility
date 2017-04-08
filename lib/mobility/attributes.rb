@@ -141,7 +141,7 @@ with other backends.
       end
       include FallthroughAccessors.new(*attributes) if options[:fallthrough_accessors]
 
-      @backend_class.configure!(options) if @backend_class.respond_to?(:configure!)
+      @backend_class.configure(options) if @backend_class.respond_to?(:configure)
 
       include_backend_modules(@backend_class, options)
 

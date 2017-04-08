@@ -47,7 +47,7 @@ or locales.)
       end
 
       # @!group Backend Configuration
-      def self.configure!(options)
+      def self.configure(options)
         options[:locale_accessors] = false
       end
       # @!endgroup

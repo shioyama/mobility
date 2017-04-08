@@ -49,7 +49,7 @@ class.
         # @!group Backend Configuration
         # @option options [Symbol,String] type (:text) Column type to use
         # @raise [ArgumentError] if type is not either :text or :string
-        def configure!(options)
+        def configure(options)
           options[:type] = (options[:type] || :text).to_sym
           raise ArgumentError, "type must be one of: [text, string]" unless [:text, :string].include?(options[:type])
         end

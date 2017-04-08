@@ -267,10 +267,10 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
     end
   end
 
-  describe ".configure!" do
+  describe ".configure" do
     it "sets association_name and class_name from string type" do
       options = { type: :string }
-      described_class.configure!(options)
+      described_class.configure(options)
       expect(options).to eq({
         type: :string,
         class_name: Mobility::ActiveRecord::StringTranslation,
@@ -280,7 +280,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
 
     it "sets association_name and class_name from text type" do
       options = { type: :text }
-      described_class.configure!(options)
+      described_class.configure(options)
       expect(options).to eq({
         type: :text,
         class_name: Mobility::ActiveRecord::TextTranslation,
@@ -289,12 +289,12 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
     end
 
     it "raises ArgumentError if type is not string or text" do
-      expect { described_class.configure!(type: :foo) }.to raise_error(ArgumentError)
+      expect { described_class.configure(type: :foo) }.to raise_error(ArgumentError)
     end
 
     it "sets default association_name, class_name and type" do
       options = {}
-      described_class.configure!(options)
+      described_class.configure(options)
       expect(options).to eq({
         association_name: :mobility_text_translations,
         class_name: Mobility::ActiveRecord::TextTranslation,

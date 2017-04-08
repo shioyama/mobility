@@ -18,7 +18,7 @@ On top of this, a backend will normally:
 
 - implement a +read+ instance method to read from the backend
 - implement a +write+ instance method to write to the backend
-- implement a +configure!+ class method to apply any normalization to the
+- implement a +configure+ class method to apply any normalization to the
   options hash
 - call the +setup+ method yielding attributes and options to configure the
   model class
@@ -35,7 +35,7 @@ On top of this, a backend will normally:
       # ...
     end
 
-    def self.configure!(options)
+    def self.configure(options)
       # ...
     end
 

@@ -41,7 +41,7 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
       # @option options [Symbol] foreign_key Name of foreign key
       # @option options [Symbol] subclass_name Name of subclass to append to model class to generate translation class
       # @raise [CacheRequired] if cache option is false
-      def self.configure!(options)
+      def self.configure(options)
         raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
         table_name = options[:model_class].table_name
         options[:table_name]  ||= :"#{table_name.to_s.singularize}_translations"

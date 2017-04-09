@@ -10,7 +10,6 @@ describe Mobility::FallthroughAccessors do
     klass.include described_class.new(:title)
     klass
   end
-  let(:options) { { these: "options" } }
 
   it_behaves_like "locale accessor", :title, :en
   it_behaves_like "locale accessor", :title, :de

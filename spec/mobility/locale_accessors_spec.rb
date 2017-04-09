@@ -8,7 +8,6 @@ describe Mobility::LocaleAccessors do
       def title=(_value, **_); end
     end
   end
-  let(:options) { { these: "options" } }
 
   context "locales unset, uses I18n.available_locales" do
     before do
@@ -31,7 +30,7 @@ describe Mobility::LocaleAccessors do
       aggregate_failures do
         expect { instance.title_de }.to raise_error(NoMethodError)
         expect { instance.title_de? }.to raise_error(NoMethodError)
-        expect { instance.send(:title_de=, "value", options) }.to raise_error(NoMethodError)
+        expect { instance.send(:title_de=, "value", {}) }.to raise_error(NoMethodError)
       end
     end
   end
@@ -49,7 +48,7 @@ describe Mobility::LocaleAccessors do
       aggregate_failures do
         expect { instance.title_en }.to raise_error(NoMethodError)
         expect { instance.title_en? }.to raise_error(NoMethodError)
-        expect { instance.send(:title_en=, "value", options) }.to raise_error(NoMethodError)
+        expect { instance.send(:title_en=, "value", {}) }.to raise_error(NoMethodError)
       end
     end
   end

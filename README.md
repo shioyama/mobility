@@ -761,6 +761,12 @@ can be changed, see the shared examples for details.
 Backends are also each tested against specialized specs targeted at their
 particular implementations.
 
+Integrations
+------------
+
+* [friendly_id-mobility](https://github.com/shioyama/friendly_id-mobility): Use
+  Mobility with [FriendlyId](https://github.com/norman/friendly_id).
+
 More Information
 ----------------
 

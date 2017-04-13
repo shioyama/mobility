@@ -22,7 +22,7 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
               contains "Mobility.configure do |config|"
               contains "config.default_backend = :key_value"
               contains "config.accessor_method = :translates"
-              contains "config.query_method = :i18n"
+              contains "config.query_method    = :i18n"
             end
           end
         end

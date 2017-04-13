@@ -21,10 +21,7 @@ module Mobility
     end
 
     def create_initializer
-      create_file(
-        "config/initializers/mobility.rb",
-        "Mobility.configure do |config|\n  config.default_backend = :key_value\n  config.accessor_method = :translates\n  config.query_method = :i18n\nend"
-      )
+      copy_file "initializer.rb", "config/initializers/mobility.rb"
     end
 
     def self.next_migration_number(dirname)

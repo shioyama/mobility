@@ -9,6 +9,10 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Symbol]
     attr_accessor :accessor_method
 
+    # Name of query scope/dataset method (defaults to +i18n+)
+    # @return [Symbol]
+    attr_accessor :query_method
+
     # Default fallbacks instance
     # @return [I18n::Locale::Fallbacks]
     def default_fallbacks(fallbacks = {})
@@ -34,6 +38,7 @@ Stores shared Mobility configuration referenced by all backends.
 
     def initialize
       @accessor_method = :translates
+      @query_method = :i18n
       @default_fallbacks = lambda { |fallbacks| I18n::Locale::Fallbacks.new(fallbacks) }
       @default_accessor_locales = lambda { I18n.available_locales }
     end

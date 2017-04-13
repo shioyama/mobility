@@ -25,7 +25,7 @@ Implements the {Mobility::Backend::Hstore} backend for Sequel models.
 
       setup do |attributes, options|
         extension = Module.new do
-          define_method :i18n do
+          define_method ::Mobility.query_method do
             @mobility_scope ||= super().with_extend(QueryMethods.new(attributes, options))
           end
         end

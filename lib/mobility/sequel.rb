@@ -18,7 +18,7 @@ Module loading Sequel-specific classes for Mobility models.
 
     module ClassMethods
       # @return [Sequel::Dataset] dataset extended with Mobility query methods.
-      def i18n
+      define_method ::Mobility.query_method do
         dataset
       end
     end

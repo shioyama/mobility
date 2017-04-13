@@ -89,7 +89,7 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
         after_destroy :mobility_destroy_key_value_translations
 
         mod = Module.new do
-          define_method :i18n do
+          define_method ::Mobility.query_method do
             @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
           end
         end

@@ -31,7 +31,7 @@ Module loading ActiveRecord-specific classes for Mobility models.
 
     module ClassMethods
       # @return [ActiveRecord::Relation] relation extended with Mobility query methods.
-      def i18n
+      define_method ::Mobility.query_method do
         all
       end
     end

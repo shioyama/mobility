@@ -84,8 +84,8 @@ This allows a backend to do things like (for example) define associations on a
 model class required by the backend, as happens in the {Backend::KeyValue} and
 {Backend::Table} backends.
 
-The +setup+ block is also used to extend the +i18n+ scope/dataset with
-backend-specific query method support.
+The +setup+ block is also used to extend the query scope/dataset (+i18n+ by
+default) with backend-specific query method support.
 
 Since setup blocks are evaluated on the model class, it is possible that
 backends can conflict (for example, overwriting previously defined methods).

@@ -32,7 +32,7 @@ Implements the {Mobility::Backend::Jsonb} backend for ActiveRecord models.
 
       setup do |attributes, options|
         query_methods = Module.new do
-          define_method :i18n do
+          define_method ::Mobility.query_method do
             @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
           end
         end

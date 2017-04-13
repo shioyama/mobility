@@ -53,7 +53,7 @@ Implements {Mobility::Backend::Serialized} backend for ActiveRecord models.
         attributes.each { |attribute| serialize attribute, coder }
 
         extension = Module.new do
-          define_method :i18n do
+          define_method ::Mobility.query_method do
             @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
           end
         end

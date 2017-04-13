@@ -23,7 +23,7 @@ module Mobility
     def create_initializer
       create_file(
         "config/initializers/mobility.rb",
-        "Mobility.configure do |config|\n  config.default_backend = :key_value\n  config.accessor_method = :translates\nend"
+        "Mobility.configure do |config|\n  config.default_backend = :key_value\n  config.accessor_method = :translates\n  config.query_method = :i18n\nend"
       )
     end
 

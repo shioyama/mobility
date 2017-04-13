@@ -14,6 +14,21 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
       run_generator
     end
 
+    it "generates initializer" do
+      expect(destination_root).to have_structure {
+        directory "config" do
+          directory "initializers" do
+            file "mobility.rb" do
+              contains "Mobility.configure do |config|"
+              contains "config.default_backend = :key_value"
+              contains "config.accessor_method = :translates"
+              contains "config.query_method = :i18n"
+            end
+          end
+        end
+      }
+    end
+
     it "generates migration for text translations table" do
       expect(destination_root).to have_structure {
         directory "db" do

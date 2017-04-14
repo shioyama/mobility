@@ -17,11 +17,11 @@ Adds {#for} method to backend to return ORM-specific backend.
       # @return [Class] Class of backend to use for model
       def for(model_class)
         if Loaded::ActiveRecord && model_class < ::ActiveRecord::Base
-          const_get(name.split("::").insert(-2, "ActiveRecord").join("::"))
+          const_get(name.split("::".freeze).insert(-2, "ActiveRecord".freeze).join("::".freeze))
         elsif Loaded::Sequel && model_class < ::Sequel::Model
-          const_get(name.split("::").insert(-2, "Sequel").join("::"))
+          const_get(name.split("::".freeze).insert(-2, "Sequel".freeze).join("::".freeze))
         else
-          raise ArgumentError, "#{name.split('::').last} backend can only be used by ActiveRecord or Sequel models"
+          raise ArgumentError, "#{name.split('::'.freeze).last} backend can only be used by ActiveRecord or Sequel models".freeze
         end
       end
 

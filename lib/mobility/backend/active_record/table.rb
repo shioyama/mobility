@@ -84,9 +84,9 @@ columns to that table.
   #  title: "bar">
 =end
     class ActiveRecord::Table
-      include Backend
+      include ActiveRecord
 
-      autoload :QueryMethods, 'mobility/backend/active_record/table/query_methods'
+      require 'mobility/backend/active_record/table/query_methods'
 
       # @return [Symbol] name of the association method
       attr_reader :association_name
@@ -157,14 +157,9 @@ columns to that table.
           class_name:  name,
           foreign_key: options[:foreign_key],
           inverse_of:  association_name
-
-        query_methods = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
-          end
-        end
-        extend query_methods
       end
+
+      setup_query_methods(QueryMethods)
 
       # @!group Cache Methods
       # @return [Table::TranslationsCache]

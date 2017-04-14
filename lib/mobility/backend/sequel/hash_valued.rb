@@ -6,7 +6,7 @@ Internal class used by Sequel backends that store values as a hash.
 
 =end
     class Sequel::HashValued
-      include Backend
+      include Sequel
 
       # @!macro backend_reader
       def read(locale, **_)

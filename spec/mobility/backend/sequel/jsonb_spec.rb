@@ -35,4 +35,4 @@ describe Mobility::Backend::Sequel::Jsonb, orm: :sequel, db: :postgres do
       expect(post.title).to eq(1)
     end
   end
-end
+end if Mobility::Loaded::Sequel

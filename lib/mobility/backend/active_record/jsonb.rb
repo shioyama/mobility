@@ -10,7 +10,7 @@ Implements the {Mobility::Backend::Jsonb} backend for ActiveRecord models.
 
 =end
     class ActiveRecord::Jsonb < ActiveRecord::HashValued
-      autoload :QueryMethods, 'mobility/backend/active_record/jsonb/query_methods'
+      require 'mobility/backend/active_record/jsonb/query_methods'
 
       # @!group Backend Accessors
       #
@@ -30,14 +30,7 @@ Implements the {Mobility::Backend::Jsonb} backend for ActiveRecord models.
       # @return [String,Integer,Boolean] Updated value
       # @!method write(locale, value, **options)
 
-      setup do |attributes, options|
-        query_methods = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
-          end
-        end
-        extend query_methods
-      end
+      setup_query_methods(QueryMethods)
     end
   end
 end

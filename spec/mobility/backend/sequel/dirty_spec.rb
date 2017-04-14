@@ -203,4 +203,4 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
       end
     end
   end
-end
+end if Mobility::Loaded::Sequel

@@ -190,4 +190,4 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       end
     end
   end
-end
+end if Mobility::Loaded::ActiveRecord

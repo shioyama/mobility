@@ -21,10 +21,10 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
 
 =end
     class ActiveRecord::KeyValue
-      include Backend
-      include Backend::KeyValue
+      include ActiveRecord
+      include KeyValue
 
-      autoload :QueryMethods, 'mobility/backend/active_record/key_value/query_methods'
+      require 'mobility/backend/active_record/key_value/query_methods'
 
       # @return [Symbol] Name of the association
       attr_reader :association_name
@@ -88,13 +88,6 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
         end
         after_destroy :mobility_destroy_key_value_translations
 
-        mod = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
-          end
-        end
-        extend mod
-
         private
 
         # Clean up *all* leftover translations of this model, only once.
@@ -105,6 +98,8 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
           end
         end unless private_instance_methods(false).include?(:mobility_destroy_key_value_translations)
       end
+
+      setup_query_methods(QueryMethods)
 
       # @!group Cache Methods
       # @return [KeyValue::TranslationsCache]

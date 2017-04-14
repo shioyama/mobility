@@ -98,4 +98,4 @@ describe Mobility::Backend::ActiveRecord::Column, orm: :active_record do
   describe "mobility scope (.i18n)" do
     include_querying_examples 'Comment', :content, :author
   end
-end
+end if Mobility::Loaded::ActiveRecord

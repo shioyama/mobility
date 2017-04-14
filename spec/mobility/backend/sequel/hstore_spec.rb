@@ -26,4 +26,4 @@ describe Mobility::Backend::Sequel::Hstore, orm: :sequel, db: :postgres do
       expect(post.title_before_mobility.to_hash).to eq({ "en" => "{:foo=>:bar}" })
     end
   end
-end
+end if Mobility::Loaded::Sequel

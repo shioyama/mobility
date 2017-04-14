@@ -34,4 +34,4 @@ describe Mobility::Backend::ActiveRecord::Jsonb, orm: :active_record, db: :postg
       expect(post.title).to eq(1)
     end
   end
-end
+end if Mobility::Loaded::ActiveRecord

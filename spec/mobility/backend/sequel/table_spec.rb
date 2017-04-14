@@ -123,4 +123,4 @@ describe Mobility::Backend::Sequel::Table, orm: :sequel do
     before { Article.translates :title, :content, backend: :table, cache: true }
     include_querying_examples('Article')
   end
-end
+end if Mobility::Loaded::Sequel

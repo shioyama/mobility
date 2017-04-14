@@ -8,6 +8,21 @@ module Mobility
       autoload :Serialized,   'mobility/backend/active_record/serialized'
       autoload :QueryMethods, 'mobility/backend/active_record/query_methods'
       autoload :Table,        'mobility/backend/active_record/table'
+
+      def setup_query_methods(query_methods)
+        setup do |attributes, options|
+          extend(Module.new do
+            define_method ::Mobility.query_method do
+              @mobility_scope ||= super().extending(query_methods.new(attributes, options))
+            end
+          end)
+        end
+      end
+
+      def self.included(backend_class)
+        backend_class.include(Backend)
+        backend_class.extend(self)
+      end
     end
   end
 end

@@ -21,9 +21,9 @@ Implements {Mobility::Backend::Serialized} backend for ActiveRecord models.
 
 =end
     class ActiveRecord::Serialized
-      include Backend
+      include ActiveRecord
 
-      autoload :QueryMethods, 'mobility/backend/active_record/serialized/query_methods'
+      require 'mobility/backend/active_record/serialized/query_methods'
 
       # @!group Backend Accessors
       #
@@ -51,14 +51,9 @@ Implements {Mobility::Backend::Serialized} backend for ActiveRecord models.
       setup do |attributes, options|
         coder = { yaml: YAMLCoder, json: JSONCoder }[options[:format]]
         attributes.each { |attribute| serialize attribute, coder }
-
-        extension = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
-          end
-        end
-        extend extension
       end
+
+      setup_query_methods(QueryMethods)
 
       # @!group Cache Methods
       # Returns column value as a hash

@@ -28,9 +28,9 @@ Sequel serialization plugin.
 
 =end
     class Sequel::Serialized
-      include Backend
+      include Sequel
 
-      autoload :QueryMethods, 'mobility/backend/sequel/serialized/query_methods'
+      require 'mobility/backend/sequel/serialized/query_methods'
 
       # @!group Backend Accessors
       #
@@ -74,15 +74,10 @@ Sequel serialization plugin.
         end
         include method_overrides
 
-        extension = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_dataset ||= super().with_extend(QueryMethods.new(attributes, options))
-          end
-        end
-        extend extension
-
         include SerializationModificationDetectionFix
       end
+
+      setup_query_methods(QueryMethods)
 
       # Returns deserialized column value
       # @return [Hash]

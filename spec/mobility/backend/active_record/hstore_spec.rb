@@ -25,4 +25,4 @@ describe Mobility::Backend::ActiveRecord::Hstore, orm: :active_record, db: :post
       expect(post.read_attribute(:title)).to match_hash({ en: "{:foo=>:bar}" })
     end
   end
-end
+end if Mobility::Loaded::ActiveRecord

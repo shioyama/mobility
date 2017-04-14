@@ -372,4 +372,4 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
       end
     end
   end
-end
+end if Mobility::Loaded::ActiveRecord

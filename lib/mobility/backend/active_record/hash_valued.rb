@@ -6,7 +6,7 @@ Internal class used by ActiveRecord backends that store values as a hash.
 
 =end
     class ActiveRecord::HashValued
-      include Backend
+      include ActiveRecord
 
       # @!group Backend Accessors
       #

@@ -12,10 +12,10 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
 
 =end
     class Sequel::KeyValue
-      include Backend
-      include Backend::KeyValue
+      include Sequel
+      include KeyValue
 
-      autoload :QueryMethods, 'mobility/backend/sequel/key_value/query_methods'
+      require 'mobility/backend/sequel/key_value/query_methods'
 
       # @return [Symbol] name of the association
       attr_reader :association_name
@@ -91,13 +91,6 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
         end
         include callback_methods
 
-        extension = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_dataset ||= super().with_extend(QueryMethods.new(attributes, options))
-          end
-        end
-        extend extension
-
         include Mobility::Sequel::ColumnChanges.new(attributes)
 
         private
@@ -116,6 +109,8 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
         end unless respond_to?(:mobility_key_value_callbacks_module, true)
         include mobility_key_value_callbacks_module
       end
+
+      setup_query_methods(QueryMethods)
 
       # @!group Cache Methods
       # @return [KeyValue::TranslationsCache]

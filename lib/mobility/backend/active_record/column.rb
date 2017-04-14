@@ -29,10 +29,10 @@ or locales.)
   #=> "foo"
 =end
     class ActiveRecord::Column
-      include Backend
-      include Backend::Column
+      include ActiveRecord
+      include Column
 
-      autoload :QueryMethods, 'mobility/backend/active_record/column/query_methods'
+      require 'mobility/backend/active_record/column/query_methods'
 
       # @!group Backend Accessors
       # @!macro backend_reader
@@ -52,14 +52,7 @@ or locales.)
       end
       # @!endgroup
 
-      setup do |attributes, options|
-        mod = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_scope ||= super().extending(QueryMethods.new(attributes, options))
-          end
-        end
-        extend mod
-      end
+      setup_query_methods(QueryMethods)
     end
   end
 end

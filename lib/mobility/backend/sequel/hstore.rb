@@ -10,7 +10,7 @@ Implements the {Mobility::Backend::Hstore} backend for Sequel models.
 
 =end
     class Sequel::Hstore < Sequel::HashValued
-      autoload :QueryMethods, 'mobility/backend/sequel/hstore/query_methods'
+      require 'mobility/backend/sequel/hstore/query_methods'
 
       # @!group Backend Accessors
       # @!macro backend_reader
@@ -23,14 +23,7 @@ Implements the {Mobility::Backend::Hstore} backend for Sequel models.
       end
       # @!endgroup
 
-      setup do |attributes, options|
-        extension = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_dataset ||= super().with_extend(QueryMethods.new(attributes, options))
-          end
-        end
-        extend extension
-      end
+      setup_query_methods(QueryMethods)
     end
   end
 end

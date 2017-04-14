@@ -10,7 +10,7 @@ Implements the {Mobility::Backend::Jsonb} backend for Sequel models.
 
 =end
     class Sequel::Jsonb < Sequel::HashValued
-      autoload :QueryMethods, 'mobility/backend/sequel/jsonb/query_methods'
+      require 'mobility/backend/sequel/jsonb/query_methods'
 
       # @!group Backend Accessors
       #
@@ -30,14 +30,7 @@ Implements the {Mobility::Backend::Jsonb} backend for Sequel models.
       # @return [String,Integer,Boolean] Updated value
       # @!method write(locale, value, **options)
 
-      setup do |attributes, options|
-        extension = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_dataset ||= super().with_extend(QueryMethods.new(attributes, options))
-          end
-        end
-        extend extension
-      end
+      setup_query_methods(QueryMethods)
     end
   end
 end

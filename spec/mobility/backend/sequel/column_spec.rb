@@ -101,4 +101,4 @@ describe Mobility::Backend::Sequel::Column, orm: :sequel do
   describe "mobility dataset (.i18n)" do
     include_querying_examples 'Comment', :content, :author
   end
-end
+end if Mobility::Loaded::Sequel

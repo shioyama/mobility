@@ -6,9 +6,9 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
 
 =end
     class Sequel::Table
-      include Backend
+      include Sequel
 
-      autoload :QueryMethods, 'mobility/backend/sequel/table/query_methods'
+      require 'mobility/backend/sequel/table/query_methods'
 
       # @return [Symbol] name of the association method
       attr_reader :association_name
@@ -95,15 +95,10 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
         end
         include callback_methods
 
-        extension = Module.new do
-          define_method ::Mobility.query_method do
-            @mobility_dataset ||= super().with_extend(QueryMethods.new(attributes, options))
-          end
-        end
-        extend extension
-
         include Mobility::Sequel::ColumnChanges.new(attributes)
       end
+
+      setup_query_methods(QueryMethods)
 
       # @!group Cache Methods
       # @return [Table::TranslationsCache]

@@ -371,4 +371,4 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
       end
     end
   end
-end
+end if Mobility::Loaded::Sequel

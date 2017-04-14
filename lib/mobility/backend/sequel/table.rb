@@ -97,7 +97,7 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
 
         extension = Module.new do
           define_method ::Mobility.query_method do
-            @mobility_scope ||= super().with_extend(QueryMethods.new(attributes, options))
+            @mobility_dataset ||= super().with_extend(QueryMethods.new(attributes, options))
           end
         end
         extend extension

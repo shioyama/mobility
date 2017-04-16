@@ -131,7 +131,7 @@ columns to that table.
       end
       # @!endgroup
 
-      setup do |attributes, options|
+      setup do |_attributes, options|
         association_name = options[:association_name]
         subclass_name    = options[:subclass_name]
 

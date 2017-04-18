@@ -14,7 +14,7 @@ module Mobility
         setup do |attributes, options|
           extend(Module.new do
             define_method ::Mobility.query_method do
-              @mobility_dataset ||= super().with_extend(query_methods.new(attributes, options))
+              super().with_extend(query_methods.new(attributes, options))
             end
           end)
         end

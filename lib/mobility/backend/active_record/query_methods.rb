@@ -18,15 +18,14 @@ models. For details see backend-specific subclasses.
 
         # @param [ActiveRecord::Relation] relation Relation being extended
         def extended(relation)
-          model_class = relation.model
-          unless model_class.respond_to?(:mobility_where_chain)
-            model_class.define_singleton_method(:mobility_where_chain) do
+          unless relation.model.respond_to?(:mobility_where_chain)
+            relation.model.define_singleton_method(:mobility_where_chain) do
               @mobility_where_chain ||= Class.new(::ActiveRecord::QueryMethods::WhereChain)
             end
+          end
 
-            relation.define_singleton_method :where do |opts = :chain, *rest|
-              opts == :chain ? mobility_where_chain.new(spawn) : super(opts, *rest)
-            end
+          relation.define_singleton_method :where do |opts = :chain, *rest|
+            opts == :chain ? mobility_where_chain.new(spawn) : super(opts, *rest)
           end
         end
       end

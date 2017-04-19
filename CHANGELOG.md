@@ -2,6 +2,16 @@
 
 ## 0.1
 
+### 0.1.13 (April 19, 2017)
+* Allow passing `cache: false` to disable cache in getter
+  ([b4858a](https://github.com/shioyama/mobility/commit/b4858acfb0cf5dae0761672269c248d0e3762bab))
+  and setter
+  ([6085d7](https://github.com/shioyama/mobility/commit/6085d791a98de7870bdd78fe6b792cbb3f96c1f4))
+* Rename `configure!` method to `configure`
+  ([4e35c54](https://github.com/shioyama/mobility/commit/4e35c54cd62033d1ce7b631a1f62efaf4ffa2565))
+* Make query scope method configurable ([#22](https://github.com/shioyama/mobility/pull/22))
+* Do not memoize scopes/datasets ([#24](https://github.com/shioyama/mobility/pull/24))
+
 ### 0.1.12
 * Extract presence filter into `Mobility::Backend::Presence` class
   ([7d654](https://github.com/shioyama/mobility/commit/7d65479c832ca154a45a548b64d27016486d34df),

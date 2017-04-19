@@ -32,7 +32,7 @@ module Mobility
             super(opts_converter.call(opts), *rest)
           end
         end
-        relation.model.mobility_where_chain.prepend(mod)
+        relation.mobility_where_chain.include(mod)
       end
     end
   end

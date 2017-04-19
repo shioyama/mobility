@@ -338,10 +338,13 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
     end
 
     describe "Subclassing ActiveRecord::QueryMethods::WhereChain" do
-      it "extends Post.mobility_where_chain to handle translated attributes without creating memory leak" do
+      it "extends relation.mobility_where_chain to handle translated attributes without creating memory leak" do
         Post.i18n # call once to ensure class is defined
-        expect(Post.mobility_where_chain.ancestors).to include(::ActiveRecord::QueryMethods::WhereChain)
-        expect { Post.i18n.where.not(title: "foo") }.not_to change(Post.mobility_where_chain.ancestors, :size)
+        expect(Post.i18n.mobility_where_chain.ancestors).to include(::ActiveRecord::QueryMethods::WhereChain)
+        expect { 2.times { Post.i18n.where.not(title: "foo") } }.not_to change(Post.i18n.mobility_where_chain, :ancestors)
+
+        scope = Post.i18n.where.not(title: "foo")
+        expect { scope.where.not(title: "foo") }.not_to change(scope, :ancestors)
       end
     end
   end

@@ -34,7 +34,7 @@ module Mobility
             end
           end
         end
-        relation.model.mobility_where_chain.prepend(mod)
+        relation.mobility_where_chain.include(mod)
       end
 
       private

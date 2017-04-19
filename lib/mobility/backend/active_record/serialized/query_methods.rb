@@ -25,7 +25,7 @@ module Mobility
             opts_checker.call(opts) || super(opts, *rest)
           end
         end
-        relation.model.mobility_where_chain.prepend(mod)
+        relation.mobility_where_chain.include(mod)
       end
     end
   end

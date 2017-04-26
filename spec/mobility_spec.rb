@@ -66,6 +66,20 @@ describe Mobility do
         expect(MyModel.translated_attribute_names).to eq(["title"])
       end
     end
+
+    describe "duplicating model" do
+      let(:instance) do
+        model.include Mobility
+        model.translates :title, backend: :null
+        # call title getter once to memoize backend
+        model.new.tap { |instance| instance.title }
+      end
+
+      it "resets memoized backends" do
+        other = instance.dup
+        expect(other.title_backend).not_to eq(instance.title_backend)
+      end
+    end
   end
 
   describe '.with_locale' do

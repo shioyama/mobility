@@ -86,6 +86,11 @@ module Mobility
           send(Backend.method_name(attribute))
         end
 
+        def initialize_dup(other)
+          @mobility_backends = nil
+          super
+        end
+
         class << self
           include Translates
 

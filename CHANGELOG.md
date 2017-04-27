@@ -2,6 +2,9 @@
 
 ## 0.1
 
+### 0.1.14 (April 27, 2017)
+* Reset memoized backends when duplicating ([#26](https://github.com/shioyama/mobility/issues/25))
+
 ### 0.1.13 (April 19, 2017)
 * Allow passing `cache: false` to disable cache in getter
   ([b4858a](https://github.com/shioyama/mobility/commit/b4858acfb0cf5dae0761672269c248d0e3762bab))

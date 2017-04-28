@@ -17,6 +17,10 @@ module Helpers
     def include_serialization_examples *args
       it_behaves_like "AR Model with serialized translations", *args
     end
+
+    def include_validation_examples *args
+      it_behaves_like "AR Model validation", *args
+    end
   end
 
   module Sequel

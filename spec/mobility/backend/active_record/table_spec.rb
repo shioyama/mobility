@@ -39,6 +39,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
   context "attributes defined separately" do
     include_accessor_examples "MultitablePost", :title, :foo
     include_querying_examples "MultitablePost", :title, :foo
+    include_validation_examples 'MultitablePost', :title, :foo
   end
 
   describe "Backend methods" do
@@ -148,6 +149,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
   describe "mobility scope (.i18n)" do
     before { Article.translates :title, :content, backend: :table, cache: false }
     include_querying_examples('Article')
+    include_validation_examples('Article')
 
     describe "joins" do
       it "uses inner join for WHERE queries if query has at least one non-null attribute" do

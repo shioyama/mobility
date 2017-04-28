@@ -86,16 +86,16 @@ module Mobility
 
           if ENV['DB'] == 'postgres'
             create_table "jsonb_posts" do |t|
-              t.jsonb :title
-              t.jsonb :content
+              t.jsonb :title, default: ''
+              t.jsonb :content, default: ''
               t.boolean :published
             end
 
             execute "CREATE EXTENSION IF NOT EXISTS hstore"
 
             create_table "hstore_posts" do |t|
-              t.hstore :title
-              t.hstore :content
+              t.hstore :title, default: ''
+              t.hstore :content, default: ''
               t.boolean :published
             end
           end

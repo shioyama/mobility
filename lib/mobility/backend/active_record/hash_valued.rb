@@ -32,9 +32,6 @@ Internal class used by ActiveRecord backends that store values as a hash.
 
       setup do |attributes, options|
         attributes.each { |attribute| store attribute, coder: Coder }
-        before_validation do
-          attributes.each { |attribute| self.send(:"#{attribute}=", {}) if send(attribute).nil? }
-        end
       end
 
       class Coder

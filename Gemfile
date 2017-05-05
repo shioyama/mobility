@@ -10,7 +10,8 @@ group :development, :test do
   end
 
   if ENV['ORM'] == 'sequel'
-    gem 'sequel', '>= 4.0.0', '< 5.0'
+    # some interal API changes are breaking specs, limit to 4.45.x for now
+    gem 'sequel', '>= 4.0.0', '< 4.46.0'
   end
 
   platforms :ruby do

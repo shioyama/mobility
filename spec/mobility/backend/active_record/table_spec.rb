@@ -39,7 +39,6 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
   context "attributes defined separately" do
     include_accessor_examples "MultitablePost", :title, :foo
     include_querying_examples "MultitablePost", :title, :foo
-    include_validation_examples 'MultitablePost', :title, :foo
   end
 
   describe "Backend methods" do

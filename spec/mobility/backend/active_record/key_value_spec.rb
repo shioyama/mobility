@@ -304,8 +304,8 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
   end
 
   describe "mobility scope (.i18n)" do
-    include_querying_examples('Post')
-    include_validation_examples('Post')
+    include_querying_examples('Article')
+    include_validation_examples('Article')
 
     describe "joins" do
       it "uses inner join for WHERE queries" do

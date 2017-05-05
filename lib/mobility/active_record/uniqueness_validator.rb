@@ -4,7 +4,7 @@ module Mobility
       def validate_each(record, attribute, value)
         klass = record.class
         if klass.translated_attribute_names.include?(attribute.to_s) ||
-            (Array(options[:scope]).map(&:to_s) & klass.translated_attribute_names)
+            (Array(options[:scope]).map(&:to_s) & klass.translated_attribute_names).present?
           return unless value.present?
           relation = klass.send(Mobility.query_method).where(attribute => value)
           relation = relation.where.not(klass.primary_key => record.id) if record.persisted?

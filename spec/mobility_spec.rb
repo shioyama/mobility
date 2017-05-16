@@ -65,6 +65,15 @@ describe Mobility do
         model.translates :title, backend: :null
         expect(MyModel.translated_attribute_names).to eq(["title"])
       end
+
+      context "model subclass" do
+        it "inherits translated_attribute_names" do
+          model.include Mobility
+          model.translates :title, backend: :null
+          subclass = Class.new(model)
+          expect(subclass.translated_attribute_names).to eq(["title"])
+        end
+      end
     end
 
     describe "duplicating model" do

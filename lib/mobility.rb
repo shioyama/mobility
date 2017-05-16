@@ -105,6 +105,10 @@ module Mobility
           def translated_attribute_names
             mobility.translated_attribute_names
           end
+
+          def inherited(subclass)
+            subclass.instance_variable_set(:@mobility, @mobility)
+          end
         end
       end
 

@@ -92,22 +92,10 @@ module Mobility
         end
 
         class << self
-          include Translates
+          include ClassMethods
 
           if translates = Mobility.config.accessor_method
             alias_method translates, :mobility_accessor
-          end
-
-          def mobility
-            @mobility ||= Mobility::Wrapper.new(self)
-          end
-
-          def translated_attribute_names
-            mobility.translated_attribute_names
-          end
-
-          def inherited(subclass)
-            subclass.instance_variable_set(:@mobility, @mobility)
           end
         end
       end
@@ -245,6 +233,22 @@ module Mobility
       locale = locale.to_sym if locale
       enforce_available_locales!(locale)
       storage[:mobility_locale] = locale
+    end
+  end
+
+  module ClassMethods
+    include Translates
+
+    def mobility
+      @mobility ||= Mobility::Wrapper.new(self)
+    end
+
+    def translated_attribute_names
+      mobility.translated_attribute_names
+    end
+
+    def inherited(subclass)
+      subclass.instance_variable_set(:@mobility, @mobility)
     end
   end
 

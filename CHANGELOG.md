@@ -2,6 +2,10 @@
 
 ## 0.1
 
+### 0.1.15 (May 21, 2017)
+* Add support for uniqueness validation ([#28](https://github.com/shioyama/mobility/pull/28))
+* Inherit translated attributes in subclasses ([#30](https://github.com/shioyama/mobility/pull/30))
+
 ### 0.1.14 (April 27, 2017)
 * Reset memoized backends when duplicating ([#26](https://github.com/shioyama/mobility/issues/25))
 

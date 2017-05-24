@@ -6,7 +6,7 @@ gemspec
 group :development, :test do
   if ENV['ORM'] == 'active_record'
     gem 'activerecord', '>= 5.0', '< 5.1'
-    gem "generator_spec", '~> 0.9.3'
+    gem "generator_spec", '~> 0.9.4'
   end
 
   if ENV['ORM'] == 'sequel'

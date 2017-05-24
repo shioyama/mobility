@@ -17,7 +17,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
 
     context "translations table does not yet exist" do
       it "generates table translations migration creating translations table" do
-        expect(destination_root).to have_structure do
+        expect(destination_root).to have_structure {
           directory "db" do
             directory "migrate" do
               migration "create_post_title_and_content_translations_for_mobility_table_backend" do
@@ -36,7 +36,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
               end
             end
           end
-        end
+        }
       end
     end
 
@@ -44,7 +44,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
       before { ActiveRecord::Base.connection.create_table :post_translations }
 
       it "generates table translations migration adding columns to existing translations table" do
-        expect(destination_root).to have_structure do
+        expect(destination_root).to have_structure {
           directory "db" do
             directory "migrate" do
               migration "create_post_title_and_content_translations_for_mobility_table_backend" do
@@ -55,7 +55,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
               end
             end
           end
-        end
+        }
       end
     end
   end
@@ -81,7 +81,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
       end
 
       it "generates column translations migration adding columns for each locale to model table" do
-        expect(destination_root).to have_structure do
+        expect(destination_root).to have_structure {
           directory "db" do
             directory "migrate" do
               migration "create_foo_title_and_content_translations_for_mobility_column_backend" do
@@ -98,7 +98,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
               end
             end
           end
-        end
+        }
       end
     end
   end

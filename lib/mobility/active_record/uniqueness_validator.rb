@@ -11,7 +11,7 @@ module Mobility
           relation = mobility_scope_relation(record, relation)
           relation = relation.merge(options[:conditions]) if options[:conditions]
 
-          if relation.exists?
+          if relation.present?
             error_options = options.except(:case_sensitive, :scope, :conditions)
             error_options[:value] = value
 

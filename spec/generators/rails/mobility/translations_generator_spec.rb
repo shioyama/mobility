@@ -10,13 +10,15 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
   after(:all) { prepare_destination }
 
   describe "--backend=table" do
-    before(:all) do
+    let(:setup_generator) do
       prepare_destination
       run_generator %w(Post title:string:index content:text --backend=table)
     end
 
     context "translations table does not yet exist" do
       it "generates table translations migration creating translations table" do
+        setup_generator
+
         expect(destination_root).to have_structure {
           directory "db" do
             directory "migrate" do
@@ -44,6 +46,8 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
       before { ActiveRecord::Base.connection.create_table :post_translations }
 
       it "generates table translations migration adding columns to existing translations table" do
+        setup_generator
+
         expect(destination_root).to have_structure {
           directory "db" do
             directory "migrate" do
@@ -87,11 +91,11 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
               migration "create_foo_title_and_content_translations_for_mobility_column_backend" do
                 contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration[5.0]"
                 contains "add_column :foos, :title_en, :string"
-                contains "add_index :foos, :title_en"
+                contains "add_index  :foos, :title_en"
                 contains "add_column :foos, :title_ja, :string"
-                contains "add_index :foos, :title_ja"
+                contains "add_index  :foos, :title_ja"
                 contains "add_column :foos, :title_de, :string"
-                contains "add_index :foos, :title_de"
+                contains "add_index  :foos, :title_de"
                 contains "add_column :foos, :content_en, :text"
                 contains "add_column :foos, :content_ja, :text"
                 contains "add_column :foos, :content_de, :text"

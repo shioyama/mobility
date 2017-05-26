@@ -5,9 +5,12 @@ rvm:
   - 2.2.5
   - 2.3.1
 env:
-  - DB=postgres ORM=active_record
-  - DB=mysql ORM=active_record
-  - DB=sqlite3 ORM=active_record
+  - DB=postgres ORM=active_record RAILS_VERSION=5.0
+  - DB=mysql ORM=active_record RAILS_VERSION=5.0
+  - DB=sqlite3 ORM=active_record RAILS_VERSION=5.0
+  - DB=postgres ORM=active_record RAILS_VERSION=5.1
+  - DB=mysql ORM=active_record RAILS_VERSION=5.1
+  - DB=sqlite3 ORM=active_record RAILS_VERSION=5.1
   - DB=postgres ORM=sequel
   - DB=mysql ORM=sequel
   - DB=sqlite3 ORM=sequel
@@ -15,11 +18,17 @@ env:
 matrix:
   exclude:
     - rvm: 2.1.10
-      env: DB=postgres ORM=active_record
+      env: DB=postgres ORM=active_record RAILS_VERSION=5.0
     - rvm: 2.1.10
-      env: DB=mysql ORM=active_record
+      env: DB=postgres ORM=active_record RAILS_VERSION=5.1
     - rvm: 2.1.10
-      env: DB=sqlite3 ORM=active_record
+      env: DB=mysql ORM=active_record RAILS_VERSION=5.0
+    - rvm: 2.1.10
+      env: DB=mysql ORM=active_record RAILS_VERSION=5.1
+    - rvm: 2.1.10
+      env: DB=sqlite3 ORM=active_record RAILS_VERSION=5.0
+    - rvm: 2.1.10
+      env: DB=sqlite3 ORM=active_record RAILS_VERSION=5.1
 before_script:
   - bundle exec rake db:create db:up
 before_install: gem install bundler -v 1.12.5

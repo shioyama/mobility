@@ -46,6 +46,15 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
           end
         end
       end
+
+      context "with exists?" do
+        it "returns correct result searching on unique attribute value" do
+          aggregate_failures do
+            expect(query_scope.where(attribute1 => "bar").exists?).to eq(true)
+            expect(query_scope.where(attribute1 => "aaa").exists?).to eq(false)
+          end
+        end
+      end
     end
 
     context "with two translated attributes" do

@@ -55,7 +55,10 @@ To translate attributes on a model, include (or extend) `Mobility`, then call
 ### ActiveRecord (Rails)
 
 Requirements:
-- ActiveRecord >= 5.0, < 5.1 (some issues with 5.1+ with fixes in the works)
+- ActiveRecord >= 5.0
+
+Using Mobility with Rails 5.1 will currently result in some deprecation
+warnings. This will be fixed soon.
 
 (Support for some backends is also supported with ActiveRecord/Rails 4.2, see
 the [active_record-4.2

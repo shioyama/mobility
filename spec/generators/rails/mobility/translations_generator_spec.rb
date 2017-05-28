@@ -23,7 +23,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
           directory "db" do
             directory "migrate" do
               migration "create_post_title_and_content_translations_for_mobility_table_backend" do
-                contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[5.0]"
+                contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
                 contains "def change"
                 contains "create_table :post_translations"
                 contains "t.string :title"
@@ -52,7 +52,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
           directory "db" do
             directory "migrate" do
               migration "create_post_title_and_content_translations_for_mobility_table_backend" do
-                contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[5.0]"
+                contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
                 contains "add_column :post_translations, :title, :string"
                 contains "add_index :post_translations, :title"
                 contains "add_column :post_translations, :content, :text"
@@ -89,7 +89,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
           directory "db" do
             directory "migrate" do
               migration "create_foo_title_and_content_translations_for_mobility_column_backend" do
-                contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration[5.0]"
+                contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
                 contains "add_column :foos, :title_en, :string"
                 contains "add_index  :foos, :title_en"
                 contains "add_column :foos, :title_ja, :string"

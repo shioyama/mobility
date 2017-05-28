@@ -34,7 +34,7 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
         directory "db" do
           directory "migrate" do
             migration "create_text_translations" do
-              contains "class CreateTextTranslations < ActiveRecord::Migration[5.0]"
+              contains "class CreateTextTranslations < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
               contains "def change"
               contains "create_table :mobility_text_translations"
               contains "t.text    :value"
@@ -52,7 +52,7 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
         directory "db" do
           directory "migrate" do
             migration "create_string_translations" do
-              contains "class CreateStringTranslations < ActiveRecord::Migration[5.0]"
+              contains "class CreateStringTranslations < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
               contains "def change"
               contains "create_table :mobility_string_translations"
               contains "t.string  :value"

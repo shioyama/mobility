@@ -21,10 +21,11 @@ different languages.
 Storage of translations is handled by customizable "backends" which encapsulate
 different storage strategies. The default, preferred way to store translations
 is to put them all in a set of two shared tables, but many alternatives are
-also supported, including translatable columns (like
-[Traco](https://github.com/barsoom/traco)) and translation tables (like
-[Globalize](https://github.com/globalize/globalize)), as well as
-database-specific storage solutions such as
+also supported, including [translatable
+columns](http://dejimata.com/2017/3/3/translating-with-mobility#strategy-1) and
+[model translation
+tables](http://dejimata.com/2017/3/3/translating-with-mobility#strategy-2), as
+well as database-specific storage solutions such as
 [jsonb](https://www.postgresql.org/docs/current/static/datatype-json.html ) and
 [Hstore](https://www.postgresql.org/docs/current/static/hstore.html) (for
 PostgreSQL).

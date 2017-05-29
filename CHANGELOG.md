@@ -2,6 +2,11 @@
 
 ## 0.1
 
+### 0.1.16 (May 29, 2017)
+* Fix deprecation warnings using class_name ([#32](https://github.com/shioyama/mobility/pull/32))
+* Avoid using respond_to? on relation, to fix ImmutableRelation exception
+  ([d3e974855f7e772b5df43f665a2251a1982cfff0](https://github.com/shioyama/mobility/commit/d3e974855f7e772b5df43f665a2251a1982cfff0).
+
 ### 0.1.15 (May 21, 2017)
 * Add support for uniqueness validation ([#28](https://github.com/shioyama/mobility/pull/28))
 * Inherit translated attributes in subclasses ([#30](https://github.com/shioyama/mobility/pull/30))

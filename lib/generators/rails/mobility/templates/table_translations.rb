@@ -1,10 +1,10 @@
 class <%= migration_class_name %> < <%= activerecord_migration_class %>
   def change
-    create_table :<%= table_name %><%= primary_key_type %> do |t|
+    create_table :<%= table_name %><%= primary_key_type if respond_to?(:primary_key_type) %> do |t|
 
       # Translated attribute(s)
 <% attributes.each do |attribute| -%>
-<% if attribute.token? -%>
+<% if attribute.respond_to?(:token?) && attribute.token? -%>
       t.string :<%= attribute.name %><%= attribute.inject_options %>
 <% else -%>
       t.<%= attribute.type %> :<%= attribute.name %><%= attribute.inject_options %>

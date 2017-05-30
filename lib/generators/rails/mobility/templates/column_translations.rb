@@ -1,4 +1,4 @@
-class <%= migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
+class <%= migration_class_name %> < <%= activerecord_migration_class %>
   def change
 <% attributes.each do |attribute| -%>
 <% I18n.available_locales.each do |locale| -%>

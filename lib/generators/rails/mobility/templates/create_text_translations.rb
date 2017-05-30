@@ -1,4 +1,4 @@
-class CreateTextTranslations < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
+class CreateTextTranslations < <%= activerecord_migration_class %>
 
   def change
     create_table :mobility_text_translations do |t|

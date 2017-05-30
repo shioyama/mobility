@@ -4,6 +4,7 @@ require "rails/generators/active_record"
 module Mobility
   class InstallGenerator < ::Rails::Generators::Base
     include ::Rails::Generators::Migration
+    include ::Mobility::ActiveRecordMigrationCompatibility
 
     desc "Generates migrations to add translations tables."
 

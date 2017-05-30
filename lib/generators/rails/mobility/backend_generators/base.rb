@@ -6,6 +6,7 @@ module Mobility
     class Base < ::Rails::Generators::NamedBase
       argument :attributes, type: :array, default: []
       include ::ActiveRecord::Generators::Migration
+      include ::Mobility::ActiveRecordMigrationCompatibility
 
       def create_migration_file
         if self.class.migration_exists?(migration_dir, migration_file)

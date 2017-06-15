@@ -45,7 +45,7 @@ module Mobility
             relation.joins(m.join(t, join_type).
                            on(t[:key].eq(attribute).
                               and(t[:locale].eq(Mobility.locale).
-                                  and(t[:translatable_type].eq(name).
+                                  and(t[:translatable_type].eq(base_class.name).
                                       and(t[:translatable_id].eq(m[:id]))))).join_sources)
           end
         end

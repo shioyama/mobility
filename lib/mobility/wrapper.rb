@@ -27,5 +27,10 @@ simple delegator, so any missing method will be delegated to the model class.
     def << backend_module
       modules << backend_module
     end
+
+    def initialize_dup(other)
+      @modules = other.modules.map(&:dup)
+      super
+    end
   end
 end

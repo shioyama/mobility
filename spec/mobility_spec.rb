@@ -73,6 +73,16 @@ describe Mobility do
           subclass = Class.new(model)
           expect(subclass.translated_attribute_names).to eq(["title"])
         end
+
+        it "defines new translated attributes independently of superclass" do
+          model.include Mobility
+          model.translates :title, backend: :null
+          subclass = Class.new(model)
+          subclass.translates :content, backend: :null
+
+          expect(model.translated_attribute_names).to eq(["title"])
+          expect(subclass.translated_attribute_names).to match_array(["title", "content"])
+        end
       end
     end
 

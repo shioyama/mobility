@@ -2,6 +2,9 @@
 
 ## 0.1
 
+### 0.1.17 (June 16, 2017)
+* Fix STI issues ([#43](https://github.com/shioyama/mobility/pull/43))
+
 ### 0.1.16 (May 29, 2017)
 * Fix deprecation warnings using class_name ([#32](https://github.com/shioyama/mobility/pull/32))
 * Avoid using respond_to? on relation, to fix ImmutableRelation exception

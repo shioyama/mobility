@@ -249,6 +249,7 @@ module Mobility
 
     def inherited(subclass)
       subclass.instance_variable_set(:@mobility, @mobility)
+      super
     end
   end
 

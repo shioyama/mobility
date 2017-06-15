@@ -119,6 +119,16 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
         end
       end
     end
+
+    context "with single table inheritance" do
+      let(:sti_model) { Class.new(model_class) }
+
+      it "works with sti model" do
+        instance = sti_model.create(attribute1 => "foo")
+        sti_model.i18n.where(attribute1 => "foo")
+        expect(sti_model.i18n.where(attribute1 => "foo")).to match_array([instance])
+      end
+    end
   end
 
   describe ".not" do

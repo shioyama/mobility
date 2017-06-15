@@ -29,7 +29,7 @@ simple delegator, so any missing method will be delegated to the model class.
     end
 
     def initialize_dup(other)
-      @modules = other.modules.map(&:dup)
+      @modules = other.modules.dup
       super
     end
   end

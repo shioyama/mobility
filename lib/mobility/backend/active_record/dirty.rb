@@ -23,10 +23,7 @@ module Mobility
           model_class.class_eval do
             extend mod
 
-            def changes_applied
-              @previously_changed = changes
-              super
-            end
+            before_save { @previously_changed = changes }
 
             def clear_changes_information
               @previously_changed = ActiveSupport::HashWithIndifferentAccess.new

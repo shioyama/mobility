@@ -31,7 +31,7 @@ module Mobility
             end
 
             def previous_changes
-              super.merge(@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new)
+              (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super)
             end
           end
         end

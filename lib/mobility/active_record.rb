@@ -5,6 +5,7 @@ Module loading ActiveRecord-specific classes for Mobility models.
 
 =end
   module ActiveRecord
+    autoload :AttributeMethods,    "mobility/active_record/attribute_methods"
     autoload :BackendResetter,     "mobility/active_record/backend_resetter"
     autoload :ModelTranslation,    "mobility/active_record/model_translation"
     autoload :StringTranslation,   "mobility/active_record/string_translation"

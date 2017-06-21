@@ -1,8 +1,8 @@
 module Mobility
-  module ActiveModel
+  module ActiveRecord
 =begin
 
-Included into model if model has +ActiveModel::AttributeMethods+ among its
+Included into model if model has +ActiveRecord::AttributeMethods+ among its
 ancestors.
 
 =end

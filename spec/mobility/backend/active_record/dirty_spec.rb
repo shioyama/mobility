@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
+describe Mobility::Backend::ActiveRecord::Dirty, orm: :active_record do
   let(:backend_class) do
     Class.new(Mobility::Backend::Null) do
       def read(locale, **options)
@@ -20,12 +20,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
   end
 
   before do
-    stub_const 'Article', Class.new {
-      def save
-        changes_applied
-      end
-    }
-    Article.include ActiveModel::Dirty
+    stub_const 'Article', Class.new(ActiveRecord::Base)
     Article.include Mobility
     Article.translates :title, backend: backend_class, dirty: true, cache: false
   end
@@ -61,9 +56,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     end
 
     it "tracks previous changes in one locale" do
-      article = Article.new
-      article.title = "foo"
-      article.save
+      article = Article.create(title: "foo")
 
       aggregate_failures do
         article.title = "bar"
@@ -100,10 +93,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     end
 
     it "tracks previous changes in multiple locales" do
-      article = Article.new
-      article.title_en = "English title 1"
-      article.title_fr = "Titre en Francais 1"
-      article.save
+      article = Article.create(title_en: "English title 1", title_fr: "Titre en Francais 1")
 
       article.title = "English title 2"
       Mobility.locale = :fr
@@ -172,9 +162,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     end
 
     it "returns changes on attribute for current locale" do
-      article = Article.new
-      article.title = "foo"
-      article.save
+      article = Article.create(title: "foo")
 
       article.title = "bar"
 
@@ -198,8 +186,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
   describe "restoring attributes" do
     it "defines restore_<attribute>! for translated attributes" do
       Mobility.locale = :'pt-BR'
-      article = Article.new
-      article.save
+      article = Article.create
 
       article.title = "foo"
 
@@ -209,8 +196,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     end
 
     it "restores attribute when passed to restore_attribute!" do
-      article = Article.new
-      article.save
+      article = Article.create
 
       article.title = "foo"
       article.send :restore_attribute!, :title
@@ -219,9 +205,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     end
 
     it "handles translated attributes when passed to restore_attributes" do
-      article = Article.new
-      article.title = "foo"
-      article.save
+      article = Article.create(title: "foo")
 
       expect(article.title).to eq("foo")
 
@@ -232,58 +216,31 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
     end
   end
 
-  describe "fallbacks compatiblity" do
-    before do
-      stub_const 'ArticleWithFallbacks', Class.new(ActiveRecord::Base)
-      ArticleWithFallbacks.class_eval do
-        self.table_name = :articles
-        include Mobility
-      end
-      ArticleWithFallbacks.translates :title, backend: backend_class, dirty: true, cache: false, fallbacks: { en: 'ja' }
-    end
 
-    it "does not compare with fallback value" do
-      article = ArticleWithFallbacks.new
+  describe "resetting original values hash on actions" do
+    shared_examples_for "resets on model action" do |action|
+      it "resets changes when model on #{action}" do
+        article = Article.create
 
-      aggregate_failures "before change" do
-        expect(article.title).to eq(nil)
-        expect(article.changed?).to eq(false)
-        expect(article.changed).to eq([])
-        expect(article.changes).to eq({})
-      end
+        aggregate_failures do
+          article.title = "foo"
+          expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
 
-      aggregate_failures "set fallback locale value" do
-        Mobility.with_locale(:ja) { article.title = "あああ" }
-        expect(article.title).to eq("あああ")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_ja"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "あああ"]})
-        Mobility.with_locale(:ja) { expect(article.title).to eq("あああ") }
-      end
+          article.send(action)
 
-      aggregate_failures "set value in current locale to same value" do
-        article.title = nil
-        expect(article.title).to eq("あああ")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_ja"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "あああ"]})
-      end
+          # bypass the dirty module and set the variable directly
+          article.mobility_backend_for("title").instance_variable_set(:@values, { :en => "bar" })
 
-      aggregate_failures "set value in fallback locale to different value" do
-        Mobility.with_locale(:ja) { article.title = "ばばば" }
-        expect(article.title).to eq("ばばば")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_ja"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "ばばば"]})
-      end
+          expect(article.title).to eq("bar")
+          expect(article.changes).to eq({})
 
-      aggregate_failures "set value in current locale to different value" do
-        article.title = "Title"
-        expect(article.title).to eq("Title")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to match_array(["title_ja", "title_en"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "ばばば"], "title_en" => ["ばばば", "Title"]})
+          article.title = nil
+          expect(article.changes).to eq({ "title_en" => ["bar", nil]})
+        end
       end
     end
+
+    it_behaves_like "resets on model action", :save
+    it_behaves_like "resets on model action", :reload
   end
 end

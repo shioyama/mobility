@@ -25,7 +25,8 @@ details.
       def self.for(model_class)
         model_class ||= Object
         if Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
-          Backend::ActiveModel::Dirty
+          (model_class < ::ActiveRecord::Base) ?
+            Backend::ActiveRecord::Dirty : Backend::ActiveModel::Dirty
         elsif Loaded::Sequel && model_class < ::Sequel::Model
           Backend::Sequel::Dirty
         else

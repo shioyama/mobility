@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mobility::ActiveRecord, orm: :active_record do
   before do
-    stub_const 'MyModel', ActiveRecord::Base
+    stub_const 'MyModel', Class.new(ActiveRecord::Base)
     MyModel.include Mobility::ActiveRecord
   end
 

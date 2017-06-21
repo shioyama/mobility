@@ -23,7 +23,11 @@ module Mobility
           model_class.class_eval do
             extend mod
 
-            before_save { @previously_changed = changes }
+            method_name = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
+            define_method method_name do
+              @previously_changed = changes
+              super()
+            end
 
             def clear_changes_information
               @previously_changed = ActiveSupport::HashWithIndifferentAccess.new

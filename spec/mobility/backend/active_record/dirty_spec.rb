@@ -69,6 +69,23 @@ describe Mobility::Backend::ActiveRecord::Dirty, orm: :active_record do
       end
     end
 
+    it "tracks previous changes in one locale in before_save hook" do
+      article = Article.create(title: "foo")
+
+      article.title = "bar"
+      article.save
+
+      article.singleton_class.class_eval do
+        before_save do
+          @actual_previous_changes = previous_changes
+        end
+      end
+
+      article.save
+
+      expect(article.instance_variable_get(:@actual_previous_changes)).to eq({ "title_en" => ["foo", "bar"]})
+    end
+
     it "tracks changes in multiple locales" do
       article = Article.new
 

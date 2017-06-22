@@ -47,7 +47,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.1.17'
+gem 'mobility', '~> 0.1.18'
 ```
 
 To translate attributes on a model, include (or extend) `Mobility`, then call
@@ -57,9 +57,6 @@ To translate attributes on a model, include (or extend) `Mobility`, then call
 
 Requirements:
 - ActiveRecord >= 5.0
-
-Using Mobility with Rails 5.1 will currently result in some deprecation
-warnings. This will be fixed soon.
 
 (Support for some backends is also supported with ActiveRecord/Rails 4.2, see
 the [active_record-4.2

@@ -2,6 +2,10 @@
 
 ## 0.1
 
+### 0.1.18 (June 21, 2017)
+* Fix deprecation warnings when using ActiveRecord 5.1
+  ([#44](https://github.com/shioyama/mobility/pull/44))
+
 ### 0.1.17 (June 16, 2017)
 * Fix STI issues ([#43](https://github.com/shioyama/mobility/pull/43))
 

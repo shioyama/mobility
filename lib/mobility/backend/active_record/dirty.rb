@@ -1,5 +1,11 @@
 module Mobility
   module Backend
+=begin
+
+Dirty tracking for AR models. See {Mobility::Backend::ActiveModel::Dirty} for
+details on usage.
+
+=end
     module ActiveRecord::Dirty
       include ActiveModel::Dirty
 
@@ -9,7 +15,10 @@ module Mobility
         backend_class.extend(ClassMethods)
       end
 
+      # Adds hook after {Backend::Setup#setup_model} to patch AR so that it
+      # handles changes to translated attributes just like normal attributes.
       module ClassMethods
+        # (see Mobility::Backend::Setup#setup_model)
         def setup_model(model_class, attributes, **options)
           super
 

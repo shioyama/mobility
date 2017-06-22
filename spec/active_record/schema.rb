@@ -91,8 +91,13 @@ module Mobility
 
           if ENV['DB'] == 'postgres'
             create_table "jsonb_posts" do |t|
-              t.jsonb :title, default: ''
-              t.jsonb :content, default: ''
+              if ::ActiveRecord::VERSION::STRING < '5.0'
+                t.jsonb :title, default: '{}'
+                t.jsonb :content, default: '{}'
+              else
+                t.jsonb :title, default: ''
+                t.jsonb :content, default: ''
+              end
               t.boolean :published
             end
 

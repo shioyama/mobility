@@ -19,7 +19,7 @@ env:
   - DB=sqlite3 ORM=sequel SEQUEL_VERSION=4.41
   - DB=postgres ORM=sequel SEQUEL_VERSION=4.46
   - DB=mysql ORM=sequel SEQUEL_VERSION=4.46
-  - DB=sqlite3 ORM=sequel SEQUEL_VERSRION=4.46
+  - DB=sqlite3 ORM=sequel SEQUEL_VERSION=4.46
   - DB=sqlite3 ORM=
 matrix:
   exclude:

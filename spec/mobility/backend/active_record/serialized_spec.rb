@@ -15,7 +15,7 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
       include_serialization_examples 'SerializedPost'
 
       describe "non-text values" do
-        it "converts non-string types to strings when saving" do
+        it "converts non-string types to strings when saving", rails_version_geq: '5.0' do
           post = SerializedPost.new
           backend = post.mobility_backend_for("title")
           backend.write(:en, { foo: :bar } )
@@ -29,6 +29,7 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
         post = SerializedPost.new
         post.title = "foo"
         post.save
+        post.reload if ENV['RAILS_VERSION'] < '5.0' # don't ask me why
         expect(post.title_before_type_cast).to eq("---\n:en: foo\n")
       end
 
@@ -57,6 +58,7 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
         post = SerializedPost.new
         post.title = "foo"
         post.save
+        post.reload if ENV['RAILS_VERSION'] < '5.0' # don't ask me why
         expect(post.title_before_type_cast).to eq("{\"en\":\"foo\"}")
       end
     end

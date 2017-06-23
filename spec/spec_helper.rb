@@ -37,6 +37,8 @@ end
 
 
 RSpec.configure do |config|
+  config.include Helpers
+
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
   config.mock_with :rspec do |mocks|
@@ -56,5 +58,5 @@ RSpec.configure do |config|
     end
   end
 
-  config.filter_run_excluding orm: lambda { |v| v != orm.to_sym }, db: lambda { |v| v!= db.to_sym }
+  config.filter_run_excluding orm: lambda { |v| v != orm.to_sym }, db: lambda { |v| v!= db.to_sym }, rails_version_geq: lambda { |v| ENV['RAILS_VERSION'] < v }
 end

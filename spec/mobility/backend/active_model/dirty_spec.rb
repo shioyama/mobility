@@ -145,7 +145,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
   end
 
   describe "suffix methods" do
-    it "defines suffix methods on translated attribute" do
+    it "defines suffix methods on translated attribute", rails_version_geq: '5.0' do
       article = Article.new
       article.title = "foo"
       article.save
@@ -171,7 +171,7 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
       end
     end
 
-    it "returns changes on attribute for current locale" do
+    it "returns changes on attribute for current locale", rails_version_geq: '5.0' do
       article = Article.new
       article.title = "foo"
       article.save

@@ -52,7 +52,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo", fr: "bar" })
     end
 
-    it "deletes keys with nil values when saving" do
+    it "deletes keys with nil values when saving", rails_version_geq: '5.0' do
       backend.write(:en, "foo")
       expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo" })
       backend.write(:en, nil)
@@ -70,7 +70,8 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       backend.write(:en, "")
       instance.save
 
-      # Note: Sequel backend returns a blank string here.
+      instance.reload if ENV['RAILS_VERSION'] < '5.0' # don't ask me why
+      # Note: Sequel backend and Rails < 5.0 return a blank string here.
       expect(backend.read(:en)).to eq(nil)
 
       expect(instance.send(attribute1)).to eq(nil)

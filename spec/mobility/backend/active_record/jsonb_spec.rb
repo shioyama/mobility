@@ -18,7 +18,7 @@ describe Mobility::Backend::ActiveRecord::Jsonb, orm: :active_record, db: :postg
   include_validation_examples 'JsonbPost'
 
   describe "non-text values" do
-    it "stores non-string types as-is when saving" do
+    it "stores non-string types as-is when saving", rails_version_geq: '5.0' do
       post = JsonbPost.new
       backend = post.mobility_backend_for("title")
       backend.write(:en, { foo: :bar } )

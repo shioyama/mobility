@@ -14,9 +14,12 @@ env:
   - DB=postgres ORM=active_record RAILS_VERSION=5.1
   - DB=mysql ORM=active_record RAILS_VERSION=5.1
   - DB=sqlite3 ORM=active_record RAILS_VERSION=5.1
-  - DB=postgres ORM=sequel
-  - DB=mysql ORM=sequel
-  - DB=sqlite3 ORM=sequel
+  - DB=postgres ORM=sequel SEQUEL_VERSION=4.41
+  - DB=mysql ORM=sequel SEQUEL_VERSION=4.41
+  - DB=sqlite3 ORM=sequel SEQUEL_VERSION=4.41
+  - DB=postgres ORM=sequel SEQUEL_VERSION=4.46
+  - DB=mysql ORM=sequel SEQUEL_VERSION=4.46
+  - DB=sqlite3 ORM=sequel SEQUEL_VERSRION=4.46
   - DB=sqlite3 ORM=
 matrix:
   exclude:

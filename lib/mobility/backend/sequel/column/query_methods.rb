@@ -6,8 +6,6 @@ module Mobility
         attributes_extractor = @attributes_extractor
 
         %w[exclude or where].each do |method_name|
-          invert = method_name == "exclude"
-
           define_method method_name do |*conds, &block|
             if keys = attributes_extractor.call(cond = conds.first.dup)
               keys.each { |attr| cond[Column.column_name_for(attr)] = cond.delete(attr) }

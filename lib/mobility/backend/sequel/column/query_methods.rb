@@ -5,12 +5,17 @@ module Mobility
         super
         attributes_extractor = @attributes_extractor
 
-        define_method :_filter_or_exclude do |invert, clause, cond, &block|
-          if keys = attributes_extractor.call(cond)
-            cond = cond.dup
-            keys.each { |attr| cond[Column.column_name_for(attr)] = cond.delete(attr) }
+        %w[exclude or where].each do |method_name|
+          invert = method_name == "exclude"
+
+          define_method method_name do |*conds, &block|
+            if keys = attributes_extractor.call(cond = conds.first.dup)
+              keys.each { |attr| cond[Column.column_name_for(attr)] = cond.delete(attr) }
+              super(cond, &block)
+            else
+              super(*conds, &block)
+            end
           end
-          super(invert, clause, cond, &block)
         end
 
         attributes.each do |attribute|

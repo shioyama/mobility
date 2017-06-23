@@ -13,11 +13,8 @@ group :development, :test do
       gem 'activerecord', '>= 5.0', '< 5.1'
     end
     gem "generator_spec", '~> 0.9.4'
-  end
-
-  if ENV['ORM'] == 'sequel'
-    # some interal API changes are breaking specs, limit to 4.45.x for now
-    gem 'sequel', '>= 4.41.0', '< 4.46.0'
+  elsif ENV['ORM'] == 'sequel'
+    gem 'sequel', '>= 4.46.0'
   end
 
   platforms :ruby do

@@ -39,20 +39,20 @@ module Mobility
         #
         attributes_extractor = @attributes_extractor
 
-        define_method :_filter_or_exclude do |invert, clause, *cond, &block|
-          if i18n_keys = attributes_extractor.call(cond.first)
-            cond = cond.first.dup
-            i18n_nulls = i18n_keys.select { |key| cond[key].nil? }
-            i18n_keys.each { |attr| cond[::Sequel[:"#{attr}_#{association_name}"][:value]] = cond.delete(attr) }
-            super(invert, clause, cond, &block).
-              send("join_#{association_name}", *(i18n_keys - i18n_nulls)).
-              send("join_#{association_name}", *i18n_nulls, outer_join: true)
-          else
-            super(invert, clause, *cond, &block)
+        %w[exclude or where].each do |method_name|
+          define_method method_name do |*conds, &block|
+            if i18n_keys = attributes_extractor.call(conds.first)
+              cond = conds.first.dup
+              i18n_nulls = i18n_keys.select { |key| cond[key].nil? }
+              i18n_keys.each { |attr| cond[::Sequel[:"#{attr}_#{association_name}"][:value]] = cond.delete(attr) }
+              super(cond, &block).
+                send("join_#{association_name}", *(i18n_keys - i18n_nulls)).
+                send("join_#{association_name}", *i18n_nulls, outer_join: true)
+            else
+              super(*conds, &block)
+            end
           end
         end
-        private :_filter_or_exclude
-
       end
     end
   end

@@ -7,26 +7,30 @@ module Mobility
         super
         attributes_extractor = @attributes_extractor
 
-        define_method :_filter_or_exclude do |invert, clause, *conds, &block|
-          if (clause == :where) && i18n_keys = attributes_extractor.call(conds.first)
-            locale = Mobility.locale.to_s
-            table_name = model.table_name
-            cond = conds.first
+        %w[exclude or where].each do |method_name|
+          invert = method_name == "exclude"
 
-            i18n_query = i18n_keys.inject(::Sequel.expr(!invert)) do |expr, attr|
-              value = cond.delete(attr)
-              attr_hstore = ::Sequel.hstore_op(attr)
-              contains_value = attr_hstore.contains({ locale => value.to_s })
-              has_key = attr_hstore.has_key?(locale)
-              if invert
-                expr.|(has_key & ~contains_value)
-              else
-                expr.&(value.nil? ? ~has_key : contains_value)
+          define_method method_name do |*cond, &block|
+            if i18n_keys = attributes_extractor.call(cond.first)
+              locale = Mobility.locale.to_s
+              table_name = model.table_name
+              cond = cond.first
+
+              i18n_query = i18n_keys.inject(::Sequel.expr(!invert)) do |expr, attr|
+                value = cond.delete(attr)
+                attr_hstore = ::Sequel.hstore_op(attr)
+                contains_value = attr_hstore.contains({ locale => value.to_s })
+                has_key = attr_hstore.has_key?(locale)
+                if invert
+                  expr.|(has_key & ~contains_value)
+                else
+                  expr.&(value.nil? ? ~has_key : contains_value)
+                end
               end
+              super(cond, &block).where(i18n_query)
+            else
+              super(*cond, &block)
             end
-            super(invert, clause, *conds, &block).where(i18n_query)
-          else
-            super(invert, clause, *conds, &block)
           end
         end
 

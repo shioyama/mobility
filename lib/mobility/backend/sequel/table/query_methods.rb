@@ -35,14 +35,16 @@ module Mobility
         # See note in AR Table QueryMethods class about limitations of
         # query methods on translated attributes when searching on nil values.
         #
-        define_method :_filter_or_exclude do |invert, clause, *cond, &block|
-          if i18n_keys = attributes_extractor.call(cond.first)
-            cond = cond.first.dup
-            outer_join = i18n_keys.all? { |key| cond[key].nil? }
-            i18n_keys.each { |attr| cond[::Sequel[translation_class.table_name][attr]] = cond.delete(attr) }
-            super(invert, clause, cond, &block).send("join_#{association_name}", outer_join: outer_join)
-          else
-            super(invert, clause, *cond, &block)
+        %w[exclude or where].each do |method_name|
+          define_method method_name do |*conds, &block|
+            if i18n_keys = attributes_extractor.call(conds.first)
+              cond = conds.first.dup
+              outer_join = i18n_keys.all? { |key| cond[key].nil? }
+              i18n_keys.each { |attr| cond[::Sequel[translation_class.table_name][attr]] = cond.delete(attr) }
+              super(cond, &block).send("join_#{association_name}", outer_join: outer_join)
+            else
+              super(*conds, &block)
+            end
           end
         end
       end

@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-ENV['RAILS_VERSION'] ||= "5.0"
+ENV['RAILS_VERSION']  ||= "5.0"
+ENV['SEQUEL_VERSION'] ||= "4.46"
 
 if orm = ENV['ORM']
   require orm

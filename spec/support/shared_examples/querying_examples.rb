@@ -305,8 +305,10 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       @instance2 = model_class.create(attribute1 => "foo", attribute2 => "baz content", published: true )
       @instance3 = model_class.create(attribute1 => "bar", attribute2 => "foo content", published: false)
     end
+    let(:backend_class) { model_class.mobility.modules.first.backend_class.superclass }
 
     it "returns union of queries" do
+      skip "Not supported by #{backend_class.name}" if [Mobility::Backend::Sequel::Hstore, Mobility::Backend::Sequel::Jsonb].include?(backend_class)
       expect(query_scope.where(published: true).or(attribute2 => "baz content").select_all(table_name).all).to match_array([@instance1, @instance2])
     end
 
@@ -316,7 +318,6 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       # result which satisfies the second (or) condition. This is impossible to
       # avoid without modification of an earlier dataset, which is probably not
       # a good idea.
-      backend_class = model_class.mobility.modules.first.backend_class.superclass
       skip "Not supported by #{backend_class.name}" if [Mobility::Backend::Sequel::Table, Mobility::Backend::Sequel::KeyValue].include?(backend_class)
       expect(query_scope.where(attribute2 => "baz content").or(published: true).select_all(table_name).all).to match_array([@instance1, @instance2])
     end

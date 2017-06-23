@@ -39,7 +39,7 @@ module Mobility
           define_method method_name do |*conds, &block|
             if i18n_keys = attributes_extractor.call(conds.first)
               cond = conds.first.dup
-              outer_join = i18n_keys.all? { |key| cond[key].nil? }
+              outer_join = method_name == "or" || i18n_keys.all? { |key| cond[key].nil? }
               i18n_keys.each { |attr| cond[::Sequel[translation_class.table_name][attr]] = cond.delete(attr) }
               super(cond, &block).send("join_#{association_name}", outer_join: outer_join)
             else

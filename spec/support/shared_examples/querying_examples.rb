@@ -299,6 +299,29 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
     end
   end
 
+  describe ".or" do
+    before do
+      @instance1 = model_class.create(attribute1 => "foo"                             , published: true )
+      @instance2 = model_class.create(attribute1 => "foo", attribute2 => "baz content", published: true )
+      @instance3 = model_class.create(attribute1 => "bar", attribute2 => "foo content", published: false)
+    end
+
+    it "returns union of queries" do
+      expect(query_scope.where(published: true).or(attribute2 => "baz content").select_all(table_name).all).to match_array([@instance1, @instance2])
+    end
+
+    it "works with query order reversed" do
+      # For backends that join translation tables (Table and KeyValue backends)
+      # this fails because the table will be inner join'ed, excluding the
+      # result which satisfies the second (or) condition. This is impossible to
+      # avoid without modification of an earlier dataset, which is probably not
+      # a good idea.
+      backend_class = model_class.mobility.modules.first.backend_class.superclass
+      skip "Not supported by #{backend_class.name}" if [Mobility::Backend::Sequel::Table, Mobility::Backend::Sequel::KeyValue].include?(backend_class)
+      expect(query_scope.where(attribute2 => "baz content").or(published: true).select_all(table_name).all).to match_array([@instance1, @instance2])
+    end
+  end
+
   describe "Model.i18n.first_by_<translated attribute>" do
     let(:finder_method) { :"first_by_#{attribute1}" }
 

@@ -45,7 +45,10 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
-  config.before :each do
+  config.before :each do |example|
+    if (version = example.metadata[:rails_version_geq]) && (ENV['RAILS_VERSION'] < version)
+      skip "Unsupported for Rails < #{version}"
+    end
     Mobility.locale = :en
   end
 
@@ -58,5 +61,5 @@ RSpec.configure do |config|
     end
   end
 
-  config.filter_run_excluding orm: lambda { |v| v != orm.to_sym }, db: lambda { |v| v!= db.to_sym }, rails_version_geq: lambda { |v| ENV['RAILS_VERSION'] < v }
+  config.filter_run_excluding orm: lambda { |v| v != orm.to_sym }, db: lambda { |v| v!= db.to_sym }
 end

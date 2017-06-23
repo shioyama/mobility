@@ -60,7 +60,7 @@ Requirements:
 
 (Support for most backends and features is also supported with
 ActiveRecord/Rails 4.2, but there are some tests still failing. To see exactly
-what might not work, look for specs tagged with `rails_version_geq: '5.0'`.)
+what might not work, check pending specs in Rails 4.2 Travis builds.)
 
 If using Mobility in a Rails project, you can run the generator to create an
 initializer and a migration to create shared translation tables for the

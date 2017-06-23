@@ -5,6 +5,20 @@ module Mobility
     class Sequel::Hstore::QueryMethods < Sequel::QueryMethods
       def initialize(attributes, **)
         super
+
+        define_query_methods
+
+        attributes.each do |attribute|
+          define_method :"first_by_#{attribute}" do |value|
+            where(::Sequel.hstore(attribute.to_sym).contains(::Sequel.hstore({ Mobility.locale.to_s => value }))).
+              select_all(model.table_name).first
+          end
+        end
+      end
+
+      private
+
+      def define_query_methods
         attributes_extractor = @attributes_extractor
 
         %w[exclude or where].each do |method_name|
@@ -31,13 +45,6 @@ module Mobility
             else
               super(*cond, &block)
             end
-          end
-        end
-
-        attributes.each do |attribute|
-          define_method :"first_by_#{attribute}" do |value|
-            where(::Sequel.hstore(attribute.to_sym).contains(::Sequel.hstore({ Mobility.locale.to_s => value }))).
-              select_all(model.table_name).first
           end
         end
       end

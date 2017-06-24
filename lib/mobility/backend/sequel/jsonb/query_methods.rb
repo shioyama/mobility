@@ -41,7 +41,11 @@ module Mobility
                   expr.&(value.nil? ? ~has_key : contains_value)
                 end
               end
-              super(cond, &block).where(i18n_query)
+              if method_name == "or"
+                cond.empty? ? super(i18n_query, &block) : super(::Sequel.&(cond, i18n_query), &block)
+              else
+                super(cond, &block).where(i18n_query)
+              end
             else
               super(*conds, &block)
             end

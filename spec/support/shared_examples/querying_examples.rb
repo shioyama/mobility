@@ -308,18 +308,17 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
     let(:backend_class) { model_class.mobility.modules.first.backend_class.superclass }
 
     it "returns union of queries" do
-      skip "Not supported by #{backend_class.name}" if [Mobility::Backend::Sequel::Hstore, Mobility::Backend::Sequel::Jsonb].include?(backend_class)
       expect(query_scope.where(published: true).or(attribute2 => "baz content").select_all(table_name).all).to match_array([@instance1, @instance2])
     end
 
-    it "works with query order reversed" do
+    it "works with set of translated and untranslated attributes" do
       # For backends that join translation tables (Table and KeyValue backends)
       # this fails because the table will be inner join'ed, excluding the
       # result which satisfies the second (or) condition. This is impossible to
       # avoid without modification of an earlier dataset, which is probably not
       # a good idea.
       skip "Not supported by #{backend_class.name}" if [Mobility::Backend::Sequel::Table, Mobility::Backend::Sequel::KeyValue].include?(backend_class)
-      expect(query_scope.where(attribute2 => "baz content").or(published: true).select_all(table_name).all).to match_array([@instance1, @instance2])
+      expect(query_scope.where(published: false).or(:published => true, attribute2 => "baz content")).to match_array([@instance2, @instance3])
     end
   end
 

@@ -26,7 +26,7 @@ module Mobility
               ops ? ops.and(op) : op
             }
 
-            opts.empty? ? where(i18n_query) : super(opts, *rest).where(i18n_query)
+            opts.empty? ? super(i18n_query) : super(opts, *rest).where(i18n_query)
           else
             super(opts, *rest)
           end

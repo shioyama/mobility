@@ -172,7 +172,7 @@ with other backends.
 
     # Include backend modules depending on value of options.
     def include_backend_modules(backend_class, options)
-      module_options = options.reject { |k, v| !module_option_keys.include?(k.to_s) }
+      module_options = options.reject { |k, _| !module_option_keys.include?(k.to_s) }
       Mobility.default_options.merge(module_options).each do |name, value|
         Backend.const_get(name.to_s.camelize).apply(backend_class, value, options)
       end

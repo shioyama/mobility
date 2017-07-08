@@ -179,7 +179,7 @@ with other backends.
       backend_class.include(Backend::Dirty.for(options[:model_class])) if options[:dirty]
       backend_class.include(Backend::Fallbacks)                        unless options[:fallbacks] == false
       backend_class.include(Backend::Presence)                         unless options[:presence] == false
-      backend_class.include(Backend::Default)                          if options[:default] != nil
+      backend_class.include(Backend::Default)                          if options.has_key?(:default)
     end
 
     def define_backend(attribute)

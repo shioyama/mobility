@@ -23,10 +23,10 @@ details.
       # @param [Boolean] option_value
       # @param [Hash] options
       # @option [Class] model_class
-      def self.apply(backend_class, option_value, model_class: nil, **_options)
+      def self.apply(backend_class, option_value, options)
         if option_value
           options[:fallthrough_accessors] = true if options[:fallthrough_accessors] != false
-          backend_class.include(self.for(model_class))
+          backend_class.include(self.for(options[:model_class]))
         end
       end
 

@@ -127,6 +127,7 @@ with other backends.
     #   this model backend. Will default to +true+ if +dirty+ option is +true+.
     # @option options_ [Boolean] presence (true) Enable presence filter on
     #   reads and writes
+    # @option options_ [Object] default Enable default value for this model backend
     # @raise [ArgumentError] if method is not reader, writer or accessor
     def initialize(method, *attributes_, **options_)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
@@ -178,6 +179,7 @@ with other backends.
       backend_class.include(Backend::Dirty.for(options[:model_class])) if options[:dirty]
       backend_class.include(Backend::Fallbacks)                        unless options[:fallbacks] == false
       backend_class.include(Backend::Presence)                         unless options[:presence] == false
+      backend_class.include(Backend::Default)                          if options[:default] != nil
     end
 
     def define_backend(attribute)

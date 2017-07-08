@@ -53,6 +53,7 @@ On top of this, a backend will normally:
     autoload :ActiveRecord, 'mobility/backend/active_record'
     autoload :Cache,        'mobility/backend/cache'
     autoload :Column,       'mobility/backend/column'
+    autoload :Default,      'mobility/backend/default'
     autoload :Dirty,        'mobility/backend/dirty'
     autoload :Fallbacks,    'mobility/backend/fallbacks'
     autoload :Hstore,       'mobility/backend/hstore'

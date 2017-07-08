@@ -437,6 +437,36 @@ fallbacks](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Fallbacks)
 and [this article on I18n
 fallbacks](https://github.com/svenfuchs/i18n/wiki/Fallbacks).
 
+### <a name="default"></a>Default values
+
+Another option is to assign a default value, which will be used if the result of a fetch would otherwise be `nil`:
+
+```ruby
+class Word < ApplicationRecord
+  include Mobility
+  translates :name, type: :string, default: 'foo'
+end
+
+Mobility.locale = :ja
+word = Word.create(name: "モビリティ")
+word.name
+#=> "モビリティ"
+Mobility.locale = :de
+word.name
+#=> "foo"
+```
+
+You can override the default by passing a `default` option to the attribute reader:
+
+```ruby
+word.name
+#=> 'foo'
+word.name(default: nil)
+#=> nil
+word.name(default: 'bar')
+#=> 'bar'
+```
+
 ### <a name="dirty"></a>Dirty Tracking
 
 Dirty tracking (tracking of changed attributes) can be enabled for models which

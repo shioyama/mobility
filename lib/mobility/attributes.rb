@@ -175,11 +175,9 @@ with other backends.
 
     # Include backend modules depending on value of options.
     def include_backend_modules(backend_class, options)
-      Backend::Cache.apply(backend_class, options[:cache], options)
-      Backend::Dirty.apply(backend_class, options[:dirty], options)
-      Backend::Fallbacks.apply(backend_class, options[:fallbacks], options)
-      Backend::Presence.apply(backend_class, options[:presence], options)
-      Backend::Default.apply(backend_class, options[:default], options)
+      %w[cache dirty fallbacks presence default].each do |name|
+        Backend.const_get(name.camelize).apply(backend_class, options[name.to_sym], options)
+      end
     end
 
     def define_backend(attribute)

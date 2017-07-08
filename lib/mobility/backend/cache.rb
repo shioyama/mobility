@@ -33,6 +33,13 @@ this).
 
 =end
     module Cache
+      # @param [Class] backend_class
+      # @param [Boolean] value
+      # @param [Hash] _options
+      def self.apply(backend_class, value, **_options)
+        backend_class.include(self) unless value == false
+      end
+
       # @group Backend Accessors
       # @!macro backend_reader
       # @param [Hash] options

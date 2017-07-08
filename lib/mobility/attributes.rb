@@ -175,11 +175,11 @@ with other backends.
 
     # Include backend modules depending on value of options.
     def include_backend_modules(backend_class, options)
-      backend_class.include(Backend::Cache)                            unless options[:cache] == false
-      backend_class.include(Backend::Dirty.for(options[:model_class])) if options[:dirty]
-      backend_class.include(Backend::Fallbacks)                        unless options[:fallbacks] == false
-      backend_class.include(Backend::Presence)                         unless options[:presence] == false
-      backend_class.include(Backend::Default)                          if options.has_key?(:default)
+      Backend::Cache.apply(backend_class, options[:cache], options)
+      Backend::Dirty.apply(backend_class, options[:dirty], options)
+      Backend::Fallbacks.apply(backend_class, options[:fallbacks], options)
+      Backend::Presence.apply(backend_class, options[:presence], options)
+      Backend::Default.apply(backend_class, options[:default], options)
     end
 
     def define_backend(attribute)

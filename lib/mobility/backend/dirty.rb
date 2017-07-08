@@ -19,6 +19,14 @@ details.
 
 =end
     module Dirty
+      # @param [Class] backend_class
+      # @param [Boolean] value
+      # @param [Hash] options
+      # @option [Class] model_class
+      def self.apply(backend_class, value, **options)
+        backend_class.include(self.for(options[:model_class])) if value
+      end
+
       # @param model_class Class of model this backend is defined on.
       # @return [Backend]
       # @raise [ArgumentError] if model class does not support dirty tracking

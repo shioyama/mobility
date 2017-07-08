@@ -48,6 +48,13 @@ otherwise be nil.
   #=> "Post"
 =end
     module Default
+      # @param [Class] backend_class
+      # @param [Boolean] _value
+      # @param [Hash] options
+      def self.apply(backend_class, _value, **options)
+        backend_class.include(self) if options.has_key?(:default)
+      end
+
       # @!macro [new] backend_constructor
       #   @option backend_options [Object] default Default value
       def initialize(*args, **backend_options)

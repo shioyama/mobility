@@ -137,14 +137,11 @@ with other backends.
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,
                                                    model_class: model_class))
-      if (options[:dirty] && options[:fallthrough_accessors] != false)
-        options[:fallthrough_accessors] = true
-      end
-      include FallthroughAccessors.new(*attributes) if options[:fallthrough_accessors]
-
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)
 
       include_backend_modules(@backend_class, options)
+
+      include FallthroughAccessors.new(*attributes) if options[:fallthrough_accessors]
 
       @accessor_locales = options[:locale_accessors]
       @accessor_locales = Mobility.config.default_accessor_locales if @accessor_locales == true

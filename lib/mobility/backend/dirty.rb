@@ -23,8 +23,11 @@ details.
       # @param [Boolean] value
       # @param [Hash] options
       # @option [Class] model_class
-      def self.apply(backend_class, value, **options)
-        backend_class.include(self.for(options[:model_class])) if value
+      def self.apply(backend_class, value, model_class: nil, **_options)
+        if value
+          options[:fallthrough_accessors] = true if options[:fallthrough_accessors] != false
+          backend_class.include(self.for(model_class))
+        end
       end
 
       # @param model_class Class of model this backend is defined on.

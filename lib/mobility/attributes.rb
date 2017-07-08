@@ -172,8 +172,9 @@ with other backends.
 
     # Include backend modules depending on value of options.
     def include_backend_modules(backend_class, options)
-      %w[cache dirty fallbacks presence default].each do |name|
-        Backend.const_get(name.camelize).apply(backend_class, options[name.to_sym], options)
+      module_options = options.reject { |k, v| !module_option_keys.include?(k.to_s) }
+      Mobility.default_options.merge(module_options).each do |name, value|
+        Backend.const_get(name.to_s.camelize).apply(backend_class, value, options)
       end
     end
 
@@ -208,6 +209,12 @@ with other backends.
       raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
       klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''.freeze).freeze)
       model_class.nil? ? klass : klass.for(model_class)
+    end
+
+    def module_option_keys
+      Mobility::Backend.constants.select do |c|
+        Mobility::Backend.const_get(c).methods.include?(:apply)
+      end.map { |c| c.to_s.downcase }
     end
   end
 end

@@ -77,10 +77,10 @@ locale was +nil+.
 =end
     module Fallbacks
       # @param [Class] backend_class
-      # @param [Boolean] value
+      # @param [Boolean] option_value
       # @param [Hash] _options
-      def self.apply(backend_class, value, **_options)
-        backend_class.include(self) unless value == false
+      def self.apply(backend_class, option_value, **_options)
+        backend_class.include(self) unless option_value == false
       end
 
       # @!macro [new] backend_constructor

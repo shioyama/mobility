@@ -20,11 +20,11 @@ details.
 =end
     module Dirty
       # @param [Class] backend_class
-      # @param [Boolean] value
+      # @param [Boolean] option_value
       # @param [Hash] options
       # @option [Class] model_class
-      def self.apply(backend_class, value, model_class: nil, **_options)
-        if value
+      def self.apply(backend_class, option_value, model_class: nil, **_options)
+        if option_value
           options[:fallthrough_accessors] = true if options[:fallthrough_accessors] != false
           backend_class.include(self.for(model_class))
         end

@@ -13,6 +13,10 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Symbol]
     attr_accessor :query_method
 
+    # Default set of options
+    # @return [Hash]
+    attr_accessor :default_options
+
     # Default fallbacks instance
     # @return [I18n::Locale::Fallbacks]
     def default_fallbacks(fallbacks = {})
@@ -41,6 +45,12 @@ Stores shared Mobility configuration referenced by all backends.
       @query_method = :i18n
       @default_fallbacks = lambda { |fallbacks| I18n::Locale::Fallbacks.new(fallbacks) }
       @default_accessor_locales = lambda { I18n.available_locales }
+      @default_options = {
+        cache: true,
+        dirty: false,
+        fallbacks: nil,
+        presence: true
+      }
     end
   end
 end

@@ -467,6 +467,9 @@ word.name(default: 'bar')
 #=> 'bar'
 ```
 
+The default can also be a `Proc`, which will be passed the model and attribute
+name as keyword arguments. See the [API docs][docs] for details.
+
 ### <a name="dirty"></a>Dirty Tracking
 
 Dirty tracking (tracking of changed attributes) can be enabled for models which

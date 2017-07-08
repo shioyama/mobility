@@ -1,8 +1,9 @@
 require "spec_helper"
 
 describe Mobility::Backend::Default do
+  let(:default) { 'default foo' }
   let(:backend_double) { double("backend") }
-  let(:backend) { backend_class.new("model", "attribute", default: 'default foo') }
+  let(:backend) { backend_class.new("model", "title", default: default) }
   let(:backend_class) do
     backend_double_ = backend_double
     backend_class = Class.new(Mobility::Backend::Null) do
@@ -41,6 +42,22 @@ describe Mobility::Backend::Default do
     it "returns false if passed default: false as option to reader" do
       expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(nil)
       expect(backend.read(:fr, default: false)).to eq(false)
+    end
+
+    context "default is a Proc" do
+      let(:default) { lambda { |model:, attribute:| "#{model} #{attribute}" } }
+
+      it "calls default with model and attribute as args if default is a Proc" do
+        expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(nil)
+        expect(backend.read(:fr)).to eq('model title')
+      end
+
+      it "calls default with model and attribute as args if default option is a Proc" do
+        expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(nil)
+        expect(backend.read(:fr, default: lambda do |model:, attribute:|
+          "#{model} #{attribute} from options"
+        end)).to eq('model title from options')
+      end
     end
   end
 end

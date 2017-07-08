@@ -34,6 +34,18 @@ otherwise be nil.
 
   post.title(default: nil)
   #=> nil
+
+@example Using Proc as default
+  class Post
+    translates :title, default: lambda { |model:, attribute:| attribute.to_s }
+  end
+
+  post = Post.new(title: nil)
+  post.title
+  #=> "title"
+
+  post.title(default: lambda { |model:| model.class.name.to_s }
+  #=> "Post"
 =end
     module Default
       # @!macro [new] backend_constructor
@@ -50,7 +62,7 @@ otherwise be nil.
       #   this read.
       def read(locale, **options)
         default = options.has_key?(:default) ? options.delete(:default) : @default
-        super || default
+        super || (default.is_a?(Proc) ? default.call(model: model, attribute:attribute) : default)
       end
     end
   end

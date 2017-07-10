@@ -62,7 +62,11 @@ otherwise be nil.
       #   this read.
       def read(locale, **options)
         default = options.has_key?(:default) ? options.delete(:default) : @default
-        super || (default.is_a?(Proc) ? default.call(model: model, attribute:attribute) : default)
+        if (value = super).nil?
+          default.is_a?(Proc) ? default.call(model: model, attribute:attribute) : default
+        else
+          value
+        end
       end
     end
   end

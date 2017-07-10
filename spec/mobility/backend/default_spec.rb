@@ -24,6 +24,11 @@ describe Mobility::Backend::Default do
       expect(backend.read(:fr)).to eq("foo")
     end
 
+    it "returns value if value is false" do
+      expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(false)
+      expect(backend.read(:fr)).to eq(false)
+    end
+
     it "returns default if backend return value is nil" do
       expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(nil)
       expect(backend.read(:fr)).to eq("default foo")

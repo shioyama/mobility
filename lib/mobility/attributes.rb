@@ -95,9 +95,9 @@ with other backends.
 
 =end
   class Attributes < Module
-    # Attributes for which accessors will be defined
-    # @return [Array<String>] Array of attributes
-    attr_reader :attributes
+    # Attribute names for which accessors will be defined
+    # @return [Array<String>] Array of names
+    attr_reader :names
 
     # Backend options
     # @return [Hash] Backend options
@@ -112,7 +112,7 @@ with other backends.
     attr_reader :backend_name
 
     # @param [Symbol] method One of: [reader, writer, accessor]
-    # @param [Array<String>] attributes_ Attributes to define backend for
+    # @param [Array<String>] names_ Names of attributes to define backend for
     # @param [Hash] options_ Backend options hash
     # @option options_ [Class] model_class Class of model
     # @option options_ [Boolean] cache (true) Enable cache for this model backend
@@ -129,10 +129,10 @@ with other backends.
     #   reads and writes
     # @option options_ [Object] default Enable default value for this model backend
     # @raise [ArgumentError] if method is not reader, writer or accessor
-    def initialize(method, *attributes_, **options_)
+    def initialize(method, *names_, **options_)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @options = options_
-      @attributes = attributes_.map(&:to_s)
+      @names = names_.map(&:to_s)
       model_class = options[:model_class]
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,
@@ -145,10 +145,10 @@ with other backends.
         klass.apply(self, options[key], options)
       end
 
-      attributes.each do |attribute|
-        define_backend(attribute)
-        define_reader(attribute) if %i[accessor reader].include?(method)
-        define_writer(attribute) if %i[accessor writer].include?(method)
+      names.each do |name|
+        define_backend(name)
+        define_reader(name) if %i[accessor reader].include?(method)
+        define_writer(name) if %i[accessor writer].include?(method)
       end
     end
 
@@ -157,13 +157,13 @@ with other backends.
     # @param model_class [Class] Class of model
     def included(model_class)
       model_class.mobility << self
-      backend_class.setup_model(model_class, attributes, options)
+      backend_class.setup_model(model_class, names, options)
     end
 
-    # Yield each attribute to block
+    # Yield each attribute name to block
     # @yield [String] Attribute
     def each &block
-      attributes.each(&block)
+      names.each(&block)
     end
 
     private

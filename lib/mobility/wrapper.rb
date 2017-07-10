@@ -19,7 +19,7 @@ simple delegator, so any missing method will be delegated to the model class.
 
     # @return [Array<String>] Translated attributes defined on model
     def translated_attribute_names
-      modules.map(&:attributes).flatten
+      modules.map(&:names).flatten
     end
 
     # Appends backend module to +modules+ array for later reference.

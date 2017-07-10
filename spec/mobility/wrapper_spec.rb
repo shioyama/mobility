@@ -13,8 +13,8 @@ describe Mobility::Wrapper do
 
   describe "#translated_attribute_names" do
     it "returns flattened array of module attributes" do
-      module1 = double("backend module", attributes: ["foo", "bar"])
-      module2 = double("backend module", attributes: ["baz"])
+      module1 = double("attributes", names: ["foo", "bar"])
+      module2 = double("attributes", names: ["baz"])
       wrapper = Mobility::Wrapper.new(model_class)
       wrapper << module1
       wrapper << module2

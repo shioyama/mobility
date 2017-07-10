@@ -37,7 +37,7 @@ model class is generated.
     # @param [Attributes] attributes
     # @param [Boolean] option_value
     def self.apply(attributes, option_value, **_)
-      attributes.include new(*attributes.attributes) if option_value
+      attributes.include new(*attributes.names) if option_value
     end
 
     # @param [String] One or more attributes

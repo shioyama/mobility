@@ -34,7 +34,7 @@ If no locales are passed as an option to the initializer,
     def self.apply(attributes, option_value, **options)
       if accessor_locales = option_value
         accessor_locales = Mobility.config.default_accessor_locales if accessor_locales == true
-        attributes.include new(*attributes.attributes, locales: accessor_locales)
+        attributes.include new(*attributes.names, locales: accessor_locales)
       end
     end
 

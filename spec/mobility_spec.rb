@@ -57,7 +57,7 @@ describe Mobility do
         backend_module = model.ancestors.find { |a| a.class == Mobility::Attributes }
         expect(backend_module).not_to be_nil
         expect(backend_module.attributes).to eq ["title"]
-        expect(backend_module.options).to eq(foo: :bar, model_class: MyModel)
+        expect(backend_module.options).to eq(Mobility.default_options.merge(foo: :bar, model_class: MyModel))
       end
 
       it "defines translated_attribute_names" do

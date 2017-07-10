@@ -48,11 +48,11 @@ otherwise be nil.
   #=> "Post"
 =end
     module Default
-      # @param [Class] backend_class
-      # @param [Boolean] _value
+      # @param [Attributes] attributes
+      # @param [Boolean] _option_value
       # @param [Hash] options
-      def self.apply(backend_class, _value, **options)
-        backend_class.include(self) if options.has_key?(:default)
+      def self.apply(attributes, _option_value, **options)
+        attributes.backend_class.include(self) if options.has_key?(:default)
       end
 
       # @!macro [new] backend_constructor

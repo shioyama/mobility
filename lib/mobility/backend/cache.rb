@@ -33,11 +33,10 @@ this).
 
 =end
     module Cache
-      # @param [Class] backend_class
+      # @param [Attributes] attributes
       # @param [Boolean] option_value
-      # @param [Hash] _options
-      def self.apply(backend_class, option_value, **_options)
-        backend_class.include(self) if option_value
+      def self.apply(attributes, option_value, **_)
+        attributes.backend_class.include(self) if option_value
       end
 
       # @group Backend Accessors

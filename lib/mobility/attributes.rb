@@ -137,15 +137,13 @@ with other backends.
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,
                                                    model_class: model_class))
+
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)
 
-      include_backend_modules(@backend_class, options)
-
-      include FallthroughAccessors.new(*attributes) if options[:fallthrough_accessors]
-
-      @accessor_locales = options[:locale_accessors]
-      @accessor_locales = Mobility.config.default_accessor_locales if @accessor_locales == true
-      include LocaleAccessors.new(*attributes, locales: @accessor_locales) if @accessor_locales
+      @options = Mobility.default_options.merge(options)
+      Mobility.option_modules.each do |key, klass|
+        klass.apply(self, options[key], options)
+      end
 
       attributes.each do |attribute|
         define_backend(attribute)
@@ -169,14 +167,6 @@ with other backends.
     end
 
     private
-
-    # Include backend modules depending on value of options.
-    def include_backend_modules(backend_class, options)
-      module_options = options.reject { |k, _| !module_option_keys.include?(k.to_s) }
-      Mobility.default_options.merge(module_options).each do |name, value|
-        Backend.const_get(name.to_s.camelize).apply(backend_class, value, options)
-      end
-    end
 
     def define_backend(attribute)
       _backend_class, _options = backend_class, options
@@ -209,12 +199,6 @@ with other backends.
       raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
       klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''.freeze).freeze)
       model_class.nil? ? klass : klass.for(model_class)
-    end
-
-    def module_option_keys
-      Mobility::Backend.constants.select do |c|
-        Mobility::Backend.const_get(c).methods.include?(:apply)
-      end.map { |c| c.to_s.downcase }
     end
   end
 end

@@ -48,11 +48,11 @@ describe Mobility::Attributes do
   describe "including Attributes in a model" do
     it "calls configure on backend class with options" do
       expect(backend_class).to receive(:configure).with({ foo: "bar" })
-      Article.include described_class.new(:accessor, "title", { backend: backend_class, foo: "bar" })
+      described_class.new(:accessor, "title", { backend: backend_class, foo: "bar" })
     end
 
     it "calls setup_model on backend class with model_class, attributes, and options" do
-      expect(backend_class).to receive(:setup_model).with(Article, ["title"], {})
+      expect(backend_class).to receive(:setup_model).with(Article, ["title"], Mobility.default_options)
       Article.include described_class.new(:accessor, "title", { backend: backend_class })
     end
 
@@ -64,14 +64,14 @@ describe Mobility::Attributes do
 
     describe "cache" do
       it "includes Backend::Cache into backend when options[:cache] is not false" do
-        expect(backend_class).to receive(:include).with(Mobility::Backend::Cache)
         clean_options.delete(:cache)
-        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
+        attributes = described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
+        expect(attributes.backend_class.ancestors).to include(Mobility::Backend::Cache)
       end
 
       it "does not include Backend::Cache into backend when options[:cache] is false" do
-        expect(backend_class).not_to receive(:include).with(Mobility::Backend::Cache)
-        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
+        attributes = described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
+        expect(attributes.backend_class.ancestors).not_to include(Mobility::Backend::Cache)
       end
     end
 
@@ -80,7 +80,7 @@ describe Mobility::Attributes do
         it "includes Backend::ActiveModel::Dirty into backend when options[:dirty] is truthy and model class includes ActiveModel::Dirty" do
           expect(backend_class).to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
           Article.include ::ActiveModel::Dirty
-          Article.include described_class.new(:accessor, "title", clean_options.merge(
+          described_class.new(:accessor, "title", clean_options.merge(
             backend: backend_class,
             dirty: true,
             model_class: Article
@@ -89,7 +89,7 @@ describe Mobility::Attributes do
 
         it "does not include Backend::Model::Dirty into backend when options[:dirty] is falsey" do
           expect(backend_class).not_to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
-          Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_class, model_class: Article))
+          described_class.new(:accessor, "title", clean_options.merge(backend: backend_class, model_class: Article))
         end
       end
 
@@ -101,7 +101,7 @@ describe Mobility::Attributes do
 
         it "includes Backend::Sequel::Dirty into backend when options[:dirty] is truthy and model class is a ::Sequel::Model" do
           expect(backend_class).to receive(:include).with(Mobility::Backend::Sequel::Dirty)
-          Article.include described_class.new(:accessor, "title", clean_options.merge(
+          described_class.new(:accessor, "title", clean_options.merge(
             backend: backend_class,
             dirty: true,
             model_class: Article
@@ -120,21 +120,21 @@ describe Mobility::Attributes do
 
     describe "fallbacks" do
       it "includes Backend::Fallbacks into backend when options[:fallbacks] is not false" do
-        expect(backend_class).to receive(:include).with(Mobility::Backend::Fallbacks)
         clean_options.delete(:fallbacks)
-        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
+        attributes = described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
+        expect(attributes.backend_class.ancestors).to include(Mobility::Backend::Fallbacks)
       end
 
       it "does not include Backend::Fallbacks into backend when options[:fallbacks] is false" do
         expect(backend_class).not_to receive(:include).with(Mobility::Backend::Fallbacks)
-        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
+        described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
       end
     end
 
     describe "default" do
       it "includes Backend::Default into backend when options has key :default" do
         expect(backend_class).to receive(:include).with(Mobility::Backend::Default)
-        Article.include described_class.new(:accessor, "title", clean_options.merge(backend: backend_class, default: nil))
+        described_class.new(:accessor, "title", clean_options.merge(backend: backend_class, default: nil))
       end
     end
 
@@ -145,12 +145,12 @@ describe Mobility::Attributes do
       let(:article) { Article.new }
 
       it "defines <attribute_name>_backend method which returns backend instance" do
-        expect(backend_class).to receive(:new).once.with(article, "title", { foo: "bar" }).and_call_original
+        expect(backend_class).to receive(:new).once.with(article, "title", Mobility.default_options.merge(foo: "bar")).and_call_original
         expect(article.mobility_backend_for("title")).to be_a(Mobility::Backend::Null)
       end
 
       it "memoizes backend instance" do
-        expect(backend_class).to receive(:new).once.with(article, "title", { foo: "bar" }).and_call_original
+        expect(backend_class).to receive(:new).once.with(article, "title", Mobility.default_options.merge(foo: "bar")).and_call_original
         2.times { article.mobility_backend_for("title") }
       end
     end

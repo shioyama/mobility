@@ -76,11 +76,11 @@ locale was +nil+.
   #=> "Mobilité"
 =end
     module Fallbacks
-      # @param [Class] backend_class
+      # @param [Attributes] attributes
       # @param [Boolean] option_value
       # @param [Hash] _options
-      def self.apply(backend_class, option_value, **_options)
-        backend_class.include(self) unless option_value == false
+      def self.apply(attributes, option_value, **_options)
+        attributes.backend_class.include(self) unless option_value == false
       end
 
       # @!macro [new] backend_constructor

@@ -17,6 +17,10 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Hash]
     attr_accessor :default_options
 
+    # Option modules to apply
+    # @return [Hash]
+    attr_accessor :option_modules
+
     # Default fallbacks instance
     # @return [I18n::Locale::Fallbacks]
     def default_fallbacks(fallbacks = {})
@@ -49,7 +53,17 @@ Stores shared Mobility configuration referenced by all backends.
         cache: true,
         dirty: false,
         fallbacks: nil,
-        presence: true
+        presence: true,
+        default: nil
+      }
+      @option_modules = {
+        cache:                 Backend::Cache,
+        dirty:                 Backend::Dirty,
+        fallbacks:             Backend::Fallbacks,
+        presence:              Backend::Presence,
+        default:               Backend::Default,
+        fallthrough_accessors: FallthroughAccessors,
+        locale_accessors:      LocaleAccessors
       }
     end
   end

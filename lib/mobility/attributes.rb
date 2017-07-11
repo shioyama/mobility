@@ -112,27 +112,27 @@ with other backends.
     attr_reader :backend_name
 
     # @param [Symbol] method One of: [reader, writer, accessor]
-    # @param [Array<String>] names_ Names of attributes to define backend for
-    # @param [Hash] options_ Backend options hash
-    # @option options_ [Class] model_class Class of model
-    # @option options_ [Boolean] cache (true) Enable cache for this model backend
-    # @option options_ [Boolean] dirty Enable dirty tracking for this model
+    # @param [Array<String>] attribute_names Names of attributes to define backend for
+    # @param [Hash] backend_options Backend options hash
+    # @option backend_options [Class] model_class Class of model
+    # @option backend_options [Boolean] cache (true) Enable cache for this model backend
+    # @option backend_options [Boolean] dirty Enable dirty tracking for this model
     #   backend
-    # @option options_ [Boolean, Hash] fallbacks Enable fallbacks or specify
+    # @option backend_options [Boolean, Hash] fallbacks Enable fallbacks or specify
     #   fallbacks for this model backend
-    # @option options_ [Boolean] fallthrough_accessors Enable fallthrough
+    # @option backend_options [Boolean] fallthrough_accessors Enable fallthrough
     #   locale accessors for this model backend
-    # @option options_ [Boolean, Array<Symbol>] locale_accessors Enable locale
+    # @option backend_options [Boolean, Array<Symbol>] locale_accessors Enable locale
     #   accessors or specify locales for which accessors should be defined on
     #   this model backend. Will default to +true+ if +dirty+ option is +true+.
-    # @option options_ [Boolean] presence (true) Enable presence filter on
+    # @option backend_options [Boolean] presence (true) Enable presence filter on
     #   reads and writes
-    # @option options_ [Object] default Enable default value for this model backend
+    # @option backend_options [Object] default Enable default value for this model backend
     # @raise [ArgumentError] if method is not reader, writer or accessor
-    def initialize(method, *names_, **options_)
+    def initialize(method, *attribute_names, **backend_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
-      @options = options_
-      @names = names_.map(&:to_s)
+      @options = backend_options
+      @names = attribute_names.map(&:to_s)
       model_class = options[:model_class]
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,

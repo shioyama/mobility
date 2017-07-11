@@ -7,6 +7,7 @@ otherwise be nil.
 
 @example With default enabled (falls through to default value)
   class Post
+    include Mobility
     translates :title, default: 'foo'
   end
 
@@ -19,6 +20,7 @@ otherwise be nil.
 
 @example Overriding default with reader option
   class Post
+    include Mobility
     translates :title, default: 'foo'
   end
 
@@ -37,6 +39,7 @@ otherwise be nil.
 
 @example Using Proc as default
   class Post
+    include Mobility
     translates :title, default: lambda { |model:, attribute:| attribute.to_s }
   end
 
@@ -44,19 +47,20 @@ otherwise be nil.
   post.title
   #=> "title"
 
-  post.title(default: lambda { |model:| model.class.name.to_s }
+  post.title(default: lambda { |model:| model.class.name.to_s })
   #=> "Post"
 =end
     module Default
+      # Applies default option module to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] _option_value
-      # @param [Hash] options
+      # @option options [Object] default Default value
       def self.apply(attributes, _option_value, **options)
         attributes.backend_class.include(self) if options.has_key?(:default)
       end
 
       # @!macro [new] backend_constructor
-      #   @option backend_options [Object] default Default value
+      # @option backend_options [Object] default Default value
       def initialize(*args, **backend_options)
         super
         @default = backend_options[:default]

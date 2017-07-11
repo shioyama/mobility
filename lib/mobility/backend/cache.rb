@@ -33,6 +33,7 @@ this).
 
 =end
     module Cache
+      # Applies cache option module to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option_value
       def self.apply(attributes, option_value, **_)
@@ -41,8 +42,7 @@ this).
 
       # @group Backend Accessors
       # @!macro backend_reader
-      # @param [Hash] options
-      # @param [Boolean] cache
+      # @option options [Boolean] cache
       #   *false* to disable cache.
       def read(locale, **options)
         return super if options.delete(:cache) == false
@@ -54,8 +54,7 @@ this).
       end
 
       # @!macro backend_writer
-      # @param [Hash] options
-      # @param [Boolean] cache
+      # @option options [Boolean] cache
       #   *false* to disable cache.
       def write(locale, value, **options)
         return super if options.delete(:cache) == false

@@ -76,10 +76,10 @@ locale was +nil+.
   #=> "Mobilité"
 =end
     module Fallbacks
+      # Applies fallbacks option module to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option_value
-      # @param [Hash] _options
-      def self.apply(attributes, option_value, **_options)
+      def self.apply(attributes, option_value, **_)
         attributes.backend_class.include(self) unless option_value == false
       end
 
@@ -99,7 +99,8 @@ locale was +nil+.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      # @param [Boolean,Symbol,Array] fallback
+      # @param [Hash] options
+      # @option options [Boolean,Symbol,Array] fallback
       #   +false+ to disable fallbacks on lookup, or a locale or array of
       #   locales to set fallback(s) for this lookup.
       def read(locale, **options)

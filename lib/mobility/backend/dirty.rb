@@ -19,10 +19,11 @@ details.
 
 =end
     module Dirty
+      # Applies dirty option module to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option_value
-      # @param [Hash] options
-      # @option [Class] model_class
+      # @option options [Class] model_class
+      # @option options [Boolean] fallthrough_accessors
       def self.apply(attributes, option_value, options)
         if option_value
           options[:fallthrough_accessors] = true if options[:fallthrough_accessors] != false

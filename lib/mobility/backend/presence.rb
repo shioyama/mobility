@@ -3,10 +3,11 @@ module Mobility
 =begin
 
 Applies presence filter to values fetched from backend and to values set on
-backend. Included by default, but can be disabled with presence: false option.
+backend. Included by default, but can be disabled with +presence: false+ option.
 
 =end
     module Presence
+      # Applies presence option module to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option_value
       def self.apply(attributes, option_value, **_)
@@ -15,7 +16,7 @@ backend. Included by default, but can be disabled with presence: false option.
 
       # @group Backend Accessors
       # @!macro backend_reader
-      # @param [Boolean] presence
+      # @option options [Boolean] presence
       #   *false* to disable presence filter.
       def read(locale, **options)
         return super if options.delete(:presence) == false
@@ -25,7 +26,7 @@ backend. Included by default, but can be disabled with presence: false option.
 
       # @group Backend Accessors
       # @!macro backend_writer
-      # @param [Boolean] presence
+      # @option options [Boolean] presence
       #   *false* to disable presence filter.
       def write(locale, value, **options)
         return super if options.delete(:presence) == false

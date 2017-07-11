@@ -13,11 +13,15 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Symbol]
     attr_accessor :query_method
 
-    # Default set of options
+    # Default set of options. These will be merged with any backend options
+    # when defining translated attributes (with +translates+).
     # @return [Hash]
     attr_accessor :default_options
 
-    # Option modules to apply
+    # Option modules to apply. Defines which module to apply for each option
+    # key. Order of hash keys/values is important, as this becomes the order in
+    # which modules are applied and included into the backend class or
+    # attributes instance.
     # @return [Hash]
     attr_accessor :option_modules
 

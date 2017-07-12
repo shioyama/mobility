@@ -55,7 +55,7 @@ otherwise be nil.
       # @param [Attributes] attributes
       # @option options [Object] default Default value
       def self.apply(attributes, _)
-        attributes.backend_class.include(self) if attributes.options.has_key?(:default)
+        attributes.backend_class.include(self)
       end
 
       # @!macro [new] backend_constructor

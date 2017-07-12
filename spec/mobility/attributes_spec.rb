@@ -132,9 +132,9 @@ describe Mobility::Attributes do
     end
 
     describe "default" do
-      it "includes Backend::Default into backend when options has key :default" do
+      it "includes Backend::Default into backend" do
         expect(backend_class).to receive(:include).with(Mobility::Backend::Default)
-        described_class.new(:accessor, "title", clean_options.merge(backend: backend_class, default: nil))
+        described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
       end
     end
 

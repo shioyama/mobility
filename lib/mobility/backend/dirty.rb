@@ -26,9 +26,8 @@ details.
       # @option options [Boolean] fallthrough_accessors
       def self.apply(attributes, option_value)
         if option_value
-          options = attributes.options
-          options[:fallthrough_accessors] = true if options[:fallthrough_accessors] != false
-          attributes.backend_class.include(self.for(options[:model_class]))
+          FallthroughAccessors.apply(attributes, true)
+          attributes.backend_class.include(self.for(attributes.options[:model_class]))
         end
       end
 

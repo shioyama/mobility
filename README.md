@@ -666,7 +666,7 @@ This would set the `name` attribute to use the `Table` backend (see below).
 The `type` option (`type: :string` or `type: :text`) is missing here because
 this is an option specific to the KeyValue backend (specifying which shared
 table to store translations on). Backends have their own specific options; see
-the [Wiki][wiki] and [API documentation][api] for which options are available
+the [Wiki][wiki] and [API documentation][docs] for which options are available
 for each.
 
 Everything else described above (fallbacks, dirty tracking, locale accessors,

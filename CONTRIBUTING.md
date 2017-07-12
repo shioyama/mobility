@@ -1,6 +1,6 @@
 # Contributing to Mobility
 
-Mobility is built to be developer friendly, with [detailed documentation](http://www.rubydoc.info/gems/mobility), a [Wiki](https://github.com/shioyama/mobility/wiki), and a very flexible interface. Contributions are welcome and encouraged! Bug reports, feature requests, and refactoring are all a great help, but please follow the instructions below to ensure things go as smoothly as possible.
+Thanks for your interest in contributing to Mobility! Contributions are welcomed and encouraged. Bug reports, feature requests, and refactoring are all a great help, but please follow the instructions below to ensure things go as smoothly as possible.
 
 ## Bugs
 
@@ -45,3 +45,11 @@ For more info, see the [Testing Backends](https://github.com/shioyama/mobility#t
 Once you've ensured that existing specs do not break, please try to write at least one spec covering the new feature. If you have questions about how to do this, first post the PR and we can help you in the PR comments section.
 
 Note that when you submit the pull request, Travis CI will run the [test suite](https://travis-ci.org/mobility/mobility) against your branch and will highlight any failures. Unless there is a good reason for it, we do not generally accept pull requests that take Mobility from green to red.
+
+# Other Resources
+
+Be sure to check out these resources for more detailed info on how Mobility works:
+
+- [API docs](http://www.rubydoc.info/gems/mobility)
+- [Wiki](https://github.com/shioyama/mobility/wiki)
+- [Translating with Mobility](http://dejimata.com/2017/3/3/translating-with-mobility)

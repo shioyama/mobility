@@ -14,7 +14,7 @@ Have an idea for a new feature? Great! Please sketch out what you are thinking o
 
 ## Questions
 
-If you are having issues understanding how to apply Mobility to your particular use case, or any other questions about the gem, please post a question to [Stack Overflow](http://stackoverflow.com) tagged with "mobility". If you don't get an answer, you can post an issue to the repository with a link to the question and someone will try to help you asap.
+If you are having issues understanding how to apply Mobility to your particular use case, or any other questions about the gem, please post a question to [Stack Overflow](http://stackoverflow.com) tagged with "mobility". If you don't get an answer, post an issue to the repository with a link to the question and someone will try to help you asap.
 
 ## Features
 
@@ -46,7 +46,7 @@ Once you've ensured that existing specs do not break, please try to write at lea
 
 Note that when you submit the pull request, Travis CI will run the [test suite](https://travis-ci.org/mobility/mobility) against your branch and will highlight any failures. Unless there is a good reason for it, we do not generally accept pull requests that take Mobility from green to red.
 
-# Other Resources
+## Other Resources
 
 Be sure to check out these resources for more detailed info on how Mobility works:
 

@@ -53,10 +53,9 @@ otherwise be nil.
     module Default
       # Applies default option module to attributes.
       # @param [Attributes] attributes
-      # @param [Boolean] _option_value
       # @option options [Object] default Default value
-      def self.apply(attributes, _option_value, **options)
-        attributes.backend_class.include(self) if options.has_key?(:default)
+      def self.apply(attributes, _)
+        attributes.backend_class.include(self) if attributes.options.has_key?(:default)
       end
 
       # @!macro [new] backend_constructor

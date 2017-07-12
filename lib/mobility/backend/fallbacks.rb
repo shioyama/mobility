@@ -79,7 +79,7 @@ locale was +nil+.
       # Applies fallbacks option module to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option_value
-      def self.apply(attributes, option_value, **_)
+      def self.apply(attributes, option_value)
         attributes.backend_class.include(self) unless option_value == false
       end
 

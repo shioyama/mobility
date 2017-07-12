@@ -142,7 +142,7 @@ with other backends.
 
       @options = Mobility.default_options.merge(options)
       Mobility.option_modules.each do |key, klass|
-        klass.apply(self, options[key], options)
+        klass.apply(self, options[key])
       end
 
       names.each do |name|

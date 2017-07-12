@@ -24,6 +24,7 @@ namespace :db do
       "postgres" => "psql -c 'create database #{config['database']};' -U #{config['username']} >/dev/null"
     }
     %x{#{commands[driver] || true}}
+    $?.success? ? puts("Database successfully created.") : puts("There was an error creating the database.")
   end
 
   desc "Drop the database"
@@ -37,6 +38,7 @@ namespace :db do
       "postgres" => "psql -c 'drop database #{config['database']};' -U #{config['username']} >/dev/null"
     }
     %x{#{commands[driver] || true}}
+    $?.success? ? puts("Database successfully dropped.") : puts("There was an error dropping the database.")
   end
 
   desc "Set up the database schema"

@@ -4,7 +4,7 @@ Mobility is built to be developer friendly, with [detailed documentation](http:/
 
 ## Bugs
 
-Notice a bug or something that seems like it's doing something it shouldn't? Great, that's valuable information. First off, make sure you go through the [Github issues](https://github.com/shioyama/mobility/issues?utf8=%E2%9C%93&q=is%3Aissue) to see if what you're experiencing has already been reported.
+Notice a bug or something that seems not to be working correctly? Great, that's valuable information. First off, make sure you go through the [Github issues](https://github.com/shioyama/mobility/issues?utf8=%E2%9C%93&q=is%3Aissue) to see if what you're experiencing has already been reported.
 
 If not, please post a new issue explaining how the issue happens, and steps to reproduce it. Also include what backend you are using, what ORM (ActiveRecord, Sequel, etc.), what Ruby version, and if relevant what platform, etc.
 
@@ -32,10 +32,10 @@ This will run specs which are not dependent on any ORM (pure Ruby specs only). T
 ORM=active_record bundle exec rspec
 ```
 
-In addition, you can specify the database with the `DB` env (`DB=mysql ORM=active_record bundle exec rspec`) and also the Rails (or Sequel) version, e.g.:
+This will run AR specs with an sqlite3 in-memory database. If you want to run specs against a specific database, you will need to specify which database to use with the `DB` env (either `mysql` or `postgres`), and first create and migrate the database:
 
 ```ruby
-ORM=active_record DB=postgres RAILS_VERSION=5.1 bundle exec rspec
+ORM=active_record DB=postgres bundle exec rspec
 ```
 
 ... will run the specs against Mobility running with AR 5.1 with postgres as the database.

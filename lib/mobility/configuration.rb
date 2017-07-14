@@ -5,6 +5,8 @@ Stores shared Mobility configuration referenced by all backends.
 
 =end
   class Configuration
+    RESERVED_OPTION_KEYS = %i[backend model_class].freeze
+
     # Alias for mobility_accessor (defaults to +translates+)
     # @return [Symbol]
     attr_accessor :accessor_method
@@ -14,9 +16,18 @@ Stores shared Mobility configuration referenced by all backends.
     attr_accessor :query_method
 
     # Default set of options. These will be merged with any backend options
-    # when defining translated attributes (with +translates+).
+    # when defining translated attributes (with +translates+). Default options
+    # may not include the keys 'backend' or 'model_class'.
     # @return [Hash]
-    attr_accessor :default_options
+    attr_reader :default_options
+    def default_options=(options)
+      if (keys = options.keys & RESERVED_OPTION_KEYS).present?
+        raise ReservedOptionKey,
+          "Default options may not contain the following reserved keys: #{keys.join(', ')}"
+      else
+        @default_options = options
+      end
+    end
 
     # Option modules to apply. Defines which module to apply for each option
     # key. Order of hash keys/values is important, as this becomes the order in
@@ -70,5 +81,7 @@ Stores shared Mobility configuration referenced by all backends.
         locale_accessors:      LocaleAccessors
       }
     end
+
+    class ReservedOptionKey < Exception; end
   end
 end

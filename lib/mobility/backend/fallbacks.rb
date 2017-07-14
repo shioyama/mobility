@@ -84,23 +84,28 @@ locale was +nil+.
       end
 
       def initialize(fallbacks_option)
-        fallbacks = convert_option_to_fallbacks(fallbacks_option)
+        define_read(convert_option_to_fallbacks(fallbacks_option))
+      end
 
+      private
+
+      def define_read(fallbacks)
         define_method :read do |locale, **options|
           if !options[:fallbacks].nil?
             warn "You passed an option with key 'fallbacks', which will be ignored. Did you mean 'fallback'?"
           end
           fallback = options.delete(:fallback)
-          return super(locale, **options) if fallback == false || (fallback.nil? && fallbacks.nil?)
 
-          (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
-            value = super(fallback_locale, **options)
-            break value if value.present?
+          if fallback == false || (fallback.nil? && fallbacks.nil?)
+            super(locale, **options)
+          else
+            (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
+              value = super(fallback_locale, **options)
+              break value if value.present?
+            end
           end
         end
       end
-
-      private
 
       def convert_option_to_fallbacks(option)
         if option.is_a?(Hash)

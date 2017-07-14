@@ -133,10 +133,9 @@ with other backends.
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @options = Mobility.default_options.merge(backend_options)
       @names = attribute_names.map(&:to_s)
-      model_class = options[:model_class]
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
       @backend_class = Class.new(get_backend_class(backend:     @backend_name,
-                                                   model_class: model_class))
+                                                   model_class: options[:model_class]))
 
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)
 

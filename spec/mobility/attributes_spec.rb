@@ -47,7 +47,7 @@ describe Mobility::Attributes do
 
   describe "including Attributes in a model" do
     it "calls configure on backend class with options" do
-      expect(backend_class).to receive(:configure).with({ foo: "bar" })
+      expect(backend_class).to receive(:configure).with(Mobility.default_options.merge(foo: "bar"))
       described_class.new(:accessor, "title", { backend: backend_class, foo: "bar" })
     end
 

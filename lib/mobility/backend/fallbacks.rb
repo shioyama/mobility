@@ -91,9 +91,6 @@ locale was +nil+.
 
       def define_read(fallbacks)
         define_method :read do |locale, **options|
-          if !options[:fallbacks].nil?
-            warn "You passed an option with key 'fallbacks', which will be ignored. Did you mean 'fallback'?"
-          end
           fallback = options.delete(:fallback)
 
           if fallback == false || (fallback.nil? && fallbacks.nil?)

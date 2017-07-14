@@ -50,32 +50,22 @@ otherwise be nil.
   post.title(default: lambda { |model:| model.class.name.to_s })
   #=> "Post"
 =end
-    module Default
+    class Default < Module
       # Applies default option module to attributes.
       # @param [Attributes] attributes
-      # @option options [Object] default Default value
-      def self.apply(attributes, _)
-        attributes.backend_class.include(self)
+      # @param [Object] option
+      def self.apply(attributes, option)
+        attributes.backend_class.include(new(option))
       end
 
-      # @!macro [new] backend_constructor
-      # @option backend_options [Object] default Default value
-      def initialize(*args, **backend_options)
-        super
-        @default = backend_options[:default]
-      end
-
-      # @group Backend Accessors
-      # @!macro backend_reader
-      # @param [Boolean] default
-      #   *false* to disable default value, or another value to set default for
-      #   this read.
-      def read(locale, **options)
-        default = options.has_key?(:default) ? options.delete(:default) : @default
-        if (value = super).nil?
-          default.is_a?(Proc) ? default.call(model: model, attribute:attribute) : default
-        else
-          value
+      def initialize(default_option)
+        define_method :read do |locale, **options|
+          default = options.has_key?(:default) ? options.delete(:default) : default_option
+          if (value = super(locale, **options)).nil?
+            default.is_a?(Proc) ? default.call(model: model, attribute: attribute) : default
+          else
+            value
+          end
         end
       end
     end

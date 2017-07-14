@@ -16,14 +16,15 @@ describe Mobility::Backend::Fallbacks do
         }[attribute][locale]
       end
     end
-    backend_class = Class.new(backend_class).include(described_class)
+    backend_class = Class.new(backend_class).include(described_class.new(fallbacks))
     backend_class
   end
   let(:object) { (stub_const 'MobilityModel', Class.new).include(Mobility).new }
 
   context "fallbacks is a hash" do
+    let(:fallbacks) { { :'en-US' => 'de-DE', :pt => 'de-DE' } }
     subject do
-      backend_class.new(object, "title", fallbacks: { :'en-US' => 'de-DE', :pt => 'de-DE' })
+      backend_class.new(object, "title", fallbacks: fallbacks)
     end
 
     it "returns value when value is not nil" do
@@ -60,8 +61,9 @@ describe Mobility::Backend::Fallbacks do
   end
 
   context "fallbacks is true" do
+    let(:fallbacks) { true }
     subject do
-      backend_class.new(object, "title", fallbacks: true)
+      backend_class.new(object, "title", fallbacks: fallbacks)
     end
 
     it "uses default fallbacks" do
@@ -73,7 +75,8 @@ describe Mobility::Backend::Fallbacks do
   end
 
   context "fallbacks is falsey" do
-    subject { backend_class.new(object, "title") }
+    let(:fallbacks) { nil }
+    subject { backend_class.new(object, "title", fallbacks: fallbacks) }
 
     it "does not use fallbacks when fallback option is false or nil" do
       original_default_locale = I18n.default_locale

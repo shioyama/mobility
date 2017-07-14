@@ -15,7 +15,7 @@ describe Mobility::Backend::Default do
         backend_double_.write(*args)
       end
     end
-    Class.new(backend_class).include(described_class)
+    Class.new(backend_class).include(described_class.new(default))
   end
 
   describe "#read" do

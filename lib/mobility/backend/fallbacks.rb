@@ -75,49 +75,42 @@ locale was +nil+.
   post.title(fallback: :fr)
   #=> "Mobilité"
 =end
-    module Fallbacks
+    class Fallbacks < Module
       # Applies fallbacks option module to attributes.
       # @param [Attributes] attributes
-      # @param [Boolean] option_value
-      def self.apply(attributes, option_value)
-        attributes.backend_class.include(self) unless option_value == false
+      # @param [Boolean] option
+      def self.apply(attributes, option)
+        attributes.backend_class.include(new(option)) unless option == false
       end
 
-      # @!macro [new] backend_constructor
-      #   @param model Model on which backend is defined
-      #   @param [String] attribute Backend attribute
-      #   @option backend_options [Hash] fallbacks Fallbacks hash
-      def initialize(model, attributes, **backend_options)
-        super
-        @fallbacks =
-          if (fallbacks = backend_options[:fallbacks]).is_a?(Hash)
-            Mobility.default_fallbacks(fallbacks)
-          elsif fallbacks == true
-            Mobility.default_fallbacks
+      def initialize(fallbacks_option)
+        fallbacks = convert_option_to_fallbacks(fallbacks_option)
+
+        define_method :read do |locale, **options|
+          if !options[:fallbacks].nil?
+            warn "You passed an option with key 'fallbacks', which will be ignored. Did you mean 'fallback'?"
           end
-      end
+          fallback = options.delete(:fallback)
+          return super(locale, **options) if fallback == false || (fallback.nil? && fallbacks.nil?)
 
-      # @!group Backend Accessors
-      # @!macro backend_reader
-      # @param [Hash] options
-      # @option options [Boolean,Symbol,Array] fallback
-      #   +false+ to disable fallbacks on lookup, or a locale or array of
-      #   locales to set fallback(s) for this lookup.
-      def read(locale, **options)
-        if !options[:fallbacks].nil?
-          warn "You passed an option with key 'fallbacks', which will be
-            ignored. Did you mean 'fallback'?"
-        end
-        fallback = options.delete(:fallback)
-        return super if fallback == false || (fallback.nil? && fallbacks.nil?)
-        (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
-          value = super(fallback_locale, **options)
-          break value if value.present?
+          (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
+            value = super(fallback_locale, **options)
+            break value if value.present?
+          end
         end
       end
 
       private
-      attr_reader :fallbacks
+
+      def convert_option_to_fallbacks(option)
+        if option.is_a?(Hash)
+          Mobility.default_fallbacks(option)
+        elsif option == true
+          Mobility.default_fallbacks
+        else
+          option
+        end
+      end
     end
   end
 end

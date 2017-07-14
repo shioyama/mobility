@@ -36,9 +36,9 @@ model class is generated.
   class FallthroughAccessors < Module
     # Apply fallthrough accessors option module to attributes.
     # @param [Attributes] attributes
-    # @param [Boolean] option_value
-    def self.apply(attributes, option_value)
-      attributes.include new(*attributes.names) if option_value
+    # @param [Boolean] option
+    def self.apply(attributes, option)
+      attributes.include new(*attributes.names) if option
     end
 
     # @param [String] One or more attributes

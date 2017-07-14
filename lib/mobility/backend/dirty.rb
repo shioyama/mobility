@@ -21,11 +21,11 @@ details.
     module Dirty
       # Applies dirty option module to attributes.
       # @param [Attributes] attributes
-      # @param [Boolean] option_value
+      # @param [Boolean] option
       # @option options [Class] model_class
       # @option options [Boolean] fallthrough_accessors
-      def self.apply(attributes, option_value)
-        if option_value
+      def self.apply(attributes, option)
+        if option
           FallthroughAccessors.apply(attributes, true)
           attributes.backend_class.include(self.for(attributes.options[:model_class]))
         end

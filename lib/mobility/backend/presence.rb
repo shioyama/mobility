@@ -9,9 +9,9 @@ backend. Included by default, but can be disabled with +presence: false+ option.
     module Presence
       # Applies presence option module to attributes.
       # @param [Attributes] attributes
-      # @param [Boolean] option_value
-      def self.apply(attributes, option_value)
-        attributes.backend_class.include(self) if option_value
+      # @param [Boolean] option
+      def self.apply(attributes, option)
+        attributes.backend_class.include(self) if option
       end
 
       # @group Backend Accessors

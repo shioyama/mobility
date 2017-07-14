@@ -30,9 +30,9 @@ If no locales are passed as an option to the initializer,
   class LocaleAccessors < Module
     # Apply locale accessors option module to attributes.
     # @param [Attributes] attributes
-    # @param [Boolean] option_value
-    def self.apply(attributes, option_value)
-      if accessor_locales = option_value
+    # @param [Boolean] option
+    def self.apply(attributes, option)
+      if accessor_locales = option
         accessor_locales = Mobility.config.default_accessor_locales if accessor_locales == true
         attributes.include new(*attributes.names, locales: accessor_locales)
       end

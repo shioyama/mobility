@@ -46,12 +46,12 @@ describe Mobility::Attributes do
   end
 
   describe "including Attributes in a model" do
-    it "calls configure on backend class with options" do
+    it "calls configure on backend class with options merged with default options" do
       expect(backend_class).to receive(:configure).with(Mobility.default_options.merge(foo: "bar"))
       described_class.new(:accessor, "title", { backend: backend_class, foo: "bar" })
     end
 
-    it "calls setup_model on backend class with model_class, attributes, and options" do
+    it "calls setup_model on backend class with model_class, attributes, and options merged with default options" do
       expect(backend_class).to receive(:setup_model).with(Article, ["title"], Mobility.default_options)
       Article.include described_class.new(:accessor, "title", { backend: backend_class })
     end
@@ -72,69 +72,6 @@ describe Mobility::Attributes do
       it "does not include Backend::Cache into backend when options[:cache] is false" do
         attributes = described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
         expect(attributes.backend_class.ancestors).not_to include(Mobility::Backend::Cache)
-      end
-    end
-
-    describe "dirty" do
-      context "ActiveModel", orm: :active_record do
-        it "includes Backend::ActiveModel::Dirty into backend when options[:dirty] is truthy and model class includes ActiveModel::Dirty" do
-          Article.include ::ActiveModel::Dirty
-          attributes = described_class.new(:accessor, "title", clean_options.merge(
-            backend: backend_class,
-            dirty: true,
-            model_class: Article
-          ))
-          expect(attributes.backend_class.ancestors).to include(Mobility::Backend::ActiveModel::Dirty)
-        end
-
-        it "does not include Backend::Model::Dirty into backend when options[:dirty] is falsey" do
-          expect(backend_class).not_to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
-          described_class.new(:accessor, "title", clean_options.merge(backend: backend_class, model_class: Article))
-        end
-      end
-
-      context "Sequel", orm: :sequel do
-        before do
-          stub_const 'Article', Class.new(::Sequel::Model)
-          Article.include Mobility
-        end
-
-        it "includes Backend::Sequel::Dirty into backend when options[:dirty] is truthy and model class is a ::Sequel::Model" do
-          attributes = described_class.new(:accessor, "title", clean_options.merge(
-            backend: backend_class,
-            dirty: true,
-            model_class: Article
-          ))
-          expect(attributes.backend_class.ancestors).to include(Mobility::Backend::Sequel::Dirty)
-        end
-
-        it "does not include Backend::Sequel::Dirty into backend when options[:dirty] is falsey" do
-          expect(backend_class).not_to receive(:include).with(Mobility::Backend::Sequel::Dirty)
-          Article.include described_class.new(:accessor, "title", clean_options.merge(
-            backend: backend_class,
-            model_class: Article
-          ))
-        end
-      end
-    end
-
-    describe "fallbacks" do
-      it "includes Backend::Fallbacks into backend when options[:fallbacks] is not false" do
-        clean_options.delete(:fallbacks)
-        attributes = described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
-        expect(attributes.backend_class.ancestors).to include(Mobility::Backend::Fallbacks)
-      end
-
-      it "does not include Backend::Fallbacks into backend when options[:fallbacks] is false" do
-        expect(backend_class).not_to receive(:include).with(Mobility::Backend::Fallbacks)
-        described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
-      end
-    end
-
-    describe "default" do
-      it "includes Backend::Default into backend" do
-        expect(backend_class).to receive(:include).with(Mobility::Backend::Default)
-        described_class.new(:accessor, "title", clean_options.merge(backend: backend_class))
       end
     end
 

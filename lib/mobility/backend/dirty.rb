@@ -22,8 +22,6 @@ details.
       # Applies dirty option module to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
-      # @option options [Class] model_class
-      # @option options [Boolean] fallthrough_accessors
       def self.apply(attributes, option)
         if option
           FallthroughAccessors.apply(attributes, true)

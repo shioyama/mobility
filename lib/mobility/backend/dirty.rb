@@ -19,28 +19,31 @@ details.
 
 =end
     module Dirty
-      # Applies dirty option module to attributes.
-      # @param [Attributes] attributes
-      # @param [Boolean] option
-      def self.apply(attributes, option)
-        if option
-          FallthroughAccessors.apply(attributes, true)
-          attributes.backend_class.include(self.for(attributes.options[:model_class]))
+      class << self
+        # Applies dirty option module to attributes.
+        # @param [Attributes] attributes
+        # @param [Boolean] option
+        # @raise [ArgumentError] if model class does not support dirty tracking
+        def apply(attributes, option)
+          if option
+            FallthroughAccessors.apply(attributes, true)
+            include_dirty_module(attributes.backend_class, attributes.options[:model_class])
+          end
         end
-      end
 
-      # @param model_class Class of model this backend is defined on.
-      # @return [Backend]
-      # @raise [ArgumentError] if model class does not support dirty tracking
-      def self.for(model_class)
-        model_class ||= Object
-        if Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
-          (model_class < ::ActiveRecord::Base) ?
-            Backend::ActiveRecord::Dirty : Backend::ActiveModel::Dirty
-        elsif Loaded::Sequel && model_class < ::Sequel::Model
-          Backend::Sequel::Dirty
-        else
-          raise ArgumentError, "#{model_class.to_s} does not support Dirty module."
+        private
+
+        def include_dirty_module(backend_class, model_class)
+          dirty_module =
+            if Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
+              (model_class < ::ActiveRecord::Base) ?
+                Backend::ActiveRecord::Dirty : Backend::ActiveModel::Dirty
+            elsif Loaded::Sequel && model_class < ::Sequel::Model
+              Backend::Sequel::Dirty
+            else
+              raise ArgumentError, "#{model_class.to_s} does not support Dirty module."
+            end
+          backend_class.include(dirty_module)
         end
       end
     end

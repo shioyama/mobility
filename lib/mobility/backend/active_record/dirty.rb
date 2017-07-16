@@ -23,17 +23,16 @@ details on usage.
           super
 
           method_name_regex = /\A(#{attributes.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
-          mod = Module.new do
+          has_attribute = Module.new do
             define_method :has_attribute? do |attr_name|
               super(attr_name) || !!method_name_regex.match(attr_name)
             end
           end
+          model_class.extend has_attribute
 
-          model_class.class_eval do
-            extend mod
-
-            method_name = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
-            define_method method_name do
+          changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
+          mod = Module.new do
+            define_method changes_applied_method do
               @previously_changed = changes
               super()
             end
@@ -47,6 +46,7 @@ details on usage.
               (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super)
             end
           end
+          model_class.include mod
         end
       end
     end

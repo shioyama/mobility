@@ -23,6 +23,22 @@ describe Mobility::Backend::ActiveRecord::Dirty, orm: :active_record do
     stub_const 'Article', Class.new(ActiveRecord::Base)
     Article.include Mobility
     Article.translates :title, backend: backend_class, dirty: true, cache: false
+
+    # ensure we include these methods as a module rather than override in class
+    changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
+    Article.class_eval do
+      define_method changes_applied_method do
+        super()
+      end
+
+      def previous_changes
+        super
+      end
+
+      def clear_changes_information
+        super
+      end
+    end
   end
 
   describe "tracking changes" do

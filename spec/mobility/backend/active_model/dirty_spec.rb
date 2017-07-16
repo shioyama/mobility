@@ -234,9 +234,9 @@ describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
 
   describe "fallbacks compatiblity" do
     before do
-      stub_const 'ArticleWithFallbacks', Class.new(ActiveRecord::Base)
+      stub_const 'ArticleWithFallbacks', Class.new
       ArticleWithFallbacks.class_eval do
-        self.table_name = :articles
+        include ActiveModel::Dirty
         include Mobility
       end
       ArticleWithFallbacks.translates :title, backend: backend_class, dirty: true, cache: false, fallbacks: { en: 'ja' }

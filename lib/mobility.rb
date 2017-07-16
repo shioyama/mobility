@@ -79,7 +79,7 @@ module Mobility
   class << self
     def extended(model_class)
       return if model_class.respond_to? :mobility_accessor
-      model_class.class_eval do
+      mod = Module.new do
         # Fetch backend for an attribute
         # @param [String] attribute Attribute
         def mobility_backend_for(attribute)
@@ -90,14 +90,12 @@ module Mobility
           @mobility_backends = nil
           super
         end
+      end
+      model_class.include(mod)
 
-        class << self
-          include ClassMethods
-
-          if translates = Mobility.config.accessor_method
-            alias_method translates, :mobility_accessor
-          end
-        end
+      model_class.extend(ClassMethods)
+      if translates = Mobility.config.accessor_method
+        model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
       end
 
       if Loaded::ActiveRecord

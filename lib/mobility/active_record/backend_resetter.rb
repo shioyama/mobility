@@ -12,14 +12,12 @@ Backend resetter for ActiveRecord models. Adds hook on +reload+ event to
       def included(model_class)
         model_reset_method = @model_reset_method
 
-        model_class.class_eval do
-          mod = Module.new do
-            define_method :reload do |*args|
-              super(*args).tap { instance_eval(&model_reset_method) }
-            end
+        mod = Module.new do
+          define_method :reload do |*args|
+            super(*args).tap { instance_eval(&model_reset_method) }
           end
-          include mod
         end
+        model_class.include mod
       end
     end
   end

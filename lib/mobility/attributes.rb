@@ -111,6 +111,10 @@ with other backends.
     # @return [Symbol,Class] Name of backend, or backend class
     attr_reader :backend_name
 
+    # Model class
+    # @return [Class] Class of model
+    attr_reader :model_class
+
     # @param [Symbol] method One of: [reader, writer, accessor]
     # @param [Array<String>] attribute_names Names of attributes to define backend for
     # @param [Hash] backend_options Backend options hash
@@ -120,9 +124,10 @@ with other backends.
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @options = Mobility.default_options.merge(backend_options)
       @names = attribute_names.map(&:to_s)
+      @model_class = options[:model_class]
       @backend_name = options.delete(:backend) || Mobility.config.default_backend
-      @backend_class = Class.new(get_backend_class(backend:     @backend_name,
-                                                   model_class: options[:model_class]))
+      @backend_class = Class.new(get_backend_class(backend:     backend_name,
+                                                   model_class: model_class))
 
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)
 

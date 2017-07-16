@@ -27,13 +27,13 @@ details.
         def apply(attributes, option)
           if option
             FallthroughAccessors.apply(attributes, true)
-            include_dirty_module(attributes.backend_class, attributes.options[:model_class])
+            include_dirty_module(attributes, attributes.model_class)
           end
         end
 
         private
 
-        def include_dirty_module(backend_class, model_class)
+        def include_dirty_module(attributes, model_class)
           dirty_module =
             if Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
               (model_class < ::ActiveRecord::Base) ?
@@ -43,7 +43,8 @@ details.
             else
               raise ArgumentError, "#{model_class.to_s} does not support Dirty module."
             end
-          backend_class.include(dirty_module)
+          attributes.backend_class.include dirty_module
+          attributes.include dirty_module.const_get(:MethodsBuilder).new(*attributes.names)
         end
       end
     end

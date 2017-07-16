@@ -35,60 +35,40 @@ value of the translated attribute if passed to it.
       end
       # @!endgroup
 
-      # @param [Class] backend_class Class of backend
-      def self.included(backend_class)
-        backend_class.extend(ClassMethods)
-      end
+      class MethodsBuilder < Module
+        def initialize(*attributes)
+          attributes.each do |attribute|
+            method_suffixes.each do |suffix|
+              define_method "#{attribute}#{suffix}" do
+                __send__("attribute#{suffix}".freeze, Mobility.normalize_locale_accessor(attribute))
+              end
+            end
 
-      # Adds hook after {Backend::Setup#setup_model} to add dirty-tracking
-      # methods for translated attributes onto model class.
-      module ClassMethods
-        # (see Mobility::Backend::Setup#setup_model)
-        def setup_model(model_class, attributes, **options)
-          super
-          model_class.class_eval do
-            Mobility::Backend::ActiveModel::Dirty.method_suffixes.each do |suffix|
-              attributes.each do |attribute|
-                class_eval <<-EOM, __FILE__, __LINE__ + 1
-                  def #{attribute}#{suffix}
-                    attribute#{suffix}(Mobility.normalize_locale_accessor("#{attribute}"))
-                  end
-                EOM
+            define_method "restore_#{attribute}!" do
+              locale_accessor = Mobility.normalize_locale_accessor(attribute)
+              if attribute_changed?(locale_accessor)
+                __send__("#{attribute}=".freeze, changed_attributes[locale_accessor])
               end
             end
           end
 
-          restore_methods = Module.new do
-            attributes.each do |attribute|
-              define_method "restore_#{attribute}!" do
-                locale_accessor = Mobility.normalize_locale_accessor(attribute)
-                if attribute_changed?(locale_accessor)
-                  __send__("#{attribute}=", changed_attributes[locale_accessor])
-                end
-              end
-            end
-
-            define_method :restore_attribute! do |attr|
-              if attributes.include?(attr.to_s)
-                send("restore_#{attr}!")
-              else
-                super(attr)
-              end
-            end
-            private :restore_attribute!
+          define_method :restore_attribute! do |attr|
+            attributes.include?(attr.to_s) ? send("restore_#{attr}!".freeze) : super(attr)
           end
-          model_class.include restore_methods
+          private :restore_attribute!
         end
-      end
 
-      # Get method suffixes. Creating an object just to get the list of
-      # suffixes is not very efficient, but the most reliable way given that
-      # they change from Rails version to version.
-      def self.method_suffixes
-        @method_suffixes ||=
-          Class.new do
-            include ::ActiveModel::Dirty
-          end.attribute_method_matchers.map(&:suffix).select { |m| m =~ /\A_/ }
+        private
+
+        # Get method suffixes. Creating an object just to get the list of
+        # suffixes is not very efficient, but the most reliable way given that
+        # they change from Rails version to version.
+        def method_suffixes
+          @method_suffixes ||=
+            Class.new do
+              include ::ActiveModel::Dirty
+            end.attribute_method_matchers.map(&:suffix).select { |m| m =~ /\A_/ }
+        end
       end
     end
   end

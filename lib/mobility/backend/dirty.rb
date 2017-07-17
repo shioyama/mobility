@@ -41,7 +41,7 @@ details.
             elsif Loaded::Sequel && model_class < ::Sequel::Model
               Backend::Sequel::Dirty
             else
-              raise ArgumentError, "#{model_class.to_s} does not support Dirty module."
+              raise ArgumentError, "#{model_class} does not support Dirty module."
             end
           backend_class.include dirty_module
           model_class.include dirty_module.const_get(:MethodsBuilder).new(*attribute_names)

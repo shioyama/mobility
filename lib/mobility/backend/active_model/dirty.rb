@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Mobility
   module Backend
 =begin
@@ -41,12 +43,12 @@ value of the translated attribute if passed to it.
         def initialize(*attribute_names)
           attribute_names.each do |name|
             method_suffixes.each do |suffix|
-              define_method "#{name}#{suffix}" do
+              define_method "#{name}#{suffix}".freeze do
                 __send__("attribute#{suffix}".freeze, Mobility.normalize_locale_accessor(name))
               end
             end
 
-            define_method "restore_#{name}!" do
+            define_method "restore_#{name}!".freeze do
               locale_accessor = Mobility.normalize_locale_accessor(name)
               if attribute_changed?(locale_accessor)
                 __send__("#{name}=".freeze, changed_attributes[locale_accessor])

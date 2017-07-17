@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Mobility
   module Backend
 =begin

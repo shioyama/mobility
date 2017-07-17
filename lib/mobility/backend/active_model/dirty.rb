@@ -36,24 +36,24 @@ value of the translated attribute if passed to it.
       # @!endgroup
 
       class MethodsBuilder < Module
-        def initialize(*attributes)
-          attributes.each do |attribute|
+        def initialize(*attribute_names)
+          attribute_names.each do |name|
             method_suffixes.each do |suffix|
-              define_method "#{attribute}#{suffix}" do
-                __send__("attribute#{suffix}".freeze, Mobility.normalize_locale_accessor(attribute))
+              define_method "#{name}#{suffix}" do
+                __send__("attribute#{suffix}".freeze, Mobility.normalize_locale_accessor(name))
               end
             end
 
-            define_method "restore_#{attribute}!" do
-              locale_accessor = Mobility.normalize_locale_accessor(attribute)
+            define_method "restore_#{name}!" do
+              locale_accessor = Mobility.normalize_locale_accessor(name)
               if attribute_changed?(locale_accessor)
-                __send__("#{attribute}=".freeze, changed_attributes[locale_accessor])
+                __send__("#{name}=".freeze, changed_attributes[locale_accessor])
               end
             end
           end
 
           define_method :restore_attribute! do |attr|
-            attributes.include?(attr.to_s) ? send("restore_#{attr}!".freeze) : super(attr)
+            attribute_names.include?(attr.to_s) ? send("restore_#{attr}!".freeze) : super(attr)
           end
           private :restore_attribute!
         end

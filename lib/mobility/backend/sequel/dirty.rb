@@ -25,10 +25,10 @@ Automatically includes dirty plugin in model class when enabled.
       # @!endgroup
 
       class MethodsBuilder < Module
-        def initialize(*attributes)
+        def initialize(*attribute_names)
           %w[initial_value column_change column_changed? reset_column].each do |method_name|
             define_method method_name do |column|
-              if attributes.map(&:to_sym).include?(column)
+              if attribute_names.map(&:to_sym).include?(column)
                 super(Mobility.normalize_locale_accessor(column).to_sym)
               else
                 super(column)

@@ -286,40 +286,6 @@ describe Mobility::Attributes do
         end
       end
     end
-
-    describe "fallthrough accessors" do
-      let(:article) { Article.new }
-      before do
-        Article.include described_class.new(:accessor, "title", backend: backend_class, **options)
-      end
-
-      context "with fallthrough_accessors = true" do
-        let(:options) { { fallthrough_accessors: true, **clean_options } }
-
-        it "handle getters for any locale" do
-          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
-          expect(article.title_de).to eq("foo")
-          expect(backend).to receive(:read).with(:fr, {}).and_return("bar")
-          expect(article.title_fr).to eq("bar")
-        end
-
-        it "handle setters for any locale" do
-          expect(backend).to receive(:write).with(:de, "foo", {}).and_return("foo")
-          expect(article.title_de="foo").to eq("foo")
-          expect(backend).to receive(:write).with(:fr, "bar", {}).and_return("bar")
-          expect(article.title_fr="bar").to eq("bar")
-        end
-
-        it "handles presence methods for any locale" do
-          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
-          expect(article.title_de?).to eq(true)
-          expect(backend).to receive(:read).with(:de, {}).and_return("")
-          expect(article.title_de?).to eq(false)
-          expect(backend).to receive(:read).with(:de, {}).and_return(nil)
-          expect(article.title_de?).to eq(false)
-        end
-      end
-    end
   end
 
   describe "#each" do

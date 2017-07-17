@@ -77,7 +77,7 @@ class.
 
         # @yield [locale, translation]
         def each_translation &block
-          @cache.each_value &block
+          @cache.each_value(&block)
         end
       end
     end

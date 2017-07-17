@@ -30,7 +30,7 @@ Internal class used by Sequel backends that store values as a hash.
       end
       # @!endgroup
 
-      setup do |attributes, options|
+      setup do |attributes|
         method_overrides = Module.new do
           define_method :initialize_set do |values|
             attributes.each { |attribute| send(:"#{attribute}_before_mobility=", {}) }

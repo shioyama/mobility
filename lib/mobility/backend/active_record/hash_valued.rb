@@ -30,14 +30,14 @@ Internal class used by ActiveRecord backends that store values as a hash.
         true
       end
 
-      setup do |attributes, options|
+      setup do |attributes|
         attributes.each { |attribute| store attribute, coder: Coder }
       end
 
       class Coder
         def self.dump(obj)
           if obj.is_a? Hash
-            obj = obj.inject({}) do |translations, (locale, value)|
+            obj.inject({}) do |translations, (locale, value)|
               translations[locale] = value if value.present?
               translations
             end

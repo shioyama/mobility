@@ -154,10 +154,10 @@ with other backends.
     private
 
     def define_backend(attribute)
-      _backend_class, _options = backend_class, options
+      backend_class_, options_ = backend_class, options
       define_method Backend.method_name(attribute) do
         @mobility_backends ||= {}
-        @mobility_backends[attribute] ||= _backend_class.new(self, attribute, _options)
+        @mobility_backends[attribute] ||= backend_class_.new(self, attribute, options_)
       end
     end
 

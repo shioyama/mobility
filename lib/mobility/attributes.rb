@@ -120,13 +120,13 @@ with other backends.
     # @param [Hash] backend_options Backend options hash
     # @option backend_options [Class] model_class Class of model
     # @raise [ArgumentError] if method is not reader, writer or accessor
-    def initialize(method, *attribute_names, **backend_options)
+    def initialize(method, *attribute_names, model_class:, backend: Mobility.default_backend, **backend_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @options = Mobility.default_options.merge(backend_options)
       @names = attribute_names.map(&:to_s)
-      @model_class = options[:model_class]
-      @backend_name = options.delete(:backend) || Mobility.config.default_backend
-      @backend_class = Class.new(get_backend_class(backend:     backend_name,
+      @model_class = @options[:model_class] = model_class
+      @backend_name = backend
+      @backend_class = Class.new(get_backend_class(backend:     backend,
                                                    model_class: model_class))
 
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)

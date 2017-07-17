@@ -103,7 +103,7 @@ On top of this, a backend will normally:
     # Defines setup hooks for backend to customize model class.
     module Setup
       # Assign block to be called on model class.
-      # @yield [attributes, options]
+      # @yield [attribute_names, options]
       # @note When called multiple times, setup blocks will be appended
       #   so that they are run together consecutively on class.
       def setup &block
@@ -124,11 +124,11 @@ On top of this, a backend will normally:
 
       # Call setup block on a class with attributes and options.
       # @param model_class Class to be setup-ed
-      # @param [Array<String>] attributes
+      # @param [Array<String>] attribute_names
       # @param [Hash] options
-      def setup_model(model_class, attributes, **options)
+      def setup_model(model_class, attribute_names, **options)
         return unless setup_block = @setup_block
-        model_class.class_exec(attributes, options, &setup_block)
+        model_class.class_exec(attribute_names, options, &setup_block)
       end
 
       # {Attributes} uses this method to get a backend class specific to the

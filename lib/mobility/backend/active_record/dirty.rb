@@ -9,8 +9,8 @@ details on usage.
     module ActiveRecord::Dirty
       include ActiveModel::Dirty
 
-      # Adds hook after {Backend::Setup#setup_model} to patch AR so that it
-      # handles changes to translated attributes just like normal attributes.
+      # Builds module which patches a few AR methods to handle changes to
+      # translated attributes just like normal attributes.
       class MethodsBuilder < ActiveModel::Dirty::MethodsBuilder
         def initialize(*attribute_names)
           super
@@ -32,6 +32,12 @@ details on usage.
           end
         end
 
+        # Overrides +ActiveRecord::AttributeMethods::ClassMethods#has_attribute+ to treat fallthrough attribute methods
+        # just like "real" attribute methods.
+        #
+        # @note Patching +has_attribute?+ is necessary as of AR 5.1 due to this commit[https://github.com/rails/rails/commit/4fed08fa787a316fa51f14baca9eae11913f5050].
+        #   (I have voiced my opposition to this change here[https://github.com/rails/rails/pull/27963#issuecomment-310092787]).
+        # @param [Attributes] attributes
         def included(attributes)
           names = @attribute_names
           method_name_regex = /\A(#{names.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze

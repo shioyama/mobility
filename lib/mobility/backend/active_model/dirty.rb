@@ -35,6 +35,8 @@ value of the translated attribute if passed to it.
       end
       # @!endgroup
 
+      # Builds module which adds suffix/prefix methods for translated
+      # attributes so they act like normal dirty-tracked attributes.
       class MethodsBuilder < Module
         def initialize(*attribute_names)
           attribute_names.each do |name|

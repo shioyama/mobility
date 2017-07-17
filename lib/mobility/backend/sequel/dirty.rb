@@ -24,6 +24,8 @@ Automatically includes dirty plugin in model class when enabled.
       end
       # @!endgroup
 
+      # Builds module which overrides dirty methods to handle translated as
+      # well as normal (untranslated) attributes.
       class MethodsBuilder < Module
         def initialize(*attribute_names)
           %w[initial_value column_change column_changed? reset_column].each do |method_name|

@@ -15,7 +15,7 @@ understanding and designing backends.
 Since {Attributes} is a subclass of +Module+, including an instance of it is
 like including a module. Creating an instance like this:
 
-  Attributes.new(:accessor, ["title"], backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
+  Attributes.new(:accessor, ["title"], backend: :my_backend, model_class: Post, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
 
 will generate an anonymous module looking something like this:
 

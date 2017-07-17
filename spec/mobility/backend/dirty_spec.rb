@@ -15,11 +15,11 @@ describe Mobility::Backend::Dirty do
         context "model_class is an ActiveRecord::Base" do
           let(:model_class) { Class.new(ActiveRecord::Base) }
 
-          it "includes Backend::ActiveRecord::Dirty into backend class" do
+          it "includes dirty modules into backend class and model class" do
             expect(backend_class).to receive(:include).with(Mobility::Backend::ActiveRecord::Dirty)
             methods = instance_double(Mobility::Backend::ActiveRecord::Dirty::MethodsBuilder)
             expect(Mobility::Backend::ActiveRecord::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
-            expect(attributes).to receive(:include).with(methods)
+            expect(model_class).to receive(:include).with(methods)
             described_class.apply(attributes, true)
           end
         end
@@ -31,11 +31,11 @@ describe Mobility::Backend::Dirty do
             klass
           end
 
-          it "includes Backend::ActiveModel::Dirty into backend class" do
+          it "includes dirty modules into backend class and model class" do
             expect(backend_class).to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
             methods = instance_double(Mobility::Backend::ActiveModel::Dirty::MethodsBuilder)
             expect(Mobility::Backend::ActiveModel::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
-            expect(attributes).to receive(:include).with(methods)
+            expect(model_class).to receive(:include).with(methods)
             described_class.apply(attributes, true)
           end
         end
@@ -44,11 +44,11 @@ describe Mobility::Backend::Dirty do
       context "options[:model_class] is a Sequel::Model", orm: :sequel do
         let(:model_class) { Class.new(Sequel::Model) }
 
-        it "includes Backend::ActiveRecord::Sequel into backend class" do
+        it "includes dirty modules into backend class and model class" do
           expect(backend_class).to receive(:include).with(Mobility::Backend::Sequel::Dirty)
           methods = instance_double(Mobility::Backend::Sequel::Dirty::MethodsBuilder)
           expect(Mobility::Backend::Sequel::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
-          expect(attributes).to receive(:include).with(methods)
+          expect(model_class).to receive(:include).with(methods)
           described_class.apply(attributes, true)
         end
       end

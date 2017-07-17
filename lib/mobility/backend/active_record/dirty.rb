@@ -38,7 +38,7 @@ details on usage.
         # @note Patching +has_attribute?+ is necessary as of AR 5.1 due to this commit[https://github.com/rails/rails/commit/4fed08fa787a316fa51f14baca9eae11913f5050].
         #   (I have voiced my opposition to this change here[https://github.com/rails/rails/pull/27963#issuecomment-310092787]).
         # @param [Attributes] attributes
-        def included(attributes)
+        def included(model_class)
           names = @attribute_names
           method_name_regex = /\A(#{names.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
           has_attribute = Module.new do
@@ -46,7 +46,7 @@ details on usage.
               super(attr_name) || !!method_name_regex.match(attr_name)
             end
           end
-          attributes.model_class.extend has_attribute
+          model_class.extend has_attribute
         end
       end
     end

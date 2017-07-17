@@ -28,6 +28,8 @@ Automatically includes dirty plugin in model class when enabled.
       # well as normal (untranslated) attributes.
       class MethodsBuilder < Module
         def initialize(*attribute_names)
+          include ::Sequel::Plugins::Dirty::InstanceMethods
+
           %w[initial_value column_change column_changed? reset_column].each do |method_name|
             define_method method_name do |column|
               if attribute_names.map(&:to_sym).include?(column)
@@ -37,10 +39,6 @@ Automatically includes dirty plugin in model class when enabled.
               end
             end
           end
-        end
-
-        def included(attributes)
-          attributes.model_class.plugin :dirty
         end
       end
     end

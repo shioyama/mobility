@@ -76,6 +76,7 @@ describe Mobility::Backend::Sequel::Column, orm: :sequel do
 
       aggregate_failures do
         expect(comment.content).to eq(nil)
+        comment.column_changed?(:content)
         expect(comment.column_changed?(:content)).to eq(false)
         expect(comment.column_change(:title)).to eq(nil)
         expect(comment.changed_columns).to eq([])

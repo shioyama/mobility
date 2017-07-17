@@ -51,7 +51,8 @@ describe Mobility::Attributes do
 
     it "calls configure on backend class with options merged with default options" do
       expect(backend_class).to receive(:configure).with(expected_options)
-      described_class.new(:accessor, "title", backend: backend_class, foo: "bar", **base_options)
+      attributes = described_class.new(:accessor, "title", backend: backend_class, foo: "bar", **base_options)
+      Article.include attributes
     end
 
     it "calls setup_model on backend class with model_class, attributes, and options merged with default options" do
@@ -69,11 +70,13 @@ describe Mobility::Attributes do
       it "includes Backend::Cache into backend when options[:cache] is not false" do
         clean_options.delete(:cache)
         attributes = described_class.new(:accessor, "title", backend: backend_class, **clean_options)
+        Article.include attributes
         expect(attributes.backend_class.ancestors).to include(Mobility::Backend::Cache)
       end
 
       it "does not include Backend::Cache into backend when options[:cache] is false" do
         attributes = described_class.new(:accessor, "title", backend: backend_class, **clean_options)
+        Article.include attributes
         expect(attributes.backend_class.ancestors).not_to include(Mobility::Backend::Cache)
       end
     end

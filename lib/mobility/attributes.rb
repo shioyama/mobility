@@ -15,7 +15,7 @@ understanding and designing backends.
 Since {Attributes} is a subclass of +Module+, including an instance of it is
 like including a module. Creating an instance like this:
 
-  Attributes.new(:accessor, ["title"], backend: :my_backend, model_class: Post, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
+  Attributes.new(:accessor, ["title"], backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
 
 will generate an anonymous module looking something like this:
 
@@ -95,6 +95,10 @@ with other backends.
 
 =end
   class Attributes < Module
+    # Method (accessor, reader or writer)
+    # @return [Symbol] method
+    attr_reader :method
+
     # Attribute names for which accessors will be defined
     # @return [Array<String>] Array of names
     attr_reader :names
@@ -120,13 +124,22 @@ with other backends.
     # @param [Hash] backend_options Backend options hash
     # @option backend_options [Class] model_class Class of model
     # @raise [ArgumentError] if method is not reader, writer or accessor
-    def initialize(method, *attribute_names, model_class:, backend: Mobility.default_backend, **backend_options)
+    def initialize(method, *attribute_names, backend: Mobility.default_backend, **backend_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
+      @method = method
       @options = Mobility.default_options.merge(backend_options)
       @names = attribute_names.map(&:to_s)
-      @model_class = @options[:model_class] = model_class
+      raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
       @backend_name = backend
-      @backend_class = Class.new(get_backend_class(backend:     backend,
+    end
+
+    # Setup backend class, include modules into model class, add this
+    # attributes module to shared {Mobility::Wrapper} and setup model with
+    # backend setup block (see {Mobility::Backend::Setup#setup_model}).
+    # @param klass [Class] Class of model
+    def included(klass)
+      @model_class = @options[:model_class] = klass
+      @backend_class = Class.new(get_backend_class(backend:     backend_name,
                                                    model_class: model_class))
 
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)
@@ -140,12 +153,7 @@ with other backends.
         define_reader(name) if %i[accessor reader].include?(method)
         define_writer(name) if %i[accessor writer].include?(method)
       end
-    end
 
-    # Add this attributes module to shared {Mobility::Wrapper} and setup model
-    # with backend setup block (see {Mobility::Backend::Setup#setup_model}).
-    # @param model_class [Class] Class of model
-    def included(model_class)
       model_class.mobility << self
       backend_class.setup_model(model_class, names, options)
     end
@@ -186,7 +194,6 @@ with other backends.
     end
 
     def get_backend_class(backend: nil, model_class: nil)
-      raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
       klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''.freeze).freeze)
       model_class.nil? ? klass : klass.for(model_class)
     end

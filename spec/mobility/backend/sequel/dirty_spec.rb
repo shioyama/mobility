@@ -26,6 +26,10 @@ describe Mobility::Backend::Sequel::Dirty, orm: :sequel do
     Article.translates :title, backend: backend_class, dirty: true, cache: false
   end
 
+  it "loads sequel dirty plugin" do
+    expect(Article.plugins).to include(::Sequel::Plugins::Dirty)
+  end
+
   describe "tracking changes" do
     it "tracks changes in one locale" do
       Mobility.locale = :'pt-BR'

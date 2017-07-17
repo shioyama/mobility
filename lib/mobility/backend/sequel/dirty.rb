@@ -1,3 +1,5 @@
+require "sequel/plugins/dirty"
+
 module Mobility
   module Backend
 =begin
@@ -28,6 +30,9 @@ Automatically includes dirty plugin in model class when enabled.
       # well as normal (untranslated) attributes.
       class MethodsBuilder < Module
         def initialize(*attribute_names)
+          # Although we load the plugin in the included callback method, we
+          # need to include this module here in advance to ensure that its
+          # instance methods are included *before* the ones defined here.
           include ::Sequel::Plugins::Dirty::InstanceMethods
 
           %w[initial_value column_change column_changed? reset_column].each do |method_name|
@@ -39,6 +44,11 @@ Automatically includes dirty plugin in model class when enabled.
               end
             end
           end
+        end
+
+        def included(model_class)
+          # this just adds Sequel::Plugins::Dirty to @plugins
+          model_class.plugin :dirty
         end
       end
     end

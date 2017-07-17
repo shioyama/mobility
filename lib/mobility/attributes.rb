@@ -144,8 +144,8 @@ with other backends.
 
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)
 
-      Mobility.option_modules.each do |key, klass|
-        klass.apply(self, options[key])
+      Mobility.option_modules.each do |key, option_module|
+        option_module.apply(self, options[key])
       end
 
       names.each do |name|

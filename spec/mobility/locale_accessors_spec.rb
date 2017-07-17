@@ -37,11 +37,12 @@ describe Mobility::LocaleAccessors do
 
   context "locales set" do
     let(:model_class) do
-      base_model_class.include described_class.new(:title, locales: [:cz, :de])
+      base_model_class.include described_class.new(:title, locales: [:cz, :de, :'pt-BR'])
     end
 
     it_behaves_like "locale accessor", :title, :cz
     it_behaves_like "locale accessor", :title, :de
+    it_behaves_like "locale accessor", :title, :'pt-BR'
 
     it "raises NoMethodError if locale not in locales" do
       instance = model_class.new

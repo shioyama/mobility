@@ -79,21 +79,10 @@ module Mobility
   class << self
     def extended(model_class)
       return if model_class.respond_to? :mobility_accessor
-      mod = Module.new do
-        # Fetch backend for an attribute
-        # @param [String] attribute Attribute
-        def mobility_backend_for(attribute)
-          send(Backend.method_name(attribute))
-        end
 
-        def initialize_dup(other)
-          @mobility_backends = nil
-          super
-        end
-      end
-      model_class.include(mod)
-
+      model_class.include(InstanceMethods)
       model_class.extend(ClassMethods)
+
       if translates = Mobility.config.accessor_method
         model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
       end
@@ -237,6 +226,19 @@ module Mobility
       locale = locale.to_sym if locale
       enforce_available_locales!(locale)
       storage[:mobility_locale] = locale
+    end
+  end
+
+  module InstanceMethods
+    # Fetch backend for an attribute
+    # @param [String] attribute Attribute
+    def mobility_backend_for(attribute)
+      send(Backend.method_name(attribute))
+    end
+
+    def initialize_dup(other)
+      @mobility_backends = nil
+      super
     end
   end
 

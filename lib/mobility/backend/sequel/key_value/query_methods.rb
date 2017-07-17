@@ -34,9 +34,6 @@ module Mobility
       end
 
       def define_query_methods(association_name)
-        # TODO: find a better way to do this that doesn't involve overriding
-        # a private method...
-        #
         attributes_extractor = @attributes_extractor
 
         %w[exclude or where].each do |method_name|

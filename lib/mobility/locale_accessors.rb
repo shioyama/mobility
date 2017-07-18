@@ -38,25 +38,25 @@ If no locales are passed as an option to the initializer,
       end
     end
 
-    # @param [String] One or more attributes
+    # @param [String] One or more attribute names
     # @param [Array<Symbol>] Locales
-    def initialize(*attributes, locales: I18n.available_locales)
+    def initialize(*attribute_names, locales: I18n.available_locales)
       warning_message = "locale passed as option to locale accessor will be ignored".freeze
 
-      attributes.each do |attribute|
+      attribute_names.each do |name|
         locales.each do |locale|
           normalized_locale = Mobility.normalize_locale(locale)
-          define_method "#{attribute}_#{normalized_locale}" do |**options|
+          define_method "#{name}_#{normalized_locale}" do |**options|
             warn warning_message if options.delete(:locale)
-            Mobility.with_locale(locale) { send(attribute, options) }
+            Mobility.with_locale(locale) { send(name, options) }
           end
-          define_method "#{attribute}_#{normalized_locale}?" do |**options|
+          define_method "#{name}_#{normalized_locale}?" do |**options|
             warn warning_message if options.delete(:locale)
-            Mobility.with_locale(locale) { send("#{attribute}?", options) }
+            Mobility.with_locale(locale) { send("#{name}?", options) }
           end
-          define_method "#{attribute}_#{normalized_locale}=" do |value, **options|
+          define_method "#{name}_#{normalized_locale}=" do |value, **options|
             warn warning_message if options.delete(:locale)
-            Mobility.with_locale(locale) { send("#{attribute}=", value, options) }
+            Mobility.with_locale(locale) { send("#{name}=", value, options) }
           end
         end
       end

@@ -46,12 +46,6 @@ or locales.)
         model.send(:write_attribute, column(locale), value)
       end
 
-      # @!group Backend Configuration
-      def self.configure(options)
-        options[:locale_accessors] = false
-      end
-      # @!endgroup
-
       setup_query_methods(QueryMethods)
     end
   end

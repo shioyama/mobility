@@ -17,21 +17,15 @@ Implements the {Mobility::Backend::Column} backend for Sequel models.
       # @!macro backend_reader
       def read(locale, **_)
         column = column(locale)
-        model.send(column) if model.columns.include?(column)
+        model[column] if model.columns.include?(column)
       end
 
       # @!group Backend Accessors
       # @!macro backend_writer
       def write(locale, value, **_)
         column = column(locale)
-        model.send("#{column}=", value) if model.columns.include?(column)
+        model[column] = value if model.columns.include?(column)
       end
-
-      # @!group Backend Configuration
-      def self.configure(options)
-        options[:locale_accessors] = false
-      end
-      # @!endgroup
 
       setup_query_methods(QueryMethods)
     end

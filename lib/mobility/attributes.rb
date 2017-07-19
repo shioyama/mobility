@@ -195,7 +195,7 @@ with other backends.
 
     def get_backend_class(backend: nil, model_class: nil)
       klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''.freeze).freeze)
-      model_class.nil? ? klass : klass.for(model_class)
+      klass.for(model_class)
     end
   end
 end

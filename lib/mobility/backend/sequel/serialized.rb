@@ -45,13 +45,9 @@ Sequel serialization plugin.
       end
       # @!endgroup
 
-      # @!group Backend Configuration
-      # @option options [Symbol] format (:yaml) Serialization format
-      # @raise [ArgumentError] if a format other than +:yaml+ or +:json+ is passed in
+      # @see Backend::Serialized
       def self.configure(options)
-        options[:format] ||= :yaml
-        options[:format] = options[:format].downcase.to_sym
-        raise ArgumentError, "Serialized backend only supports yaml or json formats." unless [:yaml, :json].include?(options[:format])
+        Serialized.configure(options)
       end
       # @!endgroup
 

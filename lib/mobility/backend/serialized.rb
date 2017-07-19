@@ -20,7 +20,7 @@ Format for serialization. Either +:yaml+ (default) or +:json+.
 
 =end
     module Serialized
-      include OrmDelegator
+      extend OrmDelegator
 
       class << self
         def serializer_for(format)

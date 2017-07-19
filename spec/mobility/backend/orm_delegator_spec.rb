@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Backend::OrmDelegator do
   before do
     stub_const 'Mobility::MyClass', Module.new
-    Mobility::MyClass.include described_class
+    Mobility::MyClass.extend described_class
     stub_const 'Mobility::ActiveRecord::MyClass', Class.new
     stub_const 'Mobility::Sequel::MyClass', Class.new
   end

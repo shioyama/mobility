@@ -15,7 +15,7 @@ This backend has no options.
 
 =end
     module Hstore
-      include OrmDelegator
+      extend OrmDelegator
     end
   end
 end

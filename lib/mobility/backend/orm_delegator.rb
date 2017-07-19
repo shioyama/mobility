@@ -24,10 +24,6 @@ Adds {#for} method to backend to return ORM-specific backend.
           raise ArgumentError, "#{name.split('::'.freeze).last} backend can only be used by ActiveRecord or Sequel models".freeze
         end
       end
-
-      def self.included(base)
-        base.extend(self)
-      end
     end
   end
 end

@@ -62,7 +62,7 @@ set.
 @see Mobility::Backend::Sequel::Table
 =end
     module Table
-      include OrmDelegator
+      extend OrmDelegator
 
       # Simple hash cache to memoize translations as a hash so they can be
       # fetched quickly.

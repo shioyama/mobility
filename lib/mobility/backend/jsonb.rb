@@ -15,7 +15,7 @@ This backend has no options.
 
 =end
     module Jsonb
-      include OrmDelegator
+      extend OrmDelegator
     end
   end
 end

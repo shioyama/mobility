@@ -39,7 +39,7 @@ class.
 
 =end
     module KeyValue
-      include OrmDelegator
+      extend OrmDelegator
 
       def self.included(backend)
         backend.extend ClassMethods

@@ -6,21 +6,19 @@ RSpec::Core::RakeTask.new(:spec)
 
 task :default => :spec
 
-task :load_path do
+task :setup do
   %w(lib spec).each do |path|
     $LOAD_PATH.unshift(File.expand_path("../#{path}", __FILE__))
   end
+  require "database"
+  exit if config["database"] == ":memory:"
 end
 
 namespace :db do
   desc "Create the database"
-  task :create => :load_path do
-    require "database"
-    driver = Mobility::Test::Database.driver
-    config = Mobility::Test::Database.config[driver]
-    exit if config["database"] == ":memory:"
+  task create: :setup do
     commands = {
-      "mysql"    => "mysql -u #{config['username']} -e 'create database #{config["database"]};' >/dev/null",
+      "mysql"    => "mysql -u #{config['username']} -e 'create database #{config["database"]} default character set #{config["encoding"]} default collate #{config["collation"]};' >/dev/null",
       "postgres" => "psql -c 'create database #{config['database']};' -U #{config['username']} >/dev/null"
     }
     %x{#{commands[driver] || true}}
@@ -28,11 +26,7 @@ namespace :db do
   end
 
   desc "Drop the database"
-  task :drop => :load_path do
-    require "database"
-    driver = Mobility::Test::Database.driver
-    config = Mobility::Test::Database.config[driver]
-    exit if config["database"] == ":memory:"
+  task drop: :setup do
     commands = {
       "mysql"    => "mysql -u #{config['username']} -e 'drop database #{config["database"]};' >/dev/null",
       "postgres" => "psql -c 'drop database #{config['database']};' -U #{config['username']} >/dev/null"
@@ -42,15 +36,19 @@ namespace :db do
   end
 
   desc "Set up the database schema"
-  task :up => :load_path do
-    require "database"
-    driver = Mobility::Test::Database.driver
-    config = Mobility::Test::Database.config[driver]
-    exit if config["database"] == ":memory:"
+  task up: :setup do
     require "spec_helper"
     Mobility::Test::Schema.up
   end
 
   desc "Drop and recreate the database schema"
   task :reset => [:drop, :create]
+
+  def config
+    Mobility::Test::Database.config[driver]
+  end
+
+  def driver
+    Mobility::Test::Database.driver
+  end
 end

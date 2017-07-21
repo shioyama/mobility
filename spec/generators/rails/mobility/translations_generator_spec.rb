@@ -48,6 +48,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
 
     context "translation table already exists" do
       before { ActiveRecord::Base.connection.create_table :post_translations }
+      after  { ActiveRecord::Base.connection.drop_table   :post_translations }
 
       it "generates table translations migration adding columns to existing translations table" do
         setup_generator
@@ -90,6 +91,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
       end
       after do
         I18n.available_locales = @available_locales
+        ActiveRecord::Base.connection.drop_table :foos
       end
 
       it "generates column translations migration adding columns for each locale to model table" do

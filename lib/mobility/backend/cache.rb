@@ -44,7 +44,7 @@ this).
       # @!macro backend_reader
       # @option options [Boolean] cache
       #   *false* to disable cache.
-      def read(locale, **options)
+      def read(locale, options = {})
         return super if options.delete(:cache) == false
         if write_to_cache? || cache.has_key?(locale)
           cache[locale]
@@ -56,7 +56,7 @@ this).
       # @!macro backend_writer
       # @option options [Boolean] cache
       #   *false* to disable cache.
-      def write(locale, value, **options)
+      def write(locale, value, options = {})
         return super if options.delete(:cache) == false
         cache[locale] = write_to_cache? ? value : super
       end
@@ -69,7 +69,7 @@ this).
       module Setup
         # @param model_class Model class
         # @param [Array<String>] attributes Backend attributes
-        def setup_model(model_class, attributes, **_)
+        def setup_model(model_class, attributes, _options = {})
           super
           model_class.include BackendResetter.for(model_class).new(attributes) { clear_cache }
         end

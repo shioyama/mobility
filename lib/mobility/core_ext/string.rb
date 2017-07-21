@@ -7,7 +7,7 @@ cannot be loaded.
 class String
   # paraphrased from activesupport
   def camelize
-    sub(/^[a-z\d]*/) { $&.capitalize }.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/', '::')
+    sub(/^[a-z\d]*/) { $&.capitalize }.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/'.freeze, '::'.freeze)
   end
 
   def present?

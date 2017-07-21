@@ -12,6 +12,7 @@ db = ENV['DB'] || 'none'
 require 'pry-byebug'
 require 'i18n'
 require 'rspec'
+require 'allocation_stats' if ENV['TEST_PERFORMANCE']
 require 'json'
 
 require 'mobility'

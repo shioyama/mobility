@@ -10,14 +10,14 @@ Backend which does absolutely nothing. Mostly for testing purposes.
 
       # @!group Backend Accessors
       # @return [NilClass]
-      def read(*); end
+      def read(_locale, _options = {}); end
 
       # @return [NilClass]
-      def write(*); end
+      def write(_locale, _value, _options = {}); end
       # @!endgroup
 
       # @!group Backend Configuration
-      def self.configure(*); end
+      def self.configure(_options); end
       # @!endgroup
     end
   end

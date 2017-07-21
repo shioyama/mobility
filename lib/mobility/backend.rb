@@ -97,7 +97,8 @@ On top of this, a backend will normally:
     # @param [String] attribute
     # @return [String] name of backend reader method
     def self.method_name(attribute)
-      "#{attribute}_backend".freeze
+      @backend_method_names ||= {}
+      @backend_method_names[attribute] ||= "#{attribute}_backend".freeze
     end
 
     # Defines setup hooks for backend to customize model class.

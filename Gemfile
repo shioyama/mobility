@@ -21,6 +21,8 @@ group :development, :test do
     end
   end
 
+  gem 'allocation_stats' if ENV['TEST_PERFORMANCE']
+
   platforms :ruby do
     gem 'guard-rspec'
     gem 'pry-byebug'

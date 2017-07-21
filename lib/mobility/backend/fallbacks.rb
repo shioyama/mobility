@@ -90,14 +90,14 @@ locale was +nil+.
       private
 
       def define_read(fallbacks)
-        define_method :read do |locale, **options|
+        define_method :read do |locale, options = {}|
           fallback = options.delete(:fallback)
 
           if fallback == false || (fallback.nil? && fallbacks.nil?)
-            super(locale, **options)
+            super(locale, options)
           else
             (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
-              value = super(fallback_locale, **options)
+              value = super(fallback_locale, options)
               break value if value.present?
             end
           end

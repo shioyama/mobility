@@ -59,9 +59,9 @@ otherwise be nil.
       end
 
       def initialize(default_option)
-        define_method :read do |locale, **options|
+        define_method :read do |locale, options = {}|
           default = options.has_key?(:default) ? options.delete(:default) : default_option
-          if (value = super(locale, **options)).nil?
+          if (value = super(locale, options)).nil?
             default.is_a?(Proc) ? default.call(model: model, attribute: attribute) : default
           else
             value

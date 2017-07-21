@@ -4,12 +4,7 @@ module Mobility
       def initialize(attributes, **)
         super
         attributes_extractor = @attributes_extractor
-        cond_checker = @cond_checker = lambda do |cond|
-          if i18n_keys = attributes_extractor.call(cond)
-            raise ArgumentError,
-              "You cannot query on mobility attributes translated with the Serialized backend (#{i18n_keys.join(", ")})."
-          end
-        end
+        cond_checker = Backend::Serialized.attr_checker(attributes_extractor)
 
         define_method :where do |*cond, &block|
           cond_checker.call(cond.first) || super(*cond, &block)

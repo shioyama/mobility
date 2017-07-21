@@ -4,12 +4,7 @@ module Mobility
       def initialize(attributes, **)
         super
         attributes_extractor = @attributes_extractor
-        opts_checker = @opts_checker = lambda do |opts|
-          if keys = attributes_extractor.call(opts)
-            raise ArgumentError,
-              "You cannot query on mobility attributes translated with the Serialized backend (#{keys.join(", ")})."
-          end
-        end
+        opts_checker = @opts_checker = Backend::Serialized.attr_checker(attributes_extractor)
 
         define_method :where! do |opts, *rest|
           opts_checker.call(opts) || super(opts, *rest)

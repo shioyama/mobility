@@ -83,8 +83,8 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
 
     context "model table exists" do
       before do
-        ActiveRecord::Base.connection.create_table :foos
         @available_locales = I18n.available_locales
+        ActiveRecord::Base.connection.create_table :foos
         I18n.available_locales = [:en, :ja, :de]
         run_generator %w(Foo title:string:index content:text --backend=column)
       end

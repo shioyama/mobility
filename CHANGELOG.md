@@ -2,6 +2,18 @@
 
 ## 0.1
 
+### 0.1.20 (July 23, 2017)
+* Fix location of Rails generators to work with plugins
+  ([#56](https://github.com/shioyama/mobility/pull/56))
+
+### 0.1.19 (July 16, 2017)
+* Partial support for AR 4.2 ([#46](https://github.com/shioyama/mobility/pull/46))
+* Fix issues with Sequel >= 4.46.0 ([#47](https://github.com/shioyama/mobility/pull/47))
+* Include anonymous modules instead of defining methods directly on class
+  ([049a5f](https://github.com/shioyama/mobility/commit/049a5f90fd898d82984d2fe1af1646fda48ad142),
+  [d8fe42](https://github.com/shioyama/mobility/commit/d8fe42f81211640125e6a50bf681d45dbaa71c40),
+  [9cc3d0](https://github.com/shioyama/mobility/commit/9cc3d0e8c3f813c15213848f305e363c4eec6b8e))
+
 ### 0.1.18 (June 21, 2017)
 * Fix deprecation warnings when using ActiveRecord 5.1
   ([#44](https://github.com/shioyama/mobility/pull/44))

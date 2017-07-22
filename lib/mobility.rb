@@ -59,7 +59,7 @@ module Mobility
   begin
     require "rails"
     Loaded::Rails = true
-    require "mobility/rails"
+    require "rails/generators/mobility/generators"
   rescue LoadError
     Loaded::Rails = false
   end

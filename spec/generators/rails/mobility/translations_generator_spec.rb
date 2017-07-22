@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record do
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase
-  require "generators/rails/mobility/translations_generator"
+  require "rails/generators/mobility/translations_generator"
 
   destination File.expand_path("../tmp", __FILE__)
 

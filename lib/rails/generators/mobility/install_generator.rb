@@ -1,5 +1,6 @@
 require "rails/generators"
 require "rails/generators/active_record"
+require_relative "./active_record_migration_compatibility"
 
 module Mobility
   class InstallGenerator < ::Rails::Generators::Base

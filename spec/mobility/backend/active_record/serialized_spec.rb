@@ -75,13 +75,6 @@ describe Mobility::Backend::ActiveRecord::Serialized, orm: :active_record do
       expect(post).to receive(:read_attribute).once.and_call_original
       2.times { backend.read(:en) }
     end
-
-    it "uses cached serialized attribute for writes" do
-      post = SerializedPost.new
-      backend = post.mobility_backend_for("title")
-      expect(post).to receive(:read_attribute).once.and_call_original
-      2.times { backend.write(:en, "foo") }
-    end
   end
 
   describe "mobility scope (.i18n)" do

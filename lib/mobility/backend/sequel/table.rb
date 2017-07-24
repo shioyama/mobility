@@ -7,6 +7,7 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
 =end
     class Sequel::Table
       include Sequel
+      include Table
 
       require 'mobility/backend/sequel/table/query_methods'
 
@@ -26,13 +27,13 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **_)
-        translation_for(locale).send(attribute)
+      def read(locale, **options)
+        translation_for(locale, options).send(attribute)
       end
 
       # @!macro backend_reader
-      def write(locale, value, **_)
-        translation_for(locale).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
+      def write(locale, value, **options)
+        translation_for(locale, options).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
       end
 
       # @!group Backend Configuration
@@ -60,10 +61,6 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
         association_name = options[:association_name]
         subclass_name    = options[:subclass_name]
 
-        cache_accessor_name = :"__#{association_name}_cache"
-
-        attr_accessor cache_accessor_name
-
         translation_class =
           if self.const_defined?(subclass_name, false)
             const_get(subclass_name, false)
@@ -88,9 +85,10 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
         callback_methods = Module.new do
           define_method :after_save do
             super()
-            send(cache_accessor_name).each_value do |translation|
+            cache_accessor = instance_variable_get(:"@__#{association_name}_cache")
+            cache_accessor.each_value do |translation|
               translation.id ? translation.save : send("add_#{association_name.to_s.singularize}", translation)
-            end if send(cache_accessor_name)
+            end if cache_accessor
           end
         end
         include callback_methods
@@ -100,42 +98,16 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
 
       setup_query_methods(QueryMethods)
 
-      # @!group Cache Methods
-      # @return [Table::TranslationsCache]
-      def new_cache
-        reset_model_cache unless model_cache
-        model_cache.for(attribute)
-      end
-
-      # @return [Boolean]
-      def write_to_cache?
-        true
-      end
-
-      def clear_cache
-        model_cache.clear if model_cache
-      end
-      # @!endgroup
-
-      private
-
-      def translation_for(locale)
+      def translation_for(locale, _options = {})
         translation = translations.find { |t| t.locale == locale.to_s }
         translation ||= translation_class.new(locale: locale)
         translation
       end
 
+      private
+
       def translations
         model.send(association_name)
-      end
-
-      def model_cache
-        model.send(:"__#{association_name}_cache")
-      end
-
-      def reset_model_cache
-        model.send(:"__#{association_name}_cache=",
-                   Table::TranslationsCache.new { |locale| translation_for(locale) })
       end
 
       class CacheRequired < ::StandardError; end

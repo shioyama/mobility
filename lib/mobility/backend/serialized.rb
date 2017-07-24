@@ -32,6 +32,7 @@ Format for serialization. Either +:yaml+ (default) or +:json+.
           options[:format] = options[:format].downcase.to_sym
           raise ArgumentError, "Serialized backend only supports yaml or json formats." unless [:yaml, :json].include?(options[:format])
         end
+        # @!endgroup
 
         def serializer_for(format)
           lambda do |obj|

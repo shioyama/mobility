@@ -22,13 +22,13 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       title_backend = article.mobility_backend_for("title")
       content_backend = article.mobility_backend_for("content")
       title_backend.read(:en)
-      expect(article.__mobility_model_translations_cache.size).to eq(1)
+      expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
       content_backend.read(:en)
-      expect(article.__mobility_model_translations_cache.size).to eq(1)
+      expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
       content_backend.read(:ja)
-      expect(article.__mobility_model_translations_cache.size).to eq(2)
-      content_backend.clear_cache
-      expect(article.__mobility_model_translations_cache.size).to eq(0)
+      expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(2)
+      content_backend.send(:clear_cache)
+      expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(0)
     end
   end
 

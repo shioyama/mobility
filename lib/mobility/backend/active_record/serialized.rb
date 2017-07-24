@@ -38,7 +38,10 @@ Implements {Mobility::Backend::Serialized} backend for ActiveRecord models.
       end
       # @!endgroup
 
-      # @see Backend::Serialized
+      # @!group Backend Configuration
+      # @param (see Backend::Serialized.configure)
+      # @option (see Backend::Serialized.configure)
+      # @raise (see Backend::Serialized.configure)
       def self.configure(options)
         Serialized.configure(options)
       end
@@ -57,13 +60,6 @@ Implements {Mobility::Backend::Serialized} backend for ActiveRecord models.
       def translations
         model.read_attribute(attribute)
       end
-      alias_method :new_cache, :translations
-
-      # @return [Boolean]
-      def write_to_cache?
-        true
-      end
-      # @!endgroup
 
       %w[yaml json].each do |format|
         class_eval <<-EOM, __FILE__, __LINE__ + 1

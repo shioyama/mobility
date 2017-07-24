@@ -85,6 +85,7 @@ columns to that table.
 =end
     class ActiveRecord::Table
       include ActiveRecord
+      include Table
 
       require 'mobility/backend/active_record/table/query_methods'
 
@@ -100,13 +101,13 @@ columns to that table.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **_)
-        translation_for(locale).send(attribute)
+      def read(locale, options = {})
+        translation_for(locale, options).send(attribute)
       end
 
       # @!macro backend_reader
-      def write(locale, value, **_)
-        translation_for(locale).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
+      def write(locale, value, options = {})
+        translation_for(locale, options).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
       end
       # @!endgroup
 
@@ -135,8 +136,6 @@ columns to that table.
         association_name = options[:association_name]
         subclass_name    = options[:subclass_name]
 
-        attr_accessor :"__#{association_name}_cache"
-
         translation_class =
           if self.const_defined?(subclass_name, false)
             const_get(subclass_name, false)
@@ -161,42 +160,16 @@ columns to that table.
 
       setup_query_methods(QueryMethods)
 
-      # @!group Cache Methods
-      # @return [Table::TranslationsCache]
-      def new_cache
-        reset_model_cache unless model_cache
-        model_cache.for(attribute)
-      end
-
-      # @return [Boolean]
-      def write_to_cache?
-        true
-      end
-
-      def clear_cache
-        model_cache.try(:clear)
-      end
-      # @!endgroup
-
-      private
-
-      def translation_for(locale)
+      def translation_for(locale, _options = {})
         translation = translations.find { |t| t.locale == locale.to_s.freeze }
         translation ||= translations.build(locale: locale)
         translation
       end
 
+      private
+
       def translations
         model.send(association_name)
-      end
-
-      def model_cache
-        model.send(:"__#{association_name}_cache")
-      end
-
-      def reset_model_cache
-        model.send(:"__#{association_name}_cache=",
-                   Table::TranslationsCache.new { |locale| translation_for(locale) })
       end
     end
   end

@@ -24,11 +24,6 @@ Internal class used by ActiveRecord backends that store values as a hash.
       def translations
         model.read_attribute(attribute)
       end
-      alias_method :new_cache, :translations
-
-      def write_to_cache?
-        true
-      end
 
       setup do |attributes|
         attributes.each { |attribute| store attribute, coder: Coder }

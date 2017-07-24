@@ -53,31 +53,16 @@ class.
           options[:type] = (options[:type] || :text).to_sym
           raise ArgumentError, "type must be one of: [text, string]" unless [:text, :string].include?(options[:type])
         end
-      end
 
-      # Simple cache to memoize translations as a hash so they can be fetched
-      # quickly.
-      class TranslationsCache
-        # @param backend Instance of KeyValue backend to cache
-        # @return [TranslationsCache]
-        def initialize(backend)
-          @cache = Hash.new { |hash, locale| hash[locale] = backend.translation_for(locale) }
-        end
-
-        # @param locale [Symbol] Locale to fetch
-        def [](locale)
-          @cache[locale].value
-        end
-
-        # @param locale [Symbol] Locale to set
-        # @param value [String] Value to set
-        def []=(locale, value)
-          @cache[locale].value = value
-        end
-
-        # @yield [locale, translation]
-        def each_translation &block
-          @cache.each_value(&block)
+        # Apply custom processing for option module
+        # @param (see Backend::Setup#apply_module)
+        def apply_module(name)
+          if name == :cache
+            include TranslationCacher.new(:translation_for)
+            true
+          else
+            super
+          end
         end
       end
     end

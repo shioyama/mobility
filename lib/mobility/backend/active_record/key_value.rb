@@ -38,13 +38,13 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **_)
-        translation_for(locale).value
+      def read(locale, options = {})
+        translation_for(locale, options).value
       end
 
       # @!macro backend_reader
-      def write(locale, value, **_)
-        translation_for(locale).tap { |t| t.value = value }.value
+      def write(locale, value, options = {})
+        translation_for(locale, options).tap { |t| t.value = value }.value
       end
       # @!endgroup
 
@@ -101,22 +101,10 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
 
       setup_query_methods(QueryMethods)
 
-      # @!group Cache Methods
-      # @return [KeyValue::TranslationsCache]
-      def new_cache
-        KeyValue::TranslationsCache.new(self)
-      end
-
-      # @return [Boolean]
-      def write_to_cache?
-        true
-      end
-      # @!endgroup
-
       # Returns translation for a given locale, or builds one if none is present.
       # @param [Symbol] locale
       # @return [Mobility::ActiveRecord::TextTranslation,Mobility::ActiveRecord::StringTranslation]
-      def translation_for(locale)
+      def translation_for(locale, _options = {})
         translation = translations.find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= translations.build(locale: locale, key: attribute)
         translation

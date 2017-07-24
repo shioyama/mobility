@@ -22,13 +22,6 @@ Internal class used by Sequel backends that store values as a hash.
       def translations
         model.send("#{attribute}_before_mobility")
       end
-      alias_method :new_cache, :translations
-
-      # @return [Boolean]
-      def write_to_cache?
-        true
-      end
-      # @!endgroup
 
       setup do |attributes|
         method_overrides = Module.new do

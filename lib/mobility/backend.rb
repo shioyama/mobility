@@ -49,22 +49,23 @@ On top of this, a backend will normally:
 =end
 
   module Backend
-    autoload :ActiveModel,  'mobility/backend/active_model'
-    autoload :ActiveRecord, 'mobility/backend/active_record'
-    autoload :Cache,        'mobility/backend/cache'
-    autoload :Column,       'mobility/backend/column'
-    autoload :Default,      'mobility/backend/default'
-    autoload :Dirty,        'mobility/backend/dirty'
-    autoload :Fallbacks,    'mobility/backend/fallbacks'
-    autoload :Hstore,       'mobility/backend/hstore'
-    autoload :Jsonb,        'mobility/backend/jsonb'
-    autoload :KeyValue,     'mobility/backend/key_value'
-    autoload :Null,         'mobility/backend/null'
-    autoload :OrmDelegator, 'mobility/backend/orm_delegator'
-    autoload :Presence,     'mobility/backend/presence'
-    autoload :Sequel,       'mobility/backend/sequel'
-    autoload :Serialized,   'mobility/backend/serialized'
-    autoload :Table,        'mobility/backend/table'
+    autoload :ActiveModel,       'mobility/backend/active_model'
+    autoload :ActiveRecord,      'mobility/backend/active_record'
+    autoload :Cache,             'mobility/backend/cache'
+    autoload :Column,            'mobility/backend/column'
+    autoload :Default,           'mobility/backend/default'
+    autoload :Dirty,             'mobility/backend/dirty'
+    autoload :Fallbacks,         'mobility/backend/fallbacks'
+    autoload :Hstore,            'mobility/backend/hstore'
+    autoload :Jsonb,             'mobility/backend/jsonb'
+    autoload :KeyValue,          'mobility/backend/key_value'
+    autoload :Null,              'mobility/backend/null'
+    autoload :OrmDelegator,      'mobility/backend/orm_delegator'
+    autoload :Presence,          'mobility/backend/presence'
+    autoload :Sequel,            'mobility/backend/sequel'
+    autoload :Serialized,        'mobility/backend/serialized'
+    autoload :Table,             'mobility/backend/table'
+    autoload :TranslationCacher, 'mobility/backend/translation_cacher'
 
     # @return [String] Backend attribute
     attr_reader :attribute
@@ -142,6 +143,15 @@ On top of this, a backend will normally:
       # @return [self] returns itself
       def for(_)
         self
+      end
+
+      # Called from option modules to apply custom processing for this backend.
+      # Name is the name of the option module.
+      # @param [Symbol] name Name of option module
+      # @return [Boolean]
+      # @note This is currently only called by Backend::Cache.
+      def apply_module(_)
+        false
       end
     end
   end

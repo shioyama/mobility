@@ -34,13 +34,13 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **_)
-        translation_for(locale).value
+      def read(locale, options)
+        translation_for(locale, options).value
       end
 
       # @!macro backend_writer
-      def write(locale, value, **_)
-        translation_for(locale).tap { |t| t.value = value }.value
+      def write(locale, value, options)
+        translation_for(locale, options).tap { |t| t.value = value }.value
       end
       # @!endgroup
 
@@ -112,22 +112,10 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
 
       setup_query_methods(QueryMethods)
 
-      # @!group Cache Methods
-      # @return [KeyValue::TranslationsCache]
-      def new_cache
-        KeyValue::TranslationsCache.new(self)
-      end
-
-      # @return [Boolean]
-      def write_to_cache?
-        true
-      end
-      # @!endgroup
-
       # Returns translation for a given locale, or initializes one if none is present.
       # @param [Symbol] locale
       # @return [Mobility::Sequel::TextTranslation,Mobility::Sequel::StringTranslation]
-      def translation_for(locale)
+      def translation_for(locale, _options = {})
         translation = model.send(association_name).find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= class_name.new(locale: locale, key: attribute)
         translation
@@ -135,7 +123,7 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
 
       # Saves translation which have been built and which have non-blank values.
       def save_translations
-        cache.each_translation do |translation|
+        cache.each_value do |translation|
           next unless translation.value.present?
           translation.id ? translation.save : model.send("add_#{association_name.to_s.singularize}", translation)
         end

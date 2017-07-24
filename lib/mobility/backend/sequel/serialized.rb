@@ -45,7 +45,10 @@ Sequel serialization plugin.
       end
       # @!endgroup
 
-      # @see Backend::Serialized
+      # @!group Backend Configuration
+      # @param (see Backend::Serialized.configure)
+      # @option (see Backend::Serialized.configure)
+      # @raise (see Backend::Serialized.configure)
       def self.configure(options)
         Serialized.configure(options)
       end
@@ -87,18 +90,6 @@ Sequel serialization plugin.
           model.deserialized_values[attribute_] = deserialize_value(attribute_, serialized_value)
         end
       end
-
-      # @!group Cache Methods
-      # @return [Hash]
-      def new_cache
-        translations
-      end
-
-      # @return [Boolean]
-      def write_to_cache?
-        true
-      end
-      # @!endgroup
 
       # @note The original serialization_modification_detection plugin sets
       #   +@original_deserialized_values+ to be +@deserialized_values+, which

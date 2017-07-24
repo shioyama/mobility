@@ -64,33 +64,40 @@ set.
     module Table
       extend OrmDelegator
 
+      def self.included(backend)
+        backend.extend ClassMethods
+      end
+
+      module ClassMethods
+        # Apply custom processing for option module
+        # @param (see Backend::Setup#apply_module)
+        def apply_module(name)
+          if name == :cache
+            include Cache
+            true
+          else
+            super
+          end
+        end
+      end
+
       # Simple hash cache to memoize translations as a hash so they can be
       # fetched quickly.
-      class TranslationsCache < Hash
+      module Cache
+        include TranslationCacher.new(:translation_for)
 
-        # @yield [locale] Yields locale to block in case attribute is not yet
-        #   cached, expects a new translation for that locale.
-        # @raise [ArgumentError] if block is not given
-        def initialize
-          raise ArgumentError, "missing block" unless block_given?
-          super() { |hash, locale| hash[locale] = yield(locale) }
+        private
+
+        def cache
+          model_cache || model.instance_variable_set(:"@__#{association_name}_cache", {})
         end
 
-        # Return wrapper class which reads and writes to only one attribute of this cache.
-        # @param [String] attribute
-        # @return [Class] Hash-like wrapper object to be used as attribute cache
-        def for(attribute)
-          cache = self
+        def model_cache
+          model.instance_variable_get(:"@__#{association_name}_cache")
+        end
 
-          Class.new do
-            define_singleton_method :[] do |locale|
-              cache[locale].send(attribute)
-            end
-
-            define_singleton_method :[]= do |locale, value|
-              cache[locale].send("#{attribute}=", value)
-            end
-          end
+        def clear_cache
+          model_cache && model_cache.clear
         end
       end
     end

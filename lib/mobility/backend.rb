@@ -148,7 +148,7 @@ On top of this, a backend will normally:
       # Called from option modules to apply custom processing for this backend.
       # Name is the name of the option module.
       # @param [Symbol] name Name of option module
-      # @return [Boolean]
+      # @return [Boolean] Whether the module was applied
       # @note This is currently only called by Backend::Cache.
       def apply_module(_)
         false

@@ -71,6 +71,7 @@ set.
       module ClassMethods
         # Apply custom processing for option module
         # @param (see Backend::Setup#apply_module)
+        # @return (see Backend::Setup#apply_module)
         def apply_module(name)
           if name == :cache
             include Cache

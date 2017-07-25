@@ -13,15 +13,15 @@ Resets backend cache when reset events occur.
 
 =end
   class BackendResetter < Module
-    # @param [Array<String>] attributes Attributes whose backends should be reset
+    # @param [Array<String>] attribute_names Names of attributes whose backends should be reset
     # @yield Backend to reset as context for block
     # @raise [ArgumentError] if no block is provided.
-    def initialize(attributes, &block)
+    def initialize(attribute_names, &block)
       raise ArgumentError, "block required" unless block_given?
       @model_reset_method = Proc.new do
-        attributes.each do |attribute|
-          if @mobility_backends && @mobility_backends[attribute]
-            @mobility_backends[attribute].instance_eval(&block)
+        attribute_names.each do |name|
+          if @mobility_backends && @mobility_backends[name]
+            @mobility_backends[name].instance_eval(&block)
           end
         end
       end

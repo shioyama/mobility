@@ -15,6 +15,17 @@ describe Mobility::Backend::Sequel::Table, orm: :sequel do
 
   include_accessor_examples "Article"
 
+  it "only fetches translation once per locale" do
+    article = Article.new
+    title_backend = article.mobility_backend_for("title")
+    expect(title_backend.model.mobility_model_translations).to receive(:find).twice.and_call_original
+    title_backend.write(:en, "foo")
+    title_backend.write(:en, "bar")
+    expect(title_backend.read(:en)).to eq("bar")
+    title_backend.write(:fr, "baz")
+    expect(title_backend.read(:fr)).to eq("baz")
+  end
+
   # Using Article to test separate backends with separate tables fails
   # when these specs are run together with other specs, due to code
   # assigning subclasses (Article::Translation, Article::FooTranslation).

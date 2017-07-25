@@ -20,6 +20,40 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
 
   include_accessor_examples 'Article'
 
+  describe "cache" do
+    let(:article) { Article.new }
+
+    it "only fetches translation once per locale" do
+      expect(title_backend.model.mobility_text_translations).to receive(:find).twice.and_call_original
+      title_backend.write(:en, "foo")
+      title_backend.write(:en, "bar")
+      expect(title_backend.read(:en)).to eq("bar")
+      title_backend.write(:fr, "baz")
+      expect(title_backend.read(:fr)).to eq("baz")
+    end
+
+    it "resets translations cache when model is refreshed" do
+      aggregate_failures "cacheing reads" do
+        title_backend.read(:en)
+        expect(title_backend.send(:cache).size).to eq(1)
+        expect(content_backend.send(:cache).size).to eq(0)
+        title_backend.read(:ja)
+        expect(title_backend.send(:cache).size).to eq(2)
+        expect(content_backend.send(:cache).size).to eq(0)
+        content_backend.read(:fr)
+        expect(title_backend.send(:cache).size).to eq(2)
+        expect(content_backend.send(:cache).size).to eq(1)
+      end
+
+      aggregate_failures "resetting cache" do
+        article.save
+        article.refresh
+        expect(title_backend.send(:cache).size).to eq(0)
+        expect(content_backend.send(:cache).size).to eq(0)
+      end
+    end
+  end
+
   describe "Backend methods" do
     before { %w[foo bar baz].each { |slug| Article.create(slug: slug) } }
     let(:article) { Article.find(slug: "baz") }

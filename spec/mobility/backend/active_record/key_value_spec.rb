@@ -3,22 +3,77 @@ require "spec_helper"
 describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
   extend Helpers::ActiveRecord
 
+  let(:title_backend)   { article.mobility_backend_for("title") }
+  let(:content_backend) { article.mobility_backend_for("content") }
+  let(:cache) { false }
+
   before do
     stub_const 'Article', Class.new(ActiveRecord::Base)
+    cache_ = cache
     Article.class_eval do
       include Mobility
-      translates :title, :content, backend: :key_value, cache: false
+      translates :title, :content, backend: :key_value, cache: cache_
       translates :subtitle, backend: :key_value
     end
   end
 
-  include_accessor_examples "Article"
+  context "without cache" do
+    let(:article) { Article.new }
+    include_accessor_examples "Article"
+
+    it "finds translation on every read/write" do
+      expect(title_backend.model.mobility_text_translations).to receive(:find).thrice.and_call_original
+      title_backend.write(:en, "foo")
+      title_backend.write(:en, "bar")
+      expect(title_backend.read(:en)).to eq("bar")
+    end
+  end
+
+  context "with cache" do
+    let(:article) { Article.new }
+    let(:cache) { true }
+    include_accessor_examples "Article"
+
+    it "only fetches translation once per locale" do
+      expect(title_backend.model.mobility_text_translations).to receive(:find).twice.and_call_original
+      title_backend.write(:en, "foo")
+      title_backend.write(:en, "bar")
+      expect(title_backend.read(:en)).to eq("bar")
+      title_backend.write(:fr, "baz")
+      expect(title_backend.read(:fr)).to eq("baz")
+    end
+
+    it "resets translations cache when model is saved or reloaded" do
+      aggregate_failures "cacheing reads" do
+        title_backend.read(:en)
+        expect(title_backend.send(:cache).size).to eq(1)
+        expect(content_backend.send(:cache).size).to eq(0)
+        title_backend.read(:ja)
+        expect(title_backend.send(:cache).size).to eq(2)
+        expect(content_backend.send(:cache).size).to eq(0)
+        content_backend.read(:fr)
+        expect(title_backend.send(:cache).size).to eq(2)
+        expect(content_backend.send(:cache).size).to eq(1)
+      end
+
+      aggregate_failures "resetting cache" do
+        article.save
+        expect(title_backend.send(:cache).size).to eq(0)
+        expect(content_backend.send(:cache).size).to eq(0)
+
+        content_backend.read(:ja)
+        expect(title_backend.send(:cache).size).to eq(0)
+        expect(content_backend.send(:cache).size).to eq(1)
+        article.reload
+        expect(title_backend.send(:cache).size).to eq(0)
+        expect(content_backend.send(:cache).size).to eq(0)
+      end
+    end
+  end
 
   describe "Backend methods" do
     before { %w[foo bar baz].each { |slug| Article.create!(slug: slug) } }
     let(:article) { Article.find_by(slug: "baz") }
-    let(:title_backend) { article.mobility_backend_for("title") }
-    let(:content_backend) { article.mobility_backend_for("content") }
 
     subject { article }
 

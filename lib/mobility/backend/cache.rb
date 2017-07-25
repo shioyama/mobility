@@ -5,8 +5,8 @@ module Mobility
 Caches values fetched from the backend so subsequent fetches can be performed
 more quickly. The cache stores cached values in a simple hash, which is not
 optimal for some storage strategies, so some backends (KeyValue, Table) use a
-custom module through the {Mobility::Backend::Setup#apply_module} hook. For details see the
-documentation for these backends.
+custom module through the {Mobility::Backend::Setup#apply_module} hook. For
+details see the documentation for these backends.
 
 The cache is reset when one of a set of events happens (saving, reloading,
 etc.). See {BackendResetter} for details.

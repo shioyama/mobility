@@ -11,24 +11,58 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
   context "without cache" do
     before { Article.translates :title, :content, backend: :table, cache: false }
     include_accessor_examples "Article"
+
+    it "finds translation on every read/write" do
+      article = Article.new
+      title_backend = article.mobility_backend_for("title")
+      expect(title_backend.model.mobility_model_translations).to receive(:find).thrice.and_call_original
+      title_backend.write(:en, "foo")
+      title_backend.write(:en, "bar")
+      expect(title_backend.read(:en)).to eq("bar")
+    end
   end
 
   context "with cache" do
     before { Article.translates :title, :content, backend: :table, cache: true }
     include_accessor_examples "Article"
 
-    it "resets model translations cache when backend cache is cleared" do
+    it "only fetches translation once per locale" do
+      article = Article.new
+      title_backend = article.mobility_backend_for("title")
+
+      aggregate_failures do
+        expect(title_backend.model.mobility_model_translations).to receive(:find).twice.and_call_original
+        title_backend.write(:en, "foo")
+        title_backend.write(:en, "bar")
+        expect(title_backend.read(:en)).to eq("bar")
+        title_backend.write(:fr, "baz")
+        expect(title_backend.read(:fr)).to eq("baz")
+      end
+    end
+
+    it "resets model translations cache when model is saved or reloaded" do
       article = Article.new
       title_backend = article.mobility_backend_for("title")
       content_backend = article.mobility_backend_for("content")
-      title_backend.read(:en)
-      expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
-      content_backend.read(:en)
-      expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
-      content_backend.read(:ja)
-      expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(2)
-      content_backend.send(:clear_cache)
-      expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(0)
+
+      aggregate_failures "cacheing reads" do
+        title_backend.read(:en)
+        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
+        content_backend.read(:en)
+        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
+        content_backend.read(:ja)
+        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(2)
+      end
+
+      aggregate_failures "resetting cache" do
+        article.save
+        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(0)
+
+        content_backend.read(:ja)
+        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
+        article.reload
+        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(0)
+      end
     end
   end
 

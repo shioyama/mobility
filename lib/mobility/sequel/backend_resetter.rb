@@ -12,14 +12,12 @@ method is called.
       def included(model_class)
         model_reset_method = @model_reset_method
 
-        model_class.class_eval do
-          mod = Module.new do
-            define_method :refresh do
-              super().tap { instance_eval(&model_reset_method) }
-            end
+        mod = Module.new do
+          define_method :refresh do
+            super().tap { instance_eval(&model_reset_method) }
           end
-          include mod
         end
+        model_class.include mod
       end
     end
   end

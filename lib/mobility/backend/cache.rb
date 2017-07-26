@@ -20,9 +20,9 @@ Values are added to the cache in two ways:
     module Cache
       # Applies cache option module to attributes.
       # @param [Attributes] attributes
-      # @param [Boolean] option_value
-      def self.apply(attributes, option_value)
-        if option_value
+      # @param [Boolean] option
+      def self.apply(attributes, option)
+        if option
           backend_class = attributes.backend_class
           backend_class.include(self) unless backend_class.apply_module(:cache)
 

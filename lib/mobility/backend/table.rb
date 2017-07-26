@@ -36,8 +36,8 @@ For more details, see examples in {Mobility::Backend::ActiveRecord::Table}.
 
 ===+association_name+
 
-Name of association on model. Defaults to +:mobility_model_translations+. If
-specified, ensure name does not overlap with other methods on model or with the
+Name of association on model. Defaults to +:model_translations+. If specified,
+ensure name does not overlap with other methods on model or with the
 association name used by other backends on model (otherwise one will overwrite
 the other).
 
@@ -90,11 +90,11 @@ set.
         private
 
         def cache
-          model_cache || model.instance_variable_set(:"@__#{association_name}_cache", {})
+          model_cache || model.instance_variable_set(:"@__mobility_#{association_name}_cache", {})
         end
 
         def model_cache
-          model.instance_variable_get(:"@__#{association_name}_cache")
+          model.instance_variable_get(:"@__mobility_#{association_name}_cache")
         end
 
         def clear_cache

@@ -18,7 +18,7 @@ describe Mobility::Backend::Sequel::Table, orm: :sequel do
   it "only fetches translation once per locale" do
     article = Article.new
     title_backend = article.mobility_backend_for("title")
-    expect(title_backend.model.mobility_model_translations).to receive(:find).twice.and_call_original
+    expect(article.send(article.title_backend.association_name)).to receive(:find).twice.and_call_original
     title_backend.write(:en, "foo")
     title_backend.write(:en, "bar")
     expect(title_backend.read(:en)).to eq("bar")
@@ -118,7 +118,7 @@ describe Mobility::Backend::Sequel::Table, orm: :sequel do
           subject.save
           subject.reload
 
-          translation = subject.mobility_model_translations.first
+          translation = subject.send(title_backend.association_name).first
 
           aggregate_failures do
             expect(translation.title).to eq("New New Article")

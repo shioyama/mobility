@@ -112,7 +112,7 @@ columns to that table.
       # @!endgroup
 
       # @!group Backend Configuration
-      # @option options [Symbol] association_name (:mobility_model_translations)
+      # @option options [Symbol] association_name (:model_translations)
       #   Name of association method
       # @option options [Symbol] table_name Name of translation table
       # @option options [Symbol] foreign_key Name of foreign key
@@ -125,7 +125,7 @@ columns to that table.
         if (association_name = options[:association_name]).present?
           options[:subclass_name] ||= association_name.to_s.singularize.camelize.freeze
         else
-          options[:association_name] = :mobility_model_translations
+          options[:association_name] = :model_translations
           options[:subclass_name] ||= :Translation
         end
         %i[foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }

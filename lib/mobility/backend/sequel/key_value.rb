@@ -46,7 +46,7 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
 
       # @!group Backend Configuration
       # @option options [Symbol,String] type (:text) Column type to use
-      # @option options [Symbol] associaiton_name (:mobility_text_translations) Name of association method
+      # @option options [Symbol] associaiton_name (:text_translations) Name of association method
       # @option options [Symbol] class_name ({Mobility::Sequel::TextTranslation}) Translation class
       # @raise [CacheRequired] if cache is disabled
       # @raise [ArgumentError] if type is not either :text or :string
@@ -56,7 +56,7 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
         type = options[:type]
         options[:class_name] ||= Mobility::Sequel.const_get("#{type.capitalize}Translation".freeze)
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
-        options[:association_name] ||= options[:class_name].table_name.to_sym
+        options[:association_name] ||= :"#{options[:type]}_translations"
         %i[type association_name].each { |key| options[key] = options[key].to_sym }
       end
       # @!endgroup

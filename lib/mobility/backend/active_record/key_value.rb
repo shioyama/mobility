@@ -50,7 +50,7 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
 
       # @!group Backend Configuration
       # @option options [Symbol] type (:text) Column type to use
-      # @option options [Symbol] association_name (:mobility_text_translations) Name of association method
+      # @option options [Symbol] association_name (:text_translations) Name of association method
       # @option options [String,Class] class_name ({Mobility::ActiveRecord::TextTranslation}) Translation class
       # @raise [ArgumentError] if type is not either :text or :string
       def self.configure(options)
@@ -58,7 +58,7 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
         type = options[:type]
         options[:class_name] ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation".freeze)
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
-        options[:association_name] ||= options[:class_name].table_name.to_sym
+        options[:association_name] ||= :"#{options[:type]}_translations"
         %i[type association_name].each { |key| options[key] = options[key].to_sym }
       end
       # @!endgroup

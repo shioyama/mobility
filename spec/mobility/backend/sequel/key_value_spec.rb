@@ -24,7 +24,7 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
     let(:article) { Article.new }
 
     it "only fetches translation once per locale" do
-      expect(title_backend.model.mobility_text_translations).to receive(:find).twice.and_call_original
+      expect(article.send(title_backend.association_name)).to receive(:find).twice.and_call_original
       title_backend.write(:en, "foo")
       title_backend.write(:en, "bar")
       expect(title_backend.read(:en)).to eq("bar")
@@ -139,7 +139,7 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
           subject.save
           subject.reload
 
-          translation = subject.mobility_text_translations.first
+          translation = subject.send(title_backend.association_name).first
 
           aggregate_failures do
             expect(translation.key).to eq("title")
@@ -163,27 +163,29 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
   end
 
   describe "translations association" do
+    let(:article) { Article.create(title: "Article", subtitle: "Article subtitle", content: "Content") }
+
     it "limits association to translations with keys matching attributes" do
-      article = Article.create(title: "Article", subtitle: "Article subtitle", content: "Content")
       translation = Mobility::Sequel::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
       article = Article.first
 
       aggregate_failures do
-        expect(article.mobility_text_translations).not_to include(translation)
-        expect(article.mobility_text_translations.count).to eq(3)
+        expect(article.send(title_backend.association_name)).not_to include(translation)
+        expect(article.send(title_backend.association_name).count).to eq(3)
       end
     end
   end
 
   describe "creating a new record with translations" do
+    let!(:article) { Article.create(title: "New Article", content: "Once upon a time...") }
+
     it "creates record and translation in current locale" do
       Mobility.locale = :en
-      article = Article.create(title: "New Article", content: "Once upon a time...")
 
       aggregate_failures do
         expect(Article.count).to eq(1)
         expect(Mobility::Sequel::TextTranslation.count).to eq(2)
-        expect(article.mobility_text_translations.size).to eq(2)
+        expect(article.send(title_backend.association_name).size).to eq(2)
         expect(article.title).to eq("New Article")
         expect(article.content).to eq("Once upon a time...")
       end
@@ -191,10 +193,9 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
 
     it "creates translations for other locales" do
       Mobility.locale = :en
-      article = Article.create(title: "New Article", content: "Once upon a time...")
 
       aggregate_failures "in one locale" do
-        expect(article.mobility_text_translations.count).to eq(2)
+        expect(article.send(title_backend.association_name).count).to eq(2)
       end
 
       aggregate_failures "in other locale" do
@@ -204,12 +205,12 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
         article.update(title: "新規記事", content: "昔々あるところに…")
         expect(article.title).to eq("新規記事")
         expect(article.content).to eq("昔々あるところに…")
-        expect(article.mobility_text_translations.count).to eq(4)
+        expect(article.send(title_backend.association_name).count).to eq(4)
       end
 
       aggregate_failures "after reloading" do
         article = Article.first
-        expect(article.mobility_text_translations.count).to eq(4)
+        expect(article.send(title_backend.association_name).count).to eq(4)
         expect(Mobility::Sequel::TextTranslation.count).to eq(4)
       end
     end
@@ -218,7 +219,7 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
   context "with separate string and text translations" do
     before do
       Article.class_eval do
-        translates :short_title, backend: :key_value, class_name: Mobility::Sequel::StringTranslation, association_name: :mobility_string_translations
+        translates :short_title, backend: :key_value, class_name: Mobility::Sequel::StringTranslation, association_name: :string_translations
       end
     end
 
@@ -245,15 +246,17 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
   end
 
   describe "storing translations" do
+    let!(:article) do
+      Mobility.with_locale(:en) { article = Article.create(title: "New Article") }
+    end
+
     it "does not save translations unless they have a value present" do
       aggregate_failures do
-        Mobility.locale = :en
-        article = Article.create(title: "New Article")
         Mobility.locale = :ja
         article.title
         article.save
         expect(translation_class.count).to eq(1)
-        expect(article.mobility_text_translations.count).to eq(1)
+        expect(article.send(title_backend.association_name).count).to eq(1)
         article.title = ""
         article.save
         expect(article.title).to be_nil
@@ -262,9 +265,6 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
     end
 
     it "destroys translation on save if value is set to a blank value" do
-      Article.create(title: "New Article")
-
-      article = Article.first
       article.title = ""
 
       aggregate_failures do
@@ -292,7 +292,6 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
     end
 
     it "resets translations if model is reloaded" do
-      article = Article.create(title: "New Article")
       Mobility.locale = :ja
       article.title = "新規記事"
 
@@ -348,7 +347,7 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
       expect(options).to eq({
         type: :string,
         class_name: Mobility::Sequel::StringTranslation,
-        association_name: :mobility_string_translations
+        association_name: :string_translations
       })
     end
 
@@ -358,7 +357,7 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
       expect(options).to eq({
         type: :text,
         class_name: Mobility::Sequel::TextTranslation,
-        association_name: :mobility_text_translations
+        association_name: :text_translations
       })
     end
 
@@ -370,7 +369,7 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
       options = {}
       described_class.configure(options)
       expect(options).to eq({
-        association_name: :mobility_text_translations,
+        association_name: :text_translations,
         class_name: Mobility::Sequel::TextTranslation,
         type: :text
       })
@@ -389,7 +388,7 @@ describe Mobility::Backend::Sequel::KeyValue, orm: :sequel do
     context "model with two translated attributes on different tables" do
       before do
         Article.class_eval do
-          translates :short_title, backend: :key_value, class_name: Mobility::Sequel::StringTranslation, association_name: :mobility_string_translations
+          translates :short_title, backend: :key_value, class_name: Mobility::Sequel::StringTranslation, association_name: :string_translations
         end
         @article1 = Article.create(title: "foo post", short_title: "bar short 1")
         @article2 = Article.create(title: "foo post", short_title: "bar short 2")

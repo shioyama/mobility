@@ -15,7 +15,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
     it "finds translation on every read/write" do
       article = Article.new
       title_backend = article.mobility_backend_for("title")
-      expect(title_backend.model.mobility_model_translations).to receive(:find).thrice.and_call_original
+      expect(title_backend.model.model_translations).to receive(:find).thrice.and_call_original
       title_backend.write(:en, "foo")
       title_backend.write(:en, "bar")
       expect(title_backend.read(:en)).to eq("bar")
@@ -31,7 +31,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       title_backend = article.mobility_backend_for("title")
 
       aggregate_failures do
-        expect(title_backend.model.mobility_model_translations).to receive(:find).twice.and_call_original
+        expect(title_backend.model.model_translations).to receive(:find).twice.and_call_original
         title_backend.write(:en, "foo")
         title_backend.write(:en, "bar")
         expect(title_backend.read(:en)).to eq("bar")
@@ -110,7 +110,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
       it "builds translation if no translation exists" do
         expect {
           title_backend.read(:de)
-        }.to change(subject.send(:mobility_model_translations), :size).by(1)
+        }.to change(subject.send(:model_translations), :size).by(1)
       end
 
       describe "reading back written attributes" do
@@ -129,7 +129,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         it "creates translation for locale" do
           expect {
             title_backend.write(:en, "New Article")
-          }.to change(subject.send(:mobility_model_translations), :size).by(1)
+          }.to change(subject.send(title_backend.association_name), :size).by(1)
 
           expect { subject.save! }.to change(Article::Translation, :count).by(1)
         end
@@ -138,7 +138,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
           title_backend.write(:en, "New Article")
           content_backend.write(:en, "Lorum ipsum...")
 
-          translation = subject.send(:mobility_model_translations).first
+          translation = subject.send(title_backend.association_name).first
 
           aggregate_failures do
             expect(translation.title).to eq("New Article")
@@ -160,7 +160,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
         it "does not create new translation for locale" do
           expect {
             title_backend.write(:en, "New Article")
-          }.not_to change(subject.send(:mobility_model_translations), :size)
+          }.not_to change(subject.send(title_backend.association_name), :size)
         end
 
         it "updates value attribute on existing translation" do
@@ -168,7 +168,7 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
           subject.save!
           subject.reload
 
-          translation = subject.send(:mobility_model_translations).first
+          translation = subject.send(title_backend.association_name).first
 
           aggregate_failures do
             expect(translation.title).to eq("New New Article")

@@ -37,7 +37,7 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
       end
 
       # @!group Backend Configuration
-      # @option options [Symbol] association_name (:mobility_model_translations) Name of association method
+      # @option options [Symbol] association_name (:model_translations) Name of association method
       # @option options [Symbol] table_name Name of translation table
       # @option options [Symbol] foreign_key Name of foreign key
       # @option options [Symbol] subclass_name Name of subclass to append to model class to generate translation class
@@ -50,7 +50,7 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
         if (association_name = options[:association_name]).present?
           options[:subclass_name] ||= association_name.to_s.singularize.camelize
         else
-          options[:association_name] = :mobility_model_translations
+          options[:association_name] = :model_translations
           options[:subclass_name] ||= :Translation
         end
         %i[table_name foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }
@@ -85,7 +85,7 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
         callback_methods = Module.new do
           define_method :after_save do
             super()
-            cache_accessor = instance_variable_get(:"@__#{association_name}_cache")
+            cache_accessor = instance_variable_get(:"@__mobility_#{association_name}_cache")
             cache_accessor.each_value do |translation|
               translation.id ? translation.save : send("add_#{association_name.to_s.singularize}", translation)
             end if cache_accessor

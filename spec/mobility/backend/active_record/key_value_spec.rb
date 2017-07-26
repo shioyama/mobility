@@ -22,7 +22,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
     include_accessor_examples "Article"
 
     it "finds translation on every read/write" do
-      expect(title_backend.model.mobility_text_translations).to receive(:find).thrice.and_call_original
+      expect(title_backend.translations).to receive(:find).thrice.and_call_original
       title_backend.write(:en, "foo")
       title_backend.write(:en, "bar")
       expect(title_backend.read(:en)).to eq("bar")
@@ -35,7 +35,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
     include_accessor_examples "Article"
 
     it "only fetches translation once per locale" do
-      expect(title_backend.model.mobility_text_translations).to receive(:find).twice.and_call_original
+      expect(title_backend.translations).to receive(:find).twice.and_call_original
       title_backend.write(:en, "foo")
       title_backend.write(:en, "bar")
       expect(title_backend.read(:en)).to eq("bar")
@@ -103,7 +103,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
       it "builds translation if no translation exists" do
         expect {
           title_backend.read(:de)
-        }.to change(subject.send(:mobility_text_translations), :size).by(1)
+        }.to change(subject.send(title_backend.association_name), :size).by(1)
       end
 
       describe "reading back written attributes" do
@@ -122,7 +122,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
         it "creates translation for locale" do
           expect {
             title_backend.write(:en, "New Article")
-          }.to change(subject.send(:mobility_text_translations), :size).by(1)
+          }.to change(subject.send(title_backend.association_name), :size).by(1)
 
           expect { subject.save! }.to change(Mobility::ActiveRecord::TextTranslation, :count).by(1)
         end
@@ -130,7 +130,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
         it "assigns attributes to translation" do
           title_backend.write(:en, "New Article")
 
-          translation = subject.send(:mobility_text_translations).first
+          translation = subject.send(title_backend.association_name).first
 
           aggregate_failures do
             expect(translation.key).to eq("title")
@@ -153,7 +153,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
         it "does not create new translation for locale" do
           expect {
             title_backend.write(:en, "New Article")
-          }.not_to change(subject.send(:mobility_text_translations), :size)
+          }.not_to change(subject.send(title_backend.association_name), :size)
         end
 
         it "updates value attribute on existing translation" do
@@ -161,7 +161,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
           subject.save!
           subject.reload
 
-          translation = subject.send(:mobility_text_translations).first
+          translation = subject.send(title_backend.association_name).first
 
           aggregate_failures do
             expect(translation.key).to eq("title")
@@ -174,11 +174,11 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
           expect(Mobility::ActiveRecord::TextTranslation.count).to eq(1)
           expect {
             title_backend.write(:en, nil)
-          }.not_to change(subject.send(:mobility_text_translations), :count)
+          }.not_to change(subject.send(title_backend.association_name), :count)
 
           expect {
             subject.save!
-          }.to change(subject.send(:mobility_text_translations), :count).by(-1)
+          }.to change(subject.send(title_backend.association_name), :count).by(-1)
 
           expect(Mobility::ActiveRecord::TextTranslation.count).to eq(0)
         end
@@ -187,40 +187,42 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
           article = Article.find_by(slug: "foo")
           expect(article.title).to eq(nil)
           article.title = ""
-          expect(article.mobility_text_translations.size).to eq(1)
+          expect(article.send(title_backend.association_name).size).to eq(1)
           article.save
-          expect(article.mobility_text_translations.size).to eq(0)
+          expect(article.send(title_backend.association_name).size).to eq(0)
         end
       end
     end
   end
 
   describe "translations association" do
+    let(:article) { Article.create(title: "Article", subtitle: "Article subtitle", content: "Content") }
+
     it "limits association to translations with keys matching attributes" do
       # This limits the results returned by the association to only those whose keys match the set of
       # translated attributes we have defined. This matters if, say, we save some translations, then change
       # the translated attributes for the model; we should only see the new translations, not the ones
       # created earlier with different keys.
-      article = Article.create(title: "Article", subtitle: "Article subtitle", content: "Content")
       translation = Mobility::ActiveRecord::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
       article = Article.first
 
       aggregate_failures do
-        expect(article.mobility_text_translations).not_to include(translation)
-        expect(article.mobility_text_translations.count).to eq(3)
+        expect(article.send(title_backend.association_name)).not_to include(translation)
+        expect(article.send(title_backend.association_name).count).to eq(3)
       end
     end
   end
 
   describe "creating a new record with translations" do
+    let!(:article) { Article.create(title: "New Article", content: "Once upon a time...") }
+
     it "creates record and translation in current locale" do
       Mobility.locale = :en
-      article = Article.create(title: "New Article", content: "Once upon a time...")
 
       aggregate_failures do
         expect(Article.count).to eq(1)
         expect(Mobility::ActiveRecord::TextTranslation.count).to eq(2)
-        expect(article.send(:mobility_text_translations).size).to eq(2)
+        expect(article.send(title_backend.association_name).size).to eq(2)
         expect(article.title).to eq("New Article")
         expect(article.content).to eq("Once upon a time...")
       end
@@ -228,10 +230,9 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
 
     it "creates translations for other locales" do
       Mobility.locale = :en
-      article = Article.create(title: "New Article", content: "Once upon a time...")
 
       aggregate_failures "in one locale" do
-        expect(article.mobility_text_translations.count).to eq(2)
+        expect(article.send(title_backend.association_name).count).to eq(2)
       end
 
       aggregate_failures "in another locale" do
@@ -243,7 +244,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
         expect(article.content).to eq("昔々あるところに…")
         expect(Article.count).to eq(1)
         expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
-        expect(article.send(:mobility_text_translations).size).to eq(4)
+        expect(article.send(title_backend.association_name).size).to eq(4)
       end
     end
 
@@ -254,10 +255,10 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
       article.title
 
       aggregate_failures do
-        expect(article.send(:mobility_text_translations).size).to eq(2)
+        expect(article.send(title_backend.association_name).size).to eq(2)
         article.save
         expect(article.title).to be_nil
-        expect(article.reload.send(:mobility_text_translations).size).to eq(1)
+        expect(article.reload.send(title_backend.association_name).size).to eq(1)
       end
     end
   end
@@ -265,7 +266,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
   context "with separate string and text translations" do
     before do
       Article.class_eval do
-        translates :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :mobility_string_translations
+        translates :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :string_translations
       end
     end
 
@@ -329,7 +330,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
       expect(options).to eq({
         type: :string,
         class_name: Mobility::ActiveRecord::StringTranslation,
-        association_name: :mobility_string_translations
+        association_name: :string_translations
       })
     end
 
@@ -339,7 +340,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
       expect(options).to eq({
         type: :text,
         class_name: Mobility::ActiveRecord::TextTranslation,
-        association_name: :mobility_text_translations
+        association_name: :text_translations
       })
     end
 
@@ -351,7 +352,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
       options = {}
       described_class.configure(options)
       expect(options).to eq({
-        association_name: :mobility_text_translations,
+        association_name: :text_translations,
         class_name: Mobility::ActiveRecord::TextTranslation,
         type: :text
       })
@@ -377,7 +378,7 @@ describe Mobility::Backend::ActiveRecord::KeyValue, orm: :active_record do
     context "model with two translated attributes on different tables" do
       before do
         Article.class_eval do
-          translates :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :mobility_string_translations
+          translates :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :string_translations
         end
         @article1 = Article.create(title: "foo post", short_title: "bar short 1")
         @article2 = Article.create(title: "foo post", short_title: "bar short 2")

@@ -19,6 +19,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
     class Sequel::KeyValue
       include Sequel
       include KeyValue
+      include Util
 
       require 'mobility/backends/sequel/key_value/query_methods'
 
@@ -114,7 +115,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       def save_translations
         cache.each_value do |translation|
           next unless translation.value.present?
-          translation.id ? translation.save : model.send("add_#{association_name.to_s.singularize}", translation)
+          translation.id ? translation.save : model.send("add_#{singularize(association_name)}", translation)
         end
       end
 

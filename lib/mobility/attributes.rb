@@ -96,6 +96,8 @@ with other backends.
 
 =end
   class Attributes < Module
+    include Util
+
     # Method (accessor, reader or writer)
     # @return [Symbol] method
     attr_reader :method

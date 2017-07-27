@@ -40,6 +40,7 @@ module Mobility
   require "mobility/loaded"
   require "mobility/plugins"
   require "mobility/translates"
+  require "mobility/util"
   require "mobility/wrapper"
 
   # General error for version compatibility conflicts

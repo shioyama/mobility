@@ -12,6 +12,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
     class Sequel::Table
       include Sequel
       include Table
+      include Util
 
       require 'mobility/backends/sequel/table/query_methods'
 
@@ -36,10 +37,10 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
       def self.configure(options)
         raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
         table_name = options[:model_class].table_name
-        options[:table_name]  ||= :"#{table_name.to_s.singularize}_translations"
-        options[:foreign_key] ||= table_name.to_s.downcase.singularize.camelize.foreign_key
+        options[:table_name]  ||= :"#{singularize(table_name)}_translations"
+        options[:foreign_key] ||= foreign_key(camelize(singularize(table_name.to_s.downcase)))
         if (association_name = options[:association_name]).present?
-          options[:subclass_name] ||= association_name.to_s.singularize.camelize
+          options[:subclass_name] ||= camelize(singularize(association_name))
         else
           options[:association_name] = :model_translations
           options[:subclass_name] ||= :Translation
@@ -78,7 +79,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
             super()
             cache_accessor = instance_variable_get(:"@__mobility_#{association_name}_cache")
             cache_accessor.each_value do |translation|
-              translation.id ? translation.save : send("add_#{association_name.to_s.singularize}", translation)
+              translation.id ? translation.save : send("add_#{Mobility::Util.singularize(association_name)}", translation)
             end if cache_accessor
           end
         end

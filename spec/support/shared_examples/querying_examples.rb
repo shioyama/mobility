@@ -169,7 +169,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
 end
 
 shared_examples_for "Sequel Model with translated dataset" do |model_class_name, attribute1=:title, attribute2=:content|
-  let(:model_class) { model_class_name.constantize }
+  let(:model_class) { constantize(model_class_name) }
   let(:table_name) { model_class.table_name }
   let(:query_scope) { model_class.i18n }
 

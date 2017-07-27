@@ -1,7 +1,7 @@
 # Basic test of translated attribute accessors which can be applied to any
 # backend, and (since there is no ORM-specific code here) to any ORM.
 shared_examples_for "model with translated attribute accessors" do |model_class_name, attribute1=:title, attribute2=:content, **options|
-  let(:model_class) { model_class_name.constantize }
+  let(:model_class) { constantize(model_class_name) }
   let(:instance) { model_class.new }
 
   it "gets and sets translations in one locale" do
@@ -96,7 +96,7 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
 end
 
 shared_examples_for "Sequel model with translated attribute accessors" do |model_class_name, attribute1=:title, attribute2=:content, **options|
-  let(:model_class) { model_class_name.constantize }
+  let(:model_class) { constantize(model_class_name) }
 
   it "marks model as modified if translation(s) change" do
     instance = model_class.create(attribute1 => "foo")

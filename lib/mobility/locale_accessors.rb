@@ -47,14 +47,17 @@ If no locales are passed as an option to the initializer,
         locales.each do |locale|
           normalized_locale = Mobility.normalize_locale(locale)
           define_method "#{name}_#{normalized_locale}" do |**options|
+            return super() if options.delete(:super)
             warn warning_message if options.delete(:locale)
             Mobility.with_locale(locale) { send(name, options) }
           end
           define_method "#{name}_#{normalized_locale}?" do |**options|
+            return super() if options.delete(:super)
             warn warning_message if options.delete(:locale)
             Mobility.with_locale(locale) { send("#{name}?", options) }
           end
           define_method "#{name}_#{normalized_locale}=" do |value, **options|
+            return super(value) if options.delete(:super)
             warn warning_message if options.delete(:locale)
             Mobility.with_locale(locale) { send("#{name}=", value, options) }
           end

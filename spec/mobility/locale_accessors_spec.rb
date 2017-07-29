@@ -66,6 +66,38 @@ describe Mobility::LocaleAccessors do
         end
       end
     end
+
+    describe "super: true" do
+      it "calls super of locale accessor method" do
+        spy = double("model")
+        mod = Module.new do
+          define_method :title_en do
+            spy.title_en
+          end
+          define_method :title_en? do
+            spy.title_en?
+          end
+          define_method :title_en= do |value|
+            spy.title_en = value
+          end
+        end
+        base_model_class.include mod
+        base_model_class.include described_class.new(:title)
+
+        instance = base_model_class.new
+
+        aggregate_failures do
+          expect(spy).to receive(:title_en).and_return("model foo")
+          instance.title_en(super: true)
+
+          expect(spy).to receive(:title_en?).and_return(true)
+          instance.title_en?(super: true)
+
+          expect(spy).to receive(:title_en=).with("model foo")
+          instance.send(:title_en=, "model foo", super: true)
+        end
+      end
+    end
   end
 
   describe ".apply" do

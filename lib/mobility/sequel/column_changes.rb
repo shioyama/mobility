@@ -2,8 +2,8 @@ module Mobility
   module Sequel
 =begin
 
-Internal class used to force Sequel model to notice changes when +mobility_set+
-is called.
+Internal class used to force Sequel model to notice changes when mobility
+setter method is called.
 
 =end
     class ColumnChanges < Module

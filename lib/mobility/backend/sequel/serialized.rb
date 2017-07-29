@@ -23,7 +23,7 @@ Sequel serialization plugin.
   post.save
   post.deserialized_values[:title]       # get deserialized value
   #=> {:en=>"foo", :ja=>"あああ"}
-  post.title_before_mobility             # get serialized value
+  post.title(super: true)                # get serialized value
   #=> "---\n:en: foo\n:ja: \"あああ\"\n"
 
 =end

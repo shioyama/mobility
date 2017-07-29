@@ -35,12 +35,12 @@ Sequel serialization plugin.
       # @!group Backend Accessors
       #
       # @!macro backend_reader
-      def read(locale, **_)
+      def read(locale, _ = {})
         translations[locale]
       end
 
       # @!macro backend_reader
-      def write(locale, value, **_)
+      def write(locale, value, _ = {})
         translations[locale] = value
       end
       # @!endgroup

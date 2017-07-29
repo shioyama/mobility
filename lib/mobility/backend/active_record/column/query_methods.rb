@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     class ActiveRecord::Column::QueryMethods < Backend::ActiveRecord::QueryMethods
-      def initialize(attributes, **options)
+      def initialize(attributes, _)
         super
         attributes_extractor = @attributes_extractor
         @opts_converter = opts_converter = lambda do |opts|

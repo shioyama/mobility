@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     class Sequel::Column::QueryMethods < Backend::Sequel::QueryMethods
-      def initialize(attributes, **)
+      def initialize(attributes, _)
         super
         attributes_extractor = @attributes_extractor
 

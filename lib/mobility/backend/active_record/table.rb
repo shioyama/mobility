@@ -94,7 +94,7 @@ columns to that table.
 
       # @!macro backend_constructor
       # @option options [Symbol] association_name Name of association
-      def initialize(model, attribute, **options)
+      def initialize(model, attribute, options = {})
         super
         @association_name = options[:association_name]
       end
@@ -160,7 +160,7 @@ columns to that table.
 
       setup_query_methods(QueryMethods)
 
-      def translation_for(locale, _options = {})
+      def translation_for(locale, _)
         translation = translations.find { |t| t.locale == locale.to_s.freeze }
         translation ||= translations.build(locale: locale)
         translation

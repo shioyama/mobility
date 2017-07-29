@@ -59,6 +59,12 @@ describe Mobility::Backend::Fallbacks do
       it "passes options to getter in fallback locale" do
         expect(subject.read(:'en-US', bar: true)).to eq("bar")
       end
+
+      it "does not modify options passed in" do
+        options = { fallback: false }
+        subject.read(:"en-US", options)
+        expect(options).to eq({ fallback: false })
+      end
     end
 
     context "fallbacks is true" do

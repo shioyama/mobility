@@ -9,7 +9,7 @@ models. For details see backend-specific subclasses.
 =end
       class QueryMethods < Module
         # @param [Array<String>] attributes Translated attributes
-        def initialize(attributes, **_)
+        def initialize(attributes, _)
           @attributes = attributes
           @attributes_extractor = lambda do |opts|
             opts.is_a?(Hash) && (opts.keys.map(&:to_s) & attributes).presence

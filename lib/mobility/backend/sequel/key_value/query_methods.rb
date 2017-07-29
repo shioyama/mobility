@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     class Sequel::KeyValue::QueryMethods < Sequel::QueryMethods
-      def initialize(attributes, association_name: nil, class_name: nil, **_)
+      def initialize(attributes, association_name: nil, class_name: nil, **)
         super
 
         define_join_method(association_name, class_name)

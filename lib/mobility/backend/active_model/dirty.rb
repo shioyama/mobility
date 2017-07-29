@@ -26,7 +26,7 @@ value of the translated attribute if passed to it.
       # @!group Backend Accessors
       # @!macro backend_writer
       # @param [Hash] options
-      def write(locale, value, **options)
+      def write(locale, value, options = {})
         locale_accessor = Mobility.normalize_locale_accessor(attribute, locale)
         if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
           model.attributes_changed_by_setter.except!(locale_accessor)

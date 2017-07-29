@@ -28,7 +28,7 @@ describe Mobility::Attributes do
     describe "calling attribute getter" do
       specify {
         instance = klass.new
-        expect { 3.times { instance.title } }.to allocate_under(5).objects
+        expect { 3.times { instance.title } }.to allocate_under(18).objects
       }
     end
 
@@ -36,7 +36,7 @@ describe Mobility::Attributes do
       specify {
         instance = klass.new
         title = "foo"
-        expect { 3.times { instance.title = title } }.to allocate_under(5).objects
+        expect { 3.times { instance.title = title } }.to allocate_under(14).objects
       }
     end
   end

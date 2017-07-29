@@ -90,7 +90,7 @@ locale was +nil+.
       private
 
       def define_read(fallbacks)
-        define_method :read do |locale, options = {}|
+        define_method :read do |locale, **options|
           fallback = options.delete(:fallback)
 
           if fallback == false || (fallback.nil? && fallbacks.nil?)

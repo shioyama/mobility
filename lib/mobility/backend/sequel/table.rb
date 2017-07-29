@@ -19,7 +19,7 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
 
       # @!macro backend_constructor
       # @option options [Symbol] association_name Name of association
-      def initialize(model, attribute, **options)
+      def initialize(model, attribute, options = {})
         super
         @association_name  = options[:association_name]
         @translation_class = options[:model_class].const_get(options[:subclass_name])
@@ -27,12 +27,12 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **options)
+      def read(locale, options = {})
         translation_for(locale, options).send(attribute)
       end
 
       # @!macro backend_reader
-      def write(locale, value, **options)
+      def write(locale, value, options = {})
         translation_for(locale, options).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
       end
 
@@ -98,7 +98,7 @@ Implements the {Mobility::Backend::Table} backend for Sequel models.
 
       setup_query_methods(QueryMethods)
 
-      def translation_for(locale, _options = {})
+      def translation_for(locale, _)
         translation = translations.find { |t| t.locale == locale.to_s }
         translation ||= translation_class.new(locale: locale)
         translation

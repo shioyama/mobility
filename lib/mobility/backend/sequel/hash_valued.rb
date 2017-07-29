@@ -9,16 +9,15 @@ Internal class used by Sequel backends that store values as a hash.
       include Sequel
 
       # @!macro backend_reader
-      def read(locale, **_)
+      def read(locale, _ = {})
         translations[locale.to_s]
       end
 
       # @!macro backend_writer
-      def write(locale, value, **_)
+      def write(locale, value, _ = {})
         translations[locale.to_s] = value
       end
 
-      # @!group Cache Methods
       def translations
         model[attribute.to_sym]
       end

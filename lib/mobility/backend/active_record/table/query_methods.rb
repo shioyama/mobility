@@ -39,7 +39,7 @@ module Mobility
 
       private
 
-      def define_join_method(association_name, translation_class, foreign_key: nil, table_name: nil, **_)
+      def define_join_method(association_name, translation_class, foreign_key: nil, table_name: nil, **)
         define_method :"join_#{association_name}" do |**options|
           return self if (@__mobility_table_joined || []).include?(table_name)
           (@__mobility_table_joined ||= []) << table_name
@@ -52,7 +52,7 @@ module Mobility
         end
       end
 
-      def define_query_methods(association_name, translation_class, **_)
+      def define_query_methods(association_name, translation_class, **)
         attributes_extractor = @attributes_extractor
 
         # Note that Mobility will try to use inner/outer joins appropriate to the query,

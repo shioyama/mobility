@@ -36,13 +36,13 @@ or locales.)
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, **_)
+      def read(locale, _ = {})
         model.read_attribute(column(locale))
       end
 
       # @!group Backend Accessors
       # @!macro backend_writer
-      def write(locale, value, **_)
+      def write(locale, value, _ = {})
         model.send(:write_attribute, column(locale), value)
       end
 

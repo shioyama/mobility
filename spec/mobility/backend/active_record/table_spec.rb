@@ -8,6 +8,10 @@ describe Mobility::Backend::ActiveRecord::Table, orm: :active_record do
     Article.include Mobility
   end
 
+  context "with no option modules applied" do
+    include_backend_examples described_class, 'Article'
+  end
+
   context "without cache" do
     before { Article.translates :title, :content, backend: :table, cache: false }
     include_accessor_examples "Article"

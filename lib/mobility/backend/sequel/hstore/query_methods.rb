@@ -7,7 +7,7 @@ module Mobility
     class Sequel::Hstore::QueryMethods < Sequel::QueryMethods
       include PostgresQueryMethods
 
-      def initialize(attributes, **)
+      def initialize(attributes, _)
         super
 
         define_query_methods("hstore")

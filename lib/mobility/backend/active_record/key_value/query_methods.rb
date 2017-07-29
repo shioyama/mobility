@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     class ActiveRecord::KeyValue::QueryMethods < ActiveRecord::QueryMethods
-      def initialize(attributes, association_name: nil, class_name: nil, **_)
+      def initialize(attributes, association_name: nil, class_name: nil, **)
         super
         @association_name = association_name
 

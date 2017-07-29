@@ -31,7 +31,7 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
 
       # @!macro backend_constructor
       # @option options [Symbol] association_name Name of association
-      def initialize(model, attribute, **options)
+      def initialize(model, attribute, options = {})
         super
         @association_name = options[:association_name]
       end

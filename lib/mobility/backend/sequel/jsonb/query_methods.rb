@@ -7,7 +7,7 @@ module Mobility
     class Sequel::Jsonb::QueryMethods < Sequel::QueryMethods
       include PostgresQueryMethods
 
-      def initialize(attributes, **)
+      def initialize(attributes, _)
         super
 
         define_query_methods("pg_jsonb")

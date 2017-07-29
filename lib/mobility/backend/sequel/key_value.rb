@@ -26,7 +26,7 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
       # @!macro backend_constructor
       # @option options [Symbol] association_name Name of association
       # @option options [Class] class_name Translation model class
-      def initialize(model, attribute, **options)
+      def initialize(model, attribute, options = {})
         super
         @association_name = options[:association_name]
         @class_name       = options[:class_name]
@@ -34,12 +34,12 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, options)
+      def read(locale, options = {})
         translation_for(locale, options).value
       end
 
       # @!macro backend_writer
-      def write(locale, value, options)
+      def write(locale, value, options = {})
         translation_for(locale, options).tap { |t| t.value = value }.value
       end
       # @!endgroup
@@ -115,7 +115,7 @@ Implements the {Mobility::Backend::KeyValue} backend for Sequel models.
       # Returns translation for a given locale, or initializes one if none is present.
       # @param [Symbol] locale
       # @return [Mobility::Sequel::TextTranslation,Mobility::Sequel::StringTranslation]
-      def translation_for(locale, _options = {})
+      def translation_for(locale, _)
         translation = model.send(association_name).find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= class_name.new(locale: locale, key: attribute)
         translation

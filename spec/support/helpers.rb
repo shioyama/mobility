@@ -5,7 +5,15 @@ module Helpers
     result
   end
 
+  module Backend
+    def include_backend_examples *args
+      it_behaves_like "Mobility backend", *args
+    end
+  end
+
   module ActiveRecord
+    include Backend
+
     def include_accessor_examples *args
       it_behaves_like "model with translated attribute accessors", *args
     end
@@ -24,6 +32,8 @@ module Helpers
   end
 
   module Sequel
+    include Backend
+
     def include_accessor_examples *args
       it_behaves_like "model with translated attribute accessors", *args
       it_behaves_like "Sequel model with translated attribute accessors", *args

@@ -15,7 +15,7 @@ module Mobility
         end
       end
 
-      def define_join_method(association_name, translation_class, table_name: nil, foreign_key: nil, **_)
+      def define_join_method(association_name, translation_class, table_name: nil, foreign_key: nil, **)
         define_method :"join_#{association_name}" do |**options|
           return self if (@__mobility_table_joined || []).include?(table_name)
           (@__mobility_table_joined ||= []) << table_name
@@ -29,7 +29,7 @@ module Mobility
         end
       end
 
-      def define_query_methods(association_name, translation_class, **_)
+      def define_query_methods(association_name, translation_class, **)
         attributes_extractor = @attributes_extractor
 
         # See note in AR Table QueryMethods class about limitations of

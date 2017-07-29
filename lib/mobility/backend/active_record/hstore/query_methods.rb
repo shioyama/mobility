@@ -1,7 +1,7 @@
 module Mobility
   module Backend
     class ActiveRecord::Hstore::QueryMethods < ActiveRecord::QueryMethods
-      def initialize(attributes, **)
+      def initialize(attributes, _)
         super
         attributes_extractor = @attributes_extractor
 

@@ -33,6 +33,14 @@ describe Mobility::Backend::Cache do
         expect(backend.spy).to receive(:read).twice.with(locale, options).and_return("foo")
         2.times { expect(backend.read(locale, options.merge(cache: false))).to eq("foo") }
       end
+
+      it "does not modify options passed in" do
+        backend = cached_backend_class.new("model", "attribute")
+        allow(backend.spy).to receive(:read).with(locale, {}).and_return("foo")
+        options = { cache: false }
+        backend.read(locale, options)
+        expect(options).to eq({ cache: false })
+      end
     end
 
     describe "#write" do
@@ -56,6 +64,14 @@ describe Mobility::Backend::Cache do
         expect(backend.write(locale, "foo", options.merge(cache: false))).to eq("bar")
         expect(backend.spy).to receive(:read).with(locale, options).and_return("baz")
         expect(backend.read(locale, options)).to eq("baz")
+      end
+
+      it "does not modify options passed in" do
+        backend = cached_backend_class.new("model", "attribute")
+        allow(backend.spy).to receive(:write).with(locale, "foo", {})
+        options = { cache: false }
+        backend.write(locale, "foo", options)
+        expect(options).to eq({ cache: false })
       end
     end
 

@@ -42,7 +42,7 @@ Values are added to the cache in two ways:
       # @!macro backend_writer
       # @option options [Boolean] cache
       #   *false* to disable cache.
-      def write(locale, value, options = {})
+      def write(locale, value, **options)
         return super if options.delete(:cache) == false
         cache[locale] = super
       end

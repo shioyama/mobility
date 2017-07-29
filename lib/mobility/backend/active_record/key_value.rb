@@ -26,28 +26,6 @@ Implements the {Mobility::Backend::KeyValue} backend for ActiveRecord models.
 
       require 'mobility/backend/active_record/key_value/query_methods'
 
-      # @return [Symbol] Name of the association
-      attr_reader :association_name
-
-      # @!macro backend_constructor
-      # @option options [Symbol] association_name Name of association
-      def initialize(model, attribute, options = {})
-        super
-        @association_name = options[:association_name]
-      end
-
-      # @!group Backend Accessors
-      # @!macro backend_reader
-      def read(locale, options = {})
-        translation_for(locale, options).value
-      end
-
-      # @!macro backend_reader
-      def write(locale, value, options = {})
-        translation_for(locale, options).tap { |t| t.value = value }.value
-      end
-      # @!endgroup
-
       # @!group Backend Configuration
       # @option options [Symbol] type (:text) Column type to use
       # @option options [Symbol] association_name (:text_translations) Name of association method

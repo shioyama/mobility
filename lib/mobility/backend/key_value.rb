@@ -42,6 +42,28 @@ class.
     module KeyValue
       extend OrmDelegator
 
+      # @return [Symbol] name of the association
+      attr_reader :association_name
+
+      # @!macro backend_constructor
+      # @option options [Symbol] association_name Name of association
+      def initialize(model, attribute, options = {})
+        super
+        @association_name = options[:association_name]
+      end
+
+      # @!group Backend Accessors
+      # @!macro backend_reader
+      def read(locale, options = {})
+        translation_for(locale, options).value
+      end
+
+      # @!macro backend_reader
+      def write(locale, value, options = {})
+        translation_for(locale, options).tap { |t| t.value = value }.value
+      end
+      # @!endgroup
+
       def self.included(backend)
         backend.extend ClassMethods
       end

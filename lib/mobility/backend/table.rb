@@ -64,6 +64,25 @@ set.
     module Table
       extend OrmDelegator
 
+      # @!macro backend_constructor
+      # @option options [Symbol] association_name Name of association
+      def initialize(model, attribute, options = {})
+        super
+        @association_name = options[:association_name]
+      end
+
+      # @!group Backend Accessors
+      # @!macro backend_reader
+      def read(locale, options = {})
+        translation_for(locale, options).send(attribute)
+      end
+
+      # @!macro backend_writer
+      def write(locale, value, options = {})
+        translation_for(locale, options).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
+      end
+      # @!endgroup
+
       def self.included(backend)
         backend.extend ClassMethods
       end

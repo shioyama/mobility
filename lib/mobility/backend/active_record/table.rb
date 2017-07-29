@@ -92,25 +92,6 @@ columns to that table.
       # @return [Symbol] name of the association method
       attr_reader :association_name
 
-      # @!macro backend_constructor
-      # @option options [Symbol] association_name Name of association
-      def initialize(model, attribute, options = {})
-        super
-        @association_name = options[:association_name]
-      end
-
-      # @!group Backend Accessors
-      # @!macro backend_reader
-      def read(locale, options = {})
-        translation_for(locale, options).send(attribute)
-      end
-
-      # @!macro backend_reader
-      def write(locale, value, options = {})
-        translation_for(locale, options).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
-      end
-      # @!endgroup
-
       # @!group Backend Configuration
       # @option options [Symbol] association_name (:model_translations)
       #   Name of association method

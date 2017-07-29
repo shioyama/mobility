@@ -23,7 +23,7 @@ describe Mobility::Backend::Sequel::Hstore, orm: :sequel, db: :postgres do
       backend = post.mobility_backend_for("title")
       backend.write(:en, { foo: :bar } )
       post.save
-      expect(post.title_before_mobility.to_hash).to eq({ "en" => "{:foo=>:bar}" })
+      expect(post[:title].to_hash).to eq({ "en" => "{:foo=>:bar}" })
     end
   end
 end if Mobility::Loaded::Sequel

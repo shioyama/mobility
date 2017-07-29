@@ -63,10 +63,6 @@ passed to accessors to configure backend (see example below).
         def mobility_#{method}(*args, **options, &block)
           attributes = Attributes.new(:#{method}, *args, options)
           attributes.backend.instance_eval(&block) if block_given?
-          attributes.each do |attribute|
-            alias_method "\#{attribute}_before_mobility",  attribute        if method_defined?(attribute)        && #{%w[accessor reader].include? method}
-            alias_method "\#{attribute}_before_mobility=", "\#{attribute}=" if method_defined?("\#{attribute}=") && #{%w[accessor writer].include? method}
-           end
           include attributes
         end
       EOM

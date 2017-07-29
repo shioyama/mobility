@@ -99,6 +99,24 @@ describe Mobility::Attributes do
     end
 
     describe "defining getters and setters" do
+      let(:model) { double("model") }
+      before do
+        model_double = model
+        mod = Module.new do
+          define_method :title do
+            model_double.title
+          end
+
+          define_method :title? do
+            model_double.title?
+          end
+
+          define_method :title= do |value|
+            model_double.title = value
+          end
+        end
+        Article.include mod
+      end
       let(:article) { Article.new }
 
       shared_examples_for "reader" do
@@ -128,6 +146,16 @@ describe Mobility::Attributes do
           expect(backend).to receive(:read).with(:de, someopt: "someval").and_return("foo")
           expect(article.title(someopt: "someval")).to eq("foo")
         end
+
+        it "calls original getter when super: true passed as option" do
+          expect(model).to receive("title").and_return("foo")
+          expect(article.title(super: true)).to eq("foo")
+        end
+
+        it "calls original presence method when super: true passed as option" do
+          expect(model).to receive("title?").and_return(true)
+          expect(article.title?(super: true)).to eq(true)
+        end
       end
 
       shared_examples_for "writer" do
@@ -141,6 +169,11 @@ describe Mobility::Attributes do
           expect(Mobility).to receive(:locale).and_return(:de)
           expect(backend).to receive(:write).with(:de, "foo", someopt: "someval").and_return("foo")
           expect(article.send(:title=, "foo", someopt: "someval")).to eq("foo")
+        end
+
+        it "calls original setter when super: true passed as option" do
+          expect(model).to receive("title=").with("foo")
+          article.send(:title=, "foo", super: true)
         end
       end
 
@@ -156,8 +189,9 @@ describe Mobility::Attributes do
 
         it_behaves_like "reader"
 
-        it "does not define writer" do
-          expect { article.title = "foo" }.to raise_error(NoMethodError)
+        it "calls original method" do
+          expect(model).to receive(:title=).once.with("foo")
+          article.title = "foo"
         end
       end
 
@@ -167,7 +201,8 @@ describe Mobility::Attributes do
         it_behaves_like "writer"
 
         it "does not define reader" do
-          expect { article.title }.to raise_error(NoMethodError)
+          expect(model).to receive(:title).once.and_return("model foo")
+          expect(article.title).to eq("model foo")
         end
       end
 

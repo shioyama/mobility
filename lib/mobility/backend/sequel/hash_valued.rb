@@ -20,18 +20,18 @@ Internal class used by Sequel backends that store values as a hash.
 
       # @!group Cache Methods
       def translations
-        model.send("#{attribute}_before_mobility")
+        model[attribute.to_sym]
       end
 
       setup do |attributes|
         method_overrides = Module.new do
           define_method :initialize_set do |values|
-            attributes.each { |attribute| send(:"#{attribute}_before_mobility=", {}) }
+            attributes.each { |attribute| self[attribute.to_sym] = {} }
             super(values)
           end
           define_method :before_validation do
             attributes.each do |attribute|
-              send("#{attribute}_before_mobility").delete_if { |_, v| v.blank? }
+              self[attribute.to_sym].delete_if { |_, v| v.blank? }
             end
             super()
           end

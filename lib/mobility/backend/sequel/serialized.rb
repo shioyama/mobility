@@ -67,7 +67,7 @@ Sequel serialization plugin.
 
         method_overrides = Module.new do
           define_method :initialize_set do |values|
-            attributes.each { |attribute| send(:"#{attribute}_before_mobility=", {}.send(:"to_#{format}")) }
+            attributes.each { |attribute| self[attribute.to_sym] = {}.send(:"to_#{format}") }
             super(values)
           end
         end
@@ -108,7 +108,7 @@ Sequel serialization plugin.
       end
 
       def serialized_value
-        model.send("#{attribute}_before_mobility")
+        model[attribute.to_sym]
       end
     end
   end

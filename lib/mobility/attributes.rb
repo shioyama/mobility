@@ -176,11 +176,13 @@ with other backends.
 
     def define_reader(attribute)
       define_method attribute do |locale: Mobility.locale, **options|
+        return super() if options.delete(:super)
         Mobility.enforce_available_locales!(locale)
         mobility_backend_for(attribute).read(locale.to_sym, options)
       end
 
       define_method "#{attribute}?" do |locale: Mobility.locale, **options|
+        return super() if options.delete(:super)
         Mobility.enforce_available_locales!(locale)
         mobility_backend_for(attribute).read(locale.to_sym, options).present?
       end
@@ -188,6 +190,7 @@ with other backends.
 
     def define_writer(attribute)
       define_method "#{attribute}=" do |value, locale: Mobility.locale, **options|
+        return super(value) if options.delete(:super)
         Mobility.enforce_available_locales!(locale)
         mobility_backend_for(attribute).write(locale.to_sym, value, options)
       end

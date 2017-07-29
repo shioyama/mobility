@@ -12,8 +12,8 @@ is called.
         @attributes = attributes
 
         attributes.each do |attribute|
-          define_method "#{attribute}=" do |value, **options|
-            if send(attribute) != value
+          define_method "#{attribute}=".freeze do |value, **options|
+            if !options[:super] && send(attribute) != value
               locale = options[:locale] || Mobility.locale
               column = attribute.to_sym
               column_with_locale = :"#{attribute}_#{Mobility.normalize_locale(locale)}"

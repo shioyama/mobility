@@ -21,7 +21,7 @@ describe Mobility::Backend::Sequel::Serialized, orm: :sequel do
           backend = post.mobility_backend_for("title")
           backend.write(:en, { foo: :bar } )
           post.save
-          expect(post.title_before_mobility).to eq({ en: "{:foo=>:bar}" }.to_yaml)
+          expect(post[:title]).to eq({ en: "{:foo=>:bar}" }.to_yaml)
         end
       end
 
@@ -51,7 +51,7 @@ describe Mobility::Backend::Sequel::Serialized, orm: :sequel do
           backend = post.mobility_backend_for("title")
           backend.write(:en, { foo: :bar } )
           post.save
-          expect(post.title_before_mobility).to eq({ en: "{:foo=>:bar}" }.to_json)
+          expect(post[:title]).to eq({ en: "{:foo=>:bar}" }.to_json)
         end
       end
 

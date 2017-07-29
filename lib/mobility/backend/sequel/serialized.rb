@@ -96,7 +96,7 @@ Sequel serialization plugin.
       #   doesn't work. Setting it to a new empty hash seems to work better.
       module SerializationModificationDetectionFix
         def after_save
-          super()
+          super
           @original_deserialized_values = {}
         end
       end

@@ -18,8 +18,8 @@ Implements the {Mobility::Backend::Hstore} backend for Sequel models.
 
       # @!group Backend Accessors
       # @!macro backend_writer
-      def write(locale, value, _ = {})
-        translations[locale.to_s] = value && value.to_s
+      def write(locale, value, options = {})
+        super(locale, value && value.to_s, options)
       end
       # @!endgroup
 

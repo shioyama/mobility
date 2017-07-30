@@ -1,4 +1,4 @@
-require 'mobility/backend/active_record/hash_valued'
+require 'mobility/backend/active_record/pg_hash'
 
 module Mobility
   module Backend
@@ -9,7 +9,7 @@ Implements the {Mobility::Backend::Jsonb} backend for ActiveRecord models.
 @see Mobility::Backend::ActiveRecord::HashValued
 
 =end
-    class ActiveRecord::Jsonb < ActiveRecord::HashValued
+    class ActiveRecord::Jsonb < ActiveRecord::PgHash
       require 'mobility/backend/active_record/jsonb/query_methods'
 
       # @!group Backend Accessors

@@ -1,4 +1,4 @@
-require 'mobility/backend/active_record/hash_valued'
+require 'mobility/backend/active_record/pg_hash'
 
 module Mobility
   module Backend
@@ -9,7 +9,7 @@ Implements the {Mobility::Backend::Hstore} backend for ActiveRecord models.
 @see Mobility::Backend::ActiveRecord::HashValued
 
 =end
-    class ActiveRecord::Hstore < ActiveRecord::HashValued
+    class ActiveRecord::Hstore < ActiveRecord::PgHash
       require 'mobility/backend/active_record/hstore/query_methods'
 
       # @!group Backend Accessors

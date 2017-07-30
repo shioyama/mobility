@@ -29,21 +29,9 @@ Sequel serialization plugin.
 =end
     class Sequel::Serialized
       include Sequel
+      include HashValued
 
       require 'mobility/backend/sequel/serialized/query_methods'
-
-      # @!group Backend Accessors
-      #
-      # @!macro backend_reader
-      def read(locale, _ = {})
-        translations[locale]
-      end
-
-      # @!macro backend_reader
-      def write(locale, value, _ = {})
-        translations[locale] = value
-      end
-      # @!endgroup
 
       # @!group Backend Configuration
       # @param (see Backend::Serialized.configure)

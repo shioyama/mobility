@@ -5,18 +5,10 @@ module Mobility
 Internal class used by Sequel backends that store values as a hash.
 
 =end
-    class Sequel::HashValued
+    class Sequel::PgHash
       include Sequel
-
-      # @!macro backend_reader
-      def read(locale, _ = {})
-        translations[locale.to_s]
-      end
-
-      # @!macro backend_writer
-      def write(locale, value, _ = {})
-        translations[locale.to_s] = value
-      end
+      include HashValued
+      include Stringify
 
       def translations
         model[attribute.to_sym]

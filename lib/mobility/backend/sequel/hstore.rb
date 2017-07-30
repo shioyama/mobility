@@ -1,4 +1,4 @@
-require 'mobility/backend/sequel/hash_valued'
+require 'mobility/backend/sequel/pg_hash'
 
 module Mobility
   module Backend
@@ -9,7 +9,7 @@ Implements the {Mobility::Backend::Hstore} backend for Sequel models.
 @see Mobility::Backend::Sequel::HashValued
 
 =end
-    class Sequel::Hstore < Sequel::HashValued
+    class Sequel::Hstore < Sequel::PgHash
       require 'mobility/backend/sequel/hstore/query_methods'
 
       # @!group Backend Accessors

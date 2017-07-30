@@ -56,6 +56,7 @@ On top of this, a backend will normally:
     autoload :Default,           'mobility/backend/default'
     autoload :Dirty,             'mobility/backend/dirty'
     autoload :Fallbacks,         'mobility/backend/fallbacks'
+    autoload :HashValued,        'mobility/backend/hash_valued'
     autoload :Hstore,            'mobility/backend/hstore'
     autoload :Jsonb,             'mobility/backend/jsonb'
     autoload :KeyValue,          'mobility/backend/key_value'
@@ -64,6 +65,7 @@ On top of this, a backend will normally:
     autoload :Presence,          'mobility/backend/presence'
     autoload :Sequel,            'mobility/backend/sequel'
     autoload :Serialized,        'mobility/backend/serialized'
+    autoload :Stringify,         'mobility/backend/stringify'
     autoload :Table,             'mobility/backend/table'
     autoload :TranslationCacher, 'mobility/backend/translation_cacher'
 

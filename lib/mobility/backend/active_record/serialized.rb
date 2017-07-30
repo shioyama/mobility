@@ -22,21 +22,9 @@ Implements {Mobility::Backend::Serialized} backend for ActiveRecord models.
 =end
     class ActiveRecord::Serialized
       include ActiveRecord
+      include HashValued
 
       require 'mobility/backend/active_record/serialized/query_methods'
-
-      # @!group Backend Accessors
-      #
-      # @!macro backend_reader
-      def read(locale, _ = {})
-        translations[locale]
-      end
-
-      # @!macro backend_reader
-      def write(locale, value, _ = {})
-        translations[locale] = value
-      end
-      # @!endgroup
 
       # @!group Backend Configuration
       # @param (see Backend::Serialized.configure)

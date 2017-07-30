@@ -2,7 +2,8 @@ module Mobility
   module Backend
 =begin
 
-Internal class used by ActiveRecord backends that store values as a hash.
+Internal class used by ActiveRecord backends backed by a Postgres data type
+(hstore, jsonb).
 
 =end
     class ActiveRecord::PgHash

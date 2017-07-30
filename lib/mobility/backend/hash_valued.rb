@@ -1,5 +1,11 @@
 module Mobility
   module Backend
+=begin
+
+Defines read and write methods that access the value at a key with value
++locale+ on a +translations+ hash.
+
+=end
     module HashValued
       # @!group Backend Accessors
       #

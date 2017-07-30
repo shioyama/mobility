@@ -65,7 +65,7 @@ On top of this, a backend will normally:
     autoload :Presence,          'mobility/backend/presence'
     autoload :Sequel,            'mobility/backend/sequel'
     autoload :Serialized,        'mobility/backend/serialized'
-    autoload :Stringify,         'mobility/backend/stringify'
+    autoload :StringifyLocale,   'mobility/backend/stringify_locale'
     autoload :Table,             'mobility/backend/table'
     autoload :TranslationCacher, 'mobility/backend/translation_cacher'
 

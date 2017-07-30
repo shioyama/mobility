@@ -1,6 +1,6 @@
 module Mobility
   module Backend
-    module Stringify
+    module StringifyLocale
       def read(locale, options = {})
         super(locale.to_s, options)
       end

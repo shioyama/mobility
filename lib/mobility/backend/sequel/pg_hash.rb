@@ -9,7 +9,7 @@ jsonb).
     class Sequel::PgHash
       include Sequel
       include HashValued
-      include Stringify
+      include StringifyLocale
 
       def translations
         model[attribute.to_sym]

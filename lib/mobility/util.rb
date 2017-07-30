@@ -5,6 +5,30 @@ module Mobility
 
 Some useful methods on strings, borrowed in parts from Sequel and ActiveSupport.
 
+@example With no methods defined on String
+  "foos".respond_to?(:singularize)
+  #=> false
+
+  class A
+    include Mobility::Util
+  end
+
+  A.new.singularize("foos")
+  #=> "foo"
+  A.new.singularize("bunnies")
+  #=> "bunnie"
+
+@example With methods on String
+  require "active_support"
+  "foos".respond_to?(:singularize)
+  #=> true
+
+  class A
+    include Mobility::Util
+  end
+
+  A.new.singularize("bunnies")
+  #=> "bunny"
 =end
   module Util
     VALID_CONSTANT_NAME_REGEXP = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.freeze
@@ -36,7 +60,8 @@ Some useful methods on strings, borrowed in parts from Sequel and ActiveSupport.
     # Returns the singular form of a word in a string.
     # @param [String] str
     # @return [String]
-    # @note Simply strips the trailing 's' from a string.
+    # @note If +singularize+ is not defined on +String+, falls back to simply
+    #   stripping the trailing 's' from the string.
     def singularize(str)
       call_or_yield str do
         str.to_s.gsub(/s$/, '')

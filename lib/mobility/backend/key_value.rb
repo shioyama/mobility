@@ -91,7 +91,7 @@ class.
       end
 
       module Cache
-        include TranslationCacher.new(:translation_for)
+        include Plugins::Cache::TranslationCacher.new(:translation_for)
       end
     end
   end

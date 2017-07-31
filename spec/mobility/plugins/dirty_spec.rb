@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::Dirty do
+describe Mobility::Plugins::Dirty do
   describe ".apply" do
     context "option value is truthy" do
       let(:attributes) do
@@ -8,7 +8,7 @@ describe Mobility::Backend::Dirty do
       end
       let(:backend_class) { Class.new }
       before do
-        expect(Mobility::FallthroughAccessors).to receive(:apply).with(attributes, true)
+        expect(Mobility::Plugins::FallthroughAccessors).to receive(:apply).with(attributes, true)
       end
 
       context "model_class includes ActiveModel::Dirty", orm: :active_record do
@@ -16,9 +16,9 @@ describe Mobility::Backend::Dirty do
           let(:model_class) { Class.new(ActiveRecord::Base) }
 
           it "includes dirty modules into backend class and model class" do
-            expect(backend_class).to receive(:include).with(Mobility::Backend::ActiveRecord::Dirty)
-            methods = instance_double(Mobility::Backend::ActiveRecord::Dirty::MethodsBuilder)
-            expect(Mobility::Backend::ActiveRecord::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
+            expect(backend_class).to receive(:include).with(Mobility::Plugins::ActiveRecord::Dirty)
+            methods = instance_double(Mobility::Plugins::ActiveRecord::Dirty::MethodsBuilder)
+            expect(Mobility::Plugins::ActiveRecord::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
             expect(model_class).to receive(:include).with(methods)
             described_class.apply(attributes, true)
           end
@@ -32,9 +32,9 @@ describe Mobility::Backend::Dirty do
           end
 
           it "includes dirty modules into backend class and model class" do
-            expect(backend_class).to receive(:include).with(Mobility::Backend::ActiveModel::Dirty)
-            methods = instance_double(Mobility::Backend::ActiveModel::Dirty::MethodsBuilder)
-            expect(Mobility::Backend::ActiveModel::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
+            expect(backend_class).to receive(:include).with(Mobility::Plugins::ActiveModel::Dirty)
+            methods = instance_double(Mobility::Plugins::ActiveModel::Dirty::MethodsBuilder)
+            expect(Mobility::Plugins::ActiveModel::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
             expect(model_class).to receive(:include).with(methods)
             described_class.apply(attributes, true)
           end
@@ -45,9 +45,9 @@ describe Mobility::Backend::Dirty do
         let(:model_class) { Class.new(Sequel::Model) }
 
         it "includes dirty modules into backend class and model class" do
-          expect(backend_class).to receive(:include).with(Mobility::Backend::Sequel::Dirty)
-          methods = instance_double(Mobility::Backend::Sequel::Dirty::MethodsBuilder)
-          expect(Mobility::Backend::Sequel::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
+          expect(backend_class).to receive(:include).with(Mobility::Plugins::Sequel::Dirty)
+          methods = instance_double(Mobility::Plugins::Sequel::Dirty::MethodsBuilder)
+          expect(Mobility::Plugins::Sequel::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
           expect(model_class).to receive(:include).with(methods)
           described_class.apply(attributes, true)
         end
@@ -57,8 +57,8 @@ describe Mobility::Backend::Dirty do
     context "optoin value is falsey" do
       let(:attributes) { instance_double(Mobility::Attributes) }
 
-      it "does not include Mobility::FallthroughAccessors" do
-        expect(Mobility::FallthroughAccessors).not_to receive(:apply)
+      it "does not include Mobility::Plugins::FallthroughAccessors" do
+        expect(Mobility::Plugins::FallthroughAccessors).not_to receive(:apply)
         described_class.apply(attributes, false)
       end
 

@@ -2,7 +2,7 @@
 require "sequel/plugins/dirty"
 
 module Mobility
-  module Backend
+  module Plugins
 =begin
 
 Dirty tracking for Sequel models which use the +Sequel::Plugins::Dirty+ plugin.

@@ -1,5 +1,5 @@
 module Mobility
-  module Backend
+  module Plugins
 =begin
 
 Applies presence filter to values fetched from backend and to values set on

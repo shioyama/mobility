@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::FallthroughAccessors do
+describe Mobility::Plugins::FallthroughAccessors do
   describe "when included into a class" do
     let(:model_class) do
       klass = Class.new do

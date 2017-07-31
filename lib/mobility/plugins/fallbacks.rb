@@ -1,5 +1,5 @@
 module Mobility
-  module Backend
+  module Plugins
 =begin
 
 Falls back to one or more alternative locales in case no value is defined for a

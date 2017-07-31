@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 module Mobility
-  module Backend
+  module Plugins
 =begin
 
 Dirty tracking for models which include the +ActiveModel::Dirty+ module.

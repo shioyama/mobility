@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::Cache do
+describe Mobility::Plugins::Cache do
   describe "when included into a class" do
     let(:backend_class) do
       Class.new(Mobility::Backend::Null) do

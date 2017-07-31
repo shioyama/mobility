@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::LocaleAccessors do
+describe Mobility::Plugins::LocaleAccessors do
   describe "when included into a class" do
     let(:base_model_class) do
       Class.new do

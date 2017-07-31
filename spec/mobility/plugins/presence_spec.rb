@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::Presence do
+describe Mobility::Plugins::Presence do
   describe "when included into a class" do
     let(:backend_double) { double("backend") }
     let(:backend) { backend_class.new("model", "attribute") }

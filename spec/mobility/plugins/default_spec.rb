@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::Default do
+describe Mobility::Plugins::Default do
   describe "when included into a class" do
     let(:default) { 'default foo' }
     let(:backend_double) { double("backend") }

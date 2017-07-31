@@ -2,7 +2,6 @@ module Mobility
   module Backend
     module ActiveRecord
       autoload :Column,       'mobility/backend/active_record/column'
-      autoload :Dirty,        'mobility/backend/active_record/dirty'
       autoload :Hstore,       'mobility/backend/active_record/hstore'
       autoload :Jsonb,        'mobility/backend/active_record/jsonb'
       autoload :KeyValue,     'mobility/backend/active_record/key_value'

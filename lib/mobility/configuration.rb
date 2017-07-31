@@ -34,7 +34,7 @@ Stores shared Mobility configuration referenced by all backends.
     # which modules are applied and included into the backend class or
     # attributes instance.
     # @return [Hash]
-    attr_accessor :option_modules
+    attr_accessor :plugins
 
     # Default fallbacks instance
     # @return [I18n::Locale::Fallbacks]
@@ -71,14 +71,14 @@ Stores shared Mobility configuration referenced by all backends.
         presence: true,
         default: nil
       }
-      @option_modules = {
-        cache:                 Backend::Cache,
-        dirty:                 Backend::Dirty,
-        fallbacks:             Backend::Fallbacks,
-        presence:              Backend::Presence,
-        default:               Backend::Default,
-        fallthrough_accessors: FallthroughAccessors,
-        locale_accessors:      LocaleAccessors
+      @plugins = {
+        cache:                 Plugins::Cache,
+        dirty:                 Plugins::Dirty,
+        fallbacks:             Plugins::Fallbacks,
+        presence:              Plugins::Presence,
+        default:               Plugins::Default,
+        fallthrough_accessors: Plugins::FallthroughAccessors,
+        locale_accessors:      Plugins::LocaleAccessors
       }
     end
 

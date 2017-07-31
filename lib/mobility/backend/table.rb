@@ -104,7 +104,7 @@ set.
       # Simple hash cache to memoize translations as a hash so they can be
       # fetched quickly.
       module Cache
-        include TranslationCacher.new(:translation_for)
+        include Plugins::Cache::TranslationCacher.new(:translation_for)
 
         private
 

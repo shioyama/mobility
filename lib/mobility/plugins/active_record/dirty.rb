@@ -1,10 +1,10 @@
 # frozen-string-literal: true
 
 module Mobility
-  module Backend
+  module Plugins
 =begin
 
-Dirty tracking for AR models. See {Mobility::Backend::ActiveModel::Dirty} for
+Dirty tracking for AR models. See {Mobility::Plugins::ActiveModel::Dirty} for
 details on usage.
 
 =end

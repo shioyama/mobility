@@ -1,12 +1,12 @@
 module Mobility
-  module Backend
+  module Plugins
 =begin
 
 Dirty tracking for Mobility attributes. See class-specific implementations for
 details.
 
-@see Mobility::Backend::ActiveModel::Dirty
-@see Mobility::Backend::Sequel::Dirty
+@see Mobility::Plugins::ActiveModel::Dirty
+@see Mobility::Plugins::Sequel::Dirty
 
 @note Dirty tracking can have unexpected results when combined with fallbacks.
   A change in the fallback locale value will not mark an attribute falling
@@ -37,9 +37,9 @@ details.
           dirty_module =
             if Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
               (model_class < ::ActiveRecord::Base) ?
-                Backend::ActiveRecord::Dirty : Backend::ActiveModel::Dirty
+                Plugins::ActiveRecord::Dirty : Plugins::ActiveModel::Dirty
             elsif Loaded::Sequel && model_class < ::Sequel::Model
-              Backend::Sequel::Dirty
+              Plugins::Sequel::Dirty
             else
               raise ArgumentError, "#{model_class} does not support Dirty module."
             end

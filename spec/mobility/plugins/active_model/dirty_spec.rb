@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::ActiveModel::Dirty, orm: :active_record do
+describe Mobility::Plugins::ActiveModel::Dirty, orm: :active_record do
   let(:backend_class) do
     Class.new(Mobility::Backend::Null) do
       def read(locale, **options)

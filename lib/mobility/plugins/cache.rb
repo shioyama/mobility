@@ -1,5 +1,7 @@
+require "mobility/plugins/cache/translation_cacher"
+
 module Mobility
-  module Backend
+  module Plugins
 =begin
 
 Caches values fetched from the backend so subsequent fetches can be performed

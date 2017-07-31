@@ -22,8 +22,9 @@ will generate an anonymous module looking something like this:
   Module.new do
     def title_backend
       # Create a subclass of Mobility::Backend::MyBackend and include in it:
-      # - Mobility::Cache (from the cache: true option)
-      # - Mobility::Fallbacks (from the fallbacks: true option)
+      # - Mobility::Plugins::Cache (from the +cache: true+ option)
+      # - Mobility::Plugins::Fallbacks (from the +fallbacks: true+ option)
+      # - Mobility::Plugins::Presence (by default, disabled by +presence: false+)
       # Then instantiate the backend, memoize it, and return it.
     end
 
@@ -144,8 +145,8 @@ with other backends.
 
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)
 
-      Mobility.option_modules.each do |key, option_module|
-        option_module.apply(self, options[key])
+      Mobility.plugins.each do |key, plugin|
+        plugin.apply(self, options[key])
       end
 
       names.each do |name|

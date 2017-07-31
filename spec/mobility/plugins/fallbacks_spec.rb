@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backend::Fallbacks do
+describe Mobility::Plugins::Fallbacks do
   describe "when included into a class" do
     let(:backend_class) do
       backend_class = stub_const 'MyBackend', Class.new

@@ -36,8 +36,7 @@ module Mobility
   autoload :Backend,              "mobility/backend"
   autoload :BackendResetter,      "mobility/backend_resetter"
   autoload :Configuration,        "mobility/configuration"
-  autoload :FallthroughAccessors, "mobility/fallthrough_accessors"
-  autoload :LocaleAccessors,      "mobility/locale_accessors"
+  autoload :Plugins,              "mobility/plugins"
   autoload :Translates,           "mobility/translates"
   autoload :Wrapper,              "mobility/wrapper"
 
@@ -159,12 +158,12 @@ module Mobility
     # (see Mobility::Configuration#default_options)
     # @!method default_options
     #
-    # (see Mobility::Configuration#option_modules)
-    # @!method option_modules
+    # (see Mobility::Configuration#plugins)
+    # @!method plugins
     #
     # (see Mobility::Configuration#default_accessor_locales)
     # @!method default_accessor_locales
-    %w[accessor_method query_method default_backend default_options option_modules default_accessor_locales].each do |method_name|
+    %w[accessor_method query_method default_backend default_options plugins default_accessor_locales].each do |method_name|
       define_method method_name do
         config.public_send(method_name)
       end

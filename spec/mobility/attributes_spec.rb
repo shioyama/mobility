@@ -66,17 +66,17 @@ describe Mobility::Attributes do
     end
 
     describe "cache" do
-      it "includes Backend::Cache into backend when options[:cache] is not false" do
+      it "includes Plugins::Cache into backend when options[:cache] is not false" do
         clean_options.delete(:cache)
         attributes = described_class.new(:accessor, "title", backend: backend_class, **clean_options)
         Article.include attributes
-        expect(attributes.backend_class.ancestors).to include(Mobility::Backend::Cache)
+        expect(attributes.backend_class.ancestors).to include(Mobility::Plugins::Cache)
       end
 
-      it "does not include Backend::Cache into backend when options[:cache] is false" do
+      it "does not include Plugins::Cache into backend when options[:cache] is false" do
         attributes = described_class.new(:accessor, "title", backend: backend_class, **clean_options)
         Article.include attributes
-        expect(attributes.backend_class.ancestors).not_to include(Mobility::Backend::Cache)
+        expect(attributes.backend_class.ancestors).not_to include(Mobility::Plugins::Cache)
       end
     end
 

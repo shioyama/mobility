@@ -1,5 +1,5 @@
 module Mobility
-  module Backend
+  module Plugins
 =begin
 
 Defines value or proc to fall through to if return value from getter would

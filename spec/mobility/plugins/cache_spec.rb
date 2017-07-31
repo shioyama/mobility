@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Plugins::Cache do
   describe "when included into a class" do
     let(:backend_class) do
-      Class.new(Mobility::Backend::Null) do
+      Class.new(Mobility::Backends::Null) do
         def read(*args)
           spy.read(*args)
         end

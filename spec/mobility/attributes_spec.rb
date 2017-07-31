@@ -13,7 +13,7 @@ describe Mobility::Attributes do
   let(:backend) { double("backend") }
   let(:backend_class) do
     backend_double = backend
-    Class.new(Mobility::Backend::Null) do
+    Class.new(Mobility::Backends::Null) do
       define_method :read do |*args|
         backend_double.read(*args)
       end
@@ -89,7 +89,7 @@ describe Mobility::Attributes do
 
       it "defines <attribute_name>_backend method which returns backend instance" do
         expect(backend_class).to receive(:new).once.with(article, "title", expected_options).and_call_original
-        expect(article.mobility_backend_for("title")).to be_a(Mobility::Backend::Null)
+        expect(article.mobility_backend_for("title")).to be_a(Mobility::Backends::Null)
       end
 
       it "memoizes backend instance" do

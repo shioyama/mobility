@@ -49,18 +49,8 @@ On top of this, a backend will normally:
 =end
 
   module Backend
-    autoload :ActiveRecord,      'mobility/backend/active_record'
-    autoload :Column,            'mobility/backend/column'
-    autoload :HashValued,        'mobility/backend/hash_valued'
-    autoload :Hstore,            'mobility/backend/hstore'
-    autoload :Jsonb,             'mobility/backend/jsonb'
-    autoload :KeyValue,          'mobility/backend/key_value'
-    autoload :Null,              'mobility/backend/null'
     autoload :OrmDelegator,      'mobility/backend/orm_delegator'
-    autoload :Sequel,            'mobility/backend/sequel'
-    autoload :Serialized,        'mobility/backend/serialized'
     autoload :StringifyLocale,   'mobility/backend/stringify_locale'
-    autoload :Table,             'mobility/backend/table'
 
     # @return [String] Backend attribute
     attr_reader :attribute

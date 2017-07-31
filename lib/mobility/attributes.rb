@@ -21,7 +21,7 @@ will generate an anonymous module looking something like this:
 
   Module.new do
     def title_backend
-      # Create a subclass of Mobility::Backend::MyBackend and include in it:
+      # Create a subclass of Mobility::Backends::MyBackend and include in it:
       # - Mobility::Plugins::Cache (from the +cache: true+ option)
       # - Mobility::Plugins::Fallbacks (from the +fallbacks: true+ option)
       # - Mobility::Plugins::Presence (by default, disabled by +presence: false+)
@@ -82,8 +82,8 @@ Assuming the backend has defined a setup block by calling +setup+, this block
 will be called when {Attributes} is {#included} in the model class, passed
 attributes and options defined when the backend was defined on the model class.
 This allows a backend to do things like (for example) define associations on a
-model class required by the backend, as happens in the {Backend::KeyValue} and
-{Backend::Table} backends.
+model class required by the backend, as happens in the {Backends::KeyValue} and
+{Backends::Table} backends.
 
 The +setup+ block is also used to extend the query scope/dataset (+i18n+ by
 default) with backend-specific query method support.
@@ -198,7 +198,7 @@ with other backends.
     end
 
     def get_backend_class(backend: nil, model_class: nil)
-      klass = Module === backend ? backend : Mobility::Backend.const_get(backend.to_s.camelize.gsub(/\s+/, ''.freeze).freeze)
+      klass = Module === backend ? backend : Mobility::Backends.const_get(backend.to_s.camelize.gsub(/\s+/, ''.freeze).freeze)
       klass.for(model_class)
     end
   end

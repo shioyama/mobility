@@ -32,13 +32,14 @@ in backends to define gem-dependent behavior.
 
 =end
 module Mobility
-  autoload :Attributes,           "mobility/attributes"
-  autoload :Backend,              "mobility/backend"
-  autoload :BackendResetter,      "mobility/backend_resetter"
-  autoload :Configuration,        "mobility/configuration"
-  autoload :Plugins,              "mobility/plugins"
-  autoload :Translates,           "mobility/translates"
-  autoload :Wrapper,              "mobility/wrapper"
+  autoload :Attributes,      "mobility/attributes"
+  autoload :Backend,         "mobility/backend"
+  autoload :Backends,        "mobility/backends"
+  autoload :BackendResetter, "mobility/backend_resetter"
+  autoload :Configuration,   "mobility/configuration"
+  autoload :Plugins,         "mobility/plugins"
+  autoload :Translates,      "mobility/translates"
+  autoload :Wrapper,         "mobility/wrapper"
 
   require "mobility/orm"
 

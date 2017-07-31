@@ -8,8 +8,8 @@ Adds {#for} method to backend to return ORM-specific backend.
   class Post < ActiveRecord::Base
     # ...
   end
-  Mobility::Backend::KeyValue.for(Post)
-  #=> Mobility::Backend::ActiveRecord::KeyValue
+  Mobility::Backends::KeyValue.for(Post)
+  #=> Mobility::Backends::ActiveRecord::KeyValue
 
 =end
     module OrmDelegator

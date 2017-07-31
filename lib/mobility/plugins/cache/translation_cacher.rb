@@ -8,8 +8,8 @@ private methods +cache+ and +clear_cache+ to access and clear, respectively, a
 translations hash.
 
 This cacher is used to cache translation values in {Mobility::Plugins::Cache},
-and also to cache translation *records* in {Mobility::Backend::Table} and
-{Mobility::Backend::KeyValue}.
+and also to cache translation *records* in {Mobility::Backends::Table} and
+{Mobility::Backends::KeyValue}.
 
 =end
       class TranslationCacher < Module

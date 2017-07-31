@@ -3,7 +3,7 @@ module Mobility
 =begin
 
 Subclassed dynamically to generate translation class in
-{Backend::ActiveRecord::Table} backend.
+{Backends::ActiveRecord::Table} backend.
 
 =end
     class ModelTranslation < ::ActiveRecord::Base

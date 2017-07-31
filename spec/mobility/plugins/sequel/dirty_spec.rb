@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
   let(:backend_class) do
-    Class.new(Mobility::Backend::Null) do
+    Class.new(Mobility::Backends::Null) do
       def read(locale, **options)
         values[locale]
       end

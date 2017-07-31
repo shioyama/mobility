@@ -317,7 +317,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       # result which satisfies the second (or) condition. This is impossible to
       # avoid without modification of an earlier dataset, which is probably not
       # a good idea.
-      skip "Not supported by #{backend_class.name}" if [Mobility::Backend::Sequel::Table, Mobility::Backend::Sequel::KeyValue].include?(backend_class)
+      skip "Not supported by #{backend_class.name}" if [Mobility::Backends::Sequel::Table, Mobility::Backends::Sequel::KeyValue].include?(backend_class)
       expect(query_scope.where(published: false).or(:published => true, attribute2 => "baz content")).to match_array([@instance2, @instance3])
     end
   end

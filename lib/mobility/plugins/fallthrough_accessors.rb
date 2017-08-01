@@ -35,7 +35,7 @@ model class is generated.
 
 =end
     class FallthroughAccessors < Module
-      # Apply fallthrough accessors option module to attributes.
+      # Apply fallthrough accessors plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
       def self.apply(attributes, option)

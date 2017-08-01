@@ -29,9 +29,9 @@ Stores shared Mobility configuration referenced by all backends.
       end
     end
 
-    # Option modules to apply. Defines which module to apply for each option
-    # key. Order of hash keys/values is important, as this becomes the order in
-    # which modules are applied and included into the backend class or
+    # Plugins to apply. Defines which plugin to apply for each option key.
+    # Order of hash keys/values is important, as this becomes the order in
+    # which plugins are applied and included into the backend class or
     # attributes instance.
     # @return [Hash]
     attr_accessor :plugins

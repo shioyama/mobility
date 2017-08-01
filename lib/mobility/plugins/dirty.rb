@@ -20,7 +20,7 @@ details.
 =end
     module Dirty
       class << self
-        # Applies dirty option module to attributes for a given option value.
+        # Applies dirty plugin to attributes for a given option value.
         # @param [Attributes] attributes
         # @param [Boolean] option Value of option
         # @raise [ArgumentError] if model class does not support dirty tracking

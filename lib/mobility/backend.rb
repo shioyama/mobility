@@ -130,12 +130,12 @@ On top of this, a backend will normally:
         self
       end
 
-      # Called from option modules to apply custom processing for this backend.
-      # Name is the name of the option module.
-      # @param [Symbol] name Name of option module
-      # @return [Boolean] Whether the module was applied
+      # Called from plugins to apply custom processing for this backend.
+      # Name is the name of the plugin.
+      # @param [Symbol] name Name of plugin
+      # @return [Boolean] Whether the plugin was applied
       # @note This is currently only called by Plugins::Cache.
-      def apply_module(_)
+      def apply_plugin(_)
         false
       end
     end

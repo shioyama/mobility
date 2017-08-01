@@ -88,10 +88,10 @@ set.
       end
 
       module ClassMethods
-        # Apply custom processing for option module
-        # @param (see Backend::Setup#apply_module)
-        # @return (see Backend::Setup#apply_module)
-        def apply_module(name)
+        # Apply custom processing for plugin
+        # @param (see Backend::Setup#apply_plugin)
+        # @return (see Backend::Setup#apply_plugin)
+        def apply_plugin(name)
           if name == :cache
             include Cache
             true

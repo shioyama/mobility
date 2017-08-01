@@ -8,7 +8,7 @@ describe Mobility::Backends::ActiveRecord::Table, orm: :active_record do
     Article.include Mobility
   end
 
-  context "with no option modules applied" do
+  context "with no plugins applied" do
     include_backend_examples described_class, 'Article'
   end
 

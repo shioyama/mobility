@@ -5,7 +5,7 @@ describe Mobility::Backends::Sequel::Table, orm: :sequel do
 
   # Note: the cache is required for the Sequel Table backend, so we need to
   # apply it.
-  context "with only cache option module applied" do
+  context "with only cache plugins applied" do
     before do
       stub_const 'Article', Class.new(Sequel::Model(:articles))
       Article.include Mobility

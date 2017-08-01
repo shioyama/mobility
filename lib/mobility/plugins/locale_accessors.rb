@@ -29,7 +29,7 @@ If no locales are passed as an option to the initializer,
 
 =end
     class LocaleAccessors < Module
-      # Apply locale accessors option module to attributes.
+      # Apply locale accessors plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
       def self.apply(attributes, option)

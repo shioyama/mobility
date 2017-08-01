@@ -51,7 +51,7 @@ otherwise be nil.
   #=> "Post"
 =end
     class Default < Module
-      # Applies default option module to attributes.
+      # Applies default plugin to attributes.
       # @param [Attributes] attributes
       # @param [Object] option
       def self.apply(attributes, option)

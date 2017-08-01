@@ -76,7 +76,7 @@ locale was +nil+.
   #=> "Mobilité"
 =end
     class Fallbacks < Module
-      # Applies fallbacks option module to attributes.
+      # Applies fallbacks plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
       def self.apply(attributes, option)

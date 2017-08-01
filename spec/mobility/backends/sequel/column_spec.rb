@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Backends::Sequel::Column, orm: :sequel do
   extend Helpers::Sequel
 
-  context "with no option modules applied" do
+  context "with no plugins applied" do
     model_class = Class.new(Sequel::Model(:comments)) do
       include Mobility
     end
@@ -11,7 +11,7 @@ describe Mobility::Backends::Sequel::Column, orm: :sequel do
     include_backend_examples described_class, model_class, :content
   end
 
-  context "with standard option modules applied" do
+  context "with standard plugins applied" do
     let(:attributes) { %w[content author] }
     let(:options) { {} }
     let(:backend) { described_class.new(comment, attributes.first, options) }

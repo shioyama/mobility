@@ -3,13 +3,13 @@ require "spec_helper"
 describe Mobility::Backends::Sequel::Hstore, orm: :sequel, db: :postgres do
   extend Helpers::Sequel
 
-  context "with no option modules applied" do
+  context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(Sequel::Model(:hstore_posts)) do
       include Mobility
     end)
   end
 
-  context "with standard option modules applied" do
+  context "with standard plugins applied" do
     let(:backend) { post.mobility_backend_for("title") }
 
     before do

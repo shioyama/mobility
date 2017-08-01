@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Backends::ActiveRecord::KeyValue, orm: :active_record do
   extend Helpers::ActiveRecord
 
-  context "with no option modules applied" do
+  context "with no plugins applied" do
     before do
       stub_const 'Article', Class.new(ActiveRecord::Base)
       Article.include Mobility
@@ -12,7 +12,7 @@ describe Mobility::Backends::ActiveRecord::KeyValue, orm: :active_record do
     include_backend_examples described_class, 'Article'
   end
 
-  context "with standard option modules applied" do
+  context "with standard plugins applied" do
     let(:title_backend)   { article.mobility_backend_for("title") }
     let(:content_backend) { article.mobility_backend_for("content") }
     let(:cache) { false }

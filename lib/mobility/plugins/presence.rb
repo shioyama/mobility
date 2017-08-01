@@ -7,7 +7,7 @@ backend. Included by default, but can be disabled with +presence: false+ option.
 
 =end
     module Presence
-      # Applies presence option module to attributes.
+      # Applies presence plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
       def self.apply(attributes, option)

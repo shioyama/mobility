@@ -3,14 +3,14 @@ require "spec_helper"
 describe Mobility::Backends::ActiveRecord::Serialized, orm: :active_record do
   extend Helpers::ActiveRecord
 
-  context "with no option modules applied" do
+  context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
       include Mobility
       self.table_name = 'serialized_posts'
     end)
   end
 
-  context "with standard option modules applied" do
+  context "with standard plugins applied" do
     before do
       stub_const 'SerializedPost', Class.new(ActiveRecord::Base)
       SerializedPost.include Mobility

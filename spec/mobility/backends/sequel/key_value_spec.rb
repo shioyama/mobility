@@ -5,7 +5,7 @@ describe Mobility::Backends::Sequel::KeyValue, orm: :sequel do
 
   # Note: the cache is required for the Sequel Table backend, so we need to
   # apply it.
-  context "with only cache option module applied" do
+  context "with only cache plugins applied" do
     before do
       stub_const 'Article', Class.new(Sequel::Model(:articles))
       Article.include Mobility
@@ -16,7 +16,7 @@ describe Mobility::Backends::Sequel::KeyValue, orm: :sequel do
     include_backend_examples backend_class_with_cache, 'Article'
   end
 
-  context "with standard option modules applied" do
+  context "with standard plugins applied" do
     let(:described_class) { Mobility::Backends::Sequel::KeyValue }
     let(:translation_class) { Mobility::Sequel::TextTranslation }
     let(:title_backend) { article.mobility_backend_for("title") }

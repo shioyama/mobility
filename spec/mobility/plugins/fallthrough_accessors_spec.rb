@@ -1,4 +1,5 @@
 require "spec_helper"
+require "mobility/plugins/fallthrough_accessors"
 
 describe Mobility::Plugins::FallthroughAccessors do
   describe "when included into a class" do

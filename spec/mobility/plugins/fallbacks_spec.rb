@@ -1,4 +1,5 @@
 require "spec_helper"
+require "mobility/plugins/fallbacks"
 
 describe Mobility::Plugins::Fallbacks do
   describe "when included into a class" do

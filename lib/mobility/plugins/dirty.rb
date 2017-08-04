@@ -1,4 +1,5 @@
 require "mobility/backend_resetter"
+require "mobility/plugins/fallthrough_accessors"
 
 module Mobility
   module Plugins

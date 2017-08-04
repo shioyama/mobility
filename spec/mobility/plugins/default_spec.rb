@@ -1,4 +1,5 @@
 require "spec_helper"
+require "mobility/plugins/default"
 
 describe Mobility::Plugins::Default do
   describe "when included into a class" do

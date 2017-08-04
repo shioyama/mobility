@@ -1,4 +1,5 @@
 require "spec_helper"
+require "mobility/plugins/locale_accessors"
 
 describe Mobility::Plugins::LocaleAccessors do
   describe "when included into a class" do

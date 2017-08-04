@@ -1,4 +1,5 @@
 require "spec_helper"
+require "mobility/plugins/presence"
 
 describe Mobility::Plugins::Presence do
   describe "when included into a class" do

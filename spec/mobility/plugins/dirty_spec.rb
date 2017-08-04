@@ -1,4 +1,5 @@
 require "spec_helper"
+require "mobility/plugins/dirty"
 
 describe Mobility::Plugins::Dirty do
   describe ".apply" do

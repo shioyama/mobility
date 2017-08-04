@@ -31,15 +31,5 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
 
 =end
   module Plugins
-    autoload :ActiveModel,          'mobility/plugins/active_model'
-    autoload :ActiveRecord,         'mobility/plugins/active_record'
-    autoload :Cache,                'mobility/plugins/cache'
-    autoload :Default,              'mobility/plugins/default'
-    autoload :Dirty,                'mobility/plugins/dirty'
-    autoload :Fallbacks,            'mobility/plugins/fallbacks'
-    autoload :FallthroughAccessors, 'mobility/plugins/fallthrough_accessors'
-    autoload :LocaleAccessors,      'mobility/plugins/locale_accessors'
-    autoload :Presence,             'mobility/plugins/presence'
-    autoload :Sequel,               'mobility/plugins/sequel'
   end
 end

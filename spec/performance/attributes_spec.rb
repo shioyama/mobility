@@ -13,7 +13,7 @@ describe Mobility::Attributes do
         include Mobility
       end
       attributes = described_class.new(:accessor, backend: :null)
-      expect { klass.include attributes }.to allocate_under(100).objects
+      expect { klass.include attributes }.to allocate_under(120).objects
     }
   end
 

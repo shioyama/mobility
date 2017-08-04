@@ -201,8 +201,9 @@ with other backends.
       Module === backend ? backend : get_class_from_key(Mobility::Backends, backend)
     end
 
-    def get_plugin_class(name)
-      get_class_from_key(Mobility::Plugins, name)
+    def get_plugin_class(plugin)
+      require "mobility/plugins/#{plugin}"
+      get_class_from_key(Mobility::Plugins, plugin)
     end
 
     def get_class_from_key(parent_class, key)

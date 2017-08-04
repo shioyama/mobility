@@ -1,4 +1,5 @@
 require "spec_helper"
+require "mobility/plugins/cache"
 
 describe Mobility::Plugins::Cache do
   describe "when included into a class" do

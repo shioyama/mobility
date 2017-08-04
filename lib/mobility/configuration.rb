@@ -29,11 +29,10 @@ Stores shared Mobility configuration referenced by all backends.
       end
     end
 
-    # Plugins to apply. Defines which plugin to apply for each option key.
-    # Order of hash keys/values is important, as this becomes the order in
-    # which plugins are applied and included into the backend class or
+    # Plugins to apply. Order of plugins is important, as this becomes the
+    # order in which plugins modules are included into the backend class or
     # attributes instance.
-    # @return [Hash]
+    # @return [Array<Symbol>]
     attr_accessor :plugins
 
     # Default fallbacks instance
@@ -71,15 +70,15 @@ Stores shared Mobility configuration referenced by all backends.
         presence: true,
         default: nil
       }
-      @plugins = {
-        cache:                 Plugins::Cache,
-        dirty:                 Plugins::Dirty,
-        fallbacks:             Plugins::Fallbacks,
-        presence:              Plugins::Presence,
-        default:               Plugins::Default,
-        fallthrough_accessors: Plugins::FallthroughAccessors,
-        locale_accessors:      Plugins::LocaleAccessors
-      }
+      @plugins = %i[
+        cache
+        dirty
+        fallbacks
+        presence
+        default
+        fallthrough_accessors
+        locale_accessors
+      ]
     end
 
     class ReservedOptionKey < Exception; end

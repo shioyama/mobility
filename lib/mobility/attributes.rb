@@ -140,13 +140,13 @@ with other backends.
     # @param klass [Class] Class of model
     def included(klass)
       @model_class = @options[:model_class] = klass
-      @backend_class = Class.new(get_backend_class(backend:     backend_name,
-                                                   model_class: model_class))
+      @backend_class = Class.new(get_backend_class(backend_name).for(model_class))
 
       @backend_class.configure(options) if @backend_class.respond_to?(:configure)
 
-      Mobility.plugins.each do |key, plugin|
-        plugin.apply(self, options[key])
+      Mobility.plugins.each do |name|
+        plugin = get_plugin_class(name)
+        plugin.apply(self, options[name])
       end
 
       names.each do |name|
@@ -197,9 +197,17 @@ with other backends.
       end
     end
 
-    def get_backend_class(backend: nil, model_class: nil)
-      klass = Module === backend ? backend : Mobility::Backends.const_get(backend.to_s.camelize.gsub(/\s+/, ''.freeze).freeze)
-      klass.for(model_class)
+    def get_backend_class(backend)
+      Module === backend ? backend : get_class_from_key(Mobility::Backends, backend)
+    end
+
+    def get_plugin_class(name)
+      get_class_from_key(Mobility::Plugins, name)
+    end
+
+    def get_class_from_key(parent_class, key)
+      klass_name = key.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
+      parent_class.const_get(klass_name)
     end
   end
 end

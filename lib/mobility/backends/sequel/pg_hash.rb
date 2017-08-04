@@ -1,3 +1,5 @@
+require "mobility/backend/stringify_locale"
+
 module Mobility
   module Backends
 =begin

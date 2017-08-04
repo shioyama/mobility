@@ -1,3 +1,5 @@
+require "mobility/backend_resetter"
+
 module Mobility
   module Plugins
 =begin
@@ -36,9 +38,15 @@ details.
         def include_dirty_module(backend_class, model_class, *attribute_names)
           dirty_module =
             if Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
-              (model_class < ::ActiveRecord::Base) ?
-                Plugins::ActiveRecord::Dirty : Plugins::ActiveModel::Dirty
+              if (model_class < ::ActiveRecord::Base)
+                require "mobility/plugins/active_record/dirty"
+                Plugins::ActiveRecord::Dirty
+              else
+                require "mobility/plugins/active_model/dirty"
+                Plugins::ActiveModel::Dirty
+              end
             elsif Loaded::Sequel && model_class < ::Sequel::Model
+              require "mobility/plugins/sequel/dirty"
               Plugins::Sequel::Dirty
             else
               raise ArgumentError, "#{model_class} does not support Dirty module."

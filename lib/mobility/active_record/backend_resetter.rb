@@ -1,3 +1,5 @@
+require "mobility/active_model/backend_resetter"
+
 module Mobility
   module ActiveRecord
 =begin

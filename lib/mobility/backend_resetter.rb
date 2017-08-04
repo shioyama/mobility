@@ -31,10 +31,13 @@ Resets backend cache when reset events occur.
     # @param [Class] model_class Class of model to which backend resetter will be applied
     def self.for(model_class)
       if Loaded::ActiveRecord && model_class < ::ActiveRecord::Base
+        require "mobility/active_record/backend_resetter"
         ActiveRecord::BackendResetter
       elsif Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
+        require "mobility/active_model/backend_resetter"
         ActiveModel::BackendResetter
       elsif Loaded::Sequel && model_class < ::Sequel::Model
+        require "mobility/sequel/backend_resetter"
         Sequel::BackendResetter
       else
         self

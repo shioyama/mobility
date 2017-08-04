@@ -1,3 +1,5 @@
+require "mobility/sequel/model_translation"
+
 module Mobility
   module Backends
 =begin

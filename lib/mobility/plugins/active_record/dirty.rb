@@ -1,4 +1,5 @@
 # frozen-string-literal: true
+require "mobility/plugins/active_model/dirty"
 
 module Mobility
   module Plugins

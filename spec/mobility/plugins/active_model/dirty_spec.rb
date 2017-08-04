@@ -286,4 +286,4 @@ describe Mobility::Plugins::ActiveModel::Dirty, orm: :active_record do
       end
     end
   end
-end
+end if Mobility::Loaded::ActiveRecord

@@ -1,4 +1,7 @@
 # frozen-string-literal: true
+require "mobility/sequel/column_changes"
+require "mobility/sequel/string_translation"
+require "mobility/sequel/text_translation"
 
 module Mobility
   module Backends

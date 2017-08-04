@@ -276,4 +276,4 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record do
     it_behaves_like "resets on model action", :save
     it_behaves_like "resets on model action", :reload
   end
-end
+end if Mobility::Loaded::ActiveRecord

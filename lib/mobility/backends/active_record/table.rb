@@ -1,4 +1,5 @@
 # frozen-string-literal: true
+require "mobility/active_record/model_translation"
 
 module Mobility
   module Backends

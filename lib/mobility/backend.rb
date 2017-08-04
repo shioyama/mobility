@@ -1,4 +1,5 @@
 # frozen-string-literal: true
+require "mobility/backend/orm_delegator"
 
 module Mobility
 =begin
@@ -49,9 +50,6 @@ On top of this, a backend will normally:
 =end
 
   module Backend
-    autoload :OrmDelegator,      'mobility/backend/orm_delegator'
-    autoload :StringifyLocale,   'mobility/backend/stringify_locale'
-
     # @return [String] Backend attribute
     attr_reader :attribute
 

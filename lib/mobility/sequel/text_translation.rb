@@ -1,3 +1,5 @@
+require "mobility/sequel/translation"
+
 module Mobility
   module Sequel
     class TextTranslation < ::Sequel::Model(:mobility_text_translations)

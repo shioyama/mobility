@@ -32,16 +32,15 @@ in backends to define gem-dependent behavior.
 
 =end
 module Mobility
-  autoload :Attributes,      "mobility/attributes"
-  autoload :Backend,         "mobility/backend"
-  autoload :Backends,        "mobility/backends"
-  autoload :BackendResetter, "mobility/backend_resetter"
-  autoload :Configuration,   "mobility/configuration"
-  autoload :Plugins,         "mobility/plugins"
-  autoload :Translates,      "mobility/translates"
-  autoload :Wrapper,         "mobility/wrapper"
-
-  require "mobility/orm"
+  require "mobility/attributes"
+  require "mobility/backend"
+  require "mobility/backends"
+  require "mobility/backend_resetter"
+  require "mobility/configuration"
+  require "mobility/loaded"
+  require "mobility/plugins"
+  require "mobility/translates"
+  require "mobility/wrapper"
 
   # General error for version compatibility conflicts
   class VersionNotSupportedError < ArgumentError; end
@@ -49,8 +48,8 @@ module Mobility
   begin
     require "active_record"
     raise VersionNotSupportedError, "Mobility is only compatible with ActiveRecord 4.2 and greater" if ::ActiveRecord::VERSION::STRING < "4.2"
-    autoload :ActiveModel,      "mobility/active_model"
-    autoload :ActiveRecord,     "mobility/active_record"
+    require "mobility/active_model"
+    require "mobility/active_record"
     Loaded::ActiveRecord = true
   rescue LoadError
     Loaded::ActiveRecord = false
@@ -68,9 +67,10 @@ module Mobility
     require "sequel"
     raise VersionNotSupportedError, "Mobility is only compatible with Sequel 4.0 and greater" if ::Sequel::MAJOR < 4
     require "sequel/plugins/mobility"
+    #TODO avoid automatically including the inflector extension
     require "sequel/extensions/inflector"
     require "sequel/plugins/dirty"
-    autoload :Sequel, "mobility/sequel"
+    require "mobility/sequel"
     Loaded::Sequel = true
   rescue LoadError
     Loaded::Sequel = false

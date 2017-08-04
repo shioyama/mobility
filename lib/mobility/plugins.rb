@@ -3,17 +3,12 @@ module Mobility
 
 Plugins allow modular customization of backends independent of the backend
 itself. They are enabled through the {Configuration.plugins} configuration
-setting, which takes a hash of option keys and plugin classes. The order of the
-keys in this hash is important since it determines the order in which plugins
-will be applied.
+setting, which takes an array of symbols corresponding to plugin names. The
+order of these names is important since it determines the order in which
+plugins will be applied.
 
-So if our {Configuration.plugins} looks like this:
-
-   {
-     foo: Foo
-   }
-
-And we call `translates` on our model, +Post+, like this:
+So if our {Configuration.plugins} is an array +[:foo]+, and we call
+`translates` on our model, +Post+, like this:
 
   class Post
     translates :title, foo: true

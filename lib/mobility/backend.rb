@@ -76,6 +76,7 @@ On top of this, a backend will normally:
     # Extend included class with +setup+ method
     def self.included(base)
       base.extend(Setup)
+      base.extend(ClassMethods)
     end
 
     # @param [String] attribute
@@ -115,7 +116,9 @@ On top of this, a backend will normally:
         return unless setup_block = @setup_block
         model_class.class_exec(attribute_names, options, &setup_block)
       end
+    end
 
+    module ClassMethods
       # {Attributes} uses this method to get a backend class specific to the
       # model using the backend. Backend classes can override this method to
       # return a class specific to the model class using the backend (e.g.

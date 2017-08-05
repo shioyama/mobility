@@ -1,3 +1,5 @@
+require "mobility/util"
+
 module Mobility
   module Plugins
 =begin
@@ -98,7 +100,7 @@ locale was +nil+.
           else
             (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
               value = super(fallback_locale, options)
-              break value if value.present?
+              break value if Util.present?(value)
             end
           end
         end

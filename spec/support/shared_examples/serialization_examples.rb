@@ -229,7 +229,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       #
       # Note that for Jsonb backend (when format is nil) this correctly returns
       # nil.
-      if format.present?
+      if format
         expect(backend.read(:en)).to eq("")
         expect(instance.send(attribute1)).to eq("")
       else

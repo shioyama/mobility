@@ -96,6 +96,19 @@ Some useful methods on strings, borrowed in parts from Sequel and ActiveSupport.
       end
     end
 
+    def present?(object)
+      !blank?(object)
+    end
+
+    def blank?(object)
+      return true if object.nil?
+      object.respond_to?(:empty?) ? !!object.empty? : !object
+    end
+
+    def presence(object)
+      object if present?(object)
+    end
+
     private
 
     # Calls caller method on object if defined, otherwise yields to block

@@ -1,3 +1,5 @@
+require "mobility/util"
+
 module Mobility
   module Plugins
 =begin
@@ -21,7 +23,7 @@ backend. Included by default, but can be disabled with +presence: false+ option.
       def read(locale, **options)
         return super if options.delete(:presence) == false
         value = super
-        value == false ? value : value.presence
+        value == false ? value : Util.presence(value)
       end
 
       # @group Backend Accessors
@@ -30,7 +32,7 @@ backend. Included by default, but can be disabled with +presence: false+ option.
       #   *false* to disable presence filter.
       def write(locale, value, **options)
         return super if options.delete(:presence) == false
-        super(locale, value == false ? value : value.presence, options)
+        super(locale, value == false ? value : Util.presence(value), options)
       end
     end
   end

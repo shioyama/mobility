@@ -2,14 +2,6 @@ require 'i18n'
 require 'request_store'
 require 'mobility/version'
 
-%w[object string].each do |type|
-  begin
-    require "active_support/core_ext/#{type}"
-  rescue LoadError
-    require "mobility/core_ext/#{type}"
-  end
-end
-
 =begin
 
 Mobility is a gem for storing and retrieving localized data through attributes
@@ -40,7 +32,6 @@ module Mobility
   require "mobility/loaded"
   require "mobility/plugins"
   require "mobility/translates"
-  require "mobility/util"
   require "mobility/wrapper"
 
   # General error for version compatibility conflicts

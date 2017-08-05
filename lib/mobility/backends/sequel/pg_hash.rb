@@ -1,3 +1,4 @@
+require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/hash_valued"
 require "mobility/backend/stringify_locale"
@@ -27,7 +28,7 @@ jsonb).
           end
           define_method :before_validation do
             attributes.each do |attribute|
-              self[attribute.to_sym].delete_if { |_, v| v.blank? }
+              self[attribute.to_sym].delete_if { |_, v| Util.blank?(v) }
             end
             super()
           end

@@ -1,4 +1,5 @@
 # frozen-string-literal: true
+require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/key_value"
 require "mobility/sequel/column_changes"
@@ -72,7 +73,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         callback_methods = Module.new do
           define_method :before_save do
             super()
-            send(association_name).select { |t| attributes.include?(t.key) && t.value.blank? }.each(&:destroy)
+            send(association_name).select { |t| attributes.include?(t.key) && Util.blank?(t.value) }.each(&:destroy)
           end
           define_method :after_save do
             super()
@@ -114,7 +115,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       # Saves translation which have been built and which have non-blank values.
       def save_translations
         cache.each_value do |translation|
-          next unless translation.value.present?
+          next unless present?(translation.value)
           translation.id ? translation.save : model.send("add_#{singularize(association_name)}", translation)
         end
       end

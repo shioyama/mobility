@@ -1,3 +1,5 @@
+require "mobility/util"
+
 module Mobility
 =begin
 
@@ -96,7 +98,6 @@ with other backends.
 
 =end
   class Attributes < Module
-    include Util
 
     # Method (accessor, reader or writer)
     # @return [Symbol] method
@@ -187,7 +188,7 @@ with other backends.
       define_method "#{attribute}?" do |locale: Mobility.locale, **options|
         return super() if options.delete(:super)
         Mobility.enforce_available_locales!(locale)
-        mobility_backend_for(attribute).read(locale.to_sym, options).present?
+        Util.present?(mobility_backend_for(attribute).read(locale.to_sym, options))
       end
     end
 

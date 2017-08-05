@@ -1,3 +1,4 @@
+require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/key_value"
 require "mobility/sequel/model_translation"
@@ -39,7 +40,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         table_name = options[:model_class].table_name
         options[:table_name]  ||= :"#{singularize(table_name)}_translations"
         options[:foreign_key] ||= foreign_key(camelize(singularize(table_name.to_s.downcase)))
-        if (association_name = options[:association_name]).present?
+        if association_name = options[:association_name]
           options[:subclass_name] ||= camelize(singularize(association_name))
         else
           options[:association_name] = :model_translations
@@ -79,7 +80,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
             super()
             cache_accessor = instance_variable_get(:"@__mobility_#{association_name}_cache")
             cache_accessor.each_value do |translation|
-              translation.id ? translation.save : send("add_#{Mobility::Util.singularize(association_name)}", translation)
+              translation.id ? translation.save : send("add_#{Util.singularize(association_name)}", translation)
             end if cache_accessor
           end
         end

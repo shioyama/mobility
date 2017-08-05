@@ -32,8 +32,10 @@ Adds {#for} method to backend to return ORM-specific backend.
 
       def require_backend(orm, backend)
         begin
-          require "mobility/backends/#{orm}/#{backend}"
-        rescue LoadError
+          orm_backend = "mobility/backends/#{orm}/#{backend}"
+          require orm_backend
+        rescue LoadError => e
+          raise unless e.message =~ /#{orm_backend}/
         end
       end
     end

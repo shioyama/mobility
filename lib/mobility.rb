@@ -51,7 +51,8 @@ module Mobility
     require "mobility/active_model"
     require "mobility/active_record"
     Loaded::ActiveRecord = true
-  rescue LoadError
+  rescue LoadError => e
+    raise unless e.message =~ /active_record/
     Loaded::ActiveRecord = false
   end
 
@@ -59,7 +60,8 @@ module Mobility
     require "rails"
     Loaded::Rails = true
     require "rails/generators/mobility/generators"
-  rescue LoadError
+  rescue LoadError => e
+    raise unless e.message =~ /rails/
     Loaded::Rails = false
   end
 
@@ -72,7 +74,8 @@ module Mobility
     require "sequel/plugins/dirty"
     require "mobility/sequel"
     Loaded::Sequel = true
-  rescue LoadError
+  rescue LoadError => e
+    raise unless e.message =~ /sequel/
     Loaded::Sequel = false
   end
 

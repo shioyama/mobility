@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backends::Sequel, orm: :sequel do
+describe "Mobility::Backends::Sequel", orm: :sequel do
   context "model with multiple backends" do
     before do
       stub_const 'Comment', Class.new(Sequel::Model)
@@ -29,4 +29,4 @@ describe Mobility::Backends::Sequel, orm: :sequel do
       end
     end
   end
-end
+end if Mobility::Loaded::Sequel

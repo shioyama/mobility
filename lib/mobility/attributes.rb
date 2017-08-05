@@ -198,7 +198,9 @@ with other backends.
     end
 
     def get_backend_class(backend)
-      Module === backend ? backend : get_class_from_key(Mobility::Backends, backend)
+      return backend if Module === backend
+      require "mobility/backends/#{backend}"
+      get_class_from_key(Mobility::Backends, backend)
     end
 
     def get_plugin_class(plugin)

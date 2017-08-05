@@ -1,6 +1,7 @@
 require "spec_helper"
 
-describe Mobility::Backends::Sequel::Hstore, orm: :sequel, db: :postgres do
+describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
+  require "mobility/backends/sequel/hstore"
   extend Helpers::Sequel
 
   context "with no plugins applied" do

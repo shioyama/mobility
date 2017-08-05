@@ -1,3 +1,5 @@
+require "mobility/backends/active_record/query_methods"
+
 module Mobility
   module Backends
     class ActiveRecord::Jsonb::QueryMethods < ActiveRecord::QueryMethods

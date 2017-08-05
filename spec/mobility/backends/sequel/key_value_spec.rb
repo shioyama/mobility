@@ -1,6 +1,7 @@
 require "spec_helper"
 
-describe Mobility::Backends::Sequel::KeyValue, orm: :sequel do
+describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
+  require "mobility/backends/sequel/key_value"
   extend Helpers::Sequel
 
   # Note: the cache is required for the Sequel Table backend, so we need to

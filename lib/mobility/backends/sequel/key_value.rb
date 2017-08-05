@@ -1,4 +1,6 @@
 # frozen-string-literal: true
+require "mobility/backends/sequel"
+require "mobility/backends/key_value"
 require "mobility/sequel/column_changes"
 require "mobility/sequel/string_translation"
 require "mobility/sequel/text_translation"

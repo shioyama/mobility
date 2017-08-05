@@ -1,6 +1,7 @@
 require "spec_helper"
 
-describe Mobility::Backends::ActiveRecord::Jsonb, orm: :active_record, db: :postgres do
+describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :postgres do
+  require "mobility/backends/active_record/jsonb"
   extend Helpers::ActiveRecord
 
   context "with no plugins applied" do

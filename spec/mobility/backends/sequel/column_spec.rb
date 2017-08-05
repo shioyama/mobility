@@ -1,6 +1,7 @@
 require "spec_helper"
 
-describe Mobility::Backends::Sequel::Column, orm: :sequel do
+describe "Mobility::Backends::Sequel::Column", orm: :sequel do
+  require "mobility/backends/sequel/column"
   extend Helpers::Sequel
 
   context "with no plugins applied" do

@@ -1,3 +1,5 @@
+require "mobility/backends/sequel"
+require "mobility/backends/key_value"
 require "mobility/sequel/model_translation"
 
 module Mobility

@@ -1,4 +1,5 @@
 require 'mobility/backends/sequel/postgres_query_methods'
+require "mobility/backends/sequel/query_methods"
 
 Sequel.extension :pg_hstore, :pg_hstore_ops
 

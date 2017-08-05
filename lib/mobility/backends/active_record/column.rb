@@ -1,3 +1,6 @@
+require "mobility/backends/active_record"
+require "mobility/backends/column"
+
 module Mobility
   module Backends
 =begin

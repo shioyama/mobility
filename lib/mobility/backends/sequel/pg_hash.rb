@@ -1,3 +1,5 @@
+require "mobility/backends/sequel"
+require "mobility/backends/hash_valued"
 require "mobility/backend/stringify_locale"
 
 module Mobility

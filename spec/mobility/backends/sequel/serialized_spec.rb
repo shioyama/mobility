@@ -1,6 +1,7 @@
 require "spec_helper"
 
-describe Mobility::Backends::Sequel::Serialized, orm: :sequel do
+describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
+  require "mobility/backends/sequel/serialized"
   extend Helpers::Sequel
 
   context "with no options applied" do

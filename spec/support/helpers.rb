@@ -5,6 +5,29 @@ module Helpers
     result
   end
 
+  def self.included(base)
+    base.extend LazyDescribedClass
+  end
+
+  module LazyDescribedClass
+    # lazy-load described_class if it's a string
+    def described_class
+      klass = super
+      return klass if klass
+
+      # crawl up metadata tree looking for description that can be constantized
+      this_metadata = metadata
+      while this_metadata do
+        candidate = this_metadata[:description_args].first
+        begin
+          return candidate.constantize if String === candidate
+        rescue NameError, NoMethodError
+        end
+        this_metadata = this_metadata[:parent_example_group]
+      end
+    end
+  end
+
   module Backend
     def include_backend_examples *args
       it_behaves_like "Mobility backend", *args

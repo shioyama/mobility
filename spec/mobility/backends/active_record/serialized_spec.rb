@@ -1,6 +1,7 @@
 require "spec_helper"
 
-describe Mobility::Backends::ActiveRecord::Serialized, orm: :active_record do
+describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
+  require "mobility/backends/active_record/serialized"
   extend Helpers::ActiveRecord
 
   context "with no plugins applied" do

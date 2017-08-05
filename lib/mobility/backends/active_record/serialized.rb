@@ -1,3 +1,7 @@
+require "mobility/backends/active_record"
+require "mobility/backends/hash_valued"
+require "mobility/backends/serialized"
+
 module Mobility
   module Backends
 =begin

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Backends::ActiveRecord, orm: :active_record do
+describe "Mobility::Backends::ActiveRecord", orm: :active_record do
   context "model with multiple backends" do
     before do
       stub_const 'Comment', Class.new(ActiveRecord::Base)

@@ -1,3 +1,5 @@
+require "mobility/backends/sequel/query_methods"
+
 module Mobility
   module Backends
     class Sequel::Table::QueryMethods < Sequel::QueryMethods

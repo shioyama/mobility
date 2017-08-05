@@ -1,4 +1,3 @@
-
 module Mobility
   module Backends
     module PostgresQueryMethods

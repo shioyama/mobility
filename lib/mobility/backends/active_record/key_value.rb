@@ -1,4 +1,6 @@
 # frozen-string-literal: true
+require "mobility/backends/active_record"
+require "mobility/backends/key_value"
 require "mobility/active_record/string_translation"
 require "mobility/active_record/text_translation"
 

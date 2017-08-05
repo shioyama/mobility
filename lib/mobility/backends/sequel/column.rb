@@ -1,3 +1,6 @@
+require "mobility/backends/sequel"
+require "mobility/backends/column"
+
 module Mobility
   module Backends
 =begin

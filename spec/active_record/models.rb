@@ -14,9 +14,9 @@ class MultitablePost < ActiveRecord::Base
   translates :title,
     backend:          :table,
     table_name:       :multitable_post_translations,
-    association_name: :model_translations
+    association_name: :translations
   translates :foo,
     backend:          :table,
     table_name:       :multitable_post_foo_translations,
-    association_name: :model_foo_translations
+    association_name: :foo_translations
 end

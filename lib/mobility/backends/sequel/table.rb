@@ -30,7 +30,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
       end
 
       # @!group Backend Configuration
-      # @option options [Symbol] association_name (:model_translations) Name of association method
+      # @option options [Symbol] association_name (:translations) Name of association method
       # @option options [Symbol] table_name Name of translation table
       # @option options [Symbol] foreign_key Name of foreign key
       # @option options [Symbol] subclass_name Name of subclass to append to model class to generate translation class

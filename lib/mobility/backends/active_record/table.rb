@@ -96,7 +96,7 @@ columns to that table.
       attr_reader :association_name
 
       # @!group Backend Configuration
-      # @option options [Symbol] association_name (:model_translations)
+      # @option options [Symbol] association_name (:translations)
       #   Name of association method
       # @option options [Symbol] table_name Name of translation table
       # @option options [Symbol] foreign_key Name of foreign key

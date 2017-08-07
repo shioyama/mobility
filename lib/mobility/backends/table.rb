@@ -36,7 +36,7 @@ For more details, see examples in {Mobility::Backends::ActiveRecord::Table}.
 
 ===+association_name+
 
-Name of association on model. Defaults to +:model_translations+. If specified,
+Name of association on model. Defaults to +:translations+. If specified,
 ensure name does not overlap with other methods on model or with the
 association name used by other backends on model (otherwise one will overwrite
 the other).

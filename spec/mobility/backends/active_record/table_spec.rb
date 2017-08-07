@@ -20,7 +20,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
     it "finds translation on every read/write" do
       article = Article.new
       title_backend = article.mobility_backend_for("title")
-      expect(title_backend.model.model_translations).to receive(:find).thrice.and_call_original
+      expect(title_backend.model.send(title_backend.association_name)).to receive(:find).thrice.and_call_original
       title_backend.write(:en, "foo")
       title_backend.write(:en, "bar")
       expect(title_backend.read(:en)).to eq("bar")
@@ -36,7 +36,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
       title_backend = article.mobility_backend_for("title")
 
       aggregate_failures do
-        expect(title_backend.model.model_translations).to receive(:find).twice.and_call_original
+        expect(title_backend.model.send(title_backend.association_name)).to receive(:find).twice.and_call_original
         title_backend.write(:en, "foo")
         title_backend.write(:en, "bar")
         expect(title_backend.read(:en)).to eq("bar")
@@ -52,21 +52,21 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
 
       aggregate_failures "cacheing reads" do
         title_backend.read(:en)
-        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
+        expect(article.instance_variable_get(:@__mobility_translations_cache).size).to eq(1)
         content_backend.read(:en)
-        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
+        expect(article.instance_variable_get(:@__mobility_translations_cache).size).to eq(1)
         content_backend.read(:ja)
-        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(2)
+        expect(article.instance_variable_get(:@__mobility_translations_cache).size).to eq(2)
       end
 
       aggregate_failures "resetting cache" do
         article.save
-        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(0)
+        expect(article.instance_variable_get(:@__mobility_translations_cache).size).to eq(0)
 
         content_backend.read(:ja)
-        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(1)
+        expect(article.instance_variable_get(:@__mobility_translations_cache).size).to eq(1)
         article.reload
-        expect(article.instance_variable_get(:@__mobility_model_translations_cache).size).to eq(0)
+        expect(article.instance_variable_get(:@__mobility_translations_cache).size).to eq(0)
       end
     end
   end
@@ -115,7 +115,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
       it "builds translation if no translation exists" do
         expect {
           title_backend.read(:de)
-        }.to change(subject.send(:model_translations), :size).by(1)
+        }.to change(subject.send(title_backend.association_name), :size).by(1)
       end
 
       describe "reading back written attributes" do
@@ -181,6 +181,29 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
           end
         end
       end
+    end
+  end
+
+  describe ".configure" do
+    let(:options) { { model_class: Article } }
+    it "sets association_name" do
+      described_class.configure(options)
+      expect(options[:association_name]).to eq(:translations)
+    end
+
+    it "sets subclass_name" do
+      described_class.configure(options)
+      expect(options[:subclass_name]).to eq(:Translation)
+    end
+
+    it "sets table_name" do
+      described_class.configure(options)
+      expect(options[:table_name]).to eq(:article_translations)
+    end
+
+    it "sets foreign_key" do
+      described_class.configure(options)
+      expect(options[:foreign_key]).to eq(:article_id)
     end
   end
 

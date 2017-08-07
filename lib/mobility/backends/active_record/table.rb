@@ -109,10 +109,10 @@ columns to that table.
         if (association_name = options[:association_name]).present?
           options[:subclass_name] ||= association_name.to_s.singularize.camelize.freeze
         else
-          options[:association_name] = :model_translations
+          options[:association_name] = :translations
           options[:subclass_name] ||= :Translation
         end
-        %i[foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }
+        %i[foreign_key association_name subclass_name table_name].each { |key| options[key] = options[key].to_sym }
       end
       # @!endgroup
 

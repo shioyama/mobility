@@ -43,7 +43,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         if association_name = options[:association_name]
           options[:subclass_name] ||= camelize(singularize(association_name))
         else
-          options[:association_name] = :model_translations
+          options[:association_name] = :translations
           options[:subclass_name] ||= :Translation
         end
         %i[table_name foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }

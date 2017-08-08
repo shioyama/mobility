@@ -52,10 +52,14 @@ Other backends are not supported, for obvious reasons:
         if SUPPORTED_BACKENDS.include?(value)
           require_relative "./backend_generators/#{value}_backend".freeze
           Mobility::BackendGenerators.const_get("#{value}_backend".camelcase.freeze)
-        elsif Mobility::Backends::ActiveRecord.const_get(value.to_s.camelize.gsub(/\s+/, ''.freeze))
-          raise Thor::Error, "The #{value} backend does not have a translations generator."
         else
-          raise Thor::Error, "#{value} is not a Mobility backend."
+          begin
+            require "mobility/backends/#{value}"
+            raise Thor::Error, "The #{value} backend does not have a translations generator."
+          rescue LoadError => e
+            raise unless e.message =~ /#{value}/
+            raise Thor::Error, "#{value} is not a Mobility backend."
+          end
         end
       else
         super

@@ -1,3 +1,5 @@
+require "mobility/plugins/cache"
+
 module Mobility
   module Backends
 =begin

@@ -16,9 +16,6 @@ The generated migration will add columns +title_<locale>+ for every locale in
 +I18n.available_locales+. (The generator can be run again to add new attributes
 or locales.)
 
-@note This backend disables the +locale_accessors+ option, which would
-  otherwise interfere with column methods.
-
 @example
   class Post < ActiveRecord::Base
     translates :title, backend: :column

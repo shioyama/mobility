@@ -19,7 +19,7 @@ like including a module. Creating an instance like this:
 
   Attributes.new(:accessor, ["title"], backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
 
-will generate an anonymous module looking something like this:
+will generate an anonymous module that behaves like this:
 
   Module.new do
     def title_backend
@@ -70,9 +70,9 @@ will generate an anonymous module looking something like this:
     # End Locale Accessors
   end
 
-Including this module into a model class will then add the backend method, the
+Including this module into a model class will thus add the backend method, the
 reader, writer and presence methods, and the locale accessor so the model
-class.
+class. (These methods are in fact added to the model in an +included+ hook.)
 
 ==Setting up the Model Class
 

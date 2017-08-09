@@ -7,8 +7,6 @@ module Mobility
 
 Implements the {Mobility::Backends::Column} backend for Sequel models.
 
-@note This backend disables the +locale_accessors+ option, which would
-  otherwise interfere with column methods.
 =end
     class Sequel::Column
       include Sequel

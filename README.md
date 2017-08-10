@@ -326,6 +326,10 @@ word.name_backend.read(:en)
 Internally, all methods for accessing translated attributes ultimately end up
 reading and writing from the backend instance this way.
 
+The `write` methods do not call underlying backend's methods to persist the change.
+This is up to the user (e.g. with ActiveRecord you should call `save` write
+the changes to the database.
+
 ### Setting the Locale
 
 It may not always be desirable to use `I18n.locale` to set the locale for

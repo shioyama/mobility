@@ -65,10 +65,12 @@ On top of this, a backend will normally:
     end
 
     # @!macro [new] backend_reader
+    #   Gets the translated value for provided locale from configured backend
     #   @param [Symbol] locale Locale to read
     #   @return [Object] Value of translation
     #
     # @!macro [new] backend_writer
+    #   Updates translation for provided locale without calling backend's methods to persist the changes.
     #   @param [Symbol] locale Locale to write
     #   @param [Object] value Value to write
     #   @return [Object] Updated value

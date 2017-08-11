@@ -95,7 +95,7 @@ See [Getting Started](#quickstart) to get started translating your models.
 Requirements:
 - Sequel >= 4.0
 
-You can include `Mobility` just like in ActiveRecord, or you can use the
+You can extend `Mobility` just like in ActiveRecord, or you can use the
 `mobility` plugin, which does the same thing:
 
 ```ruby
@@ -125,7 +125,7 @@ of options, like this:
 
 ```ruby
 class Word < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :name,    type: :string
   translates :meaning, type: :text
 end
@@ -226,7 +226,7 @@ option when defining translated attributes on the model class:
 
 ```ruby
 class Word < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :name, type: :string, locale_accessors: [:en, :ja]
 end
 ```
@@ -266,7 +266,7 @@ For example, if we define `Word` this way:
 
 ```ruby
 class Word < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :name, type: :string, fallthrough_accessors: true
 end
 ```
@@ -375,7 +375,7 @@ translated attributes on a class:
 
 ```ruby
 class Word < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :name,    type: :string, fallbacks: { de: :ja, fr: :ja }
   translates :meaning, type: :text,   fallbacks: { de: :ja, fr: :ja }
 end
@@ -447,7 +447,7 @@ Another option is to assign a default value, which will be used if the result of
 
 ```ruby
 class Word < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :name, type: :string, default: 'foo'
 end
 
@@ -493,7 +493,7 @@ dirty tracking is not specific to AR and works for non-persisted models as well)
 
 ```ruby
 class Post < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :title, type: :string, dirty: true
 end
 ```
@@ -567,7 +567,7 @@ false` when defining an attribute, like this:
 
 ```ruby
 class Word < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :name, type: :string, cache: false
 end
 ```
@@ -591,7 +591,7 @@ So assuming a model:
 
 ```ruby
 class Post < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :title,   type: :string
   translates :content, type: :text
 end
@@ -635,7 +635,7 @@ default scope on your model:
 
 ```ruby
 class Post < ApplicationRecord
-  include Mobility
+  extend Mobility
   translates :title,   type: :string
   translates :content, type: :text
   default_scope { i18n }
@@ -749,7 +749,7 @@ class MyBackend
 end
 
 class MyClass
-  include Mobility
+  extend Mobility
   translates :foo, backend: MyBackend
 end
 ```
@@ -782,7 +782,7 @@ describe MyBackend do
 
   before do
     stub_const 'MyPost', Class.new(ActiveRecord::Base)
-    MyPost.include Mobility
+    MyPost.extend Mobility
     MyPost.translates :title, :content, backend: MyBackend
   end
 

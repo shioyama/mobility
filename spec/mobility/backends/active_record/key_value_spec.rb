@@ -33,7 +33,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
       include_accessor_examples "Article"
 
       it "finds translation on every read/write" do
-        expect(title_backend.translations).to receive(:find).thrice.and_call_original
+        expect(title_backend.send(:translations)).to receive(:find).thrice.and_call_original
         title_backend.write(:en, "foo")
         title_backend.write(:en, "bar")
         expect(title_backend.read(:en)).to eq("bar")
@@ -46,7 +46,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
       include_accessor_examples "Article"
 
       it "only fetches translation once per locale" do
-        expect(title_backend.translations).to receive(:find).twice.and_call_original
+        expect(title_backend.send(:translations)).to receive(:find).twice.and_call_original
         title_backend.write(:en, "foo")
         title_backend.write(:en, "bar")
         expect(title_backend.read(:en)).to eq("bar")

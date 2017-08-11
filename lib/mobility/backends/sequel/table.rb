@@ -107,8 +107,6 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         end
       end
 
-      private
-
       class CacheRequired < ::StandardError; end
     end
   end

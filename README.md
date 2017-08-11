@@ -50,8 +50,17 @@ Add this line to your application's Gemfile:
 gem 'mobility', '~> 0.1.20'
 ```
 
-To translate attributes on a model, include (or extend) `Mobility`, then call
-`translates` passing in one or more attributes as well as a hash of options.
+Mobility is cryptographically signed. To be sure the gem you install hasn't
+been tampered with, first my public key (if you haven’t already) as a trusted
+certificate:
+
+```
+gem cert --add <(curl -Ls https://raw.github.com/shioyama/mobility/master/certs/shioyama.pem)
+gem install shioyama -P MediumSecurity
+```
+
+The MediumSecurity trust profile will verify signed gems, but allow the
+installation of unsigned dependencies.
 
 ### ActiveRecord (Rails)
 
@@ -61,6 +70,9 @@ Requirements:
 (Support for most backends and features is also supported with
 ActiveRecord/Rails 4.2, but there are some tests still failing. To see exactly
 what might not work, check pending specs in Rails 4.2 Travis builds.)
+
+To translate attributes on a model, extend `Mobility`, then call `translates`
+passing in one or more attributes as well as a hash of options (see below).
 
 If using Mobility in a Rails project, you can run the generator to create an
 initializer and a migration to create shared translation tables for the

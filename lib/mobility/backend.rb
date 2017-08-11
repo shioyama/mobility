@@ -65,7 +65,7 @@ On top of this, a backend will normally:
     end
 
     # @!macro [new] backend_reader
-    #   Gets the translated value for provided locale from configured backend
+    #   Gets the translated value for provided locale from configured backend.
     #   @param [Symbol] locale Locale to read
     #   @return [Object] Value of translation
     #
@@ -74,6 +74,12 @@ On top of this, a backend will normally:
     #   @param [Symbol] locale Locale to write
     #   @param [Object] value Value to write
     #   @return [Object] Updated value
+
+    # @param [Symbol] locale Locale to read
+    # @return [TrueClass,FalseClass] Whether translation is present for locale
+    def present?(locale, options = {})
+      Util.present?(read(locale, options))
+    end
 
     # Extend included class with +setup+ method
     def self.included(base)

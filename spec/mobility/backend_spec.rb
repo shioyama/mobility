@@ -2,12 +2,33 @@ require 'spec_helper'
 
 describe Mobility::Backend do
   context "included in backend" do
-    before do
-      backend = stub_const 'MyBackend', Class.new
-      backend.include described_class
-    end
+    let(:backend_double) { double("backend") }
     let(:attribute) { "title" }
     let(:model) { double("model") }
+    before do
+      backend_double_ = backend_double
+      backend = stub_const 'MyBackend', Class.new
+      backend.class_eval do
+        define_method :read do |locale, options = {}|
+          backend_double_.read(locale, options)
+        end
+      end
+      backend.include described_class
+    end
+
+    describe "#present?" do
+      let(:backend) { MyBackend.new(model, attribute) }
+
+      it "returns true if backend.read(locale) return non-blank value" do
+        expect(backend_double).to receive(:read).with(:en, {}).and_return("foo")
+        expect(backend.present?(:en)).to eq(true)
+      end
+
+      it "returns false if backend.read(locale) returns blank value" do
+        expect(backend_double).to receive(:read).with(:en, {}).and_return("")
+        expect(backend.present?(:en)).to eq(false)
+      end
+    end
 
     context "with no options" do
       subject { MyBackend.new(model, attribute) }

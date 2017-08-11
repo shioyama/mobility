@@ -188,7 +188,7 @@ with other backends.
       define_method "#{attribute}?" do |locale: Mobility.locale, **options|
         return super() if options.delete(:super)
         Mobility.enforce_available_locales!(locale)
-        Util.present?(mobility_backend_for(attribute).read(locale.to_sym, options))
+        mobility_backend_for(attribute).present?(locale.to_sym, options)
       end
     end
 

@@ -163,7 +163,7 @@ with other backends.
     end
 
     # Yield each attribute name to block
-    # @yield [String] Attribute
+    # @yieldparam [String] Attribute
     def each &block
       names.each(&block)
     end

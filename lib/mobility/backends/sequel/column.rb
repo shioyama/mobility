@@ -28,7 +28,25 @@ Implements the {Mobility::Backends::Column} backend for Sequel models.
         model[column] = value if model.columns.include?(column)
       end
 
+      # @!macro backend_iterator
+      def each
+        available_locales.each { |l| yield(l) if present?(l) }
+      end
+
       setup_query_methods(QueryMethods)
+
+      private
+
+      def available_locales
+        @available_locales ||= get_column_locales
+      end
+
+      def get_column_locales
+        column_name_regex = /\A#{attribute}_([a-z]{2}(_[a-z]{2})?)\z/.freeze
+        model.columns.map do |c|
+          (match = c.to_s.match(column_name_regex)) && match[1].to_sym
+        end.compact
+      end
     end
   end
 end

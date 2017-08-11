@@ -40,13 +40,31 @@ or locales.)
         model.read_attribute(column(locale))
       end
 
-      # @!group Backend Accessors
       # @!macro backend_writer
       def write(locale, value, _ = {})
         model.send(:write_attribute, column(locale), value)
       end
+      # @!endgroup
+
+      # @!macro backend_iterator
+      def each
+        available_locales.each { |l| yield(l) if present?(l) }
+      end
 
       setup_query_methods(QueryMethods)
+
+      private
+
+      def available_locales
+        @available_locales ||= get_column_locales
+      end
+
+      def get_column_locales
+        column_name_regex = /\A#{attribute}_([a-z]{2}(_[a-z]{2})?)\z/.freeze
+        model.class.columns.map do |c|
+          (match = c.name.match(column_name_regex)) && match[1].to_sym
+        end.compact
+      end
     end
   end
 end

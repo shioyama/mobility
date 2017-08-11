@@ -91,10 +91,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         translation ||= translations.build(locale: locale, key: attribute)
         translation
       end
-
-      def translations
-        model.send(association_name)
-      end
     end
   end
 end

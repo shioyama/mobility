@@ -16,6 +16,11 @@ jsonb).
       include HashValued
       include StringifyLocale
 
+      # @!macro backend_iterator
+      def each
+        super { |l| yield l.to_sym }
+      end
+
       def translations
         model[attribute.to_sym]
       end

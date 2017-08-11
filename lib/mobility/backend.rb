@@ -9,9 +9,8 @@ Defines a minimum set of shared components included in any backend. These are:
 - a reader returning the +model+ on which the backend is defined ({#model})
 - a reader returning the +attribute+ for which the backend is defined
   ({#attribute})
-- a reader returning +options+ configuring the backend ({#options})
-- a constructor setting these three elements (+model+, +attribute+, +options+),
-  and extracting fallbacks from the options hash ({#initialize})
+- a constructor setting these two elements (+model+, +attribute+), and
+  extracting fallbacks from the options hash ({#initialize})
 - a +setup+ method adding any configuration code to the model class
   ({Setup#setup})
 
@@ -19,6 +18,8 @@ On top of this, a backend will normally:
 
 - implement a +read+ instance method to read from the backend
 - implement a +write+ instance method to write to the backend
+- implement an +each+ instance method to iterate through available locales
+  (used to define other +Enumerable+ traversal and search methods)
 - implement a +configure+ class method to apply any normalization to the
   options hash
 - call the +setup+ method yielding attributes and options to configure the
@@ -28,11 +29,15 @@ On top of this, a backend will normally:
   class MyBackend
     include Mobility::Backend
 
-    def read(locale, **options)
+    def read(locale, options = {})
       # ...
     end
 
-    def write(locale, value, **options)
+    def write(locale, value, options = {})
+      # ...
+    end
+
+    def each
       # ...
     end
 
@@ -50,6 +55,8 @@ On top of this, a backend will normally:
 =end
 
   module Backend
+    include Enumerable
+
     # @return [String] Backend attribute
     attr_reader :attribute
 
@@ -74,6 +81,18 @@ On top of this, a backend will normally:
     #   @param [Symbol] locale Locale to write
     #   @param [Object] value Value to write
     #   @return [Object] Updated value
+
+    # @!macro [new] backend_iterator
+    #   Yields locales available for this attribute.
+    #   @yieldparam [Symbol] Locale
+    def each
+    end
+
+    # List locales available for this backend.
+    # @return [Array<String>] Array of avialable locales
+    def list
+      map &:itself
+    end
 
     # @param [Symbol] locale Locale to read
     # @return [TrueClass,FalseClass] Whether translation is present for locale

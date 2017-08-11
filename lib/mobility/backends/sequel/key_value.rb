@@ -121,6 +121,16 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       end
 
       class CacheRequired < ::StandardError; end
+
+      module Cache
+        include KeyValue::Cache
+
+        private
+
+        def translations
+          (model.send(association_name) + cache.values).uniq
+        end
+      end
     end
   end
 end

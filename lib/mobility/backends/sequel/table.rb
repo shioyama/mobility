@@ -92,16 +92,22 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
       setup_query_methods(QueryMethods)
 
       def translation_for(locale, _)
-        translation = translations.find { |t| t.locale == locale.to_s }
+        translation = model.send(association_name).find { |t| t.locale == locale.to_s }
         translation ||= translation_class.new(locale: locale)
         translation
       end
 
-      private
+      module Cache
+        include Table::Cache
 
-      def translations
-        model.send(association_name)
+        private
+
+        def translations
+          (model.send(association_name) + cache.values).uniq
+        end
       end
+
+      private
 
       class CacheRequired < ::StandardError; end
     end

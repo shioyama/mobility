@@ -12,7 +12,7 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel do
       Article.include Mobility
     end
     backend_class_with_cache = Class.new(described_class)
-    backend_class_with_cache.include(Mobility::Backends::KeyValue::Cache)
+    backend_class_with_cache.apply_plugin(:cache)
 
     include_backend_examples backend_class_with_cache, 'Article'
   end

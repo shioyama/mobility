@@ -66,6 +66,17 @@ class.
       end
       # @!endgroup
 
+      # @!macro backend_iterator
+      def each
+        translations.each { |t| yield(t.locale.to_sym) if t.key == attribute }
+      end
+
+      private
+
+      def translations
+        model.send(association_name)
+      end
+
       def self.included(backend)
         backend.extend ClassMethods
       end
@@ -84,7 +95,7 @@ class.
         # @return (see Backend::Setup#apply_plugin)
         def apply_plugin(name)
           if name == :cache
-            include Cache
+            include self::Cache
             true
           else
             super

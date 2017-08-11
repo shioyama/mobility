@@ -13,6 +13,11 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
       include ActiveRecord
       include HashValued
 
+      # @!macro backend_iterator
+      def each
+        super { |l| yield l.to_sym }
+      end
+
       def translations
         model.read_attribute(attribute)
       end

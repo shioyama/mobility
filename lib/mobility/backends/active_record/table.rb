@@ -149,12 +149,6 @@ columns to that table.
         translation ||= translations.build(locale: locale)
         translation
       end
-
-      private
-
-      def translations
-        model.send(association_name)
-      end
     end
   end
 end

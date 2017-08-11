@@ -2,9 +2,11 @@ require 'spec_helper'
 
 describe Mobility::Backend do
   context "included in backend" do
+    let(:backend_class) { MyBackend }
     let(:backend_double) { double("backend") }
     let(:attribute) { "title" }
     let(:model) { double("model") }
+    let(:backend) { backend_class.new(model, attribute) }
     before do
       backend_double_ = backend_double
       backend = stub_const 'MyBackend', Class.new
@@ -16,9 +18,15 @@ describe Mobility::Backend do
       backend.include described_class
     end
 
-    describe "#present?" do
-      let(:backend) { MyBackend.new(model, attribute) }
+    it "assigns attribute" do
+      expect(backend.attribute).to eq(attribute)
+    end
 
+    it "assigns model" do
+      expect(backend.model).to eq(model)
+    end
+
+    describe "#present?" do
       it "returns true if backend.read(locale) return non-blank value" do
         expect(backend_double).to receive(:read).with(:en, {}).and_return("foo")
         expect(backend.present?(:en)).to eq(true)
@@ -30,21 +38,35 @@ describe Mobility::Backend do
       end
     end
 
-    context "with no options" do
-      subject { MyBackend.new(model, attribute) }
-
-      it "assigns attribute" do
-        expect(subject.attribute).to eq(attribute)
+    describe "#each" do
+      it "returns nothing by default" do
+        backend = backend_class.new(model, attribute)
+        expect(backend.each).to eq(nil)
       end
+    end
 
-      it "assigns model" do
-        expect(subject.model).to eq(model)
+    describe "#list" do
+      it "maps locales to array" do
+        backend_class.class_eval do
+          def each
+            yield :ja
+            yield :en
+          end
+        end
+        backend = backend_class.new(model, attribute)
+        expect(backend.list).to eq([:ja, :en])
+      end
+    end
+
+    describe "enumerable methods" do
+      it "includes Enumerable methods" do
+        expect(backend_class.ancestors).to include(Enumerable)
       end
     end
 
     describe ".setup" do
       before do
-        MyBackend.class_eval do
+        backend_class.class_eval do
           setup do |attributes, options|
             def self.foo
               "foo"
@@ -64,27 +86,27 @@ describe Mobility::Backend do
 
       it "stores setup as block which is called in model class" do
         model_class = Class.new
-        MyBackend.setup_model(model_class, ["title"], { foo: "bar" })
+        backend_class.setup_model(model_class, ["title"], { foo: "bar" })
         expect(model_class.foo).to eq("foo")
         expect(model_class.new.bar).to eq("bar")
       end
 
       it "passes attributes and options to setup block when called on class" do
         model_class = Class.new
-        MyBackend.setup_model(model_class, ["title"], { foo: "bar" })
+        backend_class.setup_model(model_class, ["title"], { foo: "bar" })
         expect(model_class.new.my_attributes).to eq(["title"])
         expect(model_class.new.my_options).to eq({ foo: "bar" })
       end
 
       it "assigns setup block to descendants" do
         model_class = Class.new
-        other_backend = Class.new(MyBackend)
+        other_backend = Class.new(backend_class)
         other_backend.setup_model(model_class, ["title"], { foo: "bar" })
         expect(model_class.foo).to eq("foo")
       end
 
       it "concatenates blocks when called multiple times" do
-        MyBackend.class_eval do
+        backend_class.class_eval do
           setup do |attributes, options|
             def self.foo
               "foo2"
@@ -98,7 +120,7 @@ describe Mobility::Backend do
           end
         end
         model_class = Class.new
-        MyBackend.setup_model(model_class, ["title", "content"], { foo: "bar" })
+        backend_class.setup_model(model_class, ["title", "content"], { foo: "bar" })
 
         aggregate_failures do
           expect(model_class.foo).to eq("foo2")

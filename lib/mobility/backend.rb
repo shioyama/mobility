@@ -90,7 +90,7 @@ On top of this, a backend will normally:
 
     # List locales available for this backend.
     # @return [Array<String>] Array of avialable locales
-    def list
+    def locales
       map(&:itself)
     end
 

@@ -45,7 +45,7 @@ describe Mobility::Backend do
       end
     end
 
-    describe "#list" do
+    describe "#locales" do
       it "maps locales to array" do
         backend_class.class_eval do
           def each
@@ -54,7 +54,7 @@ describe Mobility::Backend do
           end
         end
         backend = backend_class.new(model, attribute)
-        expect(backend.list).to eq([:ja, :en])
+        expect(backend.locales).to eq([:ja, :en])
       end
     end
 

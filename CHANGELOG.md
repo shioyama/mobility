@@ -2,6 +2,23 @@
 
 ## 0.1
 
+### 0.2.0 (August 13, 2017)
+
+See overview of the changes in [this blog
+post](http://dejimata.com/2017/8/13/mobility-0-2-now-with-plugins).
+
+* Mobility.default_options ([#50](https://github.com/shioyama/mobility/pull/50))
+* Re-organized options under Plugins namespace ([#62](https://github.com/shioyama/mobility/pull/64))
+* Backends are now Enumerable ([#71](https://github.com/shioyama/mobility/pull/71))
+* Replace `autoload` by `require` ([#65](https://github.com/shioyama/mobility/pull/65))
+* Remove mobility/core_ext and replace with `Mobility::Util` ([#60](https://github.com/shioyama/mobility/pull/60))
+* New "default" plugin which sets a default value or proc for an attribute: ([#49](https://github.com/shioyama/mobility/pull/49))
+* Add `super` option ([#62](https://github.com/shioyama/mobility/pull/62))
+* Rename default associations for KeyValue and Table backends ([#59](https://github.com/shioyama/mobility/pull/59) and [#66](https://github.com/shioyama/mobility/pull/66))
+* Refactor cache code ([#57](https://github.com/shioyama/mobility/pull/58))
+* Gem is now signed ([#73](https://github.com/shioyama/mobility/pull/73))
+* Minimum Ruby version: 2.2.7
+
 ### 0.1.20 (July 23, 2017)
 * Fix location of Rails generators to work with plugins
   ([#56](https://github.com/shioyama/mobility/pull/56))

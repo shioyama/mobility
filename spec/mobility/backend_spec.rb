@@ -14,6 +14,10 @@ describe Mobility::Backend do
         define_method :read do |locale, options = {}|
           backend_double_.read(locale, options)
         end
+
+        define_method :write do |locale, value, options = {}|
+          backend_double_.read(locale, options)
+        end
       end
       backend.include described_class
     end
@@ -42,6 +46,42 @@ describe Mobility::Backend do
       it "returns nothing by default" do
         backend = backend_class.new(model, attribute)
         expect(backend.each).to eq(nil)
+      end
+
+      it "yields translations to each_locale if method is defined" do
+        backend_class.class_eval do
+          def each_locale
+            yield :ja
+            yield :en
+          end
+        end
+        backend = backend_class.new(model, attribute)
+
+        translations = backend.inject([]) do |translations, translation|
+          translations << translation
+          translations
+        end
+
+        aggregate_failures "translation locales" do
+          expect(translations.first.locale).to eq(:ja)
+          expect(translations.last.locale).to eq(:en)
+        end
+
+        options = double("options")
+
+        aggregate_failures "translation reads" do
+          expect(backend).to receive(:read).with(:ja, options).and_return("ja val")
+          expect(translations.first.read(options)).to eq("ja val")
+          expect(backend).to receive(:read).with(:en, options).and_return("en val")
+          expect(translations.last.read(options)).to eq("en val")
+        end
+
+        aggregate_failures "translation writes" do
+          expect(backend).to receive(:write).with(:ja, "ja val", options)
+          expect(translations.first.write("ja val", options))
+          expect(backend).to receive(:write).with(:en, "en val", options)
+          expect(translations.last.write("en val", options))
+        end
       end
     end
 

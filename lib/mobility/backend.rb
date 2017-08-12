@@ -18,7 +18,7 @@ On top of this, a backend will normally:
 
 - implement a +read+ instance method to read from the backend
 - implement a +write+ instance method to write to the backend
-- implement an +each+ instance method to iterate through available locales
+- implement an +each_locale+ instance method to iterate through available locales
   (used to define other +Enumerable+ traversal and search methods)
 - implement a +configure+ class method to apply any normalization to the
   options hash
@@ -95,7 +95,7 @@ On top of this, a backend will normally:
     end
 
     # List locales available for this backend.
-    # @return [Array<String>] Array of available locales
+    # @return [Array<Symbol>] Array of available locales
     def locales
       map(&:locale)
     end

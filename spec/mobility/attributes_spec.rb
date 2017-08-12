@@ -30,17 +30,17 @@ describe Mobility::Attributes do
 
   describe "initializing" do
     it "raises ArgumentError if method is not reader, writer or accessor" do
-      expect { described_class.new(:foo) }.to raise_error(ArgumentError)
+      expect { described_class.new(method: :foo) }.to raise_error(ArgumentError)
     end
 
     it "raises BackendRequired error if backend is nil and no default is set" do
-      expect { described_class.new(:accessor, "title") }.to raise_error(Mobility::BackendRequired)
+      expect { described_class.new("title") }.to raise_error(Mobility::BackendRequired)
     end
 
     it "does not raise error if backend is nil but default_backend is set" do
       original_default_backend = Mobility.config.default_backend
       Mobility.config.default_backend = :null
-      expect { described_class.new(:accessor, "title") }.not_to raise_error
+      expect { described_class.new("title") }.not_to raise_error
       Mobility.config.default_backend = original_default_backend
     end
   end
@@ -50,17 +50,17 @@ describe Mobility::Attributes do
 
     it "calls configure on backend class with options merged with default options" do
       expect(backend_class).to receive(:configure).with(expected_options)
-      attributes = described_class.new(:accessor, "title", backend: backend_class, foo: "bar")
+      attributes = described_class.new("title", backend: backend_class, foo: "bar")
       Article.include attributes
     end
 
     it "calls setup_model on backend class with model_class, attributes, and options merged with default options" do
       expect(backend_class).to receive(:setup_model).with(Article, ["title"], expected_options)
-      Article.include described_class.new(:accessor, "title", backend: backend_class, foo: "bar")
+      Article.include described_class.new("title", backend: backend_class, foo: "bar")
     end
 
     it "includes module in model_class.mobility" do
-      attributes = described_class.new(:accessor, "title", backend: backend_class)
+      attributes = described_class.new("title", backend: backend_class)
       Article.include attributes
       expect(Article.mobility.modules).to eq([attributes])
     end
@@ -68,13 +68,13 @@ describe Mobility::Attributes do
     describe "cache" do
       it "includes Plugins::Cache into backend when options[:cache] is not false" do
         clean_options.delete(:cache)
-        attributes = described_class.new(:accessor, "title", backend: backend_class, **clean_options)
+        attributes = described_class.new("title", backend: backend_class, **clean_options)
         Article.include attributes
         expect(attributes.backend_class.ancestors).to include(Mobility::Plugins::Cache)
       end
 
       it "does not include Plugins::Cache into backend when options[:cache] is false" do
-        attributes = described_class.new(:accessor, "title", backend: backend_class, **clean_options)
+        attributes = described_class.new("title", backend: backend_class, **clean_options)
         Article.include attributes
         expect(attributes.backend_class.ancestors).not_to include(Mobility::Plugins::Cache)
       end
@@ -82,7 +82,7 @@ describe Mobility::Attributes do
 
     describe "defining attribute backend on model" do
       before do
-        Article.include described_class.new(:accessor, "title", backend: backend_class, foo: "bar")
+        Article.include described_class.new("title", backend: backend_class, foo: "bar")
       end
       let(:article) { Article.new }
       let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: Article } }
@@ -178,14 +178,14 @@ describe Mobility::Attributes do
       end
 
       describe "method = :accessor" do
-        before { Article.include described_class.new(:accessor, "title", backend: backend_class) }
+        before { Article.include described_class.new("title", backend: backend_class) }
 
         it_behaves_like "reader"
         it_behaves_like "writer"
       end
 
       describe "method = :reader" do
-        before { Article.include described_class.new(:reader, "title", backend: backend_class) }
+        before { Article.include described_class.new("title", backend: backend_class, method: :reader) }
 
         it_behaves_like "reader"
 
@@ -196,7 +196,7 @@ describe Mobility::Attributes do
       end
 
       describe "method = :writer" do
-        before { Article.include described_class.new(:writer, "title", backend: backend_class) }
+        before { Article.include described_class.new("title", backend: backend_class, method: :writer) }
 
         it_behaves_like "writer"
 
@@ -240,14 +240,14 @@ describe Mobility::Attributes do
 
   describe "#each" do
     it "delegates to attributes" do
-      attributes = described_class.new(:accessor, :title, :content, backend: :null)
+      attributes = described_class.new("title", "content", backend: :null)
       expect { |b| attributes.each(&b) }.to yield_successive_args("title", "content")
     end
   end
 
   describe "#backend_name" do
     it "returns backend name" do
-      attributes = described_class.new(:accessor, :title, :content, backend: :null)
+      attributes = described_class.new("title", "content", backend: :null)
       expect(attributes.backend_name).to eq(:null)
     end
   end

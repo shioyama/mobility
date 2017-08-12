@@ -11,7 +11,7 @@ describe Mobility::Translates do
       attributes = Module.new do
         def self.each &block; end
       end
-      expect(Mobility::Attributes).to receive(:new).with(:accessor, *attribute_names, {}).and_return(attributes)
+      expect(Mobility::Attributes).to receive(:new).with(*attribute_names, { method: :accessor }).and_return(attributes)
       MyClass.mobility_accessor *attribute_names
     end
 

@@ -17,7 +17,7 @@ understanding and designing backends.
 Since {Attributes} is a subclass of +Module+, including an instance of it is
 like including a module. Creating an instance like this:
 
-  Attributes.new(:accessor, ["title"], backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
+  Attributes.new("title", backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
 
 will generate an anonymous module that behaves like this:
 
@@ -128,7 +128,7 @@ with other backends.
     # @param [Hash] backend_options Backend options hash
     # @option backend_options [Class] model_class Class of model
     # @raise [ArgumentError] if method is not reader, writer or accessor
-    def initialize(method, *attribute_names, backend: Mobility.default_backend, **backend_options)
+    def initialize(*attribute_names, method: :accessor, backend: Mobility.default_backend, **backend_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @method = method
       @options = Mobility.default_options.merge(backend_options)

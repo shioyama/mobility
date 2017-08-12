@@ -91,7 +91,7 @@ On top of this, a backend will normally:
     # List locales available for this backend.
     # @return [Array<String>] Array of avialable locales
     def locales
-      map(&:itself)
+      to_a
     end
 
     # @param [Symbol] locale Locale to read

@@ -122,7 +122,7 @@ describe Mobility::Plugins::Cache do
       context "ActiveRecord model", orm: :active_record do
         before do
           stub_const 'Article', Class.new(ActiveRecord::Base)
-          Article.include Mobility
+          Article.extend Mobility
         end
 
         context "with one backend" do
@@ -153,7 +153,7 @@ describe Mobility::Plugins::Cache do
         before do
           stub_const 'Article', Class.new(Sequel::Model)
           Article.dataset = DB[:articles]
-          Article.include Mobility
+          Article.extend Mobility
         end
 
         context "with one backend" do

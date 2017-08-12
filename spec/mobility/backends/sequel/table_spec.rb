@@ -9,7 +9,7 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel do
   context "with only cache plugins applied" do
     before do
       stub_const 'Article', Class.new(Sequel::Model(:articles))
-      Article.include Mobility
+      Article.extend Mobility
     end
     backend_class_with_cache = Class.new(described_class)
     backend_class_with_cache.apply_plugin(:cache)
@@ -23,7 +23,7 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel do
     before do
       stub_const 'Article', Class.new(Sequel::Model)
       Article.dataset = DB[:articles]
-      Article.include Mobility
+      Article.extend Mobility
       Article.translates :title, :content, backend: :table, cache: true
     end
 

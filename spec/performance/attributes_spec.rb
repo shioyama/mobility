@@ -10,7 +10,7 @@ describe Mobility::Attributes do
   describe "including into a class" do
     specify {
       klass = Class.new do
-        include Mobility
+        extend Mobility
       end
       attributes = described_class.new(backend: :null)
       expect { klass.include attributes }.to allocate_under(125).objects

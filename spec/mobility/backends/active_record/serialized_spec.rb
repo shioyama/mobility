@@ -6,7 +6,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
 
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
-      include Mobility
+      extend Mobility
       self.table_name = 'serialized_posts'
     end)
   end
@@ -14,7 +14,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
   context "with standard plugins applied" do
     before do
       stub_const 'SerializedPost', Class.new(ActiveRecord::Base)
-      SerializedPost.include Mobility
+      SerializedPost.extend Mobility
     end
 
     describe "serialized backend without cache" do

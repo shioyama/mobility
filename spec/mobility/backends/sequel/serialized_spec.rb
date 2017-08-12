@@ -6,7 +6,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
 
   context "with no options applied" do
     include_backend_examples described_class, (Class.new(Sequel::Model(:serialized_posts)) do
-      include Mobility
+      extend Mobility
     end)
   end
 
@@ -14,7 +14,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
     before do
       stub_const 'SerializedPost', Class.new(Sequel::Model)
       SerializedPost.dataset = DB[:serialized_posts]
-      SerializedPost.include Mobility
+      SerializedPost.extend Mobility
     end
 
     describe "serialized backend without cache" do

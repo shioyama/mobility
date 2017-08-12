@@ -6,7 +6,7 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
 
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(Sequel::Model(:hstore_posts)) do
-      include Mobility
+      extend Mobility
     end)
   end
 
@@ -16,7 +16,7 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
     before do
       stub_const 'HstorePost', Class.new(Sequel::Model)
       HstorePost.dataset = DB[:hstore_posts]
-      HstorePost.include Mobility
+      HstorePost.extend Mobility
       HstorePost.translates :title, :content, backend: :hstore, cache: false
     end
     let(:post) { HstorePost.new }

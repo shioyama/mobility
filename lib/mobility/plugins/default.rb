@@ -7,7 +7,7 @@ otherwise be nil.
 
 @example With default enabled (falls through to default value)
   class Post
-    include Mobility
+    extend Mobility
     translates :title, default: 'foo'
   end
 
@@ -20,7 +20,7 @@ otherwise be nil.
 
 @example Overriding default with reader option
   class Post
-    include Mobility
+    extend Mobility
     translates :title, default: 'foo'
   end
 
@@ -39,7 +39,7 @@ otherwise be nil.
 
 @example Using Proc as default
   class Post
-    include Mobility
+    extend Mobility
     translates :title, default: lambda { |model:, attribute:| attribute.to_s }
   end
 

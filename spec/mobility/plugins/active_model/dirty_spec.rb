@@ -28,7 +28,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       end
     }
     Article.include ActiveModel::Dirty
-    Article.include Mobility
+    Article.extend Mobility
     Article.translates :title, backend: backend_class, dirty: true, cache: false
   end
 
@@ -239,7 +239,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       stub_const 'ArticleWithFallbacks', Class.new
       ArticleWithFallbacks.class_eval do
         include ActiveModel::Dirty
-        include Mobility
+        extend Mobility
       end
       ArticleWithFallbacks.translates :title, backend: backend_class, dirty: true, cache: false, fallbacks: { en: 'ja' }
     end

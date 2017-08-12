@@ -6,7 +6,7 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
 
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
-      include Mobility
+      extend Mobility
       self.table_name = 'hstore_posts'
     end)
   end
@@ -16,7 +16,7 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
 
     before do
       stub_const 'HstorePost', Class.new(ActiveRecord::Base)
-      HstorePost.include Mobility
+      HstorePost.extend Mobility
       HstorePost.translates :title, :content, backend: :hstore, cache: false
     end
     let(:post) { HstorePost.new }

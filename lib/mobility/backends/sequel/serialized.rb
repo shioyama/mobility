@@ -14,7 +14,7 @@ Sequel serialization plugin.
 
 @example Define attribute with serialized backend
   class Post < Sequel::Model
-    include Mobility
+    extend Mobility
     translates :title, backend: :serialized, format: :yaml
   end
 

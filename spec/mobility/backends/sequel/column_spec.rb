@@ -6,7 +6,7 @@ describe "Mobility::Backends::Sequel::Column", orm: :sequel do
 
   context "with no plugins applied" do
     model_class = Class.new(Sequel::Model(:comments)) do
-      include Mobility
+      extend Mobility
     end
 
     include_backend_examples described_class, model_class, :content
@@ -25,7 +25,7 @@ describe "Mobility::Backends::Sequel::Column", orm: :sequel do
     before do
       stub_const 'Comment', Class.new(Sequel::Model)
       Comment.dataset = DB[:comments]
-      Comment.include Mobility
+      Comment.extend Mobility
       Comment.translates *attributes, backend: :column, cache: false
     end
 

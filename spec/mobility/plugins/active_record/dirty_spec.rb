@@ -23,7 +23,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
   before do
     stub_const 'Article', Class.new(ActiveRecord::Base)
-    Article.include Mobility
+    Article.extend Mobility
     Article.translates :title, backend: backend_class, dirty: true, cache: false
 
     # ensure we include these methods as a module rather than override in class

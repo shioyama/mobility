@@ -7,7 +7,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
   context "with no plugins applied" do
     before do
       stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.include Mobility
+      Article.extend Mobility
     end
 
     include_backend_examples described_class, 'Article'
@@ -22,7 +22,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
       stub_const 'Article', Class.new(ActiveRecord::Base)
       cache_ = cache
       Article.class_eval do
-        include Mobility
+        extend Mobility
         translates :title, :content, backend: :key_value, cache: cache_
         translates :subtitle, backend: :key_value
       end

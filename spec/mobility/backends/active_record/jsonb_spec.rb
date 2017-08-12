@@ -6,7 +6,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
 
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
-      include Mobility
+      extend Mobility
       self.table_name = 'jsonb_posts'
     end)
   end
@@ -16,7 +16,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
 
     before do
       stub_const 'JsonbPost', Class.new(ActiveRecord::Base)
-      JsonbPost.include Mobility
+      JsonbPost.extend Mobility
       JsonbPost.translates :title, :content, backend: :jsonb, cache: false
     end
     let(:post) { JsonbPost.new }

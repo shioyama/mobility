@@ -6,7 +6,7 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
 
   context "with no plugins applied" do
     model_class = Class.new(ActiveRecord::Base) do
-      include Mobility
+      extend Mobility
       self.table_name = 'comments'
     end
     include_backend_examples described_class, model_class, "content"
@@ -24,7 +24,7 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
 
     before do
       stub_const 'Comment', Class.new(ActiveRecord::Base)
-      Comment.include Mobility
+      Comment.extend Mobility
       Comment.translates *attributes, backend: :column, cache: false
     end
 

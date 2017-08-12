@@ -6,7 +6,7 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
 
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(Sequel::Model(:jsonb_posts)) do
-      include Mobility
+      extend Mobility
     end)
   end
 
@@ -16,7 +16,7 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
     before do
       stub_const 'JsonbPost', Class.new(Sequel::Model)
       JsonbPost.dataset = DB[:jsonb_posts]
-      JsonbPost.include Mobility
+      JsonbPost.extend Mobility
       JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false
     end
     let(:post) { JsonbPost.new }

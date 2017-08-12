@@ -5,7 +5,7 @@ describe "Mobility::Backends::Sequel", orm: :sequel do
     before do
       stub_const 'Comment', Class.new(Sequel::Model)
       Comment.dataset = DB[:comments]
-      Comment.include Mobility
+      Comment.extend Mobility
       Comment.translates :content, backend: :column
       Comment.translates :title, :author, backend: :key_value
       @comment1 = Comment.create(content: "foo content 1", title: "foo title 1", author: "Foo author 1")

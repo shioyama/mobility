@@ -18,7 +18,7 @@ describe Mobility do
 
     it "aliases mobility_accessor if Mobility.config.accessor_method is set" do
       expect(Mobility.config).to receive(:accessor_method).and_return(:foo_translates)
-      model.include Mobility
+      model.extend Mobility
       expect { Mobility.translates }.to raise_error(NoMethodError)
       model.foo_translates :title, backend: :null, foo: :bar
       expect(model.new.methods).to include :title
@@ -27,18 +27,18 @@ describe Mobility do
 
     it "does not alias mobility_accessor to anything if Mobility.config.accessor_method is falsy" do
       expect(Mobility.config).to receive(:accessor_method).and_return(nil)
-      model.include Mobility
+      model.extend Mobility
       expect { Mobility.translates }.to raise_error(NoMethodError)
     end
 
     context "with no translated attributes" do
       it "does not include Attributes into model class" do
         expect(Mobility::Attributes).not_to receive(:new)
-        model.include Mobility
+        model.extend Mobility
       end
 
       it "defines translated_attribute_names as empty array" do
-        model.include Mobility
+        model.extend Mobility
         expect(MyModel.translated_attribute_names).to eq([])
       end
 
@@ -52,7 +52,7 @@ describe Mobility do
     context "with translated attributes" do
       it "includes backend module into model class" do
         expect(Mobility::Attributes).to receive(:new).and_call_original
-        model.include Mobility
+        model.extend Mobility
         model.translates :title, backend: :null, foo: :bar
         attributes = model.ancestors.find { |a| a.class == Mobility::Attributes }
         expect(attributes).not_to be_nil
@@ -61,21 +61,21 @@ describe Mobility do
       end
 
       it "defines translated_attribute_names" do
-        model.include Mobility
+        model.extend Mobility
         model.translates :title, backend: :null
         expect(MyModel.translated_attribute_names).to eq(["title"])
       end
 
       context "model subclass" do
         it "inherits translated_attribute_names" do
-          model.include Mobility
+          model.extend Mobility
           model.translates :title, backend: :null
           subclass = Class.new(model)
           expect(subclass.translated_attribute_names).to eq(["title"])
         end
 
         it "defines new translated attributes independently of superclass" do
-          model.include Mobility
+          model.extend Mobility
           model.translates :title, backend: :null
           subclass = Class.new(model)
           subclass.translates :content, backend: :null
@@ -88,7 +88,7 @@ describe Mobility do
 
     describe "duplicating model" do
       let(:instance) do
-        model.include Mobility
+        model.extend Mobility
         model.translates :title, backend: :null
         # call title getter once to memoize backend
         model.new.tap { |instance| instance.title }

@@ -13,7 +13,7 @@ and define any attribute accessors using {Translates#mobility_accessor} (aliased
 value of {Mobility.accessor_method}, which defaults to +translates+).
 
   class MyClass
-    include Mobility
+    extend Mobility
     translates :title, backend: :key_value
   end
 
@@ -93,7 +93,7 @@ module Mobility
     end
 
     # Extends model with this class so that +include Mobility+ is equivalent to
-    # +extend Mobility+
+    # +extend Mobility+ (but +extend+ is preferred).
     # @param model_class
     def included(model_class)
       model_class.extend self

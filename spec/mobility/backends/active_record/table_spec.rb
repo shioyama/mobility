@@ -6,7 +6,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
 
   before do
     stub_const 'Article', Class.new(ActiveRecord::Base)
-    Article.include Mobility
+    Article.extend Mobility
   end
 
   context "with no plugins applied" do

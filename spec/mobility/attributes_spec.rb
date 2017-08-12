@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Attributes do
   before do
     stub_const 'Article', Class.new
-    Article.include Mobility
+    Article.extend Mobility
   end
 
   # In order to be able to stub methods on backend instance methods, which will be

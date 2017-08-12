@@ -48,7 +48,7 @@ describe Mobility::Backend do
     describe "#locales" do
       it "maps locales to array" do
         backend_class.class_eval do
-          def each
+          def each_locale
             yield :ja
             yield :en
           end

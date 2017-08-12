@@ -17,7 +17,7 @@ jsonb).
       include StringifyLocale
 
       # @!macro backend_iterator
-      def each
+      def each_locale
         super { |l| yield l.to_sym }
       end
 

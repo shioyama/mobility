@@ -67,7 +67,7 @@ class.
       # @!endgroup
 
       # @!macro backend_iterator
-      def each
+      def each_locale
         translations.each { |t| yield(t.locale.to_sym) if t.key == attribute }
       end
 

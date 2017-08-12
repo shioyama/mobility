@@ -29,7 +29,7 @@ Implements the {Mobility::Backends::Column} backend for Sequel models.
       end
 
       # @!macro backend_iterator
-      def each
+      def each_locale
         available_locales.each { |l| yield(l) if present?(l) }
       end
 

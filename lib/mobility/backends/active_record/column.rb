@@ -47,7 +47,7 @@ or locales.)
       # @!endgroup
 
       # @!macro backend_iterator
-      def each
+      def each_locale
         available_locales.each { |l| yield(l) if present?(l) }
       end
 

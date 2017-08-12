@@ -86,7 +86,7 @@ set.
       # @!endgroup
 
       # @!macro backend_iterator
-      def each
+      def each_locale
         translations.map { |t| yield t.locale.to_sym }
       end
 

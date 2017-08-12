@@ -21,7 +21,7 @@ Defines read and write methods that access the value at a key with value
       # @!endgroup
 
       # @!macro backend_iterator
-      def each
+      def each_locale
         translations.each { |l, _| yield l }
       end
     end

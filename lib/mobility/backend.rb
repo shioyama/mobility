@@ -37,7 +37,7 @@ On top of this, a backend will normally:
       # ...
     end
 
-    def each
+    def each_locale
       # ...
     end
 
@@ -85,13 +85,19 @@ On top of this, a backend will normally:
     # @!macro [new] backend_iterator
     #   Yields locales available for this attribute.
     #   @yieldparam [Symbol] Locale
+    def each_locale
+    end
+
+    # Yields translations to block
+    # @yieldparam [Mobility::Backend::Translation] Translation
     def each
+      each_locale { |locale| yield Translation.new(self, locale) }
     end
 
     # List locales available for this backend.
-    # @return [Array<String>] Array of avialable locales
+    # @return [Array<String>] Array of available locales
     def locales
-      to_a
+      map(&:locale)
     end
 
     # @param [Symbol] locale Locale to read
@@ -165,6 +171,12 @@ On top of this, a backend will normally:
       # @note This is currently only called by Plugins::Cache.
       def apply_plugin(_)
         false
+      end
+    end
+
+    Translation = Struct.new(:backend, :locale) do
+      def value
+        backend.read(locale)
       end
     end
   end

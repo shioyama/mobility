@@ -1,6 +1,6 @@
 # Mobility Changelog
 
-## 0.1
+## 0.2
 
 ### 0.2.0 (August 13, 2017)
 
@@ -18,6 +18,8 @@ post](http://dejimata.com/2017/8/13/mobility-0-2-now-with-plugins).
 * Refactor cache code ([#57](https://github.com/shioyama/mobility/pull/58))
 * Gem is now signed ([#73](https://github.com/shioyama/mobility/pull/73))
 * Minimum Ruby version: 2.2.7
+
+## 0.1
 
 ### 0.1.20 (July 23, 2017)
 * Fix location of Rails generators to work with plugins

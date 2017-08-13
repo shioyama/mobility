@@ -51,12 +51,11 @@ gem 'mobility', '~> 0.2.0'
 ```
 
 Mobility is cryptographically signed. To be sure the gem you install hasn't
-been tampered with, first my public key (if you haven’t already) as a trusted
-certificate:
+been tampered with, add my public key as a trusted certificate and install:
 
 ```
 gem cert --add <(curl -Ls https://raw.github.com/shioyama/mobility/master/certs/shioyama.pem)
-gem install shioyama -P MediumSecurity
+gem install mobility -P MediumSecurity
 ```
 
 The MediumSecurity trust profile will verify signed gems, but allow the

@@ -92,9 +92,6 @@ columns to that table.
 
       require 'mobility/backends/active_record/table/query_methods'
 
-      # @return [Symbol] name of the association method
-      attr_reader :association_name
-
       # @!group Backend Configuration
       # @option options [Symbol] association_name (:translations)
       #   Name of association method

@@ -17,9 +17,6 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
 
       require 'mobility/backends/sequel/table/query_methods'
 
-      # @return [Symbol] name of the association method
-      attr_reader :association_name
-
       # @return [Symbol] class for translations
       attr_reader :translation_class
 

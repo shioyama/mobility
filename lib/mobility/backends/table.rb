@@ -66,6 +66,9 @@ set.
     module Table
       extend Backend::OrmDelegator
 
+      # @return [Symbol] name of the association method
+      attr_reader :association_name
+
       # @!macro backend_constructor
       # @option options [Symbol] association_name Name of association
       def initialize(model, attribute, options = {})

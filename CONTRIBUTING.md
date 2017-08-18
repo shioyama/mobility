@@ -2,6 +2,10 @@
 
 Thanks for your interest in contributing to Mobility! Contributions are welcomed and encouraged. Bug reports, feature requests, and refactoring are all a great help, but please follow the instructions below to ensure things go as smoothly as possible.
 
+## Questions
+
+If you have a question about *usage* which is not covered in the [readme](https://github.com/shioyama/mobility/blob/master/README.md), [wiki](https://github.com/shioyama/mobility/wiki) or [API documentation](http://www.rubydoc.info/gems/mobility), please post a question to StackOverflow tagged with the [mobility tag](https://stackoverflow.com/questions/tagged/mobility). Questions will not be answered in Github issues, which are reserved for actual bugs and feature requests.
+
 ## Bugs
 
 Notice a bug or something that seems not to be working correctly? Great, that's valuable information. First off, make sure you go through the [Github issues](https://github.com/shioyama/mobility/issues?utf8=%E2%9C%93&q=is%3Aissue) to see if what you're experiencing has already been reported.

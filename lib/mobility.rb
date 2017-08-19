@@ -38,23 +38,28 @@ module Mobility
   class VersionNotSupportedError < ArgumentError; end
 
   begin
+    require "rails"
+    Loaded::Rails = true
+  rescue LoadError => e
+    raise unless e.message =~ /rails/
+    Loaded::Rails = false
+  end
+
+  begin
     require "active_record"
     raise VersionNotSupportedError, "Mobility is only compatible with ActiveRecord 4.2 and greater" if ::ActiveRecord::VERSION::STRING < "4.2"
-    require "mobility/active_model"
-    require "mobility/active_record"
     Loaded::ActiveRecord = true
   rescue LoadError => e
     raise unless e.message =~ /active_record/
     Loaded::ActiveRecord = false
   end
 
-  begin
-    require "rails"
-    Loaded::Rails = true
-    require "rails/generators/mobility/generators"
-  rescue LoadError => e
-    raise unless e.message =~ /rails/
-    Loaded::Rails = false
+  if Loaded::ActiveRecord
+    require "mobility/active_model"
+    require "mobility/active_record"
+    if Loaded::Rails
+      require "rails/generators/mobility/generators"
+    end
   end
 
   begin

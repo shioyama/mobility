@@ -2,6 +2,7 @@ require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/hash_valued"
 require "mobility/backend/stringify_locale"
+require "mobility/sequel/column_changes"
 
 module Mobility
   module Backends

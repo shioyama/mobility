@@ -16,7 +16,8 @@ and also to cache translation *records* in {Mobility::Backends::Table} and
         # @param [Symbol] fetch_method Name of translation fetch method to cache
         def initialize(fetch_method)
           define_method fetch_method do |locale, **options|
-            return super(locale, options) if options.delete(:cache) == false
+            return super(locale, options) if (options.delete(:cache) == false) || options[:super]
+
             if cache.has_key?(locale)
               cache[locale]
             else

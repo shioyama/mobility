@@ -2,6 +2,11 @@
 
 ## 0.2
 
+### 0.2.1 (August 20, 2017)
+
+* Fix missing requires in `Mobility::Backends::Sequel::PgHash` ([22df29](https://github.com/shioyama/mobility/commit/22df2946bcccadd7dff0880539ac828c42111adc))
+* Only require Rails generators if both Rails and ActiveRecord are loaded ([03a9ff](https://github.com/shioyama/mobility/commit/03a9ffe7009332f81ea7197dbce00c357e8d4b0c))
+
 ### 0.2.0 (August 13, 2017)
 
 See overview of the changes in [this blog

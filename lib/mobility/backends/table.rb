@@ -84,7 +84,7 @@ set.
 
       # @!macro backend_writer
       def write(locale, value, options = {})
-        translation_for(locale, options).tap { |t| t.send("#{attribute}=", value) }.send(attribute)
+        translation_for(locale, options).send("#{attribute}=", value)
       end
       # @!endgroup
 

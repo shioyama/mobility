@@ -62,7 +62,7 @@ class.
 
       # @!macro backend_reader
       def write(locale, value, options = {})
-        translation_for(locale, options).tap { |t| t.value = value }.value
+        translation_for(locale, options).value = value
       end
       # @!endgroup
 

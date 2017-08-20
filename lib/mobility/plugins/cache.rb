@@ -45,7 +45,7 @@ Values are added to the cache in two ways:
       # @option options [Boolean] cache
       #   *false* to disable cache.
       def write(locale, value, **options)
-        return super if options.delete(:cache) == false
+        return super if (options.delete(:cache) == false) || options[:super]
         cache[locale] = super
       end
       # @!endgroup

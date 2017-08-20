@@ -32,7 +32,13 @@ describe Mobility::Plugins::Cache do
       it "does not cache reads with cache: false option" do
         backend = cached_backend_class.new("model", "attribute")
         expect(backend.spy).to receive(:read).twice.with(locale, options).and_return("foo")
-        2.times { expect(backend.read(locale, options.merge(cache: false))).to eq("foo") }
+        2.times { expect(backend.read(locale, **options, cache: false)).to eq("foo") }
+      end
+
+      it "does not cache reads with super: true option" do
+        backend = cached_backend_class.new("model", "attribute")
+        expect(backend.spy).to receive(:read).twice.with(locale, **options, super: true).and_return("foo")
+        2.times { expect(backend.read(locale, **options, super: true)).to eq("foo") }
       end
 
       it "does not modify options passed in" do
@@ -62,7 +68,15 @@ describe Mobility::Plugins::Cache do
       it "does not store value in cache with cache: false option" do
         backend = cached_backend_class.new("model", "attribute")
         allow(backend.spy).to receive(:write).once.with(locale, "foo", options).and_return("bar")
-        expect(backend.write(locale, "foo", options.merge(cache: false))).to eq("bar")
+        expect(backend.write(locale, "foo", **options, cache: false)).to eq("bar")
+        expect(backend.spy).to receive(:read).with(locale, options).and_return("baz")
+        expect(backend.read(locale, options)).to eq("baz")
+      end
+
+      it "does not store value in cache with super: true option" do
+        backend = cached_backend_class.new("model", "attribute")
+        allow(backend.spy).to receive(:write).once.with(locale, "foo", **options, super: true).and_return("bar")
+        expect(backend.write(locale, "foo", **options, super: true)).to eq("bar")
         expect(backend.spy).to receive(:read).with(locale, options).and_return("baz")
         expect(backend.read(locale, options)).to eq("baz")
       end

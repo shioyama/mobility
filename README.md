@@ -732,7 +732,14 @@ class](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Column).
 Mobility also supports jsonb and Hstore storage options, if you are using
 PostgreSQL as your database. To use this option, create column(s) on the model
 table for each translated attribute, and set your backend to `:jsonb` or
-`:hstore`. Other details are covered in the [Postgres
+`:hstore`. If you are using Sequel, note that you will need to enable the
+[pg_json](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html)
+or
+[pg_hstore](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html)
+extensions with `DB.extension :pg_json` or `DB.extension :pg_hstore` (where
+`DB` is your database instance).
+
+Other details are covered in the [Postgres
 Backend](https://github.com/shioyama/mobility/wiki/Postgres-Backends) page of
 the wiki and in the API documentation
 ([`Mobility::Backend::Jsonb`](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Jsonb)

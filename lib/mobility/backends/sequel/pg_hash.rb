@@ -41,6 +41,9 @@ jsonb).
         end
         include method_overrides
         include Mobility::Sequel::ColumnChanges.new(attributes)
+
+        plugin :defaults_setter
+        attributes.each { |attribute| default_values[attribute.to_sym] = {} }
       end
     end
   end

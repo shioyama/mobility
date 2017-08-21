@@ -3,6 +3,11 @@ require "spec_helper"
 describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
   require "mobility/backends/sequel/jsonb"
   extend Helpers::Sequel
+  before do
+    stub_const 'JsonbPost', Class.new(Sequel::Model)
+    JsonbPost.dataset = DB[:jsonb_posts]
+    JsonbPost.extend Mobility
+  end
 
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(Sequel::Model(:jsonb_posts)) do
@@ -13,12 +18,7 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
   context "with standard plugins applied" do
     let(:backend) { post.mobility_backend_for("title") }
 
-    before do
-      stub_const 'JsonbPost', Class.new(Sequel::Model)
-      JsonbPost.dataset = DB[:jsonb_posts]
-      JsonbPost.extend Mobility
-      JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false
-    end
+    before { JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false }
     let(:post) { JsonbPost.new }
 
     include_accessor_examples 'JsonbPost'
@@ -43,5 +43,15 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
         expect(post.title).to eq(1)
       end
     end
+  end
+
+  context "with dirty plugin applied" do
+    let(:backend) { post.mobility_backend_for("title") }
+
+    before { JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false, dirty: true }
+    let(:post) { JsonbPost.new }
+
+    include_accessor_examples 'JsonbPost'
+    include_serialization_examples 'JsonbPost'
   end
 end if Mobility::Loaded::Sequel

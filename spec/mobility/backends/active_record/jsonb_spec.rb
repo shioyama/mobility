@@ -3,6 +3,10 @@ require "spec_helper"
 describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :postgres do
   require "mobility/backends/active_record/jsonb"
   extend Helpers::ActiveRecord
+  before do
+    stub_const 'JsonbPost', Class.new(ActiveRecord::Base)
+    JsonbPost.extend Mobility
+  end
 
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
@@ -14,11 +18,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
   context "with standard plugins applied" do
     let(:backend) { post.mobility_backend_for("title") }
 
-    before do
-      stub_const 'JsonbPost', Class.new(ActiveRecord::Base)
-      JsonbPost.extend Mobility
-      JsonbPost.translates :title, :content, backend: :jsonb, cache: false
-    end
+    before { JsonbPost.translates :title, :content, backend: :jsonb, presence: false, cache: false }
     let(:post) { JsonbPost.new }
 
     include_accessor_examples 'JsonbPost'
@@ -44,5 +44,15 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
         expect(post.title).to eq(1)
       end
     end
+  end
+
+  context "with dirty plugin applied" do
+    let(:backend) { post.mobility_backend_for("title") }
+
+    before { JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false, dirty: true }
+    let(:post) { JsonbPost.new }
+
+    include_accessor_examples 'JsonbPost'
+    include_serialization_examples 'JsonbPost'
   end
 end if Mobility::Loaded::ActiveRecord

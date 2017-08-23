@@ -2,6 +2,9 @@
 
 ## 0.2
 
+### 0.2.2 (August 23, 2017)
+* Set default values in Sequel Jsonb/Hstore backends ([#80](https://github.com/shioyama/mobility/pull/80))
+
 ### 0.2.1 (August 20, 2017)
 
 * Fix missing requires in `Mobility::Backends::Sequel::PgHash` ([22df29](https://github.com/shioyama/mobility/commit/22df2946bcccadd7dff0880539ac828c42111adc))

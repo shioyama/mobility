@@ -104,7 +104,7 @@ See [Getting Started](#quickstart) to get started translating your models.
 ### Sequel
 
 Requirements:
-- Sequel >= 4.0
+- Sequel >= 4.0, < 5.0 (5.0 support is in the works)
 
 You can extend `Mobility` just like in ActiveRecord, or you can use the
 `mobility` plugin, which does the same thing:

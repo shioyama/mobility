@@ -98,7 +98,7 @@ locale was +nil+.
           if fallback == false || (fallback.nil? && fallbacks.nil?)
             super(locale, options)
           else
-            (fallback ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
+            (fallback.is_a?(Symbol) ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
               value = super(fallback_locale, options)
               break value if Util.present?(value)
             end

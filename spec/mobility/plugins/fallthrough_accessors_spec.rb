@@ -16,10 +16,6 @@ describe Mobility::Plugins::FallthroughAccessors do
     it_behaves_like "locale accessor", :title, :en
     it_behaves_like "locale accessor", :title, :de
     it_behaves_like "locale accessor", :title, :'pt-BR'
-
-    it "raises InvalidLocale if locale is not in I18n.available_locales" do
-      expect { model_class.new.title_ru }.to raise_error(Mobility::InvalidLocale)
-    end
   end
 
   describe ".apply" do

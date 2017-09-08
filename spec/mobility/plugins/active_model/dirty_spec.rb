@@ -284,7 +284,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.title).to eq("Title")
         expect(article.changed?).to eq(true)
         expect(article.changed).to match_array(["title_ja", "title_en"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "ばばば"], "title_en" => ["ばばば", "Title"]})
+        expect(article.changes).to eq({ "title_ja" => [nil, "ばばば"], "title_en" => [nil, "Title"]})
       end
     end
   end

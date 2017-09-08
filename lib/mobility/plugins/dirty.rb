@@ -14,11 +14,7 @@ details.
 @note Dirty tracking can have unexpected results when combined with fallbacks.
   A change in the fallback locale value will not mark an attribute falling
   through to that locale as changed, even though it may look like it has
-  changed. However, when the value for the current locale is changed from nil
-  or blank to a new value, the change will be recorded as a change from that
-  fallback value, rather than from the nil or blank value. The specs are the
-  most reliable source of information on the interaction between dirty tracking
-  and fallbacks.
+  changed. See the specs for details on expected behavior.
 
 =end
     module Dirty

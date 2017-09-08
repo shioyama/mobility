@@ -40,11 +40,11 @@ describe Mobility::Plugins::LocaleAccessors do
         model_class.include(described_class.new(:title))
         instance = model_class.new
         warning_message = /locale passed as option to locale accessor will be ignored/
-        expect(instance).to receive(:title).and_return("foo")
+        expect(instance).to receive(:title).with(locale: :pt).and_return("foo")
         expect { expect(instance.title_pt(locale: :en)).to eq("foo") }.to output(warning_message).to_stderr
-        expect(instance).to receive(:title?).and_return(true)
+        expect(instance).to receive(:title?).with(locale: :pt).and_return(true)
         expect { expect(instance.title_pt?(locale: :en)).to eq(true) }.to output(warning_message).to_stderr
-        expect(instance).to receive(:title=).with("new foo", {})
+        expect(instance).to receive(:title=).with("new foo", locale: :pt)
         expect { instance.send(:title_pt=, "new foo", locale: :en)}.to output(warning_message).to_stderr
       end
     end

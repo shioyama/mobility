@@ -46,12 +46,12 @@ model class is generated.
       def initialize(*attributes)
         method_name_regex = /\A(#{attributes.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
 
-        define_method :method_missing do |method_name, *arguments, &block|
+        define_method :method_missing do |method_name, *arguments, **options, &block|
           if method_name =~ method_name_regex
             attribute = $1.to_sym
             locale, suffix = $2.split('_'.freeze)
             locale = "#{locale}-#{suffix.upcase}".freeze if suffix
-            Mobility.with_locale(locale) { public_send("#{attribute}#{$4}".freeze, *arguments) }
+            public_send("#{attribute}#{$4}".freeze, *arguments, **options, locale: locale.to_sym)
           else
             super(method_name, *arguments, &block)
           end

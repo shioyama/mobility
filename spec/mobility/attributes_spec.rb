@@ -132,8 +132,8 @@ describe Mobility::Attributes do
           expect(article.title?).to eq(true)
         end
 
-        it "correctly maps locale through getter options" do
-          expect(backend).to receive(:read).with(:fr, {}).and_return("foo")
+        it "correctly maps locale through getter options and converts to boolean" do
+          expect(backend).to receive(:read).with(:fr, locale: true).and_return("foo")
           expect(article.title(locale: "fr")).to eq("foo")
         end
 

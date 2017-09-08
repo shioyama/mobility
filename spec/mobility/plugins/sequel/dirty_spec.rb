@@ -201,9 +201,9 @@ describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
         article.title = "Title"
         expect(article.title).to eq("Title")
         expect(article.column_changed?(:title)).to eq(true)
-        expect(article.column_change(:title)).to eq(["ばばば", "Title"])
+        expect(article.column_change(:title)).to eq([nil, "Title"])
         expect(article.changed_columns).to match_array([:title_ja, :title_en])
-        expect(article.column_changes).to eq({ title_ja: [nil, "ばばば"], title_en: ["ばばば", "Title"]})
+        expect(article.column_changes).to eq({ title_ja: [nil, "ばばば"], title_en: [nil, "Title"]})
       end
     end
   end

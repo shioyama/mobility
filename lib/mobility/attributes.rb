@@ -168,6 +168,17 @@ with other backends.
       names.each(&block)
     end
 
+    # Process options passed into accessor method before calling backend, and
+    # return locale
+    # @param [Hash] options Options hash passed to accessor method
+    # @return [Symbol] locale
+    def self.process_options!(options)
+      (options[:locale] || Mobility.locale).tap { |locale|
+        Mobility.enforce_available_locales!(locale)
+        options[:locale] &&= !!locale
+      }.to_sym
+    end
+
     private
 
     def define_backend(attribute)
@@ -179,24 +190,24 @@ with other backends.
     end
 
     def define_reader(attribute)
-      define_method attribute do |locale: Mobility.locale, **options|
+      define_method attribute do |**options|
         return super() if options.delete(:super)
-        Mobility.enforce_available_locales!(locale)
-        mobility_backend_for(attribute).read(locale.to_sym, options)
+        locale = Mobility::Attributes.process_options!(options)
+        mobility_backend_for(attribute).read(locale, options)
       end
 
-      define_method "#{attribute}?" do |locale: Mobility.locale, **options|
+      define_method "#{attribute}?" do |**options|
         return super() if options.delete(:super)
-        Mobility.enforce_available_locales!(locale)
-        mobility_backend_for(attribute).present?(locale.to_sym, options)
+        locale = Mobility::Attributes.process_options!(options)
+        mobility_backend_for(attribute).present?(locale, options)
       end
     end
 
     def define_writer(attribute)
-      define_method "#{attribute}=" do |value, locale: Mobility.locale, **options|
+      define_method "#{attribute}=" do |value, **options|
         return super(value) if options.delete(:super)
-        Mobility.enforce_available_locales!(locale)
-        mobility_backend_for(attribute).write(locale.to_sym, value, options)
+        locale = Mobility::Attributes.process_options!(options)
+        mobility_backend_for(attribute).write(locale, value, options)
       end
     end
 

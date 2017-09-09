@@ -102,6 +102,10 @@ describe Mobility::Plugins::Fallbacks do
       it "uses locale passed in as value of fallback option when present" do
         expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
       end
+
+      it "does not use fallbacks when fallback: true option is passed" do
+        expect(subject.read(:"en-US", fallback: true)).to eq(nil)
+      end
     end
   end
 

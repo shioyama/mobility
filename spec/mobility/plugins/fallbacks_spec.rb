@@ -8,6 +8,7 @@ describe Mobility::Plugins::Fallbacks do
       backend_class.include(Mobility::Backend)
       backend_class.class_eval do
         def read(locale, **options)
+          Mobility.enforce_available_locales!(locale)
           return "bar" if options[:bar]
           {
             "title" => {
@@ -58,7 +59,7 @@ describe Mobility::Plugins::Fallbacks do
       end
 
       it "uses array of locales passed in as value of fallback options when present" do
-        expect(subject.read(:"en-US", fallback: [:es, :'de-DE'])).to eq("foo")
+        expect(subject.read(:"en-US", fallback: [:pl, :'de-DE'])).to eq("foo")
       end
 
       it "passes options to getter in fallback locale" do
@@ -101,6 +102,10 @@ describe Mobility::Plugins::Fallbacks do
 
       it "uses locale passed in as value of fallback option when present" do
         expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
+      end
+
+      it "uses array of locales passed in as value of fallback options when present" do
+        expect(subject.read(:"en-US", fallback: [:pl, :'de-DE'])).to eq("foo")
       end
 
       it "does not use fallbacks when fallback: true option is passed" do

@@ -92,10 +92,12 @@ locale was +nil+.
       private
 
       def define_read(fallbacks)
-        define_method :read do |locale, fallback: nil, **options|
-          return super(locale, options) if fallback == false || (!fallback.is_a?(Symbol) && fallbacks.nil?)
+        define_method :read do |locale, fallback: true, **options|
+          return super(locale, options) if !fallback
+          return super(locale, options) if fallbacks.nil? && fallback == true
 
-          (fallback.is_a?(Symbol) ? [locale, *fallback] : fallbacks[locale]).detect do |fallback_locale|
+          locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
+          locales.detect do |fallback_locale|
             value = super(fallback_locale, options)
             break value if Util.present?(value)
           end
@@ -108,7 +110,7 @@ locale was +nil+.
         elsif option == true
           Mobility.default_fallbacks
         else
-          option
+          nil
         end
       end
     end

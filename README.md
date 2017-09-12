@@ -222,7 +222,7 @@ locations, usually database columns. By default these values are stored as keys
 tables, one for strings and one for text columns, but this can be easily
 changed and/or customized (see the [Backends](#backends) section below).
 
-### Getting and Setting Translations
+### <a name="getset"></a> Getting and Setting Translations
 
 The easiest way to get or set a translation is to use the getter and setter
 methods described above (`word.name` and `word.name=`), but you may want to
@@ -309,6 +309,11 @@ word.name(locale: :fr)
 #=> "mobilité"
 ```
 
+Note that setting the locale this way will pass an option `locale: true` to the
+backend and all plugins. Plugins may use this option to change their behavior
+(passing the locale explicitly this way, for example, disables
+[fallbacks](#fallbacks), see below for details).
+
 You can also *set* the value of an attribute this way; however, since the
 `word.name = <value>` syntax does not accept any options, the only way to do this is to
 use `send` (this is included mostly for consistency):
@@ -387,8 +392,8 @@ translated attributes on a class:
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name,    type: :string, fallbacks: { de: :ja, fr: :ja }
-  translates :meaning, type: :text,   fallbacks: { de: :ja, fr: :ja }
+  translates :name,    type: :string, fallbacks: { de: :ja, fr: :ja }, locale_accessors: true
+  translates :meaning, type: :text,   fallbacks: { de: :ja, fr: :ja }, locale_accessors: true
 end
 ```
 
@@ -404,17 +409,20 @@ but not for other locales:
 ```ruby
 Mobility.locale = :ja
 word = Word.create(name: "モビリティ", meaning: "(名詞):動きやすさ、可動性")
-word.name(locale: :de)
+Mobility.locale = :de
+word.name
 #=> "モビリティ"
-word.meaning(locale: :de)
+word.meaning
 #=> "(名詞):動きやすさ、可動性"
-word.name(locale: :fr)
+Mobility.locale = :fr
+word.name
 #=> "モビリティ"
-word.meaning(locale: :fr)
+word.meaning
 #=> "(名詞):動きやすさ、可動性"
-word.name(locale: :ru)
+Mobility.locale = :ru
+word.name
 #=> nil
-word.meaning(locale: :ru)
+word.meaning
 #=> nil
 ```
 
@@ -423,11 +431,14 @@ You can optionally disable fallbacks to get the real value for a given locale
 passing `fallback: false` (*singular*, not plural) to the getter method:
 
 ```ruby
-word.meaning(locale: :de, fallback: false)
+Mobility.locale = :de
+word.meaning(fallback: false)
 #=> nil
-word.meaning(locale: :fr, fallback: false)
+Mobility.locale = :fr
+word.meaning(fallback: false)
 #=> nil
-word.meaning(locale: :ja, fallback: false)
+Mobility.locale = :ja
+word.meaning(fallback: false)
 #=> "(名詞):動きやすさ、可動性"
 ```
 
@@ -439,11 +450,28 @@ Mobility.with_locale(:fr) do
   word.meaning = "(nf): aptitude à bouger, à se déplacer, à changer, à évoluer"
 end
 word.save
-word.meaning(locale: :de, fallback: false)
+Mobility.locale = :de
+word.meaning(fallback: false)
 #=> nil
-word.meaning(locale: :de, fallback: :fr)
+word.meaning(fallback: :fr)
 #=> "(nf): aptitude à bouger, à se déplacer, à changer, à évoluer"
-word.meaning(locale: :de, fallback: [:ja, :fr])
+word.meaning(fallback: [:ja, :fr])
+#=> "(名詞):動きやすさ、可動性"
+```
+
+Also note that passing a `locale` option into an attribute reader or writer, or
+using [locale accessors or fallthrough accessors](#getset) to get or set
+any attribute value, will disable fallbacks (just like `fallback: false`).
+(This will take precedence over any value of the `fallback` option.)
+
+Continuing from the last example:
+
+```ruby
+word.meaning(locale: :de)
+#=> nil
+word.meaning_de
+#=> nil
+Mobility.with_locale(:de) { word.meaning }
 #=> "(名詞):動きやすさ、可動性"
 ```
 

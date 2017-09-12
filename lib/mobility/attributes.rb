@@ -19,7 +19,7 @@ like including a module. Creating an instance like this:
 
   Attributes.new("title", backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
 
-will generate an anonymous module that behaves like this:
+will generate an anonymous module that behaves (approximately) like this:
 
   Module.new do
     def title_backend

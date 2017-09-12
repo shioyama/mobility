@@ -15,14 +15,20 @@ defaults to an instance of +I18n::Locale::Fallbacks+, but can be configured
 If a hash is passed to the +fallbacks+ option, a new fallbacks instance will be
 created for the model with the hash defining additional fallbacks. 
 
-In addition, fallbacks can be disabled when reading by passing <tt>fallback:
-false</tt> to the reader method. This can be useful to determine the actual
-value of the translated attribute, including a possible +nil+ value. You can
-also pass a locale or array of locales to the +fallback+ option to use that
-locale or locales that read, e.g. <tt>fallback: :fr</tt> would fetch the French
-translation if the value in the current locale was +nil+, whereas <tt>fallback:
-[:fr, :es]</tt> would try French, then Spanish if the value in the current
-locale was +nil+.
+In addition, fallbacks are disabled in certain situation. To explicitly disable
+fallbacks when reading and writing, you can pass the <tt>fallback: false</tt>
+option to the reader method. This can be useful to determine the actual
+value of the translated attribute, including a possible +nil+ value.
+
+The other situation where fallbacks are disabled is when the locale is
+specified explicitly, either by passing a `locale` option to the accessor or by
+using locale or fallthrough accessors. (See example below.)
+
+You can also pass a locale or array of locales to the +fallback+ option to use
+that locale or locales that read, e.g. <tt>fallback: :fr</tt> would fetch the
+French translation if the value in the current locale was +nil+, whereas
+<tt>fallback: [:fr, :es]</tt> would try French, then Spanish if the value in
+the current locale was +nil+.
 
 @see https://github.com/svenfuchs/i18n/wiki/Fallbacks I18n Fallbacks
 
@@ -76,6 +82,26 @@ locale was +nil+.
   #=> nil
   post.title(fallback: :fr)
   #=> "Mobilité"
+
+@example Fallbacks disabled
+  class Post
+    translates :title, fallbacks: { :'fr' => 'en' }, locale_accessors: true
+  end
+
+  I18n.default_locale = :en
+  Mobility.locale = :en
+  post = Post.new(title: "Mobility")
+
+  Mobility.locale = :fr
+  post.title
+  #=> "Mobility"
+  post.title(fallback: false)
+  #=> nil
+  post.title(locale: :fr)
+  #=> nil
+  post.title_fr
+  #=> nil
+
 =end
     class Fallbacks < Module
       # Applies fallbacks plugin to attributes.

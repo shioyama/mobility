@@ -3,7 +3,8 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 ENV['RAILS_VERSION']  ||= "5.1"
 ENV['SEQUEL_VERSION'] ||= "4.46"
 
-if orm = ENV['ORM']
+if !ENV['ORM'].nil? && !ENV['ORM'].empty?
+  orm = ENV['ORM']
   require orm
 else
   orm = 'none'

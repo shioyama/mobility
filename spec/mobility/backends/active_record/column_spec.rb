@@ -62,6 +62,7 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
 
     describe "Model accessors" do
       include_accessor_examples 'Comment', :content, :author
+      include_dup_examples 'Comment', :content
     end
 
     describe "with locale accessors" do

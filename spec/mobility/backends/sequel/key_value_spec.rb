@@ -34,6 +34,7 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
     end
 
     include_accessor_examples 'Article'
+    include_dup_examples 'Article'
 
     describe "cache" do
       let(:article) { Article.new }

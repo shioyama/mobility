@@ -25,6 +25,7 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
     include_accessor_examples 'HstorePost'
     #include_serialization_examples 'HstorePost'
     include_querying_examples 'HstorePost'
+    include_dup_examples 'HstorePost'
 
     describe "non-text values" do
       it "converts non-string types to strings when saving" do

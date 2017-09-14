@@ -22,6 +22,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
         before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, presence: false }
         include_accessor_examples 'SerializedPost'
         include_serialization_examples 'SerializedPost'
+        include_dup_examples 'SerializedPost'
 
         describe "non-text values" do
           it "converts non-string types to strings when saving" do

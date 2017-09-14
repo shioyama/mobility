@@ -2,6 +2,11 @@
 
 ## 0.2
 
+### 0.2.3 (September 14, 2017)
+* Fix inheritance error when inheriting
+  ([#83](https://github.com/shioyama/mobility/pull/83)). Thanks
+  [pwim](https://github.com/pwim)!
+
 ### 0.2.2 (August 23, 2017)
 * Set default values in Sequel Jsonb/Hstore backends ([#80](https://github.com/shioyama/mobility/pull/80))
 

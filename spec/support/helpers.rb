@@ -32,6 +32,10 @@ module Helpers
     def include_backend_examples *args
       it_behaves_like "Mobility backend", *args
     end
+
+    def include_dup_examples *args
+      it_behaves_like "dupable model", *args
+    end
   end
 
   module ActiveRecord

@@ -137,6 +137,14 @@ columns to that table.
           class_name:  name,
           foreign_key: options[:foreign_key],
           inverse_of:  association_name
+
+          callback_methods = Module.new do
+            define_method :initialize_dup do |source|
+              super(source)
+              self.send("#{association_name}=", source.send(association_name).map(&:dup))
+            end
+          end
+          include callback_methods
       end
 
       setup_query_methods(QueryMethods)

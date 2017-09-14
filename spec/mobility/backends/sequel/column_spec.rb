@@ -112,5 +112,9 @@ describe "Mobility::Backends::Sequel::Column", orm: :sequel do
     describe "mobility dataset (.i18n)" do
       include_querying_examples 'Comment', :content, :author
     end
+
+    describe "dup" do
+      include_dup_examples 'Comment', :content
+    end
   end
 end if Mobility::Loaded::Sequel

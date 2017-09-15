@@ -30,6 +30,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   context "with cache" do
     before { Article.translates :title, :content, backend: :table, cache: true }
     include_accessor_examples "Article"
+    include_ar_integration_examples "Article"
 
     it "only fetches translation once per locale" do
       article = Article.new

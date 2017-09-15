@@ -22,6 +22,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
         before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, presence: false }
         include_accessor_examples 'SerializedPost'
         include_serialization_examples 'SerializedPost'
+        include_ar_integration_examples 'SerializedPost'
 
         describe "non-text values" do
           it "converts non-string types to strings when saving", rails_version_geq: '5.0' do

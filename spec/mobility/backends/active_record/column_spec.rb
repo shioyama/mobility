@@ -109,5 +109,9 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
       include_querying_examples 'Comment', :content, :author
       include_validation_examples 'Comment', :content, :author
     end
+
+    describe "ar integration" do
+      include_ar_integration_examples "Comment", :content
+    end
   end
 end if Mobility::Loaded::ActiveRecord

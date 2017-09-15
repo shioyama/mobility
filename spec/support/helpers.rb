@@ -52,6 +52,10 @@ module Helpers
     def include_validation_examples *args
       it_behaves_like "AR Model validation", *args
     end
+
+    def include_ar_integration_examples *args
+      it_behaves_like "AR integration", *args
+    end
   end
 
   module Sequel

@@ -31,6 +31,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     context "without cache" do
       let(:article) { Article.new }
       include_accessor_examples "Article"
+      include_ar_integration_examples "Article"
 
       it "finds translation on every read/write" do
         expect(title_backend.send(:translations)).to receive(:find).thrice.and_call_original

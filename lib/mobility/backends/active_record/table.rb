@@ -138,13 +138,16 @@ columns to that table.
           foreign_key: options[:foreign_key],
           inverse_of:  association_name
 
+        module_name = "MobilityArTable#{association_name.to_s.camelcase}"
+        unless const_defined?(module_name)
           callback_methods = Module.new do
             define_method :initialize_dup do |source|
               super(source)
               self.send("#{association_name}=", source.send(association_name).map(&:dup))
             end
           end
-          include callback_methods
+          include const_set(module_name, callback_methods)
+        end
       end
 
       setup_query_methods(QueryMethods)

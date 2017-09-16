@@ -28,6 +28,7 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel do
     end
 
     include_accessor_examples "Article"
+    include_dup_examples "Article"
 
     it "only fetches translation once per locale" do
       article = Article.new

@@ -24,6 +24,7 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
     include_accessor_examples 'JsonbPost'
     include_serialization_examples 'JsonbPost'
     include_querying_examples 'JsonbPost'
+    include_dup_examples 'JsonbPost'
 
     describe "non-text values" do
       it "stores non-string types as-is when saving" do

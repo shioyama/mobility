@@ -16,6 +16,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   context "without cache" do
     before { Article.translates :title, :content, backend: :table, cache: false }
     include_accessor_examples "Article"
+    include_dup_examples "Article"
 
     it "finds translation on every read/write" do
       article = Article.new

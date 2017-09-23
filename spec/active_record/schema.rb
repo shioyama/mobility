@@ -24,6 +24,8 @@ module Mobility
           create_table "articles" do |t|
             t.string :slug
             t.boolean :published
+            t.datetime "created_at", null: false
+            t.datetime "updated_at", null: false
           end
 
           create_table "article_translations" do |t|
@@ -81,12 +83,16 @@ module Mobility
             t.text :author_pt_br
             t.text :author_ru
             t.boolean :published
+            t.datetime "created_at", null: false
+            t.datetime "updated_at", null: false
           end
 
           create_table "serialized_posts" do |t|
             t.text :title
             t.text :content
             t.boolean :published
+            t.datetime "created_at", null: false
+            t.datetime "updated_at", null: false
           end
 
           if ENV['DB'] == 'postgres'
@@ -99,6 +105,8 @@ module Mobility
                 t.jsonb :content, default: ''
               end
               t.boolean :published
+              t.datetime "created_at", null: false
+              t.datetime "updated_at", null: false
             end
 
             execute "CREATE EXTENSION IF NOT EXISTS hstore"
@@ -107,6 +115,8 @@ module Mobility
               t.hstore :title, default: ''
               t.hstore :content, default: ''
               t.boolean :published
+              t.datetime "created_at", null: false
+              t.datetime "updated_at", null: false
             end
           end
         end

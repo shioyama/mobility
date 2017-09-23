@@ -26,6 +26,7 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
     include_querying_examples 'HstorePost'
     include_validation_examples 'HstorePost'
     include_dup_examples 'HstorePost'
+    include_cache_key_examples 'HstorePost'
 
     describe "non-text values" do
       it "converts non-string types to strings when saving" do

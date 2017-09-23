@@ -136,7 +136,8 @@ columns to that table.
         translation_class.belongs_to :translated_model,
           class_name:  name,
           foreign_key: options[:foreign_key],
-          inverse_of:  association_name
+          inverse_of:  association_name,
+          touch: true
 
         module_name = "MobilityArTable#{association_name.to_s.camelcase}"
         unless const_defined?(module_name)

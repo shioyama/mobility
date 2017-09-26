@@ -97,4 +97,31 @@ describe "ActiveRecord compatibility", orm: :active_record do
       expect(post.title_ja).to eq(nil)
     end
   end
+
+  describe "#attributes" do
+    it "includes both original and translated attributes" do
+      post = Post.new
+      post.title = "foo"
+      post.content = "bar"
+      expect(post.attributes).to eq({ "published" => post.published, "id" => post.id, "title" => "foo", "content" => "bar" })
+    end
+  end
+
+  describe "#translated_attributes" do
+    it "includes only translated attributes" do
+      post = Post.new
+      post.title = "foo"
+      post.content = "bar"
+      expect(post.translated_attributes).to eq({ "title" => "foo", "content" => "bar" }) end
+  end
+
+  describe "#untranslated_attributes" do
+    it "includes only original attributes" do
+      post = Post.new
+      post.title = "foo"
+      post.content = "bar"
+      expect(post.untranslated_attributes).to eq({ "published" => post.published, "id" => post.id })
+    end
+
+  end
 end

@@ -1,7 +1,7 @@
 class Post < ActiveRecord::Base
   extend Mobility
-  translates :title, backend: :key_value, cache: true, locale_accessors: true, dirty: true, type: :string
-  translates :content, backend: :key_value, cache: true, locale_accessors: true, dirty: true, type: :text
+  translates :title, backend: :key_value, cache: true, locale_accessors: true, dirty: true, type: :string, attribute_methods: true
+  translates :content, backend: :key_value, cache: true, locale_accessors: true, dirty: true, type: :text, attribute_methods: true
 end
 
 class FallbackPost < ActiveRecord::Base

@@ -68,7 +68,8 @@ Stores shared Mobility configuration referenced by all backends.
         dirty: false,
         fallbacks: nil,
         presence: true,
-        default: nil
+        default: nil,
+        attribute_methods: false
       }
       @plugins = %i[
         cache
@@ -76,6 +77,7 @@ Stores shared Mobility configuration referenced by all backends.
         fallbacks
         presence
         default
+        attribute_methods
         fallthrough_accessors
         locale_accessors
       ]

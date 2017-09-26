@@ -89,7 +89,6 @@ module Mobility
 
       if Loaded::ActiveRecord
         model_class.include(ActiveRecord)                   if model_class < ::ActiveRecord::Base
-        model_class.include(ActiveRecord::AttributeMethods) if model_class.ancestors.include?(::ActiveRecord::AttributeMethods)
       end
 
       if Loaded::Sequel

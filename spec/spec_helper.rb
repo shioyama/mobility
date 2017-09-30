@@ -12,7 +12,6 @@ end
 db = ENV['DB'] || 'none'
 require 'pry-byebug'
 require 'i18n'
-require 'active_support/testing/time_helpers'
 require 'rspec'
 require 'allocation_stats' if ENV['TEST_PERFORMANCE']
 require 'json'
@@ -44,7 +43,10 @@ end
 RSpec.configure do |config|
   config.include Helpers
   config.include Mobility::Util
-  config.include ActiveSupport::Testing::TimeHelpers
+  if defined?(ActiveSupport)
+    require 'active_support/testing/time_helpers'
+    config.include ActiveSupport::Testing::TimeHelpers
+  end
 
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true

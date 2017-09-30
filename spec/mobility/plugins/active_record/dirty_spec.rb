@@ -83,7 +83,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         article.save
 
         expect(article.changed?).to eq(false)
-        expect(article.previous_changes).to eq({ "title_en" => ["foo", "bar"]})
+        expect(article.previous_changes).to include({ "title_en" => ["foo", "bar"]})
       end
     end
 
@@ -101,7 +101,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
       article.save
 
-      expect(article.instance_variable_get(:@actual_previous_changes)).to eq({ "title_en" => ["foo", "bar"]})
+      expect(article.instance_variable_get(:@actual_previous_changes)).to include({ "title_en" => ["foo", "bar"]})
     end
 
     it "tracks changes in multiple locales" do
@@ -136,8 +136,9 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
       article.save
 
-      expect(article.previous_changes).to eq({"title_en" => ["English title 1", "English title 2"],
-                                              "title_fr" => ["Titre en Francais 1", "Titre en Francais 2"]})
+      expect(article.previous_changes).to include({
+        "title_en" => ["English title 1", "English title 2"],
+        "title_fr" => ["Titre en Francais 1", "Titre en Francais 2"]})
     end
 
     it "resets changes when locale is set to original value" do

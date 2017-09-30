@@ -36,6 +36,10 @@ module Helpers
     def include_dup_examples *args
       it_behaves_like "dupable model", *args
     end
+
+    def include_cache_key_examples *args
+      it_behaves_like "cache key", *args
+    end
   end
 
   module ActiveRecord

@@ -30,6 +30,8 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
 
     subject { comment }
 
+    include_cache_key_examples "Comment", :content
+
     describe "#read" do
       it "returns attribute in locale from appropriate column" do
         aggregate_failures do

@@ -26,6 +26,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
     include_querying_examples 'JsonbPost'
     include_validation_examples 'JsonbPost'
     include_dup_examples 'JsonbPost'
+    include_cache_key_examples 'JsonbPost'
 
     describe "non-text values" do
       it "stores non-string types as-is when saving", rails_version_geq: '5.0' do

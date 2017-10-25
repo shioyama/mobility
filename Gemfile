@@ -27,7 +27,7 @@ group :development, :test do
     gem 'guard-rspec'
     gem 'pry-byebug'
     gem 'sqlite3'
-    gem 'mysql2', '~> 0.3.10'
+    gem 'mysql2', '~> 0.4.9'
     gem 'pg'
   end
 end

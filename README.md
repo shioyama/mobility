@@ -867,6 +867,9 @@ More Information
 - [Doorkeeper](https://www.doorkeeper.jp/)
 - [Oreegano](https://www.oreegano.com/)
 - [Venuu](https://venuu.fi)
+- ... <sup>&#10033;</sup>
+
+<sup>&#10033;</sup> <small>Post an issue or email me to add your company's name to this list.</small>
 
 License
 -------

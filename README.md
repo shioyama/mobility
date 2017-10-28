@@ -16,7 +16,8 @@ Mobility
 Mobility is a gem for storing and retrieving translations as attributes on a
 class. These translations could be the content of blog posts, captions on
 images, tags on bookmarks, or anything else you might want to store in
-different languages.
+different languages. For examples of what Mobility can do, see the
+<a href="#companies-using-mobility">Companies using Mobility</a> section below.
 
 Storage of translations is handled by customizable "backends" which encapsulate
 different storage strategies. The default, preferred way to store translations
@@ -857,6 +858,15 @@ More Information
 - [Github repository](https://www.github.com/shioyama/mobility)
 - [API documentation][docs]
 - [Wiki][wiki]
+
+<a name="#companies-using-mobility"></a>Companies using Mobility
+------------------------
+
+<img alt="Logos of companies using Mobility" src="./img/companies-using-mobility.png" style="width: 100%" />
+
+- [Doorkeeper](https://www.doorkeeper.jp/)
+- [Oreegano](https://www.oreegano.com/)
+- [Venuu](https://venuu.fi)
 
 License
 -------

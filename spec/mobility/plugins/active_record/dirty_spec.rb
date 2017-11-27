@@ -150,7 +150,11 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       aggregate_failures do
         expect(article.changed?).to eq(true)
         expect(article.title_changed?).to eq(true)
-        expect(article.content_changed?).to eq(false)
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
+          expect(article.content_changed?).to eq(nil)
+        else
+          expect(article.content_changed?).to eq(false)
+        end
         expect(article.title_change).to eq(["foo", "foo"])
         expect(article.content_change).to eq(nil)
         expect(article.previous_changes).to include({ "title_en" => [nil, "foo"]})
@@ -197,11 +201,32 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     it "defines suffix methods on translated attribute" do
       article = Article.new
       article.title = "foo"
+
       article.save
+      aggregate_failures "after save" do
+        expect(article.changed?).to eq(false)
+        expect(article.title_change).to eq(nil)
+        expect(article.title_was).to eq("foo")
+
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
+          expect(article.title_changed?).to eq(nil)
+        else
+          expect(article.title_previously_changed?).to eq(true)
+          expect(article.title_previous_change).to eq([nil, "foo"])
+          expect(article.title_changed?).to eq(false)
+        end
+
+        # AR-specific suffix methods, added in AR 5.1
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
+          expect(article.saved_change_to_title?).to eq(true)
+          expect(article.saved_change_to_title).to eq([nil, "foo"])
+          expect(article.title_before_last_save).to eq(nil)
+        end
+      end
 
       article.title = "bar"
 
-      aggregate_failures do
+      aggregate_failures "changed after save" do
         expect(article.title_changed?).to eq(true)
         expect(article.title_change).to eq(["foo", "bar"])
         expect(article.title_was).to eq("foo")
@@ -215,8 +240,50 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           expect(article.title_changed?).to eq(false)
         end
 
+        # AR-specific suffix methods
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
+          expect(article.saved_change_to_title?).to eq(true)
+          expect(article.saved_change_to_title).to eq(["foo", "bar"])
+          expect(article.title_before_last_save).to eq("foo")
+          expect(article.will_save_change_to_title?).to eq(false)
+          expect(article.title_change_to_be_saved).to eq(nil)
+        end
+      end
+
+      aggregate_failures "force change" do
         article.title_will_change!
-        expect(article.title_changed?).to eq(true)
+
+        aggregate_failures "before save" do
+          expect(article.title_changed?).to eq(true)
+
+          # AR-specific suffix methods
+          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
+            expect(article.saved_change_to_title?).to eq(true)
+            expect(article.saved_change_to_title).to eq(["foo", "bar"])
+            expect(article.title_before_last_save).to eq("foo")
+            expect(article.will_save_change_to_title?).to eq(true)
+            expect(article.title_change_to_be_saved).to eq(["bar", "bar"])
+          end
+        end
+
+        article.save!
+
+        aggregate_failures "after save" do
+          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
+            expect(article.title_changed?).to eq(nil)
+          else
+            expect(article.title_changed?).to eq(false)
+          end
+
+          # AR-specific suffix methods
+          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
+            expect(article.saved_change_to_title?).to eq(true)
+            expect(article.saved_change_to_title).to eq(["bar", "bar"])
+            expect(article.title_before_last_save).to eq("bar")
+            expect(article.will_save_change_to_title?).to eq(false)
+            expect(article.title_change_to_be_saved).to eq(nil)
+          end
+        end
       end
     end
 
@@ -274,7 +341,6 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       expect(article.title).to eq("foo")
     end
   end
-
 
   describe "resetting original values hash on actions" do
     shared_examples_for "resets on model action" do |action|

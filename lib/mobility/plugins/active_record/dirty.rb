@@ -34,6 +34,25 @@ details on usage.
             define_method :previous_changes do
               (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super())
             end
+
+            if ::ActiveRecord::VERSION::STRING >= '5.1'
+              attribute_names.each do |name|
+                define_method :"saved_change_to_#{name}?" do
+                  previous_changes.include?(Mobility.normalize_locale_accessor(name))
+                end
+
+                define_method :"saved_change_to_#{name}" do
+                  previous_changes[Mobility.normalize_locale_accessor(name)]
+                end
+
+                define_method :"#{name}_before_last_save" do
+                  previous_changes[Mobility.normalize_locale_accessor(name)].first
+                end
+
+                alias_method :"will_save_change_to_#{name}?", :"#{name}_changed?"
+                alias_method :"#{name}_change_to_be_saved", :"#{name}_change"
+              end
+            end
           end
 
           # Overrides +ActiveRecord::AttributeMethods::ClassMethods#has_attribute+ to treat fallthrough attribute methods

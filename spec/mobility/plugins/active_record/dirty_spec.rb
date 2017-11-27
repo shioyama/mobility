@@ -25,6 +25,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     stub_const 'Article', Class.new(ActiveRecord::Base)
     Article.extend Mobility
     Article.translates :title, backend: backend_class, dirty: true, cache: false
+    Article.translates :content, backend: backend_class, dirty: true, cache: false
 
     # ensure we include these methods as a module rather than override in class
     changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
@@ -139,6 +140,28 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       expect(article.previous_changes).to include({
         "title_en" => ["English title 1", "English title 2"],
         "title_fr" => ["Titre en Francais 1", "Titre en Francais 2"]})
+    end
+
+    it "tracks forced changes" do
+      article = Article.create(title: "foo")
+
+      article.title_will_change!
+
+      aggregate_failures do
+        expect(article.changed?).to eq(true)
+        expect(article.title_changed?).to eq(true)
+        expect(article.content_changed?).to eq(false)
+        expect(article.title_change).to eq(["foo", "foo"])
+        expect(article.content_change).to eq(nil)
+        expect(article.previous_changes).to include({ "title_en" => [nil, "foo"]})
+
+        article.save
+
+        expect(article.changed?).to eq(false)
+        expect(article.title_change).to eq(nil)
+        expect(article.content_change).to eq(nil)
+        expect(article.previous_changes).to include({ "title_en" => ["foo", "foo"]})
+      end
     end
 
     it "resets changes when locale is set to original value" do

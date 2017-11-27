@@ -6,8 +6,9 @@ Adds translated attribute names and values to the hash returned by #attributes.
 Also adds a method #translated_attributes with names and values of translated
 attributes only.
 
-@note Adding translated attributes to #attributes can have unexpected
-  consequences, since these values are not true attribute values.
+@note Adding translated attributes to +attributes+ can have unexpected
+  consequences, since these attributes do not have corresponding columns in the
+  model table. Using this plugin may lead to conflicts with other gems.
 
 =end
     module AttributeMethods

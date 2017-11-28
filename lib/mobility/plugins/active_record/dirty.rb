@@ -55,6 +55,7 @@ details on usage.
 
                 alias_method :"will_save_change_to_#{name}?", :"#{name}_changed?"
                 alias_method :"#{name}_change_to_be_saved", :"#{name}_change"
+                alias_method :"#{name}_in_database", :"#{name}_was"
               end
             end
           end

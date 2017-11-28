@@ -221,6 +221,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           expect(article.saved_change_to_title?).to eq(true)
           expect(article.saved_change_to_title).to eq([nil, "foo"])
           expect(article.title_before_last_save).to eq(nil)
+          expect(article.title_in_database).to eq("foo")
         end
       end
 
@@ -247,6 +248,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           expect(article.title_before_last_save).to eq("foo")
           expect(article.will_save_change_to_title?).to eq(false)
           expect(article.title_change_to_be_saved).to eq(nil)
+          expect(article.title_in_database).to eq("bar")
         end
       end
 
@@ -263,6 +265,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
             expect(article.title_before_last_save).to eq("foo")
             expect(article.will_save_change_to_title?).to eq(true)
             expect(article.title_change_to_be_saved).to eq(["bar", "bar"])
+            expect(article.title_in_database).to eq("bar")
           end
         end
 
@@ -282,6 +285,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
             expect(article.title_before_last_save).to eq("bar")
             expect(article.will_save_change_to_title?).to eq(false)
             expect(article.title_change_to_be_saved).to eq(nil)
+            expect(article.title_in_database).to eq("bar")
           end
         end
       end

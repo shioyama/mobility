@@ -131,7 +131,7 @@ with other backends.
     def initialize(*attribute_names, method: :accessor, backend: Mobility.default_backend, **backend_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @method = method
-      @options = Mobility.default_options.merge(backend_options)
+      @options = Mobility.default_options.to_h.merge(backend_options)
       @names = attribute_names.map(&:to_s)
       raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
       @backend_name = backend

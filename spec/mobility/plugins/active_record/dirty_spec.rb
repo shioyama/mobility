@@ -368,4 +368,23 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     it_behaves_like "resets on model action", :save
     it_behaves_like "resets on model action", :reload
   end
+
+  if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
+    describe "#saved_changes" do
+      it "includes translated attributes" do
+        article = Article.create
+
+        article.title = "foo en"
+        Mobility.with_locale(:ja) { article.title = "foo ja" }
+        article.save
+
+        aggregate_failures do
+          saved_changes = article.saved_changes
+          expect(saved_changes).to include("title_en", "title_ja")
+          expect(saved_changes["title_en"]).to eq([nil, "foo en"])
+          expect(saved_changes["title_ja"]).to eq([nil, "foo ja"])
+        end
+      end
+    end
+  end
 end if Mobility::Loaded::ActiveRecord

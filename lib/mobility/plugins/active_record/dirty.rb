@@ -36,6 +36,10 @@ details on usage.
             end
 
             if ::ActiveRecord::VERSION::STRING >= '5.1'
+              define_method :saved_changes do
+                (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super())
+              end
+
               attribute_names.each do |name|
                 define_method :"saved_change_to_#{name}?" do
                   previous_changes.include?(Mobility.normalize_locale_accessor(name))

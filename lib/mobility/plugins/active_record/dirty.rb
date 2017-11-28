@@ -30,45 +30,8 @@ AR::Dirty plugin adds support for the following persistence-specific methods
           def initialize(*attribute_names)
             super
             @attribute_names = attribute_names
-
-            changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
-            define_method changes_applied_method do
-              @previously_changed = changes
-              super()
-            end
-
-            define_method :clear_changes_information do
-              @previously_changed = ActiveSupport::HashWithIndifferentAccess.new
-              super()
-            end
-
-            define_method :previous_changes do
-              (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super())
-            end
-
-            if ::ActiveRecord::VERSION::STRING >= '5.1'
-              define_method :saved_changes do
-                (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super())
-              end
-
-              attribute_names.each do |name|
-                define_method :"saved_change_to_#{name}?" do
-                  previous_changes.include?(Mobility.normalize_locale_accessor(name))
-                end
-
-                define_method :"saved_change_to_#{name}" do
-                  previous_changes[Mobility.normalize_locale_accessor(name)]
-                end
-
-                define_method :"#{name}_before_last_save" do
-                  previous_changes[Mobility.normalize_locale_accessor(name)].first
-                end
-
-                alias_method :"will_save_change_to_#{name}?", :"#{name}_changed?"
-                alias_method :"#{name}_change_to_be_saved", :"#{name}_change"
-                alias_method :"#{name}_in_database", :"#{name}_was"
-              end
-            end
+            define_method_overrides
+            define_attribute_methods if ::ActiveRecord::VERSION::STRING >= '5.1'
           end
 
           # Overrides +ActiveRecord::AttributeMethods::ClassMethods#has_attribute+ to treat fallthrough attribute methods
@@ -86,6 +49,50 @@ AR::Dirty plugin adds support for the following persistence-specific methods
               end
             end
             model_class.extend has_attribute
+          end
+
+          private
+
+          def define_method_overrides
+            changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
+            define_method changes_applied_method do
+              @previously_changed = changes
+              super()
+            end
+
+            define_method :clear_changes_information do
+              @previously_changed = ActiveSupport::HashWithIndifferentAccess.new
+              super()
+            end
+
+            define_method :previous_changes do
+              (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super())
+            end
+          end
+
+          # For AR >= 5.1 only
+          def define_attribute_methods
+            define_method :saved_changes do
+              (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super())
+            end
+
+            @attribute_names.each do |name|
+              define_method :"saved_change_to_#{name}?" do
+                previous_changes.include?(Mobility.normalize_locale_accessor(name))
+              end
+
+              define_method :"saved_change_to_#{name}" do
+                previous_changes[Mobility.normalize_locale_accessor(name)]
+              end
+
+              define_method :"#{name}_before_last_save" do
+                previous_changes[Mobility.normalize_locale_accessor(name)].first
+              end
+
+              alias_method :"will_save_change_to_#{name}?", :"#{name}_changed?"
+              alias_method :"#{name}_change_to_be_saved", :"#{name}_change"
+              alias_method :"#{name}_in_database", :"#{name}_was"
+            end
           end
         end
       end

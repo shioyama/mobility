@@ -20,7 +20,17 @@ Stores shared Mobility configuration referenced by all backends.
     # may not include the keys 'backend' or 'model_class'.
     # @return [Hash]
     attr_reader :default_options
+
+    # @deprecated The default_options= setter has been deprecated. Set each
+    #   option on the default_options hash instead.
     def default_options=(options)
+      warn %{
+WARNING: The default_options= setter has been deprecated.
+Set each option on the default_options hash instead, like this:
+
+  config.default_options[:fallbacks] = { ... }
+  config.default_options[:dirty] = true
+}
       if (keys = options.keys & RESERVED_OPTION_KEYS).present?
         raise ReservedOptionKey,
           "Default options may not contain the following reserved keys: #{keys.join(', ')}"
@@ -63,14 +73,14 @@ Stores shared Mobility configuration referenced by all backends.
       @query_method = :i18n
       @default_fallbacks = lambda { |fallbacks| I18n::Locale::Fallbacks.new(fallbacks) }
       @default_accessor_locales = lambda { I18n.available_locales }
-      @default_options = {
+      @default_options = Options[{
         cache: true,
         dirty: false,
         fallbacks: nil,
         presence: true,
         default: nil,
         attribute_methods: false
-      }
+      }]
       @plugins = %i[
         cache
         dirty
@@ -84,5 +94,14 @@ Stores shared Mobility configuration referenced by all backends.
     end
 
     class ReservedOptionKey < Exception; end
+
+    class Options < Hash
+      def []=(key, _)
+        if RESERVED_OPTION_KEYS.include?(key)
+          raise Configuration::ReservedOptionKey, "Default options may not contain the following reserved key: #{key}"
+        end
+        super
+      end
+    end
   end
 end

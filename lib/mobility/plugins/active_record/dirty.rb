@@ -8,6 +8,17 @@ module Mobility
 Dirty tracking for AR models. See {Mobility::Plugins::ActiveModel::Dirty} for
 details on usage.
 
+In addition to methods added by {Mobility::Plugins::ActiveModel::Diryt}, the
+AR::Dirty plugin adds support for the following persistence-specific methods
+(for a model with a translated attribute +title+):
+- +saved_changes+
+- +saved_change_to_title?+
+- +saved_change_to_title+
+- +title_before_last_save+
+- +will_save_change_to_title?+
+- +title_change_to_be_saved+
+- +title_in_database+
+
 =end
     module ActiveRecord
       module Dirty

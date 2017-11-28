@@ -16,6 +16,9 @@ env:
   - DB=postgres ORM=active_record RAILS_VERSION=5.1
   - DB=mysql ORM=active_record RAILS_VERSION=5.1
   - DB=sqlite3 ORM=active_record RAILS_VERSION=5.1
+  - DB=postgres ORM=active_record RAILS_VERSION=latest
+  - DB=mysql ORM=active_record RAILS_VERSION=latest
+  - DB=sqlite3 ORM=active_record RAILS_VERSION=latest
   - DB=postgres ORM=sequel SEQUEL_VERSION=4.41
   - DB=mysql ORM=sequel SEQUEL_VERSION=4.41
   - DB=sqlite3 ORM=sequel SEQUEL_VERSION=4.41
@@ -23,6 +26,11 @@ env:
   - DB=mysql ORM=sequel SEQUEL_VERSION=4.46
   - DB=sqlite3 ORM=sequel SEQUEL_VERSION=4.46
   - DB=sqlite3 ORM= TEST_PERFORMANCE=true
+matrix:
+  allow_failures:
+    - env: DB=postgres ORM=active_record RAILS_VERSION=latest
+    - env: DB=mysql ORM=active_record RAILS_VERSION=latest
+    - env: DB=sqlite3 ORM=active_record RAILS_VERSION=latest
 before_script:
   - bundle exec rake db:create db:up
 before_install: gem install bundler -v 1.12.5

@@ -32,6 +32,7 @@ value of the translated attribute if passed to it.
           if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
             model.send(:attributes_changed_by_setter).except!(locale_accessor)
           elsif read(locale, options.merge(fallback: false)) != value
+            model.send(:mobility_changed_attributes) << locale_accessor
             model.send(:attribute_will_change!, locale_accessor)
           end
           super
@@ -63,6 +64,10 @@ value of the translated attribute if passed to it.
             private :restore_attribute!
           end
 
+          def included(model_class)
+            model_class.include ChangedAttributes
+          end
+
           private
 
           # Get method suffixes. Creating an object just to get the list of
@@ -73,6 +78,19 @@ value of the translated attribute if passed to it.
               Class.new do
                 include ::ActiveModel::Dirty
               end.attribute_method_matchers.map(&:suffix).select { |m| m =~ /\A_/ }
+          end
+
+          # Tracks which translated attributes have been changed, separate from
+          # the default tracking of changes in ActiveModel/ActiveRecord Dirty.
+          # This is required in order for the Mobility ActiveRecord Dirty
+          # plugin to correctly read the value of locale accessors like
+          # +title_en+ in dirty tracking.
+          module ChangedAttributes
+            private
+
+            def mobility_changed_attributes
+              @mobility_changed_attributes ||= Set.new
+            end
           end
         end
       end

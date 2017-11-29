@@ -34,13 +34,15 @@ AR::Dirty plugin adds support for the following persistence-specific methods
             define_attribute_methods if ::ActiveRecord::VERSION::STRING >= '5.1'
           end
 
-          # Overrides +ActiveRecord::AttributeMethods::ClassMethods#has_attribute+ to treat fallthrough attribute methods
-          # just like "real" attribute methods.
+          # Overrides +ActiveRecord::AttributeMethods::ClassMethods#has_attribute+ and
+          # +ActiveModel::AttributeMethods#_read_attribute+ to treat
+          # fallthrough attribute methods just like "real" attribute methods.
           #
           # @note Patching +has_attribute?+ is necessary as of AR 5.1 due to this commit[https://github.com/rails/rails/commit/4fed08fa787a316fa51f14baca9eae11913f5050].
           #   (I have voiced my opposition to this change here[https://github.com/rails/rails/pull/27963#issuecomment-310092787]).
           # @param [Attributes] attributes
           def included(model_class)
+            super
             names = @attribute_names
             method_name_regex = /\A(#{names.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
             has_attribute = Module.new do
@@ -49,6 +51,7 @@ AR::Dirty plugin adds support for the following persistence-specific methods
               end
             end
             model_class.extend has_attribute
+            model_class.include ReadAttribute
           end
 
           private
@@ -93,6 +96,26 @@ AR::Dirty plugin adds support for the following persistence-specific methods
               alias_method :"#{name}_change_to_be_saved", :"#{name}_change"
               alias_method :"#{name}_in_database", :"#{name}_was"
             end
+          end
+
+          # Overrides _read_attribute to correctly dispatch reads on translated
+          # attributes to their respective setters, rather than to
+          # +@attributes+, which would otherwise return +nil+.
+          #
+          # For background on why this is necessary, see:
+          # https://github.com/shioyama/mobility/issues/115
+          module ReadAttribute
+            # @note We first check if attributes has the key +attr+ to avoid
+            #   doing any extra work in case this is a "normal"
+            #   (non-translated) attribute.
+            def _read_attribute(attr, *args)
+              if @attributes.key?(attr)
+                super
+              else
+                mobility_changed_attributes.include?(attr) ? __send__(attr) : super
+              end
+            end
+            private :_read_attribute
           end
         end
       end

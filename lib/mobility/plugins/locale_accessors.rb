@@ -59,13 +59,13 @@ If no locales are passed as an option to the initializer,
         define_method "#{name}_#{normalized_locale}" do |**options|
           return super() if options.delete(:super)
           warn warning_message if options[:locale]
-          send(name, **options, locale: locale)
+          public_send(name, **options, locale: locale)
         end
 
         define_method "#{name}_#{normalized_locale}?" do |**options|
           return super() if options.delete(:super)
           warn warning_message if options[:locale]
-          send("#{name}?", **options, locale: locale)
+          public_send("#{name}?", **options, locale: locale)
         end
       end
 
@@ -76,7 +76,7 @@ If no locales are passed as an option to the initializer,
         define_method "#{name}_#{normalized_locale}=" do |value, **options|
           return super(value) if options.delete(:super)
           warn warning_message if options[:locale]
-          send("#{name}=", value, **options, locale: locale)
+          public_send("#{name}=", value, **options, locale: locale)
         end
       end
     end

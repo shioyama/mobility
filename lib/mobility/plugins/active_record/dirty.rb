@@ -30,7 +30,7 @@ AR::Dirty plugin adds support for the following persistence-specific methods
           def initialize(*attribute_names)
             super
             @attribute_names = attribute_names
-            define_method_overrides
+            define_method_overrides if ::ActiveRecord::VERSION::STRING < '5.2'
             define_attribute_methods if ::ActiveRecord::VERSION::STRING >= '5.1'
           end
 
@@ -56,6 +56,9 @@ AR::Dirty plugin adds support for the following persistence-specific methods
 
           private
 
+          # @note These method overrides are needed for AR versions < 5.2,
+          #   since AR::Dirty overrides AM::Dirty, disabling previous_changes
+          #   from being set. Here we "undo" that.
           def define_method_overrides
             changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
             define_method changes_applied_method do

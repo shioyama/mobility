@@ -51,7 +51,7 @@ AR::Dirty plugin adds support for the following persistence-specific methods
               end
             end
             model_class.extend has_attribute
-            model_class.include ReadAttribute
+            model_class.include ReadAttribute if ::ActiveRecord::VERSION::STRING >= '5.2'
           end
 
           private

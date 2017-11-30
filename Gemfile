@@ -9,7 +9,7 @@ group :development, :test do
       gem 'activerecord', '>= 5.0', '< 5.1'
     elsif ENV['RAILS_VERSION'] == '4.2'
       gem 'activerecord', '>= 4.2.6', '< 5.0'
-    elsif ENV['RAILS_VERSION'] == 'latest'
+    elsif ENV['RAILS_VERSION'] == '5.2'
       gem 'activerecord', '>= 5.2.0.beta1'
       gem 'railties', '>= 5.2.0.beta1'
     else

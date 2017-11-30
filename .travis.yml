@@ -16,9 +16,9 @@ env:
   - DB=postgres ORM=active_record RAILS_VERSION=5.1
   - DB=mysql ORM=active_record RAILS_VERSION=5.1
   - DB=sqlite3 ORM=active_record RAILS_VERSION=5.1
-  - DB=postgres ORM=active_record RAILS_VERSION=latest
-  - DB=mysql ORM=active_record RAILS_VERSION=latest
-  - DB=sqlite3 ORM=active_record RAILS_VERSION=latest
+  - DB=postgres ORM=active_record RAILS_VERSION=5.2
+  - DB=mysql ORM=active_record RAILS_VERSION=5.2
+  - DB=sqlite3 ORM=active_record RAILS_VERSION=5.2
   - DB=postgres ORM=sequel SEQUEL_VERSION=4.41
   - DB=mysql ORM=sequel SEQUEL_VERSION=4.41
   - DB=sqlite3 ORM=sequel SEQUEL_VERSION=4.41

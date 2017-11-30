@@ -78,4 +78,10 @@ module Helpers
       it_behaves_like "Sequel Model with serialized translations", *args
     end
   end
+
+  module Generators
+    def version_string
+      "#{::ActiveRecord::VERSION::MAJOR}.#{::ActiveRecord::VERSION::MINOR}"
+    end
+  end
 end

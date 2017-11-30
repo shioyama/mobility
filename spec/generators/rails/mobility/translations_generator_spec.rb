@@ -3,6 +3,7 @@ require "spec_helper"
 describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record do
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase
+  include Helpers::Generators
   require "rails/generators/mobility/translations_generator"
 
   destination File.expand_path("../tmp", __FILE__)
@@ -17,6 +18,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
 
     context "translations table does not yet exist" do
       it "generates table translations migration creating translations table" do
+        version_string_ = version_string
         setup_generator
 
         expect(destination_root).to have_structure {
@@ -26,7 +28,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                 if ENV["RAILS_VERSION"] < "5.0"
                   contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration"
                 else
-                  contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
+                  contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
                 end
                 contains "def change"
                 contains "create_table :post_translations"
@@ -51,6 +53,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
       after  { ActiveRecord::Base.connection.drop_table   :post_translations }
 
       it "generates table translations migration adding columns to existing translations table" do
+        version_string_ = version_string
         setup_generator
 
         expect(destination_root).to have_structure {
@@ -60,7 +63,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                 if ENV["RAILS_VERSION"] < "5.0"
                   contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration"
                 else
-                  contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
+                  contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
                 end
                 contains "add_column :post_translations, :title, :string"
                 contains "add_index :post_translations, :title"
@@ -95,6 +98,8 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
       end
 
       it "generates column translations migration adding columns for each locale to model table" do
+        version_string_ = version_string
+
         expect(destination_root).to have_structure {
           directory "db" do
             directory "migrate" do
@@ -102,7 +107,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                 if ENV["RAILS_VERSION"] < "5.0"
                   contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration"
                 else
-                  contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
+                  contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration[#{version_string_}]"
                 end
                 contains "add_column :foos, :title_en, :string"
                 contains "add_index  :foos, :title_en"

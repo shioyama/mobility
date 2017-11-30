@@ -3,6 +3,7 @@ require "spec_helper"
 describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase
+  include Helpers::Generators
 
   destination File.expand_path("../tmp", __FILE__)
 
@@ -30,6 +31,8 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
     end
 
     it "generates migration for text translations table" do
+      version_string_ = version_string
+
       expect(destination_root).to have_structure {
         directory "db" do
           directory "migrate" do
@@ -37,7 +40,7 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
               if ENV["RAILS_VERSION"] < "5.0"
                 contains "class CreateTextTranslations < ActiveRecord::Migration"
               else
-                contains "class CreateTextTranslations < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
+                contains "class CreateTextTranslations < ActiveRecord::Migration[#{version_string_}]"
               end
               contains "def change"
               contains "create_table :mobility_text_translations"
@@ -52,6 +55,8 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
     end
 
     it "generates migration for string translations table" do
+      version_string_ = version_string
+
       expect(destination_root).to have_structure {
         directory "db" do
           directory "migrate" do
@@ -59,7 +64,7 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
               if ENV["RAILS_VERSION"] < "5.0"
                 contains "class CreateStringTranslations < ActiveRecord::Migration"
               else
-                contains "class CreateStringTranslations < ActiveRecord::Migration[#{ENV['RAILS_VERSION']}]"
+                contains "class CreateStringTranslations < ActiveRecord::Migration[#{version_string_}]"
               end
               contains "def change"
               contains "create_table :mobility_string_translations"

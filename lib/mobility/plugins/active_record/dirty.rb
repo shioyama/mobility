@@ -34,24 +34,28 @@ AR::Dirty plugin adds support for the following persistence-specific methods
             define_attribute_methods if ::ActiveRecord::VERSION::STRING >= '5.1'
           end
 
-          # Overrides +ActiveRecord::AttributeMethods::ClassMethods#has_attribute+ and
-          # +ActiveModel::AttributeMethods#_read_attribute+ to treat
-          # fallthrough attribute methods just like "real" attribute methods.
+          # Overrides +ActiveRecord::AttributeMethods::ClassMethods#has_attribute+ (in AR 5.1) and
+          # +ActiveModel::AttributeMethods#_read_attribute+ (in AR >= 5.2) to
+          # ensure that fallthrough attribute methods are treated like "real"
+          # attribute methods.
           #
-          # @note Patching +has_attribute?+ is necessary as of AR 5.1 due to this commit[https://github.com/rails/rails/commit/4fed08fa787a316fa51f14baca9eae11913f5050].
-          #   (I have voiced my opposition to this change here[https://github.com/rails/rails/pull/27963#issuecomment-310092787]).
+          # @note Patching +has_attribute?+ is necessary in AR 5.1 due to this commit[https://github.com/rails/rails/commit/4fed08fa787a316fa51f14baca9eae11913f5050].
           # @param [Attributes] attributes
           def included(model_class)
             super
-            names = @attribute_names
-            method_name_regex = /\A(#{names.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
-            has_attribute = Module.new do
-              define_method :has_attribute? do |attr_name|
-                super(attr_name) || !!method_name_regex.match(attr_name)
+
+            if ::ActiveRecord::VERSION::MAJOR == 5 && ::ActiveRecord::VERSION::MINOR == 1
+              names = @attribute_names
+              method_name_regex = /\A(#{names.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
+              has_attribute = Module.new do
+                define_method :has_attribute? do |attr_name|
+                  super(attr_name) || !!method_name_regex.match(attr_name)
+                end
               end
+              model_class.extend has_attribute
+            elsif ::ActiveRecord::VERSION::STRING >= '5.2'
+              model_class.include ReadAttribute
             end
-            model_class.extend has_attribute
-            model_class.include ReadAttribute if ::ActiveRecord::VERSION::STRING >= '5.2'
           end
 
           private

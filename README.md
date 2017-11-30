@@ -42,6 +42,10 @@ Mobility](http://dejimata.com/2017/3/3/translating-with-mobility). See also the
 works for future releases, and other pages of the [wiki][wiki] for more detail
 on usage.
 
+If you're coming from Globalize, be sure to also read the [Migrating from
+Globalize](https://github.com/shioyama/mobility/wiki/Migrating-from-Globalize)
+section of the wiki.
+
 Installation
 ------------
 

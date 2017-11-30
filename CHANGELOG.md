@@ -1,5 +1,21 @@
 # Mobility Changelog
 
+## 0.3
+
+### 0.3.0 (November 30, 2017)
+* `dup` support for table backend ([#84](https://github.com/shioyama/mobility/pull/84)). Thanks [@pwim](https://github.com/pwim)!
+* Disable fallbacks when using locale/fallthrough accessors
+  ([#86](https://github.com/shioyama/mobility/pull/86), [#87](https://github.com/shioyama/mobility/pull/87),
+  [#88](https://github.com/shioyama/mobility/pull/88), [#89](https://github.com/shioyama/mobility/pull/89))
+* Convert AttributeMethods to plugin
+  ([#102](https://github.com/shioyama/mobility/pull/102))
+* Ensure `cache_key` is invalidated when updating translations
+  ([#104](https://github.com/shioyama/mobility/pull/102)) Thanks
+  [@pwim](https://github.com/pwim)!
+* Update dependency versions ([#107](https://github.com/shioyama/mobility/pull/107))
+* Support new AR::Dirty methods ([#111](https://github.com/shioyama/mobility/pull/111))
+* Use `public_send` in LocaleAccessors plugin ([#117](https://github.com/shioyama/mobility/pull/117))
+
 ## 0.2
 
 ### 0.2.3 (September 14, 2017)

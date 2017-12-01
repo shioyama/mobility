@@ -55,4 +55,4 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
     include_accessor_examples 'JsonbPost'
     include_serialization_examples 'JsonbPost'
   end
-end if Mobility::Loaded::Sequel
+end if Mobility::Loaded::Sequel && ENV['DB'] == 'postgres'

@@ -47,4 +47,4 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
     include_accessor_examples 'HstorePost'
     include_serialization_examples 'HstorePost'
   end
-end if Mobility::Loaded::Sequel
+end if Mobility::Loaded::Sequel && ENV['DB'] == 'postgres'

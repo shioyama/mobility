@@ -19,8 +19,8 @@ group :development, :test do
   elsif ENV['ORM'] == 'sequel'
     if ENV['SEQUEL_VERSION'] == '4.41'
       gem 'sequel', '>= 4.41.0', '< 4.46.0'
-    elsif ENV['SEQUEL_VERSION'] == 'latest'
-      gem 'sequel', '>= 5.0.0'
+    elsif ENV['SEQUEL_VERSION'] == '5.0'
+      gem 'sequel', '>= 5.0.0', '< 6.0.0'
     else
       gem 'sequel', '>= 4.46.0', '< 5.0'
     end

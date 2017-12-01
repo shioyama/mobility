@@ -25,9 +25,9 @@ env:
   - DB=postgres ORM=sequel SEQUEL_VERSION=4.46
   - DB=mysql ORM=sequel SEQUEL_VERSION=4.46
   - DB=sqlite3 ORM=sequel SEQUEL_VERSION=4.46
-  - DB=postgres ORM=sequel SEQUEL_VERSION=latest
-  - DB=mysql ORM=sequel SEQUEL_VERSION=latest
-  - DB=sqlite3 ORM=sequel SEQUEL_VERSION=latest
+  - DB=postgres ORM=sequel SEQUEL_VERSION=5.0
+  - DB=mysql ORM=sequel SEQUEL_VERSION=5.0
+  - DB=sqlite3 ORM=sequel SEQUEL_VERSION=5.0
   - DB=sqlite3 ORM= TEST_PERFORMANCE=true
 matrix:
   fast_finish: true

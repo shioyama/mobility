@@ -5,6 +5,12 @@ module Mobility
 Defines value or proc to fall through to if return value from getter would
 otherwise be nil.
 
+If default is a proc, it is passed a hash with four keyword arguments:
+- +model+: the model instance
+- +attribute+: the attribute name (a String)
+- +locale+: the locale (a Symbol)
+- +options+: hash of options passed in to accessor
+
 @example With default enabled (falls through to default value)
   class Post
     extend Mobility
@@ -40,12 +46,13 @@ otherwise be nil.
 @example Using Proc as default
   class Post
     extend Mobility
-    translates :title, default: lambda { |model:, attribute:| attribute.to_s }
+    translates :title, default: lambda { |attribute:, locale:| "#{attribute} in #{locale}" }
   end
 
+  Mobility.locale = :en
   post = Post.new(title: nil)
   post.title
-  #=> "title"
+  #=> "title in en"
 
   post.title(default: lambda { |model:| model.class.name.to_s })
   #=> "Post"
@@ -62,7 +69,11 @@ otherwise be nil.
         define_method :read do |locale, options = {}|
           default = options.has_key?(:default) ? options.delete(:default) : default_option
           if (value = super(locale, options)).nil?
-            default.is_a?(Proc) ? default.call(model: model, attribute: attribute) : default
+            return default unless default.is_a?(Proc)
+            default.call(model: model,
+                         attribute: attribute,
+                         locale: locale,
+                         options: options)
           else
             value
           end

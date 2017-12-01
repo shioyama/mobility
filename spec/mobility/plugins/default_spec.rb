@@ -51,19 +51,27 @@ describe Mobility::Plugins::Default do
         expect(backend.read(:fr, default: false)).to eq(false)
       end
 
-      context "default is a Proc" do
-        let(:default) { lambda { |model:, attribute:| "#{model} #{attribute}" } }
+      context "default is a Proc", focus: true do
+        let(:default) { Proc.new {} }
 
         it "calls default with model and attribute as args if default is a Proc" do
-          expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(nil)
-          expect(backend.read(:fr)).to eq('model title')
+          expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
+          expect(default).to receive(:call).with(model: "model",
+                                                 attribute: "title",
+                                                 locale: :fr,
+                                                 options: { this: 'option' }).and_return('default')
+          expect(backend.read(:fr, this: 'option')).to eq('default')
         end
 
         it "calls default with model and attribute as args if default option is a Proc" do
-          expect(backend_double).to receive(:read).once.with(:fr, {}).and_return(nil)
-          expect(backend.read(:fr, default: lambda do |model:, attribute:|
-            "#{model} #{attribute} from options"
-          end)).to eq('model title from options')
+          expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
+          default_as_option = Proc.new {}
+          expect(default).not_to receive(:call)
+          expect(default_as_option).to receive(:call).with(model: "model",
+                                                           attribute: "title",
+                                                           locale: :fr,
+                                                           options: { this: 'option' }).and_return("default as option")
+          expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default as option")
         end
       end
     end

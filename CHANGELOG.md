@@ -2,6 +2,9 @@
 
 ## 0.3
 
+### 0.3.1 (December 1, 2017)
+* Disable AR::Dirty method overrides for AR >= 5.2 (and < 5.1 for `has_attribute`) ([#120](https://github.com/shioyama/mobility/pull/120))
+
 ### 0.3.0 (November 30, 2017)
 * `dup` support for table backend ([#84](https://github.com/shioyama/mobility/pull/84)). Thanks [@pwim](https://github.com/pwim)!
 * Disable fallbacks when using locale/fallthrough accessors

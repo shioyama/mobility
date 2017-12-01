@@ -2,6 +2,9 @@
 
 ## 0.3
 
+### 0.3.2 (December 1, 2017)
+* Fix issue with querying on translated attributes with Sequel Table backend ([#121](https://github.com/shioyama/mobility/pull/121))
+
 ### 0.3.1 (December 1, 2017)
 * Disable AR::Dirty method overrides for AR >= 5.2 (and < 5.1 for `has_attribute`) ([#120](https://github.com/shioyama/mobility/pull/120))
 

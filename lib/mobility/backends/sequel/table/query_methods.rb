@@ -19,8 +19,11 @@ module Mobility
 
       def define_join_method(association_name, translation_class, table_name: nil, foreign_key: nil, **)
         define_method :"join_#{association_name}" do |**options|
-          return self if (@__mobility_table_joined || []).include?(table_name)
-          (@__mobility_table_joined ||= []) << table_name
+          if joins = @opts[:join]
+            # Return self if we've already joined this table
+            return self if joins.find { |clause| clause.table_expr == table_name }
+          end
+
           join_type = options[:outer_join] ? :left_outer : :inner
           join_table(join_type,
                      translation_class.table_name,

@@ -37,7 +37,13 @@ namespace :db do
 
   desc "Set up the database schema"
   task up: :setup do
-    require "spec_helper"
+    orm = ENV['ORM']
+    return unless orm
+
+    require orm
+    require "database"
+    require "#{orm}/schema"
+    DB = Mobility::Test::Database.connect(orm)
     Mobility::Test::Schema.up
   end
 

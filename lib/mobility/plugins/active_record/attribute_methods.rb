@@ -1,11 +1,5 @@
 module Mobility
   module Plugins
-=begin
-
-Module builder adding translated attributes to #attributes hash on model
-instance. See {Mobility::Plugins::AttributeMethods} for further details.
-
-=end
     module ActiveRecord
       module TranslatedAttributes
         def translated_attributes
@@ -17,6 +11,12 @@ instance. See {Mobility::Plugins::AttributeMethods} for further details.
         end
       end
 
+=begin
+
+Module builder adding translated attributes to #attributes hash on model
+instance. See {Mobility::Plugins::AttributeMethods} for further details.
+
+=end
       class AttributeMethods < Module
         def initialize(*attribute_names)
           include TranslatedAttributes

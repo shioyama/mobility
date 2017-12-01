@@ -9,6 +9,7 @@ Dirty tracking for Mobility attributes. See class-specific implementations for
 details.
 
 @see Mobility::Plugins::ActiveModel::Dirty
+@see Mobility::Plugins::ActiveRecord::Dirty
 @see Mobility::Plugins::Sequel::Dirty
 
 @note Dirty tracking can have unexpected results when combined with fallbacks.

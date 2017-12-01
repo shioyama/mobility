@@ -3,6 +3,7 @@ require "mobility/plugins/active_model/dirty"
 
 module Mobility
   module Plugins
+    module ActiveRecord
 =begin
 
 Dirty tracking for AR models. See {Mobility::Plugins::ActiveModel::Dirty} for
@@ -20,7 +21,6 @@ AR::Dirty plugin adds support for the following persistence-specific methods
 - +title_in_database+
 
 =end
-    module ActiveRecord
       module Dirty
         include ActiveModel::Dirty
 

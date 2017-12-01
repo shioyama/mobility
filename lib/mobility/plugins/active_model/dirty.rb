@@ -2,6 +2,7 @@
 
 module Mobility
   module Plugins
+    module ActiveModel
 =begin
 
 Dirty tracking for models which include the +ActiveModel::Dirty+ module.
@@ -22,7 +23,6 @@ value of the translated attribute if passed to it.
 @see http://api.rubyonrails.org/classes/ActiveModel/Dirty.html Rails documentation for Active Model Dirty module
 
 =end
-    module ActiveModel
       module Dirty
         # @!group Backend Accessors
         # @!macro backend_writer

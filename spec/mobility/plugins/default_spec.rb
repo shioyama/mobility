@@ -51,7 +51,7 @@ describe Mobility::Plugins::Default do
         expect(backend.read(:fr, default: false)).to eq(false)
       end
 
-      context "default is a Proc", focus: true do
+      context "default is a Proc" do
         let(:default) { Proc.new {} }
 
         it "calls default with model and attribute as args if default is a Proc" do

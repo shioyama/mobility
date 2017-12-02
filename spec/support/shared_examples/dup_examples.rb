@@ -17,6 +17,10 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
     save_or_raise(dupped_instance)
     expect(dupped_instance.send(attribute)).to eq(instance.send(attribute))
 
+    # Ensure duped instances are pointing to different objects
+    instance_backend.write(:en, "bar")
+    expect(dupped_backend.read(:en)).to eq("foo")
+
     # Ensure we haven't mucked with the original instance
     instance.reload
 
@@ -34,6 +38,10 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
 
     save_or_raise(instance)
     save_or_raise(dupped_instance)
+
+    # Ensure duped instances are pointing to different objects
+    instance.send("#{attribute}=", "bar")
+    expect(dupped_instance.send(attribute)).to eq("foo")
 
     # Ensure we haven't mucked with the original instance
     instance.reload

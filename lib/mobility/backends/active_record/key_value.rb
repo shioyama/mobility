@@ -70,6 +70,19 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
         after_destroy :mobility_destroy_key_value_translations
 
+        module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"
+        unless const_defined?(module_name)
+          callback_methods = Module.new do
+            define_method :initialize_dup do |source|
+              super(source)
+              self.send("#{association_name}=", source.send(association_name).map(&:dup))
+              # Set inverse on associations
+              send(association_name).each { |translation| translation.translatable = self }
+            end
+          end
+          include const_set(module_name, callback_methods)
+        end
+
         private
 
         # Clean up *all* leftover translations of this model, only once.

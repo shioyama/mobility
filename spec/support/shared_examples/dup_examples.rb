@@ -17,6 +17,12 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
     save_or_raise(dupped_instance)
     expect(dupped_instance.send(attribute)).to eq(instance.send(attribute))
 
+    if ENV['ORM'] == 'active_record'
+      # Ensure duped instances are pointing to different objects
+      instance_backend.write(:en, "bar")
+      expect(dupped_backend.read(:en)).to eq("foo")
+    end
+
     # Ensure we haven't mucked with the original instance
     instance.reload
 
@@ -35,6 +41,11 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
     save_or_raise(instance)
     save_or_raise(dupped_instance)
 
+    if ENV['ORM'] == 'active_record'
+      instance.send("#{attribute}=", "bar")
+      expect(dupped_instance.send(attribute)).to eq("foo")
+    end
+
     # Ensure we haven't mucked with the original instance
     instance.reload
     dupped_instance.reload
@@ -52,7 +63,7 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
   end
 
   def skip_if_duping_not_implemented
-    if described_class < Mobility::Backends::KeyValue
+    if ENV['ORM'] == 'sequel' && described_class < Mobility::Backends::KeyValue
       skip "Duping has not been properly implemented"
     end
   end

@@ -6,7 +6,7 @@ Mobility
 [![Dependency Status](https://gemnasium.com/shioyama/mobility.svg)][gemnasium]
 [![Code Climate](https://api.codeclimate.com/v1/badges/72200f2b00c339ec4537/maintainability.svg)][codeclimate]
 
-[![Join the chat at https://gitter.im/mobility-ruby/Lobby](https://badges.gitter.im/mobility-ruby/Lobby.svg)](https://gitter.im/mobility-ruby/Lobby)
+[![Gitter Chat](https://badges.gitter.im/mobility-ruby/mobility.svg)](https://gitter.im/mobility-ruby/mobility)
 
 [gem]: https://rubygems.org/gems/mobility
 [travis]: https://travis-ci.org/shioyama/mobility

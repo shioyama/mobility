@@ -4,7 +4,7 @@ Mobility
 [![Gem Version](https://badge.fury.io/rb/mobility.svg)][gem]
 [![Build Status](https://travis-ci.org/shioyama/mobility.svg?branch=master)][travis]
 [![Dependency Status](https://gemnasium.com/shioyama/mobility.svg)][gemnasium]
-[![Code Climate](https://codeclimate.com/github/shioyama/mobility/badges/gpa.svg)][codeclimate]
+[![Code Climate](https://api.codeclimate.com/v1/badges/72200f2b00c339ec4537/maintainability.svg)][codeclimate]
 
 [![Join the chat at https://gitter.im/mobility-ruby/Lobby](https://badges.gitter.im/mobility-ruby/Lobby.svg)](https://gitter.im/mobility-ruby/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 

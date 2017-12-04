@@ -1,6 +1,8 @@
 Mobility
 ========
 
+[![Join the chat at https://gitter.im/mobility-ruby/Lobby](https://badges.gitter.im/mobility-ruby/Lobby.svg)](https://gitter.im/mobility-ruby/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Gem Version](https://badge.fury.io/rb/mobility.svg)][gem]
 [![Build Status](https://travis-ci.org/shioyama/mobility.svg?branch=master)][travis]
 [![Dependency Status](https://gemnasium.com/shioyama/mobility.svg)][gemnasium]

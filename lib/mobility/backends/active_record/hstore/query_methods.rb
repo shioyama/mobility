@@ -12,18 +12,16 @@ module Mobility
             opts = opts.with_indifferent_access
             infix = Arel::Nodes::InfixOperation
 
-            i18n_query = i18n_keys.inject(nil) { |ops, attr|
-              column = m[attr.to_sym]
-              value = opts.delete(attr)
+            i18n_query = i18n_keys.map { |key|
+              column = m[key.to_sym]
+              value = opts.delete(key)
 
-              op =
-                if value.nil?
-                  infix.new(:'?', column, locale).not
-                else
-                  infix.new(:'->', m[attr.to_sym], locale).eq(value)
-                end
-              ops ? ops.and(op) : op
-            }
+              if value.nil?
+                infix.new(:'?', column, locale).not
+              else
+                infix.new(:'->', m[key.to_sym], locale).eq(value)
+              end
+            }.inject(&:and)
 
             opts.empty? ? super(i18n_query) : super(opts, *rest).where(i18n_query)
           else
@@ -44,14 +42,13 @@ module Mobility
               opts = opts.with_indifferent_access
               infix = Arel::Nodes::InfixOperation
 
-              i18n_query = i18n_keys.inject(nil) { |ops, attr|
-                column = m[attr.to_sym]
-                value = Arel::Nodes.build_quoted(opts.delete(attr).to_s)
+              i18n_query = i18n_keys.map { |key|
+                column = m[key.to_sym]
+                value = Arel::Nodes.build_quoted(opts.delete(key).to_s)
                 has_key = infix.new(:'?', column, locale)
                 not_eq_value = infix.new(:'->', column, locale).not_eq(value)
-                op = has_key.and(not_eq_value)
-                ops ? ops.and(op) : op
-              }
+                has_key.and(not_eq_value)
+              }.inject(&:and)
 
               super(opts, *rest).where(i18n_query)
             else

@@ -2,6 +2,10 @@
 
 ## 0.3
 
+### 0.3.3 (December 5, 2017)
+* Fix duping for AR KeyValue backend ([#126](https://github.com/shioyama/mobility/pull/126))
+* Pass locale and options to Proc in default plugin ([#122](https://github.com/shioyama/mobility/pull/122))
+
 ### 0.3.2 (December 1, 2017)
 * Fix issue with querying on translated attributes with Sequel Table backend ([#121](https://github.com/shioyama/mobility/pull/121))
 

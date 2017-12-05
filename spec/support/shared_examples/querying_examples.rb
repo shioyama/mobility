@@ -152,10 +152,10 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
       @instance1 = model_class.create(attribute1 => "foo"                                               )
       @instance2 = model_class.create(attribute1 => "foo", attribute2 => "foo content"                  )
       @instance3 = model_class.create(attribute1 => "foo", attribute2 => "foo content", published: false)
-      @instance4 = model_class.create(                          attribute2 => "foo content"                  )
+      @instance4 = model_class.create(                     attribute2 => "foo content"                  )
       @instance5 = model_class.create(attribute1 => "bar", attribute2 => "bar content", published: true )
       @instance6 = model_class.create(attribute1 => "bar", attribute2 => "baz content", published: false)
-      @instance7 = model_class.create(                                                       published: true)
+      @instance7 = model_class.create(                                                  published: true )
     end
 
     # @note Regression spec

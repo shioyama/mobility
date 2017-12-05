@@ -673,9 +673,9 @@ WHERE "content_mobility_text_translations"."value" = 'bar'
 As can be seen in the query above, behind the scenes Mobility joins two tables,
 one with string translations and one with text translations, and aliases the
 joins for each attribute so as to match the particular values passed in to the
-query. Details of how this is done can be found in the [API documentation for
-AR query
-methods](http://www.rubydoc.info/gems/mobility/Mobility/Backend/ActiveRecord/KeyValue/QueryMethods).
+query. Details of how this is done can be found in the [Wiki page for the
+KeyValue
+backend](https://github.com/shioyama/mobility/wiki/KeyValue-Backend#querying).
 
 If you would prefer to avoid the `i18n` scope everywhere, define it as a
 default scope on your model:

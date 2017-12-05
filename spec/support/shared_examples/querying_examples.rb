@@ -120,6 +120,22 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
       end
     end
 
+    context "with array of values" do
+      before do
+        @instance1 = model_class.create(attribute1 => "foo")
+        @instance2 = model_class.create(attribute1 => "bar")
+        @instance3 = model_class.create(attribute1 => "baz")
+
+        Mobility.with_locale(:ja) do
+          @ja_instance1 = model_class.create(attribute1 => "foo")
+        end
+      end
+
+      it "returns records with matching translated attribute values" do
+        expect(query_scope.where(attribute1 => ["foo", "baz"])).to match_array([@instance1, @instance3])
+      end
+    end
+
     context "with single table inheritance" do
       let(:sti_model) { Class.new(model_class) }
 
@@ -164,6 +180,11 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
 
     it "works in combination with untranslated attributes" do
       expect(query_scope.where.not(attribute1 => "foo", published: true)).to eq([@instance6])
+    end
+
+    it "works with array of values" do
+      instance = model_class.create(attribute1 => "baz")
+      expect(query_scope.where.not(attribute1 => ["foo", "bar"])).to match_array([instance])
     end
   end
 end
@@ -273,6 +294,22 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
             expect(query_scope.where(attribute1 => "foo ja", attribute2 => "foo content ja").select_all(table_name).all).to eq([@ja_instance1])
           end
         end
+      end
+    end
+
+    context "with array of values" do
+      before do
+        @instance1 = model_class.create(attribute1 => "foo")
+        @instance2 = model_class.create(attribute1 => "bar")
+        @instance3 = model_class.create(attribute1 => "baz")
+
+        Mobility.with_locale(:ja) do
+          @ja_instance1 = model_class.create(attribute1 => "foo")
+        end
+      end
+
+      it "returns records with matching translated attribute values" do
+        expect(query_scope.where(attribute1 => ["foo", "baz"]).select_all(table_name).all).to match_array([@instance1, @instance3])
       end
     end
   end

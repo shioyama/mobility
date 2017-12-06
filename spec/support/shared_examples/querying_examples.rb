@@ -301,14 +301,14 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
 
   describe ".or" do
     before do
-      @instance1 = model_class.create(attribute1 => "foo"                             , published: true )
-      @instance2 = model_class.create(attribute1 => "foo", attribute2 => "baz content", published: true )
+      @instance1 = model_class.create(attribute1 => "baz", attribute2 => "foo content", published: true )
+      @instance2 = model_class.create(attribute1 => "foo", attribute2 => "baz content", published: false )
       @instance3 = model_class.create(attribute1 => "bar", attribute2 => "foo content", published: false)
     end
     let(:backend_class) { model_class.mobility.modules.first.backend_class.superclass }
 
     it "returns union of queries" do
-      expect(query_scope.where(published: true).or(attribute2 => "baz content").select_all(table_name).all).to match_array([@instance1, @instance2])
+      expect(query_scope.where(published: true).or(attribute1 => "foo").select_all(table_name).all).to match_array([@instance1, @instance2])
     end
 
     it "works with set of translated and untranslated attributes" do
@@ -318,7 +318,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       # avoid without modification of an earlier dataset, which is probably not
       # a good idea.
       skip "Not supported by #{backend_class.name}" if [Mobility::Backends::Sequel::Table, Mobility::Backends::Sequel::KeyValue].include?(backend_class)
-      expect(query_scope.where(published: false).or(:published => true, attribute2 => "baz content")).to match_array([@instance2, @instance3])
+      expect(query_scope.where(attribute1 => "foo").or(:published => false, attribute2 => "foo content").select_all(table_name).all).to match_array([@instance2, @instance3])
     end
   end
 

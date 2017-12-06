@@ -10,20 +10,15 @@ module Mobility
         define_method :where! do |opts, *rest|
           if i18n_keys = q.extract_attributes(opts)
             m = arel_table
-            locale = Arel::Nodes.build_quoted(Mobility.locale.to_s)
             opts = opts.with_indifferent_access
-            infix = Arel::Nodes::InfixOperation
 
             i18n_query = i18n_keys.map { |key|
               column = m[key.to_sym]
               value = opts.delete(key)
 
-              if value.nil?
-                infix.new(:'?', column, locale).not
-              else
-                predicate = Arel::Nodes.build_quoted({ Mobility.locale => value }.to_json)
-                infix.new(:'@>', m[key.to_sym], predicate)
-              end
+              value.nil? ?
+                q.has_locale(column).not :
+                q.contains_value(column, value)
             }.inject(&:and)
 
             opts.empty? ? super(i18n_query) : super(opts, *rest).where(i18n_query)
@@ -41,16 +36,12 @@ module Mobility
         mod = Module.new do
           define_method :not do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
-              locale = Arel::Nodes.build_quoted(Mobility.locale.to_s)
               opts = opts.with_indifferent_access
-              infix = Arel::Nodes::InfixOperation
 
               i18n_query = i18n_keys.map { |key|
                 column = m[key.to_sym]
-                has_key = infix.new(:'?', column, locale)
-                predicate = Arel::Nodes.build_quoted({ Mobility.locale => opts.delete(key) }.to_json)
-                not_eq_value = infix.new(:'@>', m[key.to_sym], predicate).not
-                has_key.and(not_eq_value)
+                q.has_locale(column).
+                  and(q.contains_value(column, opts.delete(key)).not)
               }.inject(&:and)
 
               super(opts, *rest).where(i18n_query)
@@ -60,6 +51,24 @@ module Mobility
           end
         end
         relation.mobility_where_chain.include(mod)
+      end
+
+      def contains_value(column, value)
+        build_infix(:'@>', column, Arel::Nodes.build_quoted({ Mobility.locale => value }.to_json))
+      end
+
+      def has_locale(column)
+        build_infix(:'?', column, quoted_locale)
+      end
+
+      private
+
+      def build_infix(*args)
+        Arel::Nodes::InfixOperation.new(*args)
+      end
+
+      def quoted_locale
+        Arel::Nodes.build_quoted(Mobility.locale.to_s)
       end
     end
   end

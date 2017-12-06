@@ -260,4 +260,5 @@ module Mobility
 
   class BackendRequired < ArgumentError; end
   class InvalidLocale < I18n::InvalidLocale; end
+  class NotImplementedError < StandardError; end
 end

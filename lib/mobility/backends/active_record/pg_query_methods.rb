@@ -72,6 +72,10 @@ code.
 
         private
 
+        def contains_value(_column, _value)
+          raise NotImplementedError
+        end
+
         def has_locale(column)
           build_infix(:'?', column, quoted_locale)
         end

@@ -3,22 +3,24 @@ require "mobility/backends/active_record/query_methods"
 module Mobility
   module Backends
     class ActiveRecord::Serialized::QueryMethods < ActiveRecord::QueryMethods
+      include Serialized
+
       def initialize(attributes, _)
         super
-        opts_checker = @opts_checker = Backends::Serialized.attr_checker(self)
+        q = self
 
         define_method :where! do |opts, *rest|
-          opts_checker.call(opts) || super(opts, *rest)
+          q.check_opts(opts) || super(opts, *rest)
         end
       end
 
       def extended(relation)
         super
-        opts_checker = @opts_checker
+        q = self
 
         mod = Module.new do
           define_method :not do |opts, *rest|
-            opts_checker.call(opts) || super(opts, *rest)
+            q.check_opts(opts) || super(opts, *rest)
           end
         end
         relation.mobility_where_chain.include(mod)

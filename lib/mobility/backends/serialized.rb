@@ -61,9 +61,9 @@ Format for serialization. Either +:yaml+ (default) or +:json+.
           end
         end
 
-        def attr_checker(attributes_extractor)
+        def attr_checker(query_methods)
           lambda do |cond|
-            if keys = attributes_extractor.call(cond)
+            if keys = query_methods.extract_attributes(cond)
               raise ArgumentError,
                 "You cannot query on mobility attributes translated with the Serialized backend (#{keys.join(", ")})."
             end

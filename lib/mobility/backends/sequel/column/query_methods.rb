@@ -5,11 +5,11 @@ module Mobility
     class Sequel::Column::QueryMethods < Sequel::QueryMethods
       def initialize(attributes, _)
         super
-        attributes_extractor = @attributes_extractor
+        q = self
 
         %w[exclude or where].each do |method_name|
           define_method method_name do |*conds, &block|
-            if keys = attributes_extractor.call(conds.first)
+            if keys = q.extract_attributes(conds.first)
               cond = conds.first.dup
               keys.each { |attr| cond[Column.column_name_for(attr)] = cond.delete(attr) }
               super(cond, &block)

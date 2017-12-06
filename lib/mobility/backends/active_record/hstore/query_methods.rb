@@ -3,10 +3,10 @@ module Mobility
     class ActiveRecord::Hstore::QueryMethods < ActiveRecord::QueryMethods
       def initialize(attributes, _)
         super
-        attributes_extractor = @attributes_extractor
+        q = self
 
         define_method :where! do |opts, *rest|
-          if i18n_keys = attributes_extractor.call(opts)
+          if i18n_keys = q.extract_attributes(opts)
             m = arel_table
             locale = Arel::Nodes.build_quoted(Mobility.locale.to_s)
             opts = opts.with_indifferent_access
@@ -32,12 +32,12 @@ module Mobility
 
       def extended(relation)
         super
-        attributes_extractor = @attributes_extractor
+        q = self
         m = relation.model.arel_table
 
         mod = Module.new do
           define_method :not do |opts, *rest|
-            if i18n_keys = attributes_extractor.call(opts)
+            if i18n_keys = q.extract_attributes(opts)
               locale = Arel::Nodes.build_quoted(Mobility.locale.to_s)
               opts = opts.with_indifferent_access
               infix = Arel::Nodes::InfixOperation

@@ -21,13 +21,13 @@ module Mobility
 
       def extended(relation)
         super
-        association_name     = @association_name
-        attributes_extractor = @attributes_extractor
-        translation_class    = @translation_class
+        association_name  = @association_name
+        translation_class = @translation_class
+        q                 = self
 
         mod = Module.new do
           define_method :not do |opts, *rest|
-            if i18n_keys = attributes_extractor.call(opts)
+            if i18n_keys = q.extract_attributes(opts)
               opts = opts.with_indifferent_access
               i18n_keys.each { |attr| opts["#{translation_class.table_name}.#{attr}"] = opts.delete(attr) }
               super(opts, *rest).send("join_#{association_name}")
@@ -55,7 +55,7 @@ module Mobility
       end
 
       def define_query_methods(association_name, translation_class, **)
-        attributes_extractor = @attributes_extractor
+        q = self
 
         # Note that Mobility will try to use inner/outer joins appropriate to the query,
         # so for example:
@@ -85,7 +85,7 @@ module Mobility
         # Article.where(title: nil, content: "foo") #=> INNER JOIN
         #
         define_method :where! do |opts, *rest|
-          if i18n_keys = attributes_extractor.call(opts)
+          if i18n_keys = q.extract_attributes(opts)
             opts = opts.with_indifferent_access
             options = { outer_join: i18n_keys.all? { |attr| opts[attr].nil? } }
             i18n_keys.each { |attr| opts["#{translation_class.table_name}.#{attr}"] = opts.delete(attr) }

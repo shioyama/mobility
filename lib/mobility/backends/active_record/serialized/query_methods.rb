@@ -5,8 +5,7 @@ module Mobility
     class ActiveRecord::Serialized::QueryMethods < ActiveRecord::QueryMethods
       def initialize(attributes, _)
         super
-        attributes_extractor = @attributes_extractor
-        opts_checker = @opts_checker = Backends::Serialized.attr_checker(attributes_extractor)
+        opts_checker = @opts_checker = Backends::Serialized.attr_checker(self)
 
         define_method :where! do |opts, *rest|
           opts_checker.call(opts) || super(opts, *rest)

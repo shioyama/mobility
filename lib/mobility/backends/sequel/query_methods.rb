@@ -13,9 +13,10 @@ models. For details see backend-specific subclasses.
         # @param [Array<String>] attributes Translated attributes
         def initialize(attributes, _)
           @attributes = attributes.map!(&:to_sym)
-          @attributes_extractor = lambda do |cond|
-            cond.is_a?(Hash) && Util.presence(cond.keys & attributes)
-          end
+        end
+
+        def extract_attributes(cond)
+          cond.is_a?(Hash) && Util.presence(cond.keys & @attributes)
         end
       end
     end

@@ -4,13 +4,13 @@ module Mobility
       private
 
       def define_query_methods(column_type)
-        attributes_extractor = @attributes_extractor
+        q = self
 
         %w[exclude or where].each do |method_name|
           invert = method_name == "exclude"
 
           define_method method_name do |*cond, &block|
-            if i18n_keys = attributes_extractor.call(cond.first)
+            if i18n_keys = q.extract_attributes(cond.first)
               locale = Mobility.locale.to_s
               cond = cond.first
 

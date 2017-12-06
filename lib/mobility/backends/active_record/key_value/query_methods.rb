@@ -19,12 +19,12 @@ module Mobility
 
       def extended(relation)
         super
-        association_name     = @association_name
-        attributes_extractor = @attributes_extractor
+        association_name = @association_name
+        q = self
 
         mod = Module.new do
           define_method :not do |opts, *rest|
-            if i18n_keys = attributes_extractor.call(opts)
+            if i18n_keys = q.extract_attributes(opts)
               opts = opts.with_indifferent_access
               i18n_keys.each { |attr| opts["#{attr}_#{association_name}"] = { value: opts.delete(attr) }}
               super(opts, *rest).send(:"join_#{association_name}", *i18n_keys)
@@ -54,10 +54,10 @@ module Mobility
       end
 
       def define_query_methods(association_name)
-        attributes_extractor = @attributes_extractor
+        q = self
 
         define_method :where! do |opts, *rest|
-          if i18n_keys = attributes_extractor.call(opts)
+          if i18n_keys = q.extract_attributes(opts)
             opts = opts.with_indifferent_access
             i18n_nulls = i18n_keys.select { |key| opts[key].nil? }
             i18n_keys.each { |attr| opts["#{attr}_#{association_name}"] = { value: opts.delete(attr) }}

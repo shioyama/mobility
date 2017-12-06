@@ -36,11 +36,11 @@ module Mobility
       end
 
       def define_query_methods(association_name)
-        attributes_extractor = @attributes_extractor
+        q = self
 
         %w[exclude or where].each do |method_name|
           define_method method_name do |*conds, &block|
-            if i18n_keys = attributes_extractor.call(conds.first)
+            if i18n_keys = q.extract_attributes(conds.first)
               cond = conds.first.dup
               i18n_nulls = i18n_keys.select { |key| cond[key].nil? }
               i18n_keys.each { |attr| cond[::Sequel[:"#{attr}_#{association_name}"][:value]] = cond.delete(attr) }

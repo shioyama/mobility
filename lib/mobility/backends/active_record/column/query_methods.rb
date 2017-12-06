@@ -5,17 +5,10 @@ module Mobility
     class ActiveRecord::Column::QueryMethods < ActiveRecord::QueryMethods
       def initialize(attributes, _)
         super
-        attributes_extractor = @attributes_extractor
-        @opts_converter = opts_converter = lambda do |opts|
-          if i18n_keys = attributes_extractor.call(opts)
-            opts = opts.with_indifferent_access
-            i18n_keys.each { |attr| opts[Column.column_name_for(attr)] = opts.delete(attr) }
-          end
-          return opts
-        end
+        q = self
 
         define_method :where! do |opts, *rest|
-          super(opts_converter.call(opts), *rest)
+          super(q.convert_opts(opts), *rest)
         end
 
         attributes.each do |attribute|
@@ -27,14 +20,22 @@ module Mobility
 
       def extended(relation)
         super
-        opts_converter = @opts_converter
+        q = self
 
         mod = Module.new do
           define_method :not do |opts, *rest|
-            super(opts_converter.call(opts), *rest)
+            super(q.convert_opts(opts), *rest)
           end
         end
         relation.mobility_where_chain.include(mod)
+      end
+
+      def convert_opts(opts)
+        if i18n_keys = extract_attributes(opts)
+          opts = opts.with_indifferent_access
+          i18n_keys.each { |attr| opts[Column.column_name_for(attr)] = opts.delete(attr) }
+        end
+        opts
       end
     end
   end

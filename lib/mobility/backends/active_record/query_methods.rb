@@ -11,9 +11,6 @@ models. For details see backend-specific subclasses.
         # @param [Array<String>] attributes Translated attributes
         def initialize(attributes, _)
           @attributes = attributes
-          @attributes_extractor = lambda do |opts|
-            opts.is_a?(Hash) && (opts.keys.map(&:to_s) & attributes).presence
-          end
         end
 
         # @param [ActiveRecord::Relation] relation Relation being extended
@@ -29,6 +26,10 @@ models. For details see backend-specific subclasses.
               opts == :chain ? mobility_where_chain.new(spawn) : super(opts, *rest)
             end
           end
+        end
+
+        def extract_attributes(opts)
+          opts.is_a?(Hash) && (opts.keys.map(&:to_s) & @attributes).presence
         end
       end
     end

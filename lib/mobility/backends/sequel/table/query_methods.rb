@@ -35,14 +35,14 @@ module Mobility
       end
 
       def define_query_methods(association_name, translation_class, **)
-        attributes_extractor = @attributes_extractor
+        q = self
 
         # See note in AR Table QueryMethods class about limitations of
         # query methods on translated attributes when searching on nil values.
         #
         %w[exclude or where].each do |method_name|
           define_method method_name do |*conds, &block|
-            if i18n_keys = attributes_extractor.call(conds.first)
+            if i18n_keys = q.extract_attributes(conds.first)
               cond = conds.first.dup
               outer_join = method_name == "or" || i18n_keys.all? { |key| cond[key].nil? }
               i18n_keys.each { |attr| cond[::Sequel[translation_class.table_name][attr]] = cond.delete(attr) }

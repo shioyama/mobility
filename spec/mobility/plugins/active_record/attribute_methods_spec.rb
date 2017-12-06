@@ -25,12 +25,6 @@ describe Mobility::Plugins::ActiveRecord::AttributeMethods, orm: :active_record 
 
   subject { Article.new }
 
-  describe "#translated_attribute_names" do
-    it 'returns title' do
-      expect(subject.translated_attribute_names).to include('title')
-    end
-  end
-
   describe "#translated_attributes" do
     it "returns hash of translated attribute names/values" do
       expect(subject.translated_attributes).to eq("title" => "foo")

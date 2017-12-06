@@ -16,6 +16,7 @@ Module loading ActiveRecord-specific classes for Mobility models.
       model_class.extend query_method
       model_class.const_set(:UniquenessValidator,
                             Class.new(::Mobility::ActiveRecord::UniquenessValidator))
+      model_class.delegate :translated_attribute_names, to: :class
     end
   end
 end

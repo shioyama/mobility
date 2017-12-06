@@ -25,7 +25,6 @@ instance. See {Mobility::Plugins::AttributeMethods} for further details.
               attributes.merge(name.to_s => send(name))
             end)
           end
-          delegate :translated_attribute_names, to: :class
         end
 
         def included(model_class)

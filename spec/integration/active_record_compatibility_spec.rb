@@ -122,6 +122,13 @@ describe "ActiveRecord compatibility", orm: :active_record do
       post.content = "bar"
       expect(post.untranslated_attributes).to eq({ "published" => post.published, "id" => post.id })
     end
-
   end
+
+  describe "#translated_attribute_names" do
+    it "delegates to class method" do
+      post = Post.new
+      expect(post.translated_attribute_names).to match_array(%w[title content])
+    end
+  end
+
 end

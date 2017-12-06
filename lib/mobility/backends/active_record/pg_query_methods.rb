@@ -21,19 +21,10 @@ code.
 
           define_method :where! do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
-              m = arel_table
               opts = opts.with_indifferent_access
+              query = q.create_where_query(opts, i18n_keys, arel_table)
 
-              i18n_query = i18n_keys.map { |key|
-                column = m[key.to_sym]
-                value = opts.delete(key)
-
-                value.nil? ?
-                  q.has_locale(column).not :
-                  q.contains_value(column, value)
-              }.inject(&:and)
-
-              opts.empty? ? super(i18n_query) : super(opts, *rest).where(i18n_query)
+              opts.empty? ? super(query) : super(opts, *rest).where(query)
             else
               super(opts, *rest)
             end
@@ -49,14 +40,9 @@ code.
             define_method :not do |opts, *rest|
               if i18n_keys = q.extract_attributes(opts)
                 opts = opts.with_indifferent_access
+                query = q.create_not_query(opts, i18n_keys, m)
 
-                i18n_query = i18n_keys.map { |key|
-                  column = m[key.to_sym]
-                  q.has_locale(column).
-                    and(q.contains_value(column, opts.delete(key)).not)
-                }.inject(&:and)
-
-                super(opts, *rest).where(i18n_query)
+                super(opts, *rest).where(query)
               else
                 super(opts, *rest)
               end
@@ -65,11 +51,30 @@ code.
           relation.mobility_where_chain.include(mod)
         end
 
-        def has_locale(column)
-          build_infix(:'?', column, quoted_locale)
+        def create_where_query(opts, keys, arel_table)
+          keys.map { |key|
+            column = arel_table[key.to_sym]
+            value = opts.delete(key)
+
+            value.nil? ?
+              has_locale(column).not :
+              contains_value(column, value)
+          }.inject(&:and)
+        end
+
+        def create_not_query(opts, keys, arel_table)
+          keys.map { |key|
+            column = arel_table[key.to_sym]
+            has_locale(column).
+              and(contains_value(column, opts.delete(key)).not)
+          }.inject(&:and)
         end
 
         private
+
+        def has_locale(column)
+          build_infix(:'?', column, quoted_locale)
+        end
 
         def build_infix(*args)
           Arel::Nodes::InfixOperation.new(*args)

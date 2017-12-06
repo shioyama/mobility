@@ -6,6 +6,8 @@ module Mobility
     class ActiveRecord::Jsonb::QueryMethods < ActiveRecord::QueryMethods
       include ActiveRecord::PgQueryMethods
 
+      private
+
       def contains_value(column, value)
         build_infix(:'@>', column, Arel::Nodes.build_quoted({ Mobility.locale => value }.to_json))
       end

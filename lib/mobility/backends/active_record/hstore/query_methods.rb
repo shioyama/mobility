@@ -6,6 +6,8 @@ module Mobility
     class ActiveRecord::Hstore::QueryMethods < ActiveRecord::QueryMethods
       include ActiveRecord::PgQueryMethods
 
+      private
+
       def contains_value(column, value)
         build_infix(:'->', column, quoted_locale).eq(Arel::Nodes.build_quoted(value.to_s))
       end

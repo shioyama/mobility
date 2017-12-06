@@ -1,4 +1,4 @@
-require 'mobility/backends/sequel/postgres_query_methods'
+require 'mobility/backends/sequel/pg_query_methods'
 require "mobility/backends/sequel/query_methods"
 
 Sequel.extension :pg_hstore, :pg_hstore_ops
@@ -6,7 +6,7 @@ Sequel.extension :pg_hstore, :pg_hstore_ops
 module Mobility
   module Backends
     class Sequel::Hstore::QueryMethods < Sequel::QueryMethods
-      include PostgresQueryMethods
+      include Sequel::PgQueryMethods
 
       def initialize(attributes, _)
         super

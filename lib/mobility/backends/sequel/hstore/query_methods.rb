@@ -11,7 +11,7 @@ module Mobility
       def initialize(attributes, _)
         super
 
-        define_query_methods("hstore")
+        define_query_methods
 
         attributes.each do |attribute|
           define_method :"first_by_#{attribute}" do |value|
@@ -19,6 +19,12 @@ module Mobility
               select_all(model.table_name).first
           end
         end
+      end
+
+      private
+
+      def build_pg_op(v)
+        ::Sequel.hstore_op(v)
       end
     end
   end

@@ -22,7 +22,7 @@ code.
           define_method :where! do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
               opts = opts.with_indifferent_access
-              query = q.create_where_query(opts, i18n_keys, arel_table)
+              query = q.create_where_query!(opts, i18n_keys, arel_table)
 
               opts.empty? ? super(query) : super(opts, *rest).where(query)
             else
@@ -40,7 +40,7 @@ code.
             define_method :not do |opts, *rest|
               if i18n_keys = q.extract_attributes(opts)
                 opts = opts.with_indifferent_access
-                query = q.create_not_query(opts, i18n_keys, m)
+                query = q.create_not_query!(opts, i18n_keys, m)
 
                 super(opts, *rest).where(query)
               else
@@ -51,7 +51,14 @@ code.
           relation.mobility_where_chain.include(mod)
         end
 
-        def create_where_query(opts, keys, arel_table)
+        # Create +where+ query for options hash, translated keys and arel_table
+        # @note This is a destructive operation, it will modify +opts+.
+        #
+        # @param [Hash] opts Hash of attribute/value pairs
+        # @param [Array] keys Translated attribute names
+        # @param [Arel::Table] arel_table Model or relation's arel table
+        # @return [Arel::Node] Arel node to pass to +where+
+        def create_where_query!(opts, keys, arel_table)
           keys.map { |key|
             column = arel_table[key.to_sym]
             value = opts.delete(key)
@@ -62,7 +69,14 @@ code.
           }.inject(&:and)
         end
 
-        def create_not_query(opts, keys, arel_table)
+        # Create +not+ query for options hash, translated keys and arel_table
+        # @note This is a destructive operation, it will modify +opts+.
+        #
+        # @param [Hash] opts Hash of attribute/value pairs
+        # @param [Array] keys Translated attribute names
+        # @param [Arel::Table] arel_table Model or relation's arel table
+        # @return [Arel::Node] Arel node to pass to +where+
+        def create_not_query!(opts, keys, arel_table)
           keys.map { |key|
             column = arel_table[key.to_sym]
             has_locale(column).

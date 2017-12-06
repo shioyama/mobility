@@ -8,19 +8,15 @@ module Mobility
         define_method :where! do |opts, *rest|
           if i18n_keys = q.extract_attributes(opts)
             m = arel_table
-            locale = Arel::Nodes.build_quoted(Mobility.locale.to_s)
             opts = opts.with_indifferent_access
-            infix = Arel::Nodes::InfixOperation
 
             i18n_query = i18n_keys.map { |key|
               column = m[key.to_sym]
               value = opts.delete(key)
 
-              if value.nil?
-                infix.new(:'?', column, locale).not
-              else
-                infix.new(:'->', m[key.to_sym], locale).eq(value)
-              end
+              value.nil? ?
+                q.has_locale(column).not :
+                q.equals_value(column, value)
             }.inject(&:and)
 
             opts.empty? ? super(i18n_query) : super(opts, *rest).where(i18n_query)
@@ -38,16 +34,12 @@ module Mobility
         mod = Module.new do
           define_method :not do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
-              locale = Arel::Nodes.build_quoted(Mobility.locale.to_s)
               opts = opts.with_indifferent_access
-              infix = Arel::Nodes::InfixOperation
 
               i18n_query = i18n_keys.map { |key|
                 column = m[key.to_sym]
-                value = Arel::Nodes.build_quoted(opts.delete(key).to_s)
-                has_key = infix.new(:'?', column, locale)
-                not_eq_value = infix.new(:'->', column, locale).not_eq(value)
-                has_key.and(not_eq_value)
+                q.has_locale(column).
+                  and(q.equals_value(column, opts.delete(key)).not)
               }.inject(&:and)
 
               super(opts, *rest).where(i18n_query)
@@ -57,6 +49,24 @@ module Mobility
           end
         end
         relation.mobility_where_chain.include(mod)
+      end
+
+      def equals_value(column, value)
+        build_infix(:'->', column, quoted_locale).eq(Arel::Nodes.build_quoted(value.to_s))
+      end
+
+      def has_locale(column)
+        build_infix(:'?', column, quoted_locale)
+      end
+
+      private
+
+      def build_infix(*args)
+        Arel::Nodes::InfixOperation.new(*args)
+      end
+
+      def quoted_locale
+        Arel::Nodes.build_quoted(Mobility.locale.to_s)
       end
     end
   end

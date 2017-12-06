@@ -2,6 +2,11 @@
 
 ## 0.3
 
+### 0.3.4 (December 6, 2017)
+* Move `translated_attribute_names` to `Mobility::ActiveRecord`
+  ([#132](https://github.com/shioyama/mobility/pull/129))
+* Refactor AR pg query methods ([#129](https://github.com/shioyama/mobility/pull/129))
+
 ### 0.3.3 (December 5, 2017)
 * Fix duping for AR KeyValue backend ([#126](https://github.com/shioyama/mobility/pull/126))
 * Pass locale and options to Proc in default plugin ([#122](https://github.com/shioyama/mobility/pull/122))

@@ -17,12 +17,10 @@ group :development, :test do
     end
     gem "generator_spec", '~> 0.9.4'
   elsif ENV['ORM'] == 'sequel'
-    if ENV['SEQUEL_VERSION'] == '4.41'
-      gem 'sequel', '>= 4.41.0', '< 4.46.0'
-    elsif ENV['SEQUEL_VERSION'] == '5.0'
-      gem 'sequel', '>= 5.0.0', '< 6.0.0'
-    else
+    if ENV['SEQUEL_VERSION'] == '4'
       gem 'sequel', '>= 4.46.0', '< 5.0'
+    else
+      gem 'sequel', '>= 5.0.0', '< 6.0.0'
     end
   end
 

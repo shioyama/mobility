@@ -52,26 +52,40 @@ describe Mobility::Plugins::Default do
       end
 
       context "default is a Proc" do
-        let(:default) { Proc.new {} }
+        let(:default) { Proc.new { |attribute, locale, options| "#{attribute} in #{locale} with #{options[:this]}" } }
 
         it "calls default with model and attribute as args if default is a Proc" do
           expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
-          expect(default).to receive(:call).with(model: "model",
-                                                 attribute: "title",
-                                                 locale: :fr,
-                                                 options: { this: 'option' }).and_return('default')
-          expect(backend.read(:fr, this: 'option')).to eq('default')
+          expect(backend.read(:fr, this: 'option')).to eq("title in fr with option")
         end
 
         it "calls default with model and attribute as args if default option is a Proc" do
-          expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
-          default_as_option = Proc.new {}
-          expect(default).not_to receive(:call)
-          expect(default_as_option).to receive(:call).with(model: "model",
-                                                           attribute: "title",
-                                                           locale: :fr,
-                                                           options: { this: 'option' }).and_return("default as option")
-          expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default as option")
+          aggregate_failures do
+            # with no arguments
+            expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
+            default_as_option = Proc.new { "default" }
+            expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default")
+
+            # with one argument
+            expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
+            default_as_option = Proc.new { |attribute| "default #{attribute}" }
+            expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default title")
+
+            # with two arguments
+            expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
+            default_as_option = Proc.new { |attribute, locale| "default #{attribute} #{locale}" }
+            expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default title fr")
+
+            # with three arguments
+            expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
+            default_as_option = Proc.new { |attribute, locale, options| "default #{attribute} #{locale} #{options[:this]}" }
+            expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default title fr option")
+
+            # with any arguments
+            expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
+            default_as_option = Proc.new { |attribute, **| "default #{attribute}" }
+            expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default title")
+          end
         end
       end
     end

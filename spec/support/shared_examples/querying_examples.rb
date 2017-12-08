@@ -103,7 +103,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
             @ja_instance1 = model_class.create(attribute1 => "foo ja", attribute2 => "foo content ja")
             @ja_instance2 = model_class.create(attribute1 => "foo",    attribute2 => "foo content"   )
             @ja_instance3 = model_class.create(attribute1 => "foo"                                   )
-            @ja_instance4 = model_class.create(                             attribute2 => "foo"      )
+            @ja_instance4 = model_class.create(                        attribute2 => "foo"           )
           end
         end
 

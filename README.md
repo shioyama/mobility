@@ -603,7 +603,7 @@ dirty tracking is implemented this way to ensure that it is clear what
 has changed in which locale, avoiding any possible ambiguity.
 
 For more details, see the [API documentation on dirty
-tracking](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Dirty).
+tracking](http://www.rubydoc.info/gems/mobility/Mobility/Plugins/Dirty).
 
 ### Cache
 
@@ -743,7 +743,7 @@ This will generate the `post_translations` table with columns `title` and
 the [Table
 Backend](https://github.com/shioyama/mobility/wiki/Table-Backend) page of the
 wiki and API documentation on the [`Mobility::Backend::Table`
-class](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Table).
+class](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Table).
 
 ### Column Backend (like Traco)
 
@@ -761,7 +761,7 @@ rails generate mobility:translations post title:string content:text
 For more details, see the [Column
 Backend](https://github.com/shioyama/mobility/wiki/Column-Backend) page of the
 wiki and API documentation on the [`Mobility::Backend::Column`
-class](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Column).
+class](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Column).
 
 ### PostgreSQL-specific Backends
 
@@ -778,9 +778,9 @@ extensions with `DB.extension :pg_json` or `DB.extension :pg_hstore` (where
 Other details are covered in the [Postgres
 Backend](https://github.com/shioyama/mobility/wiki/Postgres-Backends) page of
 the wiki and in the API documentation
-([`Mobility::Backend::Jsonb`](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Jsonb)
+([`Mobility::Backend::Jsonb`](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Jsonb)
 and
-[`Mobility::Backend::Hstore`](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Hstore)).
+[`Mobility::Backend::Hstore`](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Hstore)).
 
 Development
 -----------

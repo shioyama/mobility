@@ -60,12 +60,14 @@ code.
         # @return [Arel::Node] Arel node to pass to +where+
         def create_where_query!(opts, keys, arel_table)
           keys.map { |key|
-            column = arel_table[key.to_sym]
-            value = opts.delete(key)
+            column = arel_table[key]
+            values = opts.delete(key)
 
-            value.nil? ?
-              has_locale(column).not :
+            next has_locale(column).not if values.nil?
+
+            Array.wrap(values).map { |value|
               contains_value(column, value)
+            }.inject(&:or)
           }.inject(&:and)
         end
 
@@ -79,8 +81,13 @@ code.
         def create_not_query!(opts, keys, arel_table)
           keys.map { |key|
             column = arel_table[key.to_sym]
-            has_locale(column).
-              and(contains_value(column, opts.delete(key)).not)
+            values = opts.delete(key)
+
+            next has_locale(column) if values.nil?
+
+            Array.wrap(values).map { |value|
+              has_locale(column).and(contains_value(column, value).not)
+            }.inject(&:and)
           }.inject(&:and)
         end
 

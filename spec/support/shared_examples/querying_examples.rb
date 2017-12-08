@@ -125,6 +125,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
         @instance1 = model_class.create(attribute1 => "foo")
         @instance2 = model_class.create(attribute1 => "bar")
         @instance3 = model_class.create(attribute1 => "baz")
+        @instance4 = model_class.create(attribute1 => nil)
 
         Mobility.with_locale(:ja) do
           @ja_instance1 = model_class.create(attribute1 => "foo")
@@ -133,6 +134,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
 
       it "returns records with matching translated attribute values" do
         expect(query_scope.where(attribute1 => ["foo", "baz"])).to match_array([@instance1, @instance3])
+        expect(query_scope.where(attribute1 => ["foo", nil])).to match_array([@instance1, @instance4, @ja_instance1])
       end
     end
 
@@ -184,7 +186,10 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
 
     it "works with array of values" do
       instance = model_class.create(attribute1 => "baz")
-      expect(query_scope.where.not(attribute1 => ["foo", "bar"])).to match_array([instance])
+      aggregate_failures do
+        expect(query_scope.where.not(attribute1 => ["foo", "bar"])).to match_array([instance])
+        expect(query_scope.where.not(attribute1 => ["foo", nil])).to match_array([instance, @instance5, @instance6])
+      end
     end
   end
 end

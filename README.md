@@ -484,7 +484,7 @@ Mobility.with_locale(:de) { word.meaning }
 ```
 
 For more details, see the [API documentation on
-fallbacks](http://www.rubydoc.info/gems/mobility/Mobility/Backend/Fallbacks)
+fallbacks](http://www.rubydoc.info/gems/mobility/Mobility/Plugins/Fallbacks)
 and [this article on I18n
 fallbacks](https://github.com/svenfuchs/i18n/wiki/Fallbacks).
 

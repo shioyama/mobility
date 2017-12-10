@@ -60,18 +60,26 @@ module Mobility
         # Note that Mobility will try to use inner/outer joins appropriate to the query,
         # so for example:
         #
-        # Article.where(title: nil, content: nil)   #=> OUTER JOIN (all nils)
-        # Article.where(title: "foo", content: nil) #=> INNER JOIN (one non-nil)
+        # Article.where(title: nil, content: nil)          #=> OUTER JOIN (all nils)
+        # Article.where(title: "foo", content: nil)        #=> INNER JOIN (one non-nil)
         #
         # In the first case, if we are in (say) the "en" locale, then we should match articles
         # that have *no* article_translations with English locales (since no translation is
         # equivalent to a nil value). If we used an inner join in the first case, an article
         # with no English translations would be filtered out, so we use an outer join.
         #
-        # However, if you call `where` multiple times, you may end up with an outer join
-        # when a (faster) inner join would have worked fine:
+        # When deciding whether to use an outer or inner join, array-valued
+        # conditions are treated as nil if they have any values.
         #
-        # Article.where(title: nil).where(content: "foo") #=> OUTER JOIN
+        # Article.where(title: nil, content: ["foo", nil])            #=> OUTER JOIN (all nil or array with nil)
+        # Article.where(title: "foo", content: ["foo", nil])          #=> INNER JOIN (one non-nil)
+        # Article.where(title: ["foo", "bar"], content: ["foo", nil]) #=> INNER JOIN (one non-nil array)
+        #
+        # Note that if you call `where` multiple times, you may end up with an
+        # outer join when a (faster) inner join would have worked fine:
+        #
+        # Article.where(title: nil).where(content: "foo")          #=> OUTER JOIN
+        # Article.where(title: [nil, "foo"]).where(content: "foo") #=> OUTER JOIN
         #
         # In this case, we are searching for a match on the article_translations table
         # which has a NULL title and a content equal to "foo". Since we need a positive
@@ -88,6 +96,7 @@ module Mobility
           if i18n_keys = q.extract_attributes(opts)
             opts = opts.with_indifferent_access
             options = {
+              # We only need an OUTER JOIN if every
               outer_join: opts.values_at(*i18n_keys).compact.all? { |v| !Array.wrap(v).all? }
             }
             i18n_keys.each { |attr| opts["#{translation_class.table_name}.#{attr}"] = opts.delete(attr) }

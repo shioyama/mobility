@@ -217,6 +217,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
     describe "joins" do
       it "uses inner join for WHERE queries if query has at least one non-null attribute" do
         expect(Article.i18n.where(title: "foo", content: nil).to_sql).not_to match(/OUTER/)
+        expect(Article.i18n.where(title: "foo", content: [nil, "bar"]).to_sql).not_to match(/OUTER/)
       end
 
       it "does not use OUTER JOIN with .not" do

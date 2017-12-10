@@ -66,7 +66,7 @@ code.
             next has_locale(column).not if values.nil?
 
             Array.wrap(values).map { |value|
-              contains_value(column, value)
+              value.nil? ? has_locale(column).not : contains_value(column, value)
             }.inject(&:or)
           }.inject(&:and)
         end

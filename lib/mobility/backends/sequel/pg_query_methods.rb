@@ -20,7 +20,9 @@ generates an appropriate operator (using either +::Sequel.hstore_op+ or
         # @return [Sequel::SQL::Expression] Query expression
         def create_query!(cond, keys, invert = false)
           keys.map { |key|
-            create_query_op(key, cond.delete(key), invert)
+            values = cond.delete(key)
+            values = [values] unless values.is_a?(Array)
+            values.map { |value| create_query_op(key, value, invert) }.inject(&:|)
           }.inject(invert ? :| : :&)
         end
 

@@ -83,15 +83,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           include const_set(module_name, callback_methods)
         end
 
-        private
-
-        # Clean up *all* leftover translations of this model, only once.
-        def mobility_destroy_key_value_translations
-          [:string, :text].freeze.each do |type|
-            Mobility::ActiveRecord.const_get("#{type.capitalize}Translation".freeze).
-              where(translatable: self).destroy_all
-          end
-        end unless private_instance_methods(false).include?(:mobility_destroy_key_value_translations)
+        include DestroyKeyValueTranslations
       end
 
       setup_query_methods(QueryMethods)
@@ -103,6 +95,18 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         translation = translations.find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= translations.build(locale: locale, key: attribute)
         translation
+      end
+
+      module DestroyKeyValueTranslations
+        private
+
+        # Clean up *all* leftover translations of this model, only once.
+        def mobility_destroy_key_value_translations
+          [:string, :text].freeze.each do |type|
+            Mobility::ActiveRecord.const_get("#{type.capitalize}Translation".freeze).
+              where(translatable: self).destroy_all
+          end
+        end
       end
     end
   end

@@ -73,6 +73,52 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
     end
   end
 
+  describe "translations association" do
+    before { Article.translates :title, :content, backend: :table, cache: true }
+
+    describe "cleaning up blank translations" do
+      let(:title_backend) { article.mobility_backend_for("title") }
+
+      it "builds nil translations when reading but does not save them" do
+        Mobility.locale = :en
+        article = Article.new(title: "New Article")
+        association_name = article.mobility_backend_for("title").association_name
+
+        Mobility.locale = :ja
+        article.title
+
+        aggregate_failures do
+          expect(article.send(association_name).size).to eq(2)
+          article.save
+          expect(article.title).to be_nil
+          expect(article.reload.send(association_name).size).to eq(1)
+        end
+      end
+
+      it "removes nil translations when saving persisted record" do
+        Mobility.locale = :en
+        article = Article.create(title: "New Article")
+        association_name = article.mobility_backend_for("title").association_name
+
+        aggregate_failures do
+          expect(article.send(association_name).size).to eq(1)
+
+          Mobility.locale = :ja
+          article.title = "新規記事"
+          expect(article.send(association_name).size).to eq(2)
+
+          article.save
+          expect(article.send(association_name).size).to eq(2)
+
+          article.title = nil
+          article.save
+          article.reload
+          expect(article.send(association_name).size).to eq(1)
+        end
+      end
+    end
+  end
+
   # Using Article to test separate backends with separate tables fails
   # when these specs are run together with other specs, due to code
   # assigning subclasses (Article::Translation, Article::FooTranslation).

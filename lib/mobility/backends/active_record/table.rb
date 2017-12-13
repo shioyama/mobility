@@ -139,6 +139,8 @@ columns to that table.
           inverse_of:  association_name,
           touch: true
 
+        before_save { mobility_destroy_empty_table_translations(association_name) }
+
         module_name = "MobilityArTable#{association_name.to_s.camelcase}"
         unless const_defined?(module_name)
           callback_methods = Module.new do
@@ -149,6 +151,8 @@ columns to that table.
           end
           include const_set(module_name, callback_methods)
         end
+
+        include DestroyEmptyTranslations
       end
 
       setup_query_methods(QueryMethods)
@@ -157,6 +161,17 @@ columns to that table.
         translation = translations.find { |t| t.locale == locale.to_s.freeze }
         translation ||= translations.build(locale: locale)
         translation
+      end
+
+      module DestroyEmptyTranslations
+        private
+
+        def mobility_destroy_empty_table_translations(association_name)
+          send(association_name).each do |t|
+            attrs = t.attribute_names & self.class.translated_attribute_names
+            send(association_name).destroy(t) if attrs.map(&t.method(:send)).none?
+          end
+        end
       end
     end
   end

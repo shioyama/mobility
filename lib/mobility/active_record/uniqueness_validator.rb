@@ -25,10 +25,9 @@ module Mobility
       private
 
       def mobility_scope_relation(record, relation)
-        Array(options[:scope]).each do |scope_item|
-          relation = relation.where(scope_item => record.send(scope_item))
+        Array(options[:scope]).inject(relation) do |scoped_relation, scope_item|
+          scoped_relation.where(scope_item => record.send(scope_item))
         end
-        relation
       end
     end
   end

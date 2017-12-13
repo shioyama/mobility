@@ -20,7 +20,7 @@ columns to that table.
 
 @example Model with table backend
   class Post < ActiveRecord::Base
-    translates :title, backend: :table, association_name: :translations
+    translates :title, backend: :table
   end
 
   post = Post.create(title: "foo")

@@ -1,5 +1,4 @@
 sudo: false
-dist: precise
 language: ruby
 cache: bundler
 rvm:

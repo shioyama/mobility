@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Chris Salzberg"]
   spec.email         = ["chris@dejimata.com"]
 
-  spec.required_ruby_version = '>= 2.2.7'
+  spec.required_ruby_version = '>= 2.2.9'
 
   spec.summary       = %q{Pluggable Ruby translation framework}
   spec.description   = %q{Stores and retrieves localized data through attributes on a Ruby class, with flexible support for different storage strategies.}

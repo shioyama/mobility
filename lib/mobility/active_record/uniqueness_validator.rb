@@ -16,6 +16,10 @@ A backend-agnostic uniqueness validator for ActiveRecord translated attributes.
         klass = record.class
 
         if ((Array(options[:scope]) + [attribute]).map(&:to_s) & klass.translated_attribute_names).present?
+          warn %{
+WARNING: The Mobility uniqueness validator for translated attributes does not
+support case-insensitive validation. This option will be ignored.
+} if options[:case_sensitive] == false
           return unless value.present?
           relation = klass.send(Mobility.query_method).where(attribute => value)
           relation = relation.where.not(klass.primary_key => record.id) if record.persisted?

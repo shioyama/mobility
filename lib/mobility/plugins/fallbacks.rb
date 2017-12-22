@@ -13,7 +13,9 @@ instance. This defaults to an instance of +I18n::Locale::Fallbacks+, but can be
 configured (see {Mobility::Configuration}).
 
 If a hash is passed to the +fallbacks+ option, a new fallbacks instance will be
-created for the model with the hash defining additional fallbacks. 
+created for the model with the hash defining additional fallbacks. To set a
+default value for this hash, use set the value of `default_options[:fallbacks]`
+in your Mobility configuration (see below).
 
 In addition, fallbacks are disabled in certain situation. To explicitly disable
 fallbacks when reading and writing, you can pass the <tt>fallback: false</tt>
@@ -101,6 +103,18 @@ the current locale was +nil+.
   #=> nil
   post.title_fr
   #=> nil
+
+@example Setting default fallbacks across all models
+  Mobility.configure do |config|
+    # ...
+    config.default_options[:fallbacks] = { :'fr' => 'en' }
+    # ...
+  end
+
+  class Post
+    # Post will fallback from French to English by default
+    translates :title, fallbacks: true
+  end
 
 =end
     class Fallbacks < Module

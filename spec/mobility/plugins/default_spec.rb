@@ -94,7 +94,9 @@ describe Mobility::Plugins::Default do
           default_as_option = Proc.new { |model:, attribute:, locale:, options:|  "default #{model} #{attribute} #{locale} #{options[:this]}" }
           expect {
             expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default model title fr option")
-          }.to output(/#{"WARNING: The Mobility default plugin no longer accepts keyword arguments."}/).to_stderr
+          }.to output(/#{%{
+WARNING: Passing keyword arguments to a Proc in the Default plugin is
+deprecated. See the API documentation for details.}}/).to_stderr
         end
       end
     end

@@ -73,7 +73,9 @@ The proc can accept zero to three arguments (see examples below)
             return default unless default.is_a?(Proc)
             # TODO: Remove in v1.0
             if default.parameters.any? { |n, v| [:keyreq, :keyopt].include?(n) && [:model, :attribute, :locale, :options].include?(v) }
-              warn "WARNING: The Mobility default plugin no longer accepts keyword arguments."
+              warn %{
+WARNING: Passing keyword arguments to a Proc in the Default plugin is
+deprecated. See the API documentation for details.}
               return default.call(model: model, attribute: attribute, locale: locale, options: options)
             end
             args = [attribute, locale, options]

@@ -9,7 +9,7 @@ module Mobility
 Dirty tracking for AR models. See {Mobility::Plugins::ActiveModel::Dirty} for
 details on usage.
 
-In addition to methods added by {Mobility::Plugins::ActiveModel::Diryt}, the
+In addition to methods added by {Mobility::Plugins::ActiveModel::Dirty}, the
 AR::Dirty plugin adds support for the following persistence-specific methods
 (for a model with a translated attribute +title+):
 - +saved_changes+

@@ -45,7 +45,7 @@ describe Mobility::ActiveRecord, orm: :active_record do
         expect { expect(article.valid?).to eq(true) }.to output(
           /#{%{
 WARNING: The Mobility uniqueness validator for translated attributes does not
-support case-insensitive validation. This option will be ignored.}}/).to_stderr
+support case-insensitive validation. This option will be ignored for: title}}/).to_stderr
       end
     end
 

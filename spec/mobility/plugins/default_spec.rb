@@ -87,6 +87,15 @@ describe Mobility::Plugins::Default do
             expect(backend.read(:fr, default: default_as_option, this: 'option')).to eq("default title")
           end
         end
+
+        # TODO: Remove in v1.0
+        it "emits warning if proc takes keyword arguments" do
+          expect(backend_double).to receive(:read).once.with(:fr, this: 'option').and_return(nil)
+          default_as_option = Proc.new { |model:, attribute:, locale:, options:| }
+          expect {
+            backend.read(:fr, default: default_as_option, this: 'option')
+          }.to output(/#{"WARNING: The Mobility default plugin no longer accepts keyword arguments."}/).to_stderr
+        end
       end
     end
   end

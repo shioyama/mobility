@@ -149,8 +149,8 @@ module Mobility
     # (see Mobility::Configuration#query_method)
     # @!method query_method
 
-    # (see Mobility::Configuration#default_fallbacks)
-    # @!method default_fallbacks
+    # (see Mobility::Configuration#default_fallbacks_instance)
+    # @!method default_fallbacks_instance
 
     # (see Mobility::Configuration#default_backend)
     # @!method default_backend
@@ -169,8 +169,13 @@ module Mobility
       end
     end
 
+    # TODO: Remove in v1.0
     define_method :default_fallbacks do |*args|
       config.public_send(:default_fallbacks, *args)
+    end
+
+    define_method :default_fallbacks_instance do |*args|
+      config.public_send(:default_fallbacks_instance, *args)
     end
 
     # Configure Mobility

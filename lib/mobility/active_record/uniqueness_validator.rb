@@ -1,6 +1,17 @@
 module Mobility
   module ActiveRecord
+=begin
+
+A backend-agnostic uniqueness validator for ActiveRecord translated attributes.
+
+@note This validator does not support case sensitivity, since doing so would
+  significantly complicate implementation.
+
+=end
     class UniquenessValidator < ::ActiveRecord::Validations::UniquenessValidator
+      # @param [ActiveRecord::Base] record Translated model
+      # @param [String] attribute Name of attribute
+      # @param [Object] value Attribute value
       def validate_each(record, attribute, value)
         klass = record.class
 

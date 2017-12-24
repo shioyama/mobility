@@ -122,7 +122,6 @@ AR::Dirty plugin adds support for the following persistence-specific methods
                 mobility_changed_attributes.include?(attr) ? __send__(attr) : super
               end
             end
-            private :_read_attribute
           end
         end
       end

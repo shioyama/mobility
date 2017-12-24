@@ -34,6 +34,7 @@
   ([#104](https://github.com/shioyama/mobility/pull/102)) Thanks
   [@pwim](https://github.com/pwim)!
 * Update dependency versions ([#107](https://github.com/shioyama/mobility/pull/107))
+* Fix AM/AR Dirty plugin issues with Rails 5.2 ([#116](https://github.com/shioyama/mobility/pull/116))
 * Support new AR::Dirty methods ([#111](https://github.com/shioyama/mobility/pull/111))
 * Use `public_send` in LocaleAccessors plugin ([#117](https://github.com/shioyama/mobility/pull/117))
 * Deprecate setting value of `default_options` directly ([#113](https://github.com/shioyama/mobility/pull/113))

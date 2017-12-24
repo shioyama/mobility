@@ -534,8 +534,10 @@ word.name(default: 'bar')
 #=> 'bar'
 ```
 
-The default can also be a `Proc`, which will be passed the model and attribute
-name as keyword arguments. See the [API docs][docs] for details.
+The default can also be a `Proc`, which will be called with the context as the
+model itself, and passed optional arguments (attribute, locale and options
+passed to accessor) which can be used to customize behaviour. See the [API
+docs][docs] for details.
 
 ### <a name="dirty"></a>Dirty Tracking
 

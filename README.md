@@ -545,6 +545,9 @@ class Post < ApplicationRecord
 end
 ```
 
+(If you want to enable dirty tracking on all models, set the
+`config.default_options[:dirty]` option in your Mobility configuration.)
+
 Let's assume we start with a post with a title in English and Japanese:
 
 ```ruby
@@ -602,8 +605,16 @@ Notice that Mobility uses locale suffixes to indicate which locale has changed;
 dirty tracking is implemented this way to ensure that it is clear what
 has changed in which locale, avoiding any possible ambiguity.
 
-For more details, see the [API documentation on dirty
-tracking](http://www.rubydoc.info/gems/mobility/Mobility/Plugins/Dirty).
+For performance reasons, it is highly recommended that when using the Dirty
+plugin, you also enable [locale accessors](#getset) for all locales which will
+be used, so that methods like `title_en` above are defined; otherwise they will
+be caught by `method_missing` (using fallthrough accessors), which is much slower.
+The easiest way to do this is to set `config.default_options[:locale_accessors]
+= true` in your Mobility config, and make sure that `I18n.available_locales`
+includes all locales you use in production.
+
+For more details on dirty tracking, see the [API
+documentation](http://www.rubydoc.info/gems/mobility/Mobility/Plugins/Dirty).
 
 ### Cache
 

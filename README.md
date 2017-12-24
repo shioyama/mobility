@@ -103,7 +103,23 @@ end
 ```
 
 To use a different default backend, set `default_backend` to another value (see
-possibilities [below](#backends)). Other configuration options are
+possibilities [below](#backends)).
+
+You will likely also want to set default values for the various translation
+options described below. You can set these defaults by assigning values to keys
+on the `config.default_options` hash, like this (to set the default value for
+the `dirty` option to `true`):
+
+```diff
+ Mobility.configure do |config|
+   config.default_backend = :key_value
+   config.accessor_method = :translates
+   config.query_method    = :i18n
++  config.default_options[:dirty] = true
+end
+```
+
+Other configuration options are
 described in the [API
 docs](http://www.rubydoc.info/gems/mobility/Mobility/Configuration).
 

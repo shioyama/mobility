@@ -55,7 +55,7 @@ describe Mobility::Plugins::Dirty do
       end
     end
 
-    context "optoin value is falsey" do
+    context "option value is falsey" do
       let(:attributes) { instance_double(Mobility::Attributes) }
 
       it "does not include Mobility::Plugins::FallthroughAccessors" do

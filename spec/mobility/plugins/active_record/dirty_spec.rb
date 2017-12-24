@@ -391,4 +391,12 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       end
     end
   end
+
+  # Regression test for https://github.com/shioyama/mobility/issues/149
+  describe "#_read_attribute" do
+    it "is public" do
+      article = Article.create
+      expect { article._read_attribute("foo") }.not_to raise_error
+    end
+  end
 end if Mobility::Loaded::ActiveRecord

@@ -2,6 +2,12 @@
 
 ## 0.3
 
+### 0.3.5 (December 24, 2017)
+* Make Default plugin handle Procs more gracefully
+  ([#137](https://github.com/shioyama/mobility/pull/137))
+* Show deprecation warning if keyword options passed to Default plugin
+  ([#147](https://github.com/shioyama/mobility/pull/147))
+
 ### 0.3.4 (December 6, 2017)
 * Move `translated_attribute_names` to `Mobility::ActiveRecord`
   ([#132](https://github.com/shioyama/mobility/pull/129))

@@ -2,6 +2,10 @@
 
 ## 0.3
 
+### 0.3.6 (December 25, 2017)
+* Make `_read_attribute` public in AR Dirty plugin
+  ([#150](https://github.com/shioyama/mobility/pull/150))
+
 ### 0.3.5 (December 24, 2017)
 * Make Default plugin handle Procs more gracefully
   ([#137](https://github.com/shioyama/mobility/pull/137))

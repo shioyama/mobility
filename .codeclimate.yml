@@ -10,6 +10,9 @@ engines:
       - php
   fixme:
     enabled: true
+    checks:
+      TODO:
+        enabled: false
   rubocop:
     enabled: true
 ratings:

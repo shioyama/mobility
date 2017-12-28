@@ -34,3 +34,7 @@ group :development, :test do
     gem 'pg'
   end
 end
+
+group :benchmark do
+  gem "benchmark-ips"
+end

@@ -190,27 +190,29 @@ with other backends.
     end
 
     def define_reader(attribute)
+      backend = Backend.method_name(attribute)
       class_eval <<-EOM, __FILE__, __LINE__ + 1
         def #{attribute}(**options)
           return super() if options.delete(:super)
           locale = Mobility::Attributes.process_options!(options)
-          #{Backend.method_name(attribute)}.read(locale, options)
+          #{backend}.read(locale, options)
         end
 
         def #{attribute}?(**options)
           return super() if options.delete(:super)
           locale = Mobility::Attributes.process_options!(options)
-          #{Backend.method_name(attribute)}.present?(locale, options)
+          #{backend}.present?(locale, options)
         end
       EOM
     end
 
     def define_writer(attribute)
+      backend = Backend.method_name(attribute)
       class_eval <<-EOM, __FILE__, __LINE__ + 1
         def #{attribute}=(value, **options)
           return super(value) if options.delete(:super)
           locale = Mobility::Attributes.process_options!(options)
-          #{Backend.method_name(attribute)}.write(locale, value, options)
+          #{backend}.write(locale, value, options)
         end
       EOM
     end

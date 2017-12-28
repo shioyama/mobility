@@ -170,8 +170,11 @@ with other backends.
 
     # Process options passed into accessor method before calling backend, and
     # return locale
+    # @deprecated This method was mainly used internally but is no longer
+    #   needed. It will be removed in the next major release.
     # @param [Hash] options Options hash passed to accessor method
     # @return [Symbol] locale
+    # TODO: Remove in v1.0
     def self.process_options!(options)
       (options[:locale] || Mobility.locale).tap { |locale|
         Mobility.enforce_available_locales!(locale)
@@ -194,13 +197,13 @@ with other backends.
       class_eval <<-EOM, __FILE__, __LINE__ + 1
         def #{attribute}(**options)
           return super() if options.delete(:super)
-          locale = Mobility::Attributes.process_options!(options)
+          #{set_locale_from_options_inline}
           #{backend}.read(locale, options)
         end
 
         def #{attribute}?(**options)
           return super() if options.delete(:super)
-          locale = Mobility::Attributes.process_options!(options)
+          #{set_locale_from_options_inline}
           #{backend}.present?(locale, options)
         end
       EOM
@@ -211,10 +214,24 @@ with other backends.
       class_eval <<-EOM, __FILE__, __LINE__ + 1
         def #{attribute}=(value, **options)
           return super(value) if options.delete(:super)
-          locale = Mobility::Attributes.process_options!(options)
+          #{set_locale_from_options_inline}
           #{backend}.write(locale, value, options)
         end
       EOM
+    end
+
+    # This string is evaluated inline in order to optimize performance of
+    # getters and setters, avoiding extra steps where they are unneeded.
+    def set_locale_from_options_inline
+      <<-EOL
+if options[:locale]
+  #{"Mobility.enforce_available_locales!(options[:locale])" if I18n.enforce_available_locales}
+  locale = options[:locale].to_sym
+  options[:locale] &&= !!locale
+else
+  locale = Mobility.locale
+end
+EOL
     end
 
     def get_backend_class(backend)

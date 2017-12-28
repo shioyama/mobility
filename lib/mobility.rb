@@ -210,8 +210,16 @@ module Mobility
     # @param [String,Symbol] locale
     # @raise [InvalidLocale] if locale is present but not available
     def enforce_available_locales!(locale)
+      # TODO: Remove conditional in v1.0
       if I18n.enforce_available_locales
         raise Mobility::InvalidLocale.new(locale) unless (I18n.locale_available?(locale) || locale.nil?)
+      else
+        warn <<-EOL
+WARNING: You called Mobility.enforce_available_locales! in a situation where
+I18n.enforce_available_locales is false. In the past, Mobility would do nothing
+in this case, but as of the next major release Mobility will ignore the I18n
+setting and enforce available locales whenever this method is called.
+EOL
       end
     end
 
@@ -223,7 +231,7 @@ module Mobility
 
     def set_locale(locale)
       locale = locale.to_sym if locale
-      enforce_available_locales!(locale)
+      enforce_available_locales!(locale) if I18n.enforce_available_locales
       storage[:mobility_locale] = locale
     end
   end

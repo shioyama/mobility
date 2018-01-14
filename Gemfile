@@ -31,7 +31,7 @@ group :development, :test do
     gem 'pry-byebug'
     gem 'sqlite3'
     gem 'mysql2', '~> 0.4.9'
-    gem 'pg'
+    gem 'pg', '< 1.0'
   end
 end
 

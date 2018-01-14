@@ -103,7 +103,7 @@ describe "ActiveRecord compatibility", orm: :active_record do
       post = Post.new
       post.title = "foo"
       post.content = "bar"
-      expect(post.attributes).to eq({ "published" => post.published, "id" => post.id, "title" => "foo", "content" => "bar" })
+      expect(post.attributes).to include_hash({ "published" => post.published, "id" => post.id, "title" => "foo", "content" => "bar" })
     end
   end
 
@@ -120,7 +120,7 @@ describe "ActiveRecord compatibility", orm: :active_record do
       post = Post.new
       post.title = "foo"
       post.content = "bar"
-      expect(post.untranslated_attributes).to eq({ "published" => post.published, "id" => post.id })
+      expect(post.untranslated_attributes).to include_hash({ "published" => post.published, "id" => post.id })
     end
   end
 

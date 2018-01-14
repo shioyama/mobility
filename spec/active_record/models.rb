@@ -5,6 +5,7 @@ class Post < ActiveRecord::Base
 end
 
 class FallbackPost < ActiveRecord::Base
+  self.table_name = "posts"
   extend Mobility
   translates :title, :content, backend: :key_value, cache: true, locale_accessors: true, dirty: true, fallbacks: true
 end

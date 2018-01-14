@@ -119,8 +119,8 @@ module Mobility
           if ENV['DB'] == 'postgres'
             DB.create_table? :jsonb_posts do
               primary_key :id
-              jsonb       :title
-              jsonb       :content
+              jsonb       :title,      default: '""'
+              jsonb       :content,    default: '""'
               TrueClass   :published
               DateTime    :created_at, allow_null: false
               DateTime    :updated_at, allow_null: false
@@ -129,8 +129,8 @@ module Mobility
             DB.run "CREATE EXTENSION IF NOT EXISTS hstore"
             DB.create_table? :hstore_posts do
               primary_key :id
-              hstore      :title
-              hstore      :content
+              hstore      :title,      default: ''
+              hstore      :content,    default: ''
               TrueClass   :published
               DateTime    :created_at, allow_null: false
               DateTime    :updated_at, allow_null: false

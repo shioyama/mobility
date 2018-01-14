@@ -73,7 +73,7 @@ describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
         article.save
 
         expect(article.column_changed?(:title)).to eq(false)
-        expect(article.previous_changes).to eq({ :title_en => ["foo", "bar"]})
+        expect(article.previous_changes).to include_hash({ :title_en => ["foo", "bar"]})
       end
     end
 
@@ -112,8 +112,8 @@ describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
 
       article.save
 
-      expect(article.previous_changes).to eq({title_en: ["English title 1", "English title 2"],
-                                              title_fr: ["Titre en Francais 1", "Titre en Francais 2"]})
+      expect(article.previous_changes).to include_hash(title_en: ["English title 1", "English title 2"],
+                                                       title_fr: ["Titre en Francais 1", "Titre en Francais 2"])
     end
 
     it "resets changes when locale is set to original value" do

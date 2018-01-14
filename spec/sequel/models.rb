@@ -6,7 +6,7 @@ class Post < Sequel::Model
   translates :content, backend: :key_value, cache: true, locale_accessors: true, dirty: true, type: :text
 end
 
-class FallbackPost < Sequel::Model
+class FallbackPost < Sequel::Model(DB[:posts])
   plugin :mobility
   translates :title, :content, backend: :key_value, cache: true, locale_accessors: true, dirty: true, fallbacks: true
 end

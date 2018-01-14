@@ -374,9 +374,9 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       instance.send(:"#{attribute1}=", "Title")
       instance.save
       match = query_scope.send(finder_method, "Title")
-      expect(match).to eq(instance)
+      expect(match.id).to eq(instance.id)
       Mobility.locale = :ja
-      expect(query_scope.send(finder_method, "タイトル")).to eq(instance)
+      expect(query_scope.send(finder_method, "タイトル").id).to eq(instance.id)
       expect(query_scope.send(finder_method, "foo")).to be_nil
     end
 

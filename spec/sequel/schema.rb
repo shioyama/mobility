@@ -1,4 +1,5 @@
 require "sequel/extensions/migration"
+Sequel::Model.plugin :timestamps, update_on_create: true
 
 module Mobility
   module Test
@@ -8,23 +9,24 @@ module Mobility
           DB.create_table? :posts do
             primary_key :id
             TrueClass   :published
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
           DB.create_table? :post_metadatas do
             primary_key :id
             String      :metadata
             Integer     :post_id
-          end
-
-          DB.create_table? :fallback_posts do
-            primary_key :id
-            TrueClass   :published
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
           DB.create_table? :articles do
             primary_key :id
             String      :slug
             TrueClass   :published
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
           DB.create_table? :article_translations do
@@ -33,11 +35,15 @@ module Mobility
             String      :locale
             String      :title
             String      :content, size: 65535
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
           DB.create_table? :multitable_posts do
             primary_key :id
             TrueClass   :published
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
           DB.create_table? :multitable_post_translations do
@@ -45,6 +51,8 @@ module Mobility
             Integer     :multitable_post_id
             String      :locale
             String      :title
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
 
@@ -53,6 +61,8 @@ module Mobility
             Integer     :multitable_post_id
             String      :locale
             String      :foo
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
           DB.create_table? :mobility_text_translations do
@@ -62,6 +72,8 @@ module Mobility
             String      :value,             null: false, size: 65535
             Integer     :translatable_id,   null: false
             String      :translatable_type, null: false
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
             index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_text_translations_on_keys
             index [:translatable_id, :translatable_type, :key], name: :index_mobility_text_translations_on_translatable_attribute
           end
@@ -73,6 +85,8 @@ module Mobility
             String      :value,             null: false
             Integer     :translatable_id,   null: false
             String      :translatable_type, null: false
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
             index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_string_translations_on_keys
             index [:translatable_id, :translatable_type, :key], name: :index_mobility_string_translations_on_translatable_attribute
             index [:translatable_type, :key, :value, :locale], name: :index_mobility_string_translations_on_query_keys
@@ -89,6 +103,8 @@ module Mobility
             String      :author_pt_br
             String      :author_ru
             TrueClass   :published
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
           DB.create_table? :serialized_posts do
@@ -96,6 +112,8 @@ module Mobility
             String      :title,         size: 65535
             String      :content,       size: 65535
             TrueClass   :published
+            DateTime    :created_at, allow_null: false
+            DateTime    :updated_at, allow_null: false
           end
 
           if ENV['DB'] == 'postgres'
@@ -104,6 +122,8 @@ module Mobility
               jsonb       :title
               jsonb       :content
               TrueClass   :published
+              DateTime    :created_at, allow_null: false
+              DateTime    :updated_at, allow_null: false
             end
 
             DB.run "CREATE EXTENSION IF NOT EXISTS hstore"
@@ -112,6 +132,8 @@ module Mobility
               hstore      :title
               hstore      :content
               TrueClass   :published
+              DateTime    :created_at, allow_null: false
+              DateTime    :updated_at, allow_null: false
             end
           end
         end

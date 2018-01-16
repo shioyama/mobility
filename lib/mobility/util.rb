@@ -1,5 +1,3 @@
-require "singleton"
-
 module Mobility
 =begin
 

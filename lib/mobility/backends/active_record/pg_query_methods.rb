@@ -4,8 +4,8 @@ module Mobility
 =begin
 
 Defines query methods for Postgres backends. Including class must define a
-single method, +contains_value+, which accepts a column and value to match, and
-returns an Arel node.
+single method, +contains_value+, which accepts a column, value and locale to
+match, and returns an Arel node.
 
 This module avoids 99% duplication between hstore and jsonb backend querying
 code.
@@ -59,14 +59,15 @@ code.
         # @param [Arel::Table] arel_table Model or relation's arel table
         # @return [Arel::Node] Arel node to pass to +where+
         def create_where_query!(opts, keys, arel_table)
+          locale = Mobility.locale
           keys.map { |key|
             column = arel_table[key]
             values = opts.delete(key)
 
-            next has_locale(column).not if values.nil?
+            next has_locale(column, locale).not if values.nil?
 
             Array.wrap(values).map { |value|
-              value.nil? ? has_locale(column).not : contains_value(column, value)
+              value.nil? ? has_locale(column, locale).not : contains_value(column, value, locale)
             }.inject(&:or)
           }.inject(&:and)
         end
@@ -79,34 +80,35 @@ code.
         # @param [Arel::Table] arel_table Model or relation's arel table
         # @return [Arel::Node] Arel node to pass to +where+
         def create_not_query!(opts, keys, arel_table)
+          locale = Mobility.locale
           keys.map { |key|
             column = arel_table[key.to_sym]
             values = opts.delete(key)
 
-            next has_locale(column) if values.nil?
+            next has_locale(column, locale) if values.nil?
 
             Array.wrap(values).map { |value|
-              has_locale(column).and(contains_value(column, value).not)
+              has_locale(column, locale).and(contains_value(column, value, locale).not)
             }.inject(&:and)
           }.inject(&:and)
         end
 
         private
 
-        def contains_value(_column, _value)
+        def contains_value(_column, _value, _locale)
           raise NotImplementedError
         end
 
-        def has_locale(column)
-          build_infix(:'?', column, quoted_locale)
+        def has_locale(column, locale)
+          build_infix(:'?', column, quote(locale))
         end
 
         def build_infix(*args)
           Arel::Nodes::InfixOperation.new(*args)
         end
 
-        def quoted_locale
-          Arel::Nodes.build_quoted(Mobility.locale.to_s)
+        def quote(value)
+          Arel::Nodes.build_quoted(value.to_s)
         end
       end
     end

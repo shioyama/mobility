@@ -8,8 +8,8 @@ module Mobility
 
       private
 
-      def contains_value(column, value)
-        build_infix(:'@>', column, Arel::Nodes.build_quoted({ Mobility.locale => value }.to_json))
+      def contains_value(column, value, locale)
+        build_infix(:'@>', column, quote({locale => value }.to_json))
       end
     end
   end

@@ -23,8 +23,16 @@ module Mobility
 
       private
 
-      def build_pg_op(v)
-        ::Sequel.hstore_op(v)
+      def contains_value(key, value, locale)
+        build_op(key).contains(locale => value.to_s)
+      end
+
+      def has_locale(key, locale)
+        build_op(key).has_key?(locale)
+      end
+
+      def build_op(key)
+        ::Sequel.hstore_op(key)
       end
     end
   end

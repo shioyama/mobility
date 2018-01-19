@@ -16,14 +16,14 @@ Implements the {Mobility::Backends::Column} backend for Sequel models.
 
       # @!group Backend Accessors
       # @!macro backend_reader
-      def read(locale, _ = {})
+      def read(locale, _options = nil)
         column = column(locale)
         model[column] if model.columns.include?(column)
       end
 
       # @!group Backend Accessors
       # @!macro backend_writer
-      def write(locale, value, _ = {})
+      def write(locale, value, _options = nil)
         column = column(locale)
         model[column] = value if model.columns.include?(column)
       end

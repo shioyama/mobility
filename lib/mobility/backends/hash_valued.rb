@@ -10,12 +10,12 @@ Defines read and write methods that access the value at a key with value
       # @!group Backend Accessors
       #
       # @!macro backend_reader
-      def read(locale, _ = {})
+      def read(locale, _options = nil)
         translations[locale]
       end
 
       # @!macro backend_writer
-      def write(locale, value, _ = {})
+      def write(locale, value, _options = nil)
         translations[locale] = value
       end
       # @!endgroup

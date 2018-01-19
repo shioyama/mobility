@@ -67,7 +67,9 @@ code.
             next has_locale(column, locale).not if values.nil?
 
             Array.wrap(values).map { |value|
-              value.nil? ? has_locale(column, locale).not : contains_value(column, value, locale)
+              value.nil? ?
+                has_locale(column, locale).not :
+                contains_value(column, value, locale)
             }.inject(&:or)
           }.inject(&:and)
         end
@@ -85,11 +87,9 @@ code.
             column = arel_table[key.to_sym]
             values = opts.delete(key)
 
-            next has_locale(column, locale) if values.nil?
-
             Array.wrap(values).map { |value|
-              has_locale(column, locale).and(contains_value(column, value, locale).not)
-            }.inject(&:and)
+              contains_value(column, value, locale).not
+            }.inject(has_locale(column, locale), &:and)
           }.inject(&:and)
         end
 

@@ -64,12 +64,12 @@ code.
             column = arel_table[key]
             values = opts.delete(key)
 
-            next has_locale(column, locale).not if values.nil?
+            next has_locale(key, locale).not if values.nil?
 
             Array.wrap(values).map { |value|
               value.nil? ?
-                has_locale(column, locale).not :
-                contains_value(column, value, locale)
+                has_locale(key, locale).not :
+                contains_value(key, value, locale)
             }.inject(&:or)
           }.inject(&:and)
         end
@@ -84,23 +84,22 @@ code.
         def create_not_query!(opts, keys, arel_table)
           locale = Mobility.locale
           keys.map { |key|
-            column = arel_table[key.to_sym]
             values = opts.delete(key)
 
             Array.wrap(values).map { |value|
-              contains_value(column, value, locale).not
-            }.inject(has_locale(column, locale), &:and)
+              contains_value(key, value, locale).not
+            }.inject(has_locale(key, locale), &:and)
           }.inject(&:and)
         end
 
         private
 
-        def contains_value(_column, _value, _locale)
+        def contains_value(_key, _value, _locale)
           raise NotImplementedError
         end
 
-        def has_locale(column, locale)
-          build_infix(:'?', column, quote(locale))
+        def has_locale(key, locale)
+          build_infix(:'?', arel_table[key], quote(locale))
         end
 
         def build_infix(*args)

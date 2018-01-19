@@ -8,8 +8,8 @@ module Mobility
 
       private
 
-      def contains_value(column, value, locale)
-        build_infix(:'->', column, quote(locale)).eq(quote(value.to_s))
+      def contains_value(key, value, locale)
+        build_infix(:'->', arel_table[key], quote(locale)).eq(quote(value.to_s))
       end
     end
   end

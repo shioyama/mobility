@@ -15,8 +15,12 @@ code.
 
 =end
       module PgQueryMethods
-        def initialize(attributes, _)
+        attr_reader :arel_table
+
+        def initialize(attributes, options)
           super
+          @arel_table = options[:model_class].arel_table
+
           q = self
 
           define_method :where! do |opts, *rest|
@@ -61,7 +65,6 @@ code.
         def create_where_query!(opts, keys, arel_table)
           locale = Mobility.locale
           keys.map { |key|
-            column = arel_table[key]
             values = opts.delete(key)
 
             next has_locale(key, locale).not if values.nil?

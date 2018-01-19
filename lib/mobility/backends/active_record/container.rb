@@ -1,0 +1,116 @@
+module Mobility
+  module Backends
+=begin
+
+Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
+
+=end
+    class ActiveRecord::Container
+      include ActiveRecord
+
+      require 'mobility/backends/active_record/container/query_methods'
+
+      # @return [Symbol] name of container column
+      attr_reader :column_name
+
+      # @!macro backend_constructor
+      # @option options [Symbol] column_name Name of container column
+      def initialize(model, attribute, options = {})
+        super
+        @column_name = options[:column_name]
+      end
+
+      # @!group Backend Accessors
+      #
+      # @note Translation may be a string, integer, boolean, hash or array
+      #   since value is stored on a JSON hash.
+      # @param [Symbol] locale Locale to read
+      # @param [Hash] options
+      # @return [String,Integer,Boolean] Value of translation
+      def read(locale, _ = nil)
+        model_translations(locale)[attribute]
+      end
+
+      # @note Translation may be a string, integer, boolean, hash or array
+      #   since value is stored on a JSON hash.
+      # @param [Symbol] locale Locale to write
+      # @param [String,Integer,Boolean] value Value to write
+      # @param [Hash] options
+      # @return [String,Integer,Boolean] Updated value
+      def write(locale, value, _ = nil)
+        set_attribute_translation(locale, value)
+        model_translations(locale)[attribute]
+      end
+      # @!endgroup
+
+      # @!group Backend Configuration
+      # @option options [Symbol] column_name (:translations) Name of column on which to store translations
+      def self.configure(options)
+        options[:column_name] ||= :translations
+      end
+      # @!endgroup
+
+      # @!macro backend_iterator
+      def each_locale
+        model[column_name].each do |l, v|
+          yield l.to_sym if v.present?
+        end
+      end
+
+      setup do |_attributes, options|
+        store options[:column_name], coder: Coder
+
+        # Fix for duping depth-2 jsonb column in AR < 5.0
+        if ::ActiveRecord::VERSION::STRING < '5.0'
+          column_name = options[:column_name]
+          module_name = "MobilityArContainer#{column_name.to_s.camelcase}"
+          unless const_defined?(module_name)
+            dupable = Module.new do
+              class_eval <<-EOM, __FILE__, __LINE__ + 1
+                def initialize_dup(source)
+                  super
+                  self.#{column_name} = source.#{column_name}.deep_dup
+                end
+              EOM
+            end
+            include const_set(module_name, dupable)
+          end
+        end
+      end
+
+      setup_query_methods(QueryMethods)
+
+      private
+
+      def model_translations(locale)
+        model[column_name][locale] ||= {}
+      end
+
+      def set_attribute_translation(locale, value)
+        translations = model[column_name] || {}
+        translations[locale.to_s] ||= {}
+        translations[locale.to_s][attribute] = value
+        model[column_name] = translations
+      end
+
+      class Coder
+        def self.dump(obj)
+          if obj.is_a? Hash
+            obj.inject({}) do |translations, (locale, value)|
+              value.each do |k, v|
+                (translations[locale] ||= {})[k] = v if v.present?
+              end
+              translations
+            end
+          else
+            raise ArgumentError, "Attribute is supposed to be a Hash, but was a #{obj.class}. -- #{obj.inspect}"
+          end
+        end
+
+        def self.load(obj)
+          obj
+        end
+      end
+    end
+  end
+end

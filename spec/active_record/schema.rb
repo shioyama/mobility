@@ -103,6 +103,16 @@ module Mobility
               t.timestamps
             end
 
+            create_table "container_posts" do |t|
+              if ::ActiveRecord::VERSION::STRING < '5.0'
+                t.jsonb :translations, default: '{}'
+              else
+                t.jsonb :translations, default: ''
+              end
+              t.boolean :published
+              t.timestamps
+            end
+
             execute "CREATE EXTENSION IF NOT EXISTS hstore"
 
             create_table "hstore_posts" do |t|

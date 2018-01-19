@@ -23,8 +23,16 @@ module Mobility
 
       private
 
-      def build_pg_op(v)
-        ::Sequel.pg_jsonb_op(v)
+      def contains_value(key, value, locale)
+        build_op(key).contains({ locale => value }.to_json)
+      end
+
+      def has_locale(key, locale)
+        build_op(key).has_key?(locale)
+      end
+
+      def build_op(key)
+        ::Sequel.pg_jsonb_op(key)
       end
     end
   end

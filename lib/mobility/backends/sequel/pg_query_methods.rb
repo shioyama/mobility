@@ -3,10 +3,18 @@ module Mobility
     module Sequel
 =begin
 
-Defines query methods for Postgres backends. Including class must define a
-single private method, +build_pg_op+, which takes a single argument and
-generates an appropriate operator (using either +::Sequel.hstore_op+ or
-+::Sequel.pg_jsonb_op+).
+Defines query methods for Postgres backends. Including class must define two
+private methods:
+
+- a private method +contains_value+ which takes a key (column name), value and
+  locale and returns an SQL expression, and checks that the column has the
+  specified value in the specified locale
+- a private method +has_locale+ which takes a key (column name) and locale, and
+  returns an SQL expression which checks that the column has a value in the
+  locale
+
+(The +contains_value+ method is implemented slightly differently for hstore and
+jsonb columns.)
 
 =end
       module PgQueryMethods
@@ -56,18 +64,19 @@ generates an appropriate operator (using either +::Sequel.hstore_op+ or
 
         def create_query_op(key, value, invert)
           locale = Mobility.locale.to_s
-          op = build_pg_op(key)
-          contains_value = op.contains(locale => value.to_s)
-          has_key = op.has_key?(locale)
 
           if invert
-            has_key & ~contains_value
+            has_locale(key, locale) & ~contains_value(key, value, locale)
           else
-            value.nil? ? ~has_key : contains_value
+            value.nil? ? ~has_locale(key, locale) : contains_value(key, value, locale)
           end
         end
 
-        def build_pg_op
+        def contains_value(_key, _value, _locale)
+          raise NotImplementedError
+        end
+
+        def has_locale(_key, _locale)
           raise NotImplementedError
         end
       end

@@ -143,13 +143,13 @@ columns to that table.
 
         module_name = "MobilityArTable#{association_name.to_s.camelcase}"
         unless const_defined?(module_name)
-          callback_methods = Module.new do
+          dupable = Module.new do
             define_method :initialize_dup do |source|
               super(source)
               self.send("#{association_name}=", source.send(association_name).map(&:dup))
             end
           end
-          include const_set(module_name, callback_methods)
+          include const_set(module_name, dupable)
         end
 
         include DestroyEmptyTranslations

@@ -30,21 +30,35 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
 
     describe "non-text values" do
       it "stores non-string types as-is when saving", rails_version_geq: '5.0' do
-        post = JsonbPost.new
         backend = post.mobility_backend_for("title")
         backend.write(:en, { foo: :bar } )
         post.save
-        expect(post.read_attribute(:title)).to eq({ "en" => { "foo" => "bar" }})
+        expect(post[:title]).to eq({ "en" => { "foo" => "bar" }})
       end
 
-      it "stores integer values" do
-        post.title = 1
-        expect(post.title).to eq(1)
-        post.save
+      shared_examples_for "jsonb translated value" do |name, value|
+        it "stores #{name} values" do
+          post.title = value
+          expect(post.title).to eq(value)
+          post.save
 
-        post = JsonbPost.first
-        expect(post.title).to eq(1)
+          post = JsonbPost.first
+          expect(post.title).to eq(value)
+        end
+
+        it "queries on #{name} values" do
+          skip "arrays treated as array of values, not value to match" if name == :array
+          post1 = JsonbPost.create(title: "foo")
+          post2 = JsonbPost.create(title: value)
+
+          expect(JsonbPost.i18n.find_by(title: "foo")).to eq(post1)
+          expect(JsonbPost.i18n.find_by(title: value)).to eq(post2)
+        end
       end
+
+      it_behaves_like "jsonb translated value", :integer, 1
+      it_behaves_like "jsonb translated value", :hash,    { "a" => "b" }
+      it_behaves_like "jsonb translated value", :array,   [1, "a", nil]
     end
   end
 

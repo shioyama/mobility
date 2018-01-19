@@ -26,7 +26,7 @@ code.
           define_method :where! do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
               opts = opts.with_indifferent_access
-              query = q.create_where_query!(opts, i18n_keys, arel_table)
+              query = q.create_where_query!(opts, i18n_keys)
 
               opts.empty? ? super(query) : super(opts, *rest).where(query)
             else
@@ -38,13 +38,12 @@ code.
         def extended(relation)
           super
           q = self
-          m = relation.model.arel_table
 
           mod = Module.new do
             define_method :not do |opts, *rest|
               if i18n_keys = q.extract_attributes(opts)
                 opts = opts.with_indifferent_access
-                query = q.create_not_query!(opts, i18n_keys, m)
+                query = q.create_not_query!(opts, i18n_keys)
 
                 super(opts, *rest).where(query)
               else
@@ -60,9 +59,8 @@ code.
         #
         # @param [Hash] opts Hash of attribute/value pairs
         # @param [Array] keys Translated attribute names
-        # @param [Arel::Table] arel_table Model or relation's arel table
         # @return [Arel::Node] Arel node to pass to +where+
-        def create_where_query!(opts, keys, arel_table)
+        def create_where_query!(opts, keys)
           locale = Mobility.locale
           keys.map { |key|
             values = opts.delete(key)
@@ -77,14 +75,13 @@ code.
           }.inject(&:and)
         end
 
-        # Create +not+ query for options hash, translated keys and arel_table
+        # Create +not+ query for options hash and translated keys
         # @note This is a destructive operation, it will modify +opts+.
         #
         # @param [Hash] opts Hash of attribute/value pairs
         # @param [Array] keys Translated attribute names
-        # @param [Arel::Table] arel_table Model or relation's arel table
         # @return [Arel::Node] Arel node to pass to +where+
-        def create_not_query!(opts, keys, arel_table)
+        def create_not_query!(opts, keys)
           locale = Mobility.locale
           keys.map { |key|
             values = opts.delete(key)

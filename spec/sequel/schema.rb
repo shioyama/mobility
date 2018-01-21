@@ -126,6 +126,14 @@ module Mobility
               DateTime    :updated_at, allow_null: false
             end
 
+            DB.create_table? :container_posts do
+              primary_key :id
+              jsonb       :translations, default: '""'
+              TrueClass   :published
+              DateTime    :created_at, allow_null: false
+              DateTime    :updated_at, allow_null: false
+            end
+
             DB.run "CREATE EXTENSION IF NOT EXISTS hstore"
             DB.create_table? :hstore_posts do
               primary_key :id

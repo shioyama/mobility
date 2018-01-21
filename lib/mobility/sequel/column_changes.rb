@@ -17,8 +17,7 @@ setter method is called.
               locale = options[:locale] || Mobility.locale
               column = attribute.to_sym
               column_with_locale = :"#{attribute}_#{Mobility.normalize_locale(locale)}"
-              @changed_columns << column_with_locale if !changed_columns.include?(column_with_locale)
-              @changed_columns << column             if !changed_columns.include?(column)
+              @changed_columns = changed_columns | [column, column_with_locale]
             end
             super(value, **options)
           end

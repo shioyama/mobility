@@ -9,8 +9,6 @@ setter method is called.
     class ColumnChanges < Module
       # @param [Array<String>] attributes Backend attributes
       def initialize(attributes)
-        @attributes = attributes
-
         attributes.each do |attribute|
           define_method "#{attribute}=".freeze do |value, **options|
             if !options[:super] && send(attribute) != value

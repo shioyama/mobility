@@ -83,7 +83,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         end
         include callback_methods
 
-        include Mobility::Sequel::ColumnChanges.new(attributes)
+        include Mobility::Sequel::ColumnChanges.new(*attributes)
       end
 
       setup_query_methods(QueryMethods)

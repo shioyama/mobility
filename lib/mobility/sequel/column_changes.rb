@@ -8,7 +8,7 @@ setter method is called.
 =end
     class ColumnChanges < Module
       # @param [Array<String>] attributes Backend attributes
-      def initialize(attributes)
+      def initialize(*attributes)
         attributes.each do |attribute|
           define_method "#{attribute}=".freeze do |value, **options|
             if !options[:super] && send(attribute) != value

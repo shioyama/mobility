@@ -3,6 +3,7 @@ require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/key_value"
 require "mobility/sequel/column_changes"
+require "mobility/sequel/hash_initializer"
 require "mobility/sequel/string_translation"
 require "mobility/sequel/text_translation"
 
@@ -82,7 +83,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
         include callback_methods
 
-        include Mobility::Sequel::ColumnChanges.new(attributes)
+        include Mobility::Sequel::ColumnChanges.new(*attributes)
 
         private
 

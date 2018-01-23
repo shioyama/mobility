@@ -27,11 +27,7 @@ jsonb).
       end
 
       setup do |attributes|
-        method_overrides = Module.new do
-          define_method :initialize_set do |values|
-            attributes.each { |attribute| self[attribute.to_sym] = {} }
-            super(values)
-          end
+        before_validation = Module.new do
           define_method :before_validation do
             attributes.each do |attribute|
               self[attribute.to_sym].delete_if { |_, v| Util.blank?(v) }
@@ -39,8 +35,9 @@ jsonb).
             super()
           end
         end
-        include method_overrides
-        include Mobility::Sequel::ColumnChanges.new(attributes)
+        include before_validation
+        include Mobility::Sequel::HashInitializer.new(*attributes)
+        include Mobility::Sequel::ColumnChanges.new(*attributes)
 
         plugin :defaults_setter
         attributes.each { |attribute| default_values[attribute.to_sym] = {} }

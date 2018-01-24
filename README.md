@@ -423,7 +423,7 @@ end
 
 Internally, Mobility assigns the fallbacks hash to an instance of
 `I18n::Locale::Fallbacks.new` (this can be customized by setting the
-`default_fallbacks` configuration option, see the [API documentation on
+`fallbacks_generator` configuration option, see the [API documentation on
 configuration](http://www.rubydoc.info/gems/mobility/Mobility/Configuration)).
 
 By setting fallbacks for German and French to Japanese, values will fall

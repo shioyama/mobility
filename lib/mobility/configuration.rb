@@ -45,38 +45,38 @@ Set each option on the default_options hash instead, like this:
     # @return [Array<Symbol>]
     attr_accessor :plugins
 
-    # Call default fallbacks instance
-    # @note This method will *call* the proc defined in the variable set by the
-    # +default_fallbacks_instance=+ setter. By default this will return an
-    # instance of +I18n::Locale::Fallbacks+.
+    # Generate new fallbacks instance
+    # @note This method will call the proc defined in the variable set by the
+    # +fallbacks_generator=+ setter. By default this will return an instance of
+    # +I18n::Locale::Fallbacks+.
     # @return [I18n::Locale::Fallbacks]
-    def default_fallbacks_instance(fallbacks = {})
-      @default_fallbacks_instance.call(fallbacks)
+    def new_fallbacks(fallbacks = {})
+      @fallbacks_generator.call(fallbacks)
     end
 
     # Assign proc which, passed a set of fallbacks, returns a default fallbacks
     # instance. By default this is a proc which takes fallbacks and returns an
     # instance of +I18n::Locale::Fallbacks+.
-    attr_writer :default_fallbacks_instance
+    attr_writer :fallbacks_generator
 
-    # @deprecated Use {#default_fallbacks_instance} instead.
+    # @deprecated Use {#new_fallbacks} instead.
     def default_fallbacks(fallbacks = {})
       warn %{
-WARNING: The default_fallbacks configuration has been renamed
-default_fallbacks_instance to avoid confusion. The original method
-default_fallbacks will be removed in the next major version of Mobility.
+WARNING: The default_fallbacks configuration getter has been renamed
+new_fallbacks to avoid confusion. The original method default_fallbacks will be
+removed in the next major version of Mobility.
 }
-      default_fallbacks_instance(fallbacks)
+      new_fallbacks(fallbacks)
     end
 
-    # @deprecated Use {#default_fallbacks_instance=} instead.
+    # @deprecated Use {#fallbacks_generator=} instead.
     def default_fallbacks=(fallbacks)
       warn %{
 WARNING: The default_fallbacks= configuration setter has been renamed
-default_fallbacks_instance= to avoid confusion. The original method
+fallbacks_generator= to avoid confusion. The original method
 default_fallbacks= will be removed in the next major version of Mobility.
 }
-      self.default_fallbacks_instance = fallbacks
+      self.fallbacks_generator = fallbacks
     end
 
     # Default backend to use (can be symbol or actual backend class)
@@ -98,7 +98,7 @@ default_fallbacks= will be removed in the next major version of Mobility.
     def initialize
       @accessor_method = :translates
       @query_method = :i18n
-      @default_fallbacks_instance = lambda { |fallbacks| I18n::Locale::Fallbacks.new(fallbacks) }
+      @fallbacks_generator = lambda { |fallbacks| I18n::Locale::Fallbacks.new(fallbacks) }
       @default_accessor_locales = lambda { I18n.available_locales }
       @default_options = Options[{
         cache: true,

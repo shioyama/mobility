@@ -8,8 +8,8 @@ Falls back to one or more alternative locales in case no value is defined for a
 given locale.
 
 For +fallbacks: true+, Mobility will use the value of
-{Mobility::Configuration#default_fallbacks_instance} for the fallbacks
-instance. This defaults to an instance of +I18n::Locale::Fallbacks+, but can be
+{Mobility::Configuration#new_fallbacks} for the fallbacks instance. This
+defaults to an instance of +I18n::Locale::Fallbacks+, but can be
 configured (see {Mobility::Configuration}).
 
 If a hash is passed to the +fallbacks+ option, a new fallbacks instance will be
@@ -147,9 +147,9 @@ the current locale was +nil+.
 
       def convert_option_to_fallbacks(option)
         if option.is_a?(Hash)
-          Mobility.default_fallbacks_instance(option)
+          Mobility.new_fallbacks(option)
         elsif option == true
-          Mobility.default_fallbacks_instance
+          Mobility.new_fallbacks
         else
           Hash.new { [] }
         end

@@ -1,5 +1,26 @@
 # Mobility Changelog
 
+## 0.4
+
+### 0.4.0 (January 24, 2018)
+* Add new jsonb Container backend
+  ([#157](https://github.com/shioyama/mobility/pull/157))
+* Define attributes accessors with eval
+  ([#152](https://github.com/shioyama/mobility/pull/152))
+* Rename `default_fallbacks` to `new_fallbacks` / `fallbacks_generator=`
+  ([#148](https://github.com/shioyama/mobility/pull/148))
+* Warn user if `case_sensitive` option is passed to ActiveRecord uniqueness
+  validator ([#146](https://github.com/shioyama/mobility/pull/146))
+* Handle array of values to translated attribute query
+  ([#128](https://github.com/shioyama/mobility/pull/128))
+* Use module builder instance to define shared methods in closure
+  ([#130](https://github.com/shioyama/mobility/pull/130))
+* Query on translated json value with Sequel ORM
+  ([#155](https://github.com/shioyama/mobility/pull/155))
+* Refactor pg query methods ([#129](https://github.com/shioyama/mobility/pull/129))
+* Reduce object allocations
+  ([#156](https://github.com/shioyama/mobility/pull/156))
+
 ## 0.3
 
 ### 0.3.6 (December 25, 2017)

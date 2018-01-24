@@ -54,7 +54,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.3.6'
+gem 'mobility', '~> 0.4.0'
 ```
 
 Mobility is cryptographically signed. To be sure the gem you install hasn't
@@ -804,10 +804,8 @@ or
 extensions with `DB.extension :pg_json` or `DB.extension :pg_hstore` (where
 `DB` is your database instance).
 
-Another option currently in pre-release (only available on the [master
-branch](https://github.com/shioyama/mobility)) is to store all your
-translations on a single jsonb column (one per model). This is called the
-"container" backend.
+Another option is to store all your translations on a single jsonb column (one
+per model). This is called the "container" backend.
 
 For details on these backends, see the [Postgres
 Backend](https://github.com/shioyama/mobility/wiki/Postgres-Backends-%28Column-Attribute%29)

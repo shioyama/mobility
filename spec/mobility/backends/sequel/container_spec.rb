@@ -58,4 +58,20 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
       it_behaves_like "jsonb translated value", :array,   [1, "a", nil]
     end
   end
+
+  context "with a different column_name" do
+    before(:all) do
+      DB.create_table!(:foo_posts) { primary_key :id; jsonb :foo, default: '""'; TrueClass :published }
+    end
+    before(:each) do
+      stub_const 'FooPost', Class.new(Sequel::Model)
+      FooPost.dataset = DB[:foo_posts]
+      FooPost.extend Mobility
+      FooPost.translates :title, :content, backend: :container, presence: false, cache: false, column_name: :foo
+    end
+    after(:all) { DB.drop_table?(:foo_posts) }
+
+    include_accessor_examples 'FooPost'
+    include_querying_examples 'FooPost'
+  end
 end if Mobility::Loaded::Sequel && ENV['DB'] == 'postgres'

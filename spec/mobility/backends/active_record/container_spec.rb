@@ -60,4 +60,28 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       it_behaves_like "container translated value", :array,   [1, "a", nil]
     end
   end
+
+  context "with a different column_name" do
+    before(:all) do
+      m = ActiveRecord::Migration.new
+      m.verbose = false
+      m.create_table :foo_posts do |t|
+        t.jsonb :foo, default: (::ActiveRecord::VERSION::STRING < '5.0' ? '{}' : '')
+        t.boolean :published
+        t.timestamps
+      end
+    end
+    before(:each) do
+      stub_const 'FooPost', Class.new(ActiveRecord::Base)
+      FooPost.extend Mobility
+      FooPost.translates :title, :content, backend: :container, presence: false, cache: false, column_name: :foo
+    end
+    after(:all) do
+      m = ActiveRecord::Migration.new
+      m.verbose = false
+      m.drop_table :foo_posts
+    end
+    include_accessor_examples 'FooPost'
+    include_querying_examples 'FooPost'
+  end
 end if Mobility::Loaded::ActiveRecord

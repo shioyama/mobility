@@ -228,7 +228,8 @@ describe Mobility do
     end
   end
 
-  %w[accessor_method query_method default_fallbacks default_accessor_locales].each do |delegated_method|
+  # TODO: remove default_fallbacks in v1.0
+  %w[accessor_method query_method default_fallbacks new_fallbacks default_accessor_locales].each do |delegated_method|
     describe ".#{delegated_method}" do
       it "delegates to config" do
         expect(Mobility.config).to receive(delegated_method).and_return("foo")

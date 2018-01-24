@@ -3,8 +3,9 @@ require "spec_helper"
 describe Mobility::Configuration do
   subject { Mobility::Configuration.new }
 
-  it "initializes default fallbacks to I18n::Locale::Fallbacks.new" do
-    expect(subject.default_fallbacks).to be_a(I18n::Locale::Fallbacks)
+  it "initializes new fallbacks instance to I18n::Locale::Fallbacks.new" do
+    expect(subject.new_fallbacks).to be_a(I18n::Locale::Fallbacks)
+    expect(subject.default_fallbacks).to be_a(I18n::Locale::Fallbacks) # TODO: remove in v1.0
   end
 
   it "initializes default accessor_locales to I18n.available_locales" do

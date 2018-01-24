@@ -47,8 +47,10 @@ Set each option on the default_options hash instead, like this:
 
     # Generate new fallbacks instance
     # @note This method will call the proc defined in the variable set by the
-    # +fallbacks_generator=+ setter. By default this will return an instance of
+    # +fallbacks_generator=+ setter, passing the first argument to its `call`
+    # method. By default the generator returns an instance of
     # +I18n::Locale::Fallbacks+.
+    # @param fallbacks [Hash] Fallbacks hash passed to generator
     # @return [I18n::Locale::Fallbacks]
     def new_fallbacks(fallbacks = {})
       @fallbacks_generator.call(fallbacks)
@@ -57,6 +59,7 @@ Set each option on the default_options hash instead, like this:
     # Assign proc which, passed a set of fallbacks, returns a default fallbacks
     # instance. By default this is a proc which takes fallbacks and returns an
     # instance of +I18n::Locale::Fallbacks+.
+    # @param [Proc] fallbacks generator
     attr_writer :fallbacks_generator
 
     # @deprecated Use {#new_fallbacks} instead.

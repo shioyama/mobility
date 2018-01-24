@@ -29,7 +29,7 @@ columns](http://dejimata.com/2017/3/3/translating-with-mobility#strategy-1) and
 [model translation
 tables](http://dejimata.com/2017/3/3/translating-with-mobility#strategy-2), as
 well as database-specific storage solutions such as
-[jsonb](https://www.postgresql.org/docs/current/static/datatype-json.html ) and
+[jsonb](https://www.postgresql.org/docs/current/static/datatype-json.html) and
 [Hstore](https://www.postgresql.org/docs/current/static/hstore.html) (for
 PostgreSQL).
 
@@ -804,9 +804,16 @@ or
 extensions with `DB.extension :pg_json` or `DB.extension :pg_hstore` (where
 `DB` is your database instance).
 
-Other details are covered in the [Postgres
-Backend](https://github.com/shioyama/mobility/wiki/Postgres-Backends) page of
-the wiki and in the API documentation
+Another option currently in pre-release (only available on the [master
+branch](https://github.com/shioyama/mobility)) is to store all your
+translations on a single jsonb column (one per model). This is called the
+"container" backend.
+
+For details on these backends, see the [Postgres
+Backend](https://github.com/shioyama/mobility/wiki/Postgres-Backends-%28Column-Attribute%29)
+and [Container
+Backend](https://github.com/shioyama/mobility/wiki/Container-Backend)
+pages of the wiki and in the API documentation
 ([`Mobility::Backend::Jsonb`](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Jsonb)
 and
 [`Mobility::Backend::Hstore`](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Hstore)).

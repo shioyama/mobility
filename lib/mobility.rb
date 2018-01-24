@@ -170,11 +170,11 @@ module Mobility
     end
 
     # TODO: Remove in v1.0
-    define_method :default_fallbacks do |*args|
+    def default_fallbacks(*args)
       config.public_send(:default_fallbacks, *args)
     end
 
-    define_method :new_fallbacks do |*args|
+    def new_fallbacks(*args)
       config.public_send(:new_fallbacks, *args)
     end
 

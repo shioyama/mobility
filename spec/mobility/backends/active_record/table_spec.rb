@@ -21,7 +21,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
 
     it "finds translation on every read/write" do
       article = Article.new
-      title_backend = article.mobility_backend_for("title")
+      title_backend = article.mobility.backend_for("title")
       expect(title_backend.model.send(title_backend.association_name)).to receive(:find).thrice.and_call_original
       title_backend.write(:en, "foo")
       title_backend.write(:en, "bar")
@@ -35,7 +35,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
 
     it "only fetches translation once per locale" do
       article = Article.new
-      title_backend = article.mobility_backend_for("title")
+      title_backend = article.mobility.backend_for("title")
 
       aggregate_failures do
         expect(title_backend.model.send(title_backend.association_name)).to receive(:find).twice.and_call_original
@@ -49,8 +49,8 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
 
     it "resets model translations cache when model is saved or reloaded" do
       article = Article.new
-      title_backend = article.mobility_backend_for("title")
-      content_backend = article.mobility_backend_for("content")
+      title_backend = article.mobility.backend_for("title")
+      content_backend = article.mobility.backend_for("content")
 
       aggregate_failures "cacheing reads" do
         title_backend.read(:en)
@@ -77,12 +77,12 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
     before { Article.translates :title, :content, backend: :table, cache: true }
 
     describe "cleaning up blank translations" do
-      let(:title_backend) { article.mobility_backend_for("title") }
+      let(:title_backend) { article.mobility.backend_for("title") }
 
       it "builds nil translations when reading but does not save them" do
         Mobility.locale = :en
         article = Article.new(title: "New Article")
-        association_name = article.mobility_backend_for("title").association_name
+        association_name = article.mobility.backend_for("title").association_name
 
         Mobility.locale = :ja
         article.title
@@ -98,7 +98,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
       it "removes nil translations when saving persisted record" do
         Mobility.locale = :en
         article = Article.create(title: "New Article")
-        association_name = article.mobility_backend_for("title").association_name
+        association_name = article.mobility.backend_for("title").association_name
 
         aggregate_failures do
           expect(article.send(association_name).size).to eq(1)
@@ -134,8 +134,8 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
       %w[foo bar baz].each { |slug| Article.create!(slug: slug) }
     end
     let(:article) { Article.find_by(slug: "baz") }
-    let(:title_backend) { article.mobility_backend_for("title") }
-    let(:content_backend) { article.mobility_backend_for("content") }
+    let(:title_backend) { article.mobility.backend_for("title") }
+    let(:content_backend) { article.mobility.backend_for("content") }
 
     subject { article }
 

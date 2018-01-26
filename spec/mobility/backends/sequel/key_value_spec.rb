@@ -20,8 +20,8 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
   context "with standard plugins applied" do
     let(:described_class) { Mobility::Backends::Sequel::KeyValue }
     let(:translation_class) { Mobility::Sequel::TextTranslation }
-    let(:title_backend) { article.mobility_backend_for("title") }
-    let(:content_backend) { article.mobility_backend_for("content") }
+    let(:title_backend) { article.mobility.backend_for("title") }
+    let(:content_backend) { article.mobility.backend_for("content") }
 
     before do
       stub_const 'Article', Class.new(::Sequel::Model)

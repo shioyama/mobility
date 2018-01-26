@@ -358,7 +358,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           article.send(action)
 
           # bypass the dirty module and set the variable directly
-          article.mobility_backend_for("title").instance_variable_set(:@values, { :en => "bar" })
+          article.mobility.backend_for("title").instance_variable_set(:@values, { :en => "bar" })
 
           expect(article.title).to eq("bar")
           expect(article.changes).to eq({})

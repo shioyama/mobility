@@ -16,7 +16,7 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
   end
 
   context "with standard plugins applied" do
-    let(:backend) { post.mobility_backend_for("title") }
+    let(:backend) { post.mobility.backend_for("title") }
 
     before { ContainerPost.translates :title, :content, backend: :container, presence: false, cache: false }
     let(:post) { ContainerPost.new }
@@ -29,7 +29,7 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
 
     describe "non-text values" do
       it "stores non-string types as-is when saving", rails_version_geq: '5.0' do
-        backend = post.mobility_backend_for("title")
+        backend = post.mobility.backend_for("title")
         backend.write(:en, { foo: :bar } )
         post.save
         expect(post[:translations]).to eq({ "en" => { "title" => { "foo" => "bar" }}})

@@ -16,7 +16,7 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
   end
 
   context "with standard plugins applied" do
-    let(:backend) { post.mobility_backend_for("title") }
+    let(:backend) { post.mobility.backend_for("title") }
 
     before { ContainerPost.translates :title, :content, backend: :container, presence: false, cache: false }
     let(:post) { ContainerPost.new }
@@ -27,7 +27,7 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
 
     describe "non-text values" do
       it "stores non-string types as-is when saving" do
-        backend = post.mobility_backend_for("title")
+        backend = post.mobility.backend_for("title")
         backend.write(:en, { foo: :bar } )
         post.save
         expect(post[:translations]).to eq({ "en" => { "title" => { "foo" => "bar" }}})

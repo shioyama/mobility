@@ -27,7 +27,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
         describe "non-text values" do
           it "converts non-string types to strings when saving" do
             post = SerializedPost.new
-            backend = post.mobility_backend_for("title")
+            backend = post.mobility.backend_for("title")
             backend.write(:en, { foo: :bar } )
             post.save
             expect(post[:title]).to eq({ en: "{:foo=>:bar}" }.to_yaml)
@@ -36,14 +36,14 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
 
         it "does not cache reads" do
           post = SerializedPost.new
-          backend = post.mobility_backend_for("title")
+          backend = post.mobility.backend_for("title")
           expect(backend).to receive(:translations).twice.and_call_original
           2.times { backend.read(:en) }
         end
 
         it "re-reads serialized attribute for every write" do
           post = SerializedPost.new
-          backend = post.mobility_backend_for("title")
+          backend = post.mobility.backend_for("title")
           expect(backend).to receive(:translations).twice.and_call_original
           2.times { backend.write(:en, "foo") }
         end
@@ -57,7 +57,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
         describe "non-text values" do
           it "converts non-string types to strings when saving" do
             post = SerializedPost.new
-            backend = post.mobility_backend_for("title")
+            backend = post.mobility.backend_for("title")
             backend.write(:en, { foo: :bar } )
             post.save
             expect(post[:title]).to eq({ en: "{:foo=>:bar}" }.to_json)
@@ -74,7 +74,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
 
       it "uses cache for reads" do
         post = SerializedPost.new
-        backend = post.mobility_backend_for("title")
+        backend = post.mobility.backend_for("title")
         expect(backend).to receive(:translations).once.and_call_original
         2.times { backend.read(:en) }
       end

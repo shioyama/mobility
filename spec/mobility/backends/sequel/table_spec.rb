@@ -32,7 +32,7 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel do
 
     it "only fetches translation once per locale" do
       article = Article.new
-      title_backend = article.mobility_backend_for("title")
+      title_backend = article.mobility.backend_for("title")
       expect(article.send(article.title_backend.association_name)).to receive(:find).twice.and_call_original
       title_backend.write(:en, "foo")
       title_backend.write(:en, "bar")
@@ -53,8 +53,8 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel do
     describe "Backend methods" do
       before { %w[foo bar baz].each { |slug| Article.create(slug: slug) } }
       let(:article) { Article.find(slug: "baz") }
-      let(:title_backend) { article.mobility_backend_for("title") }
-      let(:content_backend) { article.mobility_backend_for("content") }
+      let(:title_backend) { article.mobility.backend_for("title") }
+      let(:content_backend) { article.mobility.backend_for("content") }
 
       subject { article }
 

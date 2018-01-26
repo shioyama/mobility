@@ -78,7 +78,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           end
           define_method :after_save do
             super()
-            attributes.each { |attribute| mobility_backend_for(attribute).save_translations }
+            attributes.each { |attribute| public_send(Backend.method_name(attribute)).save_translations }
           end
         end
         include callback_methods

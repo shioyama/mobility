@@ -17,7 +17,7 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
   end
 
   context "with standard plugins applied" do
-    let(:backend) { post.mobility_backend_for("title") }
+    let(:backend) { post.mobility.backend_for("title") }
 
     before { HstorePost.translates :title, :content, backend: :hstore, cache: false }
     let(:post) { HstorePost.new }
@@ -30,7 +30,7 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
     describe "non-text values" do
       it "converts non-string types to strings when saving" do
         post = HstorePost.new
-        backend = post.mobility_backend_for("title")
+        backend = post.mobility.backend_for("title")
         backend.write(:en, { foo: :bar } )
         post.save
         expect(post[:title].to_hash).to eq({ "en" => "{:foo=>:bar}" })
@@ -39,7 +39,7 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
   end
 
   context "with dirty plugin applied" do
-    let(:backend) { post.mobility_backend_for("title") }
+    let(:backend) { post.mobility.backend_for("title") }
 
     before { HstorePost.translates :title, :content, backend: :hstore, cache: false, presence: false, dirty: true }
     let(:post) { HstorePost.new }

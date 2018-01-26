@@ -25,6 +25,7 @@ in backends to define gem-dependent behavior.
 
 =end
 module Mobility
+  require "mobility/adapter"
   require "mobility/accumulator"
   require "mobility/attributes"
   require "mobility/backend"
@@ -245,14 +246,24 @@ EOL
 
   module InstanceMethods
     # Fetch backend for an attribute
+    # @deprecated Use mobility.backend_for(attribute) instead.
     # @param [String] attribute Attribute
+    # TODO: Remove in v1.0
     def mobility_backend_for(attribute)
-      send(Backend.method_name(attribute))
+      warn %{
+WARNING: mobility_backend_for is deprecated and will be removed in the next
+major version of Mobility. Use <post>.mobility.backend_for(attributes)
+instead.}
+      mobility.backend_for(attribute)
     end
 
     def initialize_dup(other)
       @mobility_backends = nil
       super
+    end
+
+    def mobility
+      @mobility ||= Adapter.new(self)
     end
   end
 

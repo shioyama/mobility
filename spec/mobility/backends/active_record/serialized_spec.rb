@@ -28,7 +28,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
         describe "non-text values" do
           it "converts non-string types to strings when saving", rails_version_geq: '5.0' do
             post = SerializedPost.new
-            backend = post.mobility_backend_for("title")
+            backend = post.mobility.backend_for("title")
             backend.write(:en, { foo: :bar } )
             post.save
             expect(post.read_attribute(:title)).to match_hash({ en: "{:foo=>:bar}" })
@@ -46,14 +46,14 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
 
         it "does not cache reads" do
           post = SerializedPost.new
-          backend = post.mobility_backend_for("title")
+          backend = post.mobility.backend_for("title")
           expect(post).to receive(:read_attribute).twice.and_call_original
           2.times { backend.read(:en) }
         end
 
         it "re-reads serialized attribute for every write" do
           post = SerializedPost.new
-          backend = post.mobility_backend_for("title")
+          backend = post.mobility.backend_for("title")
           expect(post).to receive(:read_attribute).twice.and_call_original
           2.times { backend.write(:en, "foo") }
         end
@@ -82,7 +82,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
 
       it "uses cache for reads" do
         post = SerializedPost.new
-        backend = post.mobility_backend_for("title")
+        backend = post.mobility.backend_for("title")
         expect(post).to receive(:read_attribute).once.and_call_original
         2.times { backend.read(:en) }
       end

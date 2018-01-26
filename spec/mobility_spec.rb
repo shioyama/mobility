@@ -42,9 +42,9 @@ describe Mobility do
         expect(MyModel.translated_attribute_names).to eq([])
       end
 
-      it "defines Model.mobility as memoized wrapper" do
+      it "defines Model.mobility as memoized accumulator" do
         model.include Mobility
-        expect(MyModel.mobility).to be_a(Mobility::Wrapper)
+        expect(MyModel.mobility).to be_a(Mobility::Accumulator)
         expect(MyModel.mobility).to be(MyModel.mobility)
       end
     end

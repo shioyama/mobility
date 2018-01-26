@@ -25,6 +25,7 @@ in backends to define gem-dependent behavior.
 
 =end
 module Mobility
+  require "mobility/accumulator"
   require "mobility/attributes"
   require "mobility/backend"
   require "mobility/backends"
@@ -34,7 +35,6 @@ module Mobility
   require "mobility/loaded"
   require "mobility/plugins"
   require "mobility/translates"
-  require "mobility/wrapper"
 
   # General error for version compatibility conflicts
   class VersionNotSupportedError < ArgumentError; end
@@ -260,7 +260,7 @@ EOL
     include Translates
 
     def mobility
-      @mobility ||= Mobility::Wrapper.new(self)
+      @mobility ||= Mobility::Accumulator.new
     end
 
     def translated_attribute_names

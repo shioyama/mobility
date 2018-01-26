@@ -6,14 +6,12 @@ which {Attributes} modules have been included on the model class. It is also a
 simple delegator, so any missing method will be delegated to the model class.
 
 =end
-  class Wrapper < SimpleDelegator
+  class Accumulator
     # @return [Array<Attributes>]
     attr_reader :modules
-    alias :model_class :__getobj__
 
     # @param [Class] model_class Model class
-    def initialize(model_class)
-      super
+    def initialize
       @modules = []
     end
 

@@ -139,7 +139,7 @@ with other backends.
     end
 
     # Setup backend class, include modules into model class, add this
-    # attributes module to shared {Mobility::Wrapper} and setup model with
+    # attributes module to shared {Mobility::Accumulator} and setup model with
     # backend setup block (see {Mobility::Backend::Setup#setup_model}).
     # @param klass [Class] Class of model
     def included(klass)

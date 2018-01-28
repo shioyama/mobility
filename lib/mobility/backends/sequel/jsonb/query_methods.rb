@@ -23,7 +23,7 @@ module Mobility
 
       private
 
-      def contains_value(key, value, locale)
+      def matches(key, value, locale)
         build_op(key)[locale] =~ value.to_json
       end
 

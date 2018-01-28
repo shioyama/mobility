@@ -4,7 +4,7 @@ module Mobility
 =begin
 
 Defines query methods for Postgres backends. Including class must define a
-single method, +contains_value+, which accepts a column, value and locale to
+single method, +matches+, which accepts a column, value and locale to
 match, and returns an Arel node.
 
 This module avoids 99% duplication between hstore and jsonb backend querying
@@ -70,7 +70,7 @@ code.
             Array.wrap(values).map { |value|
               value.nil? ?
                 has_locale(key, locale).not :
-                contains_value(key, value, locale)
+                matches(key, value, locale)
             }.inject(&:or)
           }.inject(&:and)
         end
@@ -87,14 +87,14 @@ code.
             values = opts.delete(key)
 
             Array.wrap(values).map { |value|
-              contains_value(key, value, locale).not
+              matches(key, value, locale).not
             }.inject(has_locale(key, locale), &:and)
           }.inject(&:and)
         end
 
         private
 
-        def contains_value(_key, _value, _locale)
+        def matches(_key, _value, _locale)
           raise NotImplementedError
         end
 

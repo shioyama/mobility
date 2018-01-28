@@ -25,7 +25,7 @@ module Mobility
 
       private
 
-      def contains_value(key, value, locale)
+      def matches(key, value, locale)
         build_op(column_name)[locale][key.to_s] =~ value.to_json
       end
 

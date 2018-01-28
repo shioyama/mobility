@@ -26,7 +26,7 @@ module Mobility
       private
 
       def contains_value(key, value, locale)
-        build_op(column_name)[locale].contains({ key.to_s => value }.to_json)
+        build_op(column_name)[locale][key.to_s] =~ value.to_json
       end
 
       def has_locale(key, locale)

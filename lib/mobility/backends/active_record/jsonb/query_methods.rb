@@ -9,7 +9,7 @@ module Mobility
       private
 
       def contains_value(key, value, locale)
-        build_infix(:'@>', arel_table[key], quote({locale => value }.to_json))
+        build_infix(:'->', arel_table[key], quote(locale)).eq(quote(value.to_json))
       end
     end
   end

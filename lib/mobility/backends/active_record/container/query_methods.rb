@@ -15,9 +15,9 @@ module Mobility
       private
 
       def contains_value(key, value, locale)
-        build_infix(:'@>',
+        build_infix(:'->',
                     build_infix(:'->', column, quote(locale)),
-                    quote({ key => value }.to_json))
+                    quote(key)).eq(quote(value.to_json))
       end
 
       def has_locale(key, locale)

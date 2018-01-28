@@ -41,7 +41,7 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
           expect(post.title).to eq(value)
           post.save
 
-          post = ContainerPost.first
+          post = ContainerPost.last
           expect(post.title).to eq(value)
         end
 
@@ -56,7 +56,9 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       end
 
       it_behaves_like "container translated value", :integer, 1
-      it_behaves_like "container translated value", :hash,    { "a" => "b" }
+      it_behaves_like "container translated value", :hash,    { "a" => "b" } do
+        before { ContainerPost.create(title: { "a" => "b", "c" => "d" }) }
+      end
       it_behaves_like "container translated value", :array,   [1, "a", nil]
     end
   end

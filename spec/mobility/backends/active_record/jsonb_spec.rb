@@ -42,7 +42,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
           expect(post.title).to eq(value)
           post.save
 
-          post = JsonbPost.first
+          post = JsonbPost.last
           expect(post.title).to eq(value)
         end
 
@@ -57,7 +57,9 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
       end
 
       it_behaves_like "jsonb translated value", :integer, 1
-      it_behaves_like "jsonb translated value", :hash,    { "a" => "b" }
+      it_behaves_like "jsonb translated value", :hash,    { "a" => "b" } do
+        before { JsonbPost.create(title: { "a" => "b", "c" => "d" }) }
+      end
       it_behaves_like "jsonb translated value", :array,   [1, "a", nil]
     end
   end

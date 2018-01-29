@@ -8,12 +8,6 @@ module Mobility
 
         define_join_method(association_name, class_name)
         define_query_methods(association_name)
-
-        attributes.each do |attribute|
-          define_method :"first_by_#{attribute}" do |value|
-            where(attribute => value).select_all(model.table_name).first
-          end
-        end
       end
 
       private

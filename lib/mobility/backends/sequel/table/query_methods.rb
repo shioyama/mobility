@@ -9,12 +9,6 @@ module Mobility
 
         define_join_method(association_name, translation_class, **options)
         define_query_methods(association_name, translation_class, **options)
-
-        attributes.each do |attribute|
-          define_method :"first_by_#{attribute}" do |value|
-            where(attribute => value).select_all(model.table_name).first
-          end
-        end
       end
 
       def define_join_method(association_name, translation_class, table_name: nil, foreign_key: nil, **)

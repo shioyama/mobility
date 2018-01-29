@@ -8,23 +8,10 @@ module Mobility
     class Sequel::Hstore::QueryMethods < Sequel::QueryMethods
       include Sequel::PgQueryMethods
 
-      def initialize(attributes, _)
-        super
-
-        define_query_methods
-
-        attributes.each do |attribute|
-          define_method :"first_by_#{attribute}" do |value|
-            where(::Sequel.hstore(attribute.to_sym).contains(::Sequel.hstore({ Mobility.locale.to_s => value }))).
-              select_all(model.table_name).first
-          end
-        end
-      end
-
       private
 
       def matches(key, value, locale)
-        build_op(key).contains(locale => value.to_s)
+        build_op(key)[locale] =~ value.to_s
       end
 
       def has_locale(key, locale)

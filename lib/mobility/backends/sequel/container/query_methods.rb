@@ -11,16 +11,8 @@ module Mobility
 
       def initialize(attributes, options)
         super
-        column_name = @column_name = options[:column_name]
-
+        @column_name = options[:column_name]
         define_query_methods
-
-        attributes.each do |attribute|
-          define_method :"first_by_#{attribute}" do |value|
-            where(::Sequel.pg_jsonb_op(column_name)[Mobility.locale.to_s].contains({ attribute => value })).
-              select_all(model.table_name).first
-          end
-        end
       end
 
       private

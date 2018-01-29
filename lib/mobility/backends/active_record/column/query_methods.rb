@@ -10,12 +10,6 @@ module Mobility
         define_method :where! do |opts, *rest|
           super(q.convert_opts(opts), *rest)
         end
-
-        attributes.each do |attribute|
-          define_method :"find_by_#{attribute}" do |value|
-            find_by(Column.column_name_for(attribute) => value)
-          end
-        end
       end
 
       def extended(relation)

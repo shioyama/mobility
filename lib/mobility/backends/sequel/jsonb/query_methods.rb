@@ -8,19 +8,6 @@ module Mobility
     class Sequel::Jsonb::QueryMethods < Sequel::QueryMethods
       include Sequel::PgQueryMethods
 
-      def initialize(attributes, _)
-        super
-
-        define_query_methods
-
-        attributes.each do |attribute|
-          define_method :"first_by_#{attribute}" do |value|
-            where(::Sequel.pg_jsonb_op(attribute).contains({ Mobility.locale => value })).
-              select_all(model.table_name).first
-          end
-        end
-      end
-
       private
 
       def matches(key, value, locale)

@@ -18,12 +18,6 @@ module Mobility
             end
           end
         end
-
-        attributes.each do |attribute|
-          define_method :"first_by_#{attribute}" do |value|
-            where(attribute.to_sym => value).first
-          end
-        end
       end
     end
   end

@@ -9,12 +9,6 @@ module Mobility
 
         define_join_method(association_name, class_name)
         define_query_methods(association_name)
-
-        attributes.each do |attribute|
-          define_method :"find_by_#{attribute}" do |value|
-            find_by(attribute.to_sym => value)
-          end
-        end
       end
 
       def extended(relation)

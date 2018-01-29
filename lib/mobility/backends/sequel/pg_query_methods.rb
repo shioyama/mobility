@@ -18,6 +18,10 @@ jsonb columns.)
 
 =end
       module PgQueryMethods
+        def initialize(attributes, _)
+          super
+          define_query_methods
+        end
 
         # Create query for conditions and translated keys
         # @note This is a destructive action, it will alter +cond+.

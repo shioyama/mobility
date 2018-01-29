@@ -2,6 +2,10 @@
 
 ## 0.4
 
+### 0.4.1 (January 29, 2018)
+* Use element operator instead of contains for jsonb query8ing
+  ([#159](https://github.com/shioyama/mobility/pull/159))
+
 ### 0.4.0 (January 24, 2018)
 * Add new jsonb Container backend
   ([#157](https://github.com/shioyama/mobility/pull/157))

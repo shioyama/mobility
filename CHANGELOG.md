@@ -2,6 +2,10 @@
 
 ## 0.4
 
+### 0.4.2 (January 29, 2018)
+* Refactor find_by for translated attributes
+  ([#160](https://github.com/shioyama/mobility/pull/160))
+
 ### 0.4.1 (January 29, 2018)
 * Use element operator instead of contains for jsonb querying
   ([#159](https://github.com/shioyama/mobility/pull/159))

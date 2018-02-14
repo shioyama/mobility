@@ -87,12 +87,12 @@ module Mobility
         model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
       end
 
-      if Loaded::ActiveRecord
-        model_class.include(ActiveRecord)                   if model_class < ::ActiveRecord::Base
+      if Loaded::ActiveRecord && model_class < ::ActiveRecord::Base
+        model_class.include(ActiveRecord)
       end
 
-      if Loaded::Sequel
-        model_class.include(Sequel) if model_class < ::Sequel::Model
+      if Loaded::Sequel && model_class < ::Sequel::Model
+        model_class.include(Sequel)
       end
     end
 

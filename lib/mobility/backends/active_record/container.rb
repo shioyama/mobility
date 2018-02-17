@@ -1,3 +1,5 @@
+require "mobility/backends/active_record"
+
 module Mobility
   module Backends
 =begin

@@ -2,6 +2,13 @@
 
 ## 0.4
 
+### 0.4.3 (February 18, 2018)
+* Add missing require in container backend
+  ([#174](https://github.com/shioyama/mobility/pull/174))
+* Update dependencies to support i18n v1.0
+* Use `locale: true` instead of `fallback: false` in dirty plugin
+  ([a52998](https://github.com/shioyama/mobility/commit/a52998479893e33a6df5bfd395f50f76884cf64e))
+
 ### 0.4.2 (January 29, 2018)
 * Refactor find_by for translated attributes
   ([#160](https://github.com/shioyama/mobility/pull/160))

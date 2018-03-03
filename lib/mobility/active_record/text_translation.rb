@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "mobility/active_record/translation"
 
 module Mobility

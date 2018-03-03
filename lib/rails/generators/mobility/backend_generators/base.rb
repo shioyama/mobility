@@ -53,15 +53,15 @@ module Mobility
       end
 
       def template
-        "#{backend}_translations".freeze
+        "#{backend}_translations"
       end
 
       def migration_dir
-        File.expand_path("db/migrate".freeze)
+        File.expand_path("db/migrate")
       end
 
       def migration_file
-        "create_#{file_name}_#{attributes.map(&:name).join('_and_')}_translations_for_mobility_#{backend}_backend".freeze
+        "create_#{file_name}_#{attributes.map(&:name).join('_and_')}_translations_for_mobility_#{backend}_backend"
       end
     end
 

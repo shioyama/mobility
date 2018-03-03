@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'i18n'
 require 'request_store'
 require 'mobility/version'
@@ -194,7 +195,7 @@ module Mobility
     #   Mobility.normalize_locale("pt-BR")
     #   #=> "pt_br"
     def normalize_locale(locale = Mobility.locale)
-      "#{locale.to_s.downcase.sub("-", "_")}".freeze
+      "#{locale.to_s.downcase.sub("-", "_")}"
     end
     alias_method :normalized_locale, :normalize_locale
 
@@ -208,7 +209,7 @@ module Mobility
     #   Mobility.normalize_locale_accessor(:bar, "pt-BR")
     #   #=> "bar_pt_br"
     def normalize_locale_accessor(attribute, locale = Mobility.locale)
-      "#{attribute}_#{normalize_locale(locale)}".freeze
+      "#{attribute}_#{normalize_locale(locale)}"
     end
 
     # Raises InvalidLocale exception if the locale passed in is present but not available.

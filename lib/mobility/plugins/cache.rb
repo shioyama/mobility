@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "mobility/plugins/cache/translation_cacher"
 
 module Mobility

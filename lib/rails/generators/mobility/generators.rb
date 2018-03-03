@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "rails/generators"
 
 require_relative "./active_record_migration_compatibility"

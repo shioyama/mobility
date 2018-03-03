@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "mobility/active_model/backend_resetter"
 
 module Mobility

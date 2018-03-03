@@ -45,21 +45,21 @@ value of the translated attribute if passed to it.
           def initialize(*attribute_names)
             attribute_names.each do |name|
               method_suffixes.each do |suffix|
-                define_method "#{name}#{suffix}".freeze do
-                  __send__("attribute#{suffix}".freeze, Mobility.normalize_locale_accessor(name))
+                define_method "#{name}#{suffix}" do
+                  __send__("attribute#{suffix}", Mobility.normalize_locale_accessor(name))
                 end
               end
 
-              define_method "restore_#{name}!".freeze do
+              define_method "restore_#{name}!" do
                 locale_accessor = Mobility.normalize_locale_accessor(name)
                 if attribute_changed?(locale_accessor)
-                  __send__("#{name}=".freeze, changed_attributes[locale_accessor])
+                  __send__("#{name}=", changed_attributes[locale_accessor])
                 end
               end
             end
 
             define_method :restore_attribute! do |attr|
-              attribute_names.include?(attr.to_s) ? send("restore_#{attr}!".freeze) : super(attr)
+              attribute_names.include?(attr.to_s) ? send("restore_#{attr}!") : super(attr)
             end
             private :restore_attribute!
           end

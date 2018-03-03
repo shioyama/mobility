@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mobility
 =begin
 
@@ -40,7 +42,7 @@ Some useful methods on strings, borrowed in parts from Sequel and ActiveSupport.
     # @return [String]
     def camelize(str)
       call_or_yield str do
-        str.to_s.sub(/^[a-z\d]*/) { $&.capitalize }.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/'.freeze, '::'.freeze)
+        str.to_s.sub(/^[a-z\d]*/) { $&.capitalize }.gsub(/(?:_|(\/))([a-z\d]*)/) { "#{$1}#{$2.capitalize}" }.gsub('/', '::')
       end
     end
 

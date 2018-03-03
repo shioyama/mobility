@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "mobility/backends/active_record/query_methods"
 
 module Mobility

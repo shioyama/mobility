@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "mobility/backends/sequel/pg_query_methods"
 require "mobility/backends/sequel/query_methods"
 

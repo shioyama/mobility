@@ -1,4 +1,5 @@
-require 'mobility/backends/sequel/pg_query_methods'
+# frozen_string_literal: true
+require "mobility/backends/sequel/pg_query_methods"
 require "mobility/backends/sequel/query_methods"
 
 Sequel.extension :pg_json, :pg_json_ops

@@ -38,7 +38,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       def self.configure(options)
         super
         type = options[:type]
-        options[:class_name] ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation".freeze)
+        options[:class_name] ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
         options[:association_name] ||= :"#{options[:type]}_translations"
         %i[type association_name].each { |key| options[key] = options[key].to_sym }
@@ -103,7 +103,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         # Clean up *all* leftover translations of this model, only once.
         def mobility_destroy_key_value_translations
           [:string, :text].freeze.each do |type|
-            Mobility::ActiveRecord.const_get("#{type.capitalize}Translation".freeze).
+            Mobility::ActiveRecord.const_get("#{type.capitalize}Translation").
               where(translatable: self).destroy_all
           end
         end

@@ -46,7 +46,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         super
         raise CacheRequired, "Cache required for Sequel::KeyValue backend" if options[:cache] == false
         type = options[:type]
-        options[:class_name] ||= Mobility::Sequel.const_get("#{type.capitalize}Translation".freeze)
+        options[:class_name] ||= Mobility::Sequel.const_get("#{type.capitalize}Translation")
         options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
         options[:association_name] ||= :"#{options[:type]}_translations"
         %i[type association_name].each { |key| options[key] = options[key].to_sym }
@@ -93,7 +93,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             def after_destroy
               super
               [:string, :text].freeze.each do |type|
-                Mobility::Sequel.const_get("#{type.capitalize}Translation".freeze).
+                Mobility::Sequel.const_get("#{type.capitalize}Translation").
                   where(translatable_id: id, translatable_type: self.class.name).destroy
               end
             end

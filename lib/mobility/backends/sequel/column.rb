@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "mobility/backends/sequel"
 require "mobility/backends/column"
 

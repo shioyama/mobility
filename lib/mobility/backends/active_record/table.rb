@@ -101,7 +101,7 @@ columns to that table.
       #   to append to model class to generate translation class
       def self.configure(options)
         table_name = options[:model_class].table_name
-        options[:table_name]  ||= "#{table_name.singularize}_translations".freeze
+        options[:table_name]  ||= "#{table_name.singularize}_translations"
         options[:foreign_key] ||= table_name.downcase.singularize.camelize.foreign_key
         if (association_name = options[:association_name]).present?
           options[:subclass_name] ||= association_name.to_s.singularize.camelize.freeze
@@ -158,7 +158,7 @@ columns to that table.
       setup_query_methods(QueryMethods)
 
       def translation_for(locale, _)
-        translation = translations.find { |t| t.locale == locale.to_s.freeze }
+        translation = translations.find { |t| t.locale == locale.to_s }
         translation ||= translations.build(locale: locale)
         translation
       end

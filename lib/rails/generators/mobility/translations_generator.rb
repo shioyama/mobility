@@ -35,7 +35,7 @@ Other backends are not supported, for obvious reasons:
 =end
   class TranslationsGenerator < ::Rails::Generators::NamedBase
     SUPPORTED_BACKENDS = %w[column table]
-    BACKEND_OPTIONS = { type: :string, desc: "Backend to use for translations (defaults to Mobility.default_backend)".freeze }
+    BACKEND_OPTIONS = { type: :string, desc: "Backend to use for translations (defaults to Mobility.default_backend)" }
     argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
 
     class_option(:backend, BACKEND_OPTIONS)
@@ -50,7 +50,7 @@ Other backends are not supported, for obvious reasons:
     def self.prepare_for_invocation(name, value)
       if name == :backend
         if SUPPORTED_BACKENDS.include?(value)
-          require_relative "./backend_generators/#{value}_backend".freeze
+          require_relative "./backend_generators/#{value}_backend"
           Mobility::BackendGenerators.const_get("#{value}_backend".camelcase.freeze)
         else
           begin
@@ -70,7 +70,7 @@ Other backends are not supported, for obvious reasons:
 
     def say_status(status, message, *args)
       if status == :invoke && SUPPORTED_BACKENDS.include?(message)
-        super(status, "#{message}_backend".freeze, *args)
+        super(status, "#{message}_backend", *args)
       else
         super
       end

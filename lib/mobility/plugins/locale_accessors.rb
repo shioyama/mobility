@@ -53,7 +53,7 @@ If no locales are passed as an option to the initializer,
       private
 
       def define_reader(name, locale)
-        warning_message = "locale passed as option to locale accessor will be ignored".freeze
+        warning_message = "locale passed as option to locale accessor will be ignored"
         normalized_locale = Mobility.normalize_locale(locale)
 
         define_method "#{name}_#{normalized_locale}" do |**options|
@@ -70,7 +70,7 @@ If no locales are passed as an option to the initializer,
       end
 
       def define_writer(name, locale)
-        warning_message = "locale passed as option to locale accessor will be ignored".freeze
+        warning_message = "locale passed as option to locale accessor will be ignored"
         normalized_locale = Mobility.normalize_locale(locale)
 
         define_method "#{name}_#{normalized_locale}=" do |value, **options|

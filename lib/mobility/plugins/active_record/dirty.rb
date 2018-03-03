@@ -46,7 +46,7 @@ AR::Dirty plugin adds support for the following persistence-specific methods
 
             if ::ActiveRecord::VERSION::MAJOR == 5 && ::ActiveRecord::VERSION::MINOR == 1
               names = @attribute_names
-              method_name_regex = /\A(#{names.join('|'.freeze)})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
+              method_name_regex = /\A(#{names.join('|')})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
               has_attribute = Module.new do
                 define_method :has_attribute? do |attr_name|
                   super(attr_name) || !!method_name_regex.match(attr_name)

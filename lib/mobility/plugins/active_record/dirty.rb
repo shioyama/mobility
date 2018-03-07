@@ -122,6 +122,24 @@ AR::Dirty plugin adds support for the following persistence-specific methods
                 mobility_changed_attributes.include?(attr) ? __send__(attr) : super
               end
             end
+
+            # @note This is necessary due to a performance fix in e12607
+            #   which skips setting @previously_changed if @attributes is
+            #   defined. For Mobility models using the Dirty plugin, there will
+            #   be cases where @attributes has been set, but there are *other*
+            #   changes on virtual translated attributes which need to also be
+            #   assigned. In this case, we use the presence of such changed
+            #   virtual attributes as an alternative trigger to set this variable.
+            #
+            #   See:
+            #   - https://github.com/rails/rails/commit/e126078a0e013acfe0a397a8dad33b2c9de78732
+            #   - https://github.com/shioyama/mobility/pull/166
+            def changes_applied
+              if defined?(@attributes) && mobility_changed_attributes.any?
+                @previously_changed = changes
+              end
+              super
+            end
           end
         end
       end

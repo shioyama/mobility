@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-ENV['RAILS_VERSION']  ||= "5.1"
+ENV['RAILS_VERSION']  ||= "5.2"
 ENV['SEQUEL_VERSION'] ||= "4"
 
 if !ENV['ORM'].nil? && !ENV['ORM'].empty?

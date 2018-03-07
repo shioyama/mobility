@@ -12,10 +12,10 @@ group :development, :test do
     elsif ENV['RAILS_VERSION'] == '5.1'
       gem 'activerecord', '>= 5.1', '< 5.2'
     else
-      # TODO: change to '>= 5.2.0.beta1, < 5.3'
-      #   once dirty specs pass in 5.2.0.rc1
-      gem 'activerecord', '5.2.0.beta2'
-      gem 'railties', '5.2.0.beta2'
+      git 'https://github.com/rails/rails.git', branch: '5-2-stable' do
+        gem 'activerecord'
+        gem 'railties'
+      end
     end
     gem "generator_spec", '~> 0.9.4'
   elsif ENV['ORM'] == 'sequel'

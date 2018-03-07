@@ -252,7 +252,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
           Mobility.locale = :ja
           expect(article.title).to eq(nil)
           expect(article.content).to eq(nil)
-          article.update_attributes!(title: "新規記事", content: "昔々あるところに…")
+          article.update!(title: "新規記事", content: "昔々あるところに…")
           expect(article.title).to eq("新規記事")
           expect(article.content).to eq("昔々あるところに…")
           expect(Article.count).to eq(1)
@@ -310,7 +310,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
       # sure we clean them up when the model is destroyed.
       it "cleans up all associated translations, regardless of key" do
         article = Article.create(title: "foo title", content: "foo content")
-        Mobility.with_locale(:ja) { article.update_attributes(title: "あああ", content: "ばばば") }
+        Mobility.with_locale(:ja) { article.update(title: "あああ", content: "ばばば") }
         article.save
 
         # Create translations on another model, to check they do not get destroyed

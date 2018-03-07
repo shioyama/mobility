@@ -5,7 +5,7 @@ shared_examples_for "cache key"  do |model_class_name, attribute=:title|
     model = model_class.create!(attribute => "foo")
     original_cache_key = model.cache_key
     travel 1.second do
-      model.update_attributes!(attribute => "bar")
+      model.update!(attribute => "bar")
     end
     expect(model.cache_key).to_not eq(original_cache_key)
   end

@@ -103,7 +103,7 @@ default_fallbacks= will be removed in the next major version of Mobility.
     def initialize
       @accessor_method = :translates
       @query_method = :i18n
-      @fallbacks_generator = lambda { |fallbacks| I18n::Locale::Fallbacks.new(fallbacks) }
+      @fallbacks_generator = lambda { |fallbacks| Mobility::Fallbacks.build(fallbacks) }
       @default_accessor_locales = lambda { I18n.available_locales }
       @default_options = Options[{
         cache: true,

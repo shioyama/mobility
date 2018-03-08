@@ -30,6 +30,7 @@ module Mobility
   require "mobility/backends"
   require "mobility/backend_resetter"
   require "mobility/configuration"
+  require "mobility/fallbacks"
   require "mobility/loaded"
   require "mobility/plugins"
   require "mobility/translates"

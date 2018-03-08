@@ -12,6 +12,7 @@ end
 db = ENV['DB'] || 'none'
 require 'pry-byebug'
 require 'i18n'
+require 'i18n/backend/fallbacks' if ENV['I18N_FALLBACKS']
 require 'rspec'
 require 'allocation_stats' if ENV['TEST_PERFORMANCE']
 require 'json'

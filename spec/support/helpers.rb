@@ -9,6 +9,13 @@ module Helpers
     base.extend LazyDescribedClass
   end
 
+  # Reset I18n.fallbacks to nil, necessary in case the default locale is
+  # changed since I18n.fallbacks implicitly stores the previous default locale
+  # as @@defaults.
+  def reset_i18n_fallbacks
+    I18n.class_variable_set(:@@fallbacks, nil)
+  end
+
   module LazyDescribedClass
     # lazy-load described_class if it's a string
     def described_class

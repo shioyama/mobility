@@ -60,6 +60,8 @@ RSpec.configure do |config|
     if (version = example.metadata[:rails_version_geq]) && (ENV['RAILS_VERSION'] < version)
       skip "Unsupported for Rails < #{version}"
     end
+    # Always clear I18n.fallbacks to avoid "leakage" between specs
+    reset_i18n_fallbacks
     Mobility.locale = :en
   end
 

@@ -43,7 +43,7 @@ describe Mobility::Plugins::Fallbacks do
       end
 
       it "returns nil when no fallback is found" do
-        expect(subject.read(:"fr")).to eq(nil)
+        expect(subject.read(:fr)).to eq(nil)
       end
 
       it "returns nil when fallback: false option is passed" do

@@ -22,6 +22,7 @@ require "mobility/backends/null"
 
 I18n.enforce_available_locales = true
 I18n.available_locales = [:en, :'en-US', :ja, :fr, :de, :'de-DE', :cz, :pl, :pt, :'pt-BR']
+I18n.default_locale = :en
 
 Dir[File.expand_path("./spec/support/**/*.rb")].each { |f| require f }
 

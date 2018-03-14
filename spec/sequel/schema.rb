@@ -126,6 +126,15 @@ module Mobility
               DateTime    :updated_at, allow_null: false
             end
 
+            DB.create_table? :json_posts do
+              primary_key :id
+              json        :title,      default: '{}'
+              json        :content,    default: '{}'
+              TrueClass   :published
+              DateTime    :created_at, allow_null: false
+              DateTime    :updated_at, allow_null: false
+            end
+
             DB.create_table? :container_posts do
               primary_key :id
               jsonb       :translations, default: '{}'

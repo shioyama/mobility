@@ -29,7 +29,7 @@ columns](http://dejimata.com/2017/3/3/translating-with-mobility#strategy-1) and
 [model translation
 tables](http://dejimata.com/2017/3/3/translating-with-mobility#strategy-2), as
 well as database-specific storage solutions such as
-[jsonb](https://www.postgresql.org/docs/current/static/datatype-json.html) and
+[json/jsonb](https://www.postgresql.org/docs/current/static/datatype-json.html) and
 [Hstore](https://www.postgresql.org/docs/current/static/hstore.html) (for
 PostgreSQL).
 
@@ -794,11 +794,11 @@ class](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Column).
 
 ### PostgreSQL-specific Backends
 
-Mobility also supports jsonb and Hstore storage options, if you are using
+Mobility also supports JSON and Hstore storage options, if you are using
 PostgreSQL as your database. To use this option, create column(s) on the model
-table for each translated attribute, and set your backend to `:jsonb` or
-`:hstore`. If you are using Sequel, note that you will need to enable the
-[pg_json](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html)
+table for each translated attribute, and set your backend to `:json` (on master
+branch only), `:jsonb` or `:hstore`. If you are using Sequel, note that you
+will need to enable the [pg_json](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html)
 or
 [pg_hstore](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html)
 extensions with `DB.extension :pg_json` or `DB.extension :pg_hstore` (where
@@ -857,8 +857,8 @@ they conform to the same expected behaviour. These examples can be found in:
 - `spec/support/shared_examples/querying_examples.rb` (specs for
   [querying](#querying))
 - `spec/support/shared_examples/serialization_examples.rb` (specialized specs
-  for backends which store translations as a Hash: `serialized`, `hstore` and
-  `jsonb` backends)
+  for backends which store translations as a Hash: `serialized`, `hstore`,
+  `json` and `jsonb` backends)
 
 A minimal test can simply define a model class and use helpers defined in
 `spec/support/helpers.rb` to run these examples, by extending either

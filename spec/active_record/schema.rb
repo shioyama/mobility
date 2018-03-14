@@ -98,6 +98,13 @@ module Mobility
               t.timestamps
             end
 
+            create_table "json_posts" do |t|
+              t.json :title, default: {}
+              t.json :content, default: {}
+              t.boolean :published
+              t.timestamps
+            end
+
             create_table "container_posts" do |t|
               t.jsonb :translations, default: {}
               t.boolean :published

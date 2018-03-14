@@ -4,26 +4,26 @@ module Mobility
   module Backends
 =begin
 
-Implements the {Mobility::Backends::Jsonb} backend for ActiveRecord models.
+Implements the {Mobility::Backends::Json} backend for ActiveRecord models.
 
 @see Mobility::Backends::ActiveRecord::HashValued
 
 =end
-    class ActiveRecord::Jsonb < ActiveRecord::PgHash
-      require 'mobility/backends/active_record/jsonb/query_methods'
+    class ActiveRecord::Json < ActiveRecord::PgHash
+      require 'mobility/backends/active_record/json/query_methods'
 
       # @!group Backend Accessors
       #
-      # @note Translation may be any json type, but querying will only work on
-      #   string-typed values.
+      # @note Translation may be string, integer or boolean-valued since
+      #   value is stored on a JSON hash.
       # @param [Symbol] locale Locale to read
       # @param [Hash] options
       # @return [String,Integer,Boolean] Value of translation
       # @!method read(locale, **options)
 
       # @!group Backend Accessors
-      # @note Translation may be any json type, but querying will only work on
-      #   string-typed values.
+      # @note Translation may be string, integer or boolean-valued since
+      #   value is stored on a JSON hash.
       # @param [Symbol] locale Locale to write
       # @param [String,Integer,Boolean] value Value to write
       # @param [Hash] options

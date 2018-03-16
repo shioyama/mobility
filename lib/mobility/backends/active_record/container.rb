@@ -11,7 +11,8 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
     class ActiveRecord::Container
       include ActiveRecord
 
-      require 'mobility/backends/active_record/container/query_methods'
+      require 'mobility/backends/active_record/container/json_query_methods'
+      require 'mobility/backends/active_record/container/jsonb_query_methods'
 
       # @return [Symbol] name of container column
       attr_reader :column_name
@@ -48,8 +49,14 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
 
       # @!group Backend Configuration
       # @option options [Symbol] column_name (:translations) Name of column on which to store translations
+      # @raise [InvalidColumnType] if the type of the container column is not json or jsonb
       def self.configure(options)
         options[:column_name] ||= :translations
+        options[:column_name] = options[:column_name].to_sym
+        options[:column_type] = options[:model_class].type_for_attribute(options[:column_name].to_s).try(:type)
+        unless %i[json jsonb].include?(options[:column_type])
+          raise InvalidColumnType, "#{options[:column_name]} must be a column of type json or jsonb"
+        end
       end
       # @!endgroup
 
@@ -60,7 +67,9 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
         end
       end
 
-      setup do |_attributes, options|
+      backend_class = self
+
+      setup do |attributes, options|
         store options[:column_name], coder: Coder
 
         # Fix for duping depth-2 jsonb column in AR < 5.0
@@ -79,9 +88,14 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
             include const_set(module_name, dupable)
           end
         end
-      end
 
-      setup_query_methods(QueryMethods)
+        query_methods = backend_class.const_get("#{options[:column_type].capitalize}QueryMethods")
+        extend(Module.new do
+          define_method ::Mobility.query_method do
+            super().extending(query_methods.new(attributes, options))
+          end
+        end)
+      end
 
       private
 
@@ -114,6 +128,8 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
           obj
         end
       end
+
+      class InvalidColumnType < StandardError; end
     end
   end
 end

@@ -103,7 +103,7 @@ code.
         end
 
         def build_infix(*args)
-          Arel::Nodes::InfixOperation.new(*args)
+          arel_table.grouping(Arel::Nodes::InfixOperation.new(*args))
         end
 
         def quote(value)

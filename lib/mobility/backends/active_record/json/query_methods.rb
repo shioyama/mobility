@@ -18,7 +18,7 @@ module Mobility
       end
 
       def build_locale_infix(key, locale)
-        arel_table.grouping(build_infix(:'->>', arel_table[key], quote(locale)))
+        build_infix(:'->>', arel_table[key], quote(locale))
       end
     end
   end

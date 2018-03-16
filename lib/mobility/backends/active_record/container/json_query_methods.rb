@@ -1,9 +1,10 @@
 # frozen_string_literal: true
-require "mobility/backends/active_record/jsonb"
+require 'mobility/backends/active_record/pg_query_methods'
+require "mobility/backends/active_record/query_methods"
 
 module Mobility
   module Backends
-    class ActiveRecord::Container::QueryMethods < ActiveRecord::QueryMethods
+    class ActiveRecord::Container::JsonQueryMethods < ActiveRecord::QueryMethods
       include ActiveRecord::PgQueryMethods
       attr_reader :column_name, :column
 
@@ -16,16 +17,13 @@ module Mobility
       private
 
       def matches(key, value, locale)
-        build_infix(:'->',
+        build_infix(:'->>',
                     build_infix(:'->', column, quote(locale)),
-                    quote(key)).eq(quote(value.to_json))
+                    quote(key)).eq(value && value.to_s)
       end
 
       def has_locale(key, locale)
-        build_infix(:'?', column, quote(locale)).and(
-          build_infix(:'?',
-                      build_infix(:'->', column, quote(locale)),
-                      quote(key)))
+        matches(key, nil, locale).not
       end
     end
   end

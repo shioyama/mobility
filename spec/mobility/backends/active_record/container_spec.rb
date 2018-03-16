@@ -63,27 +63,52 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
     end
   end
 
-  context "with a different column_name" do
+  context "with a json column" do
     before(:all) do
       m = ActiveRecord::Migration.new
       m.verbose = false
-      m.create_table :foo_posts do |t|
-        t.jsonb :foo, default: (::ActiveRecord::VERSION::STRING < '5.0' ? '{}' : '')
+      m.create_table :json_container_posts do |t|
+        t.json :json_translations, default: {}
         t.boolean :published
         t.timestamps
       end
     end
     before(:each) do
-      stub_const 'FooPost', Class.new(ActiveRecord::Base)
-      FooPost.extend Mobility
-      FooPost.translates :title, :content, backend: :container, presence: false, cache: false, column_name: :foo
+      stub_const 'JsonContainerPost', Class.new(ActiveRecord::Base)
+      JsonContainerPost.extend Mobility
+      JsonContainerPost.translates :title, :content, backend: :container, presence: false, cache: false, column_name: :json_translations
     end
     after(:all) do
       m = ActiveRecord::Migration.new
       m.verbose = false
-      m.drop_table :foo_posts
+      m.drop_table :json_container_posts
     end
-    include_accessor_examples 'FooPost'
-    include_querying_examples 'FooPost'
+    include_accessor_examples 'JsonContainerPost'
+    include_querying_examples 'JsonContainerPost' unless ENV['RAILS_VERSION'] < '5.0'
+  end
+
+  context "with a non-json/jsonb column" do
+    before(:all) do
+      m = ActiveRecord::Migration.new
+      m.verbose = false
+      m.create_table :string_column_posts do |t|
+        t.string :foo
+        t.boolean :published
+        t.timestamps
+      end
+    end
+    after(:all) do
+      m = ActiveRecord::Migration.new
+      m.verbose = false
+      m.drop_table :string_column_posts
+    end
+
+    it "raises InvalidColumnType exception" do
+      stub_const 'StringColumnPost', Class.new(ActiveRecord::Base)
+      StringColumnPost.extend Mobility
+      expect {
+        StringColumnPost.translates :title, backend: :container, column_name: :foo
+      }.to raise_error(Mobility::Backends::ActiveRecord::Container::InvalidColumnType)
+    end
   end
 end if Mobility::Loaded::ActiveRecord

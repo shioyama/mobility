@@ -119,7 +119,8 @@ the current locale was +nil+.
 
 =end
     class Fallbacks < Module
-      # Applies fallbacks plugin to attributes.
+      # Applies fallbacks plugin to attributes. Completely disables fallbacks
+      # on model if option is +false+.
       # @param [Attributes] attributes
       # @param [Boolean] option
       def self.apply(attributes, option)

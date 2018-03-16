@@ -107,11 +107,7 @@ default_fallbacks= will be removed in the next major version of Mobility.
       @default_accessor_locales = lambda { I18n.available_locales }
       @default_options = Options[{
         cache: true,
-        dirty: false,
-        fallbacks: nil,
         presence: true,
-        default: nil,
-        attribute_methods: false
       }]
       @plugins = %i[
         cache

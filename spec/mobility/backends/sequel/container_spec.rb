@@ -61,19 +61,35 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
     end
   end
 
-  context "with a different column_name" do
+  context "with a json column_name" do
     before(:all) do
-      DB.create_table!(:foo_posts) { primary_key :id; jsonb :foo, default: '""'; TrueClass :published }
+      DB.create_table!(:json_container_posts) { primary_key :id; json :json_translations, default: '{}'; TrueClass :published }
     end
     before(:each) do
-      stub_const 'FooPost', Class.new(Sequel::Model)
-      FooPost.dataset = DB[:foo_posts]
-      FooPost.extend Mobility
-      FooPost.translates :title, :content, backend: :container, presence: false, cache: false, column_name: :foo
+      stub_const 'JsonContainerPost', Class.new(Sequel::Model)
+      JsonContainerPost.dataset = DB[:json_container_posts]
+      JsonContainerPost.extend Mobility
+      JsonContainerPost.translates :title, :content, backend: :container, presence: false, cache: false, column_name: :json_translations
     end
-    after(:all) { DB.drop_table?(:foo_posts) }
+    after(:all) { DB.drop_table?(:json_container_posts) }
 
-    include_accessor_examples 'FooPost'
-    include_querying_examples 'FooPost'
+    include_accessor_examples 'JsonContainerPost'
+    include_querying_examples 'JsonContainerPost'
+  end
+
+  context "with a non-json/jsonb column" do
+    before(:all) do
+      DB.create_table!(:string_column_posts) { primary_key :id; String :foo, default: ''; TrueClass :published }
+    end
+    after(:all) { DB.drop_table?(:string_column_posts) }
+
+    it "raises InvalidColumnType exception" do
+      stub_const 'StringColumnPost', Class.new(Sequel::Model)
+      StringColumnPost.dataset = DB[:string_column_posts]
+      StringColumnPost.extend Mobility
+      expect { StringColumnPost.translates :title, backend: :container, column_name: :foo
+      }.to raise_error(Mobility::Backends::Sequel::Container::InvalidColumnType,
+                       "foo must be a column of type json or jsonb")
+    end
   end
 end if Mobility::Loaded::Sequel && ENV['DB'] == 'postgres'

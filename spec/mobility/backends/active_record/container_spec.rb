@@ -108,7 +108,8 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       StringColumnPost.extend Mobility
       expect {
         StringColumnPost.translates :title, backend: :container, column_name: :foo
-      }.to raise_error(Mobility::Backends::ActiveRecord::Container::InvalidColumnType)
+      }.to raise_error(Mobility::Backends::ActiveRecord::Container::InvalidColumnType,
+                       "foo must be a column of type json or jsonb")
     end
   end
 end if Mobility::Loaded::ActiveRecord

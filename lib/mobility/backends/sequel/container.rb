@@ -8,7 +8,8 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
     class Sequel::Container
       include Sequel
 
-      require 'mobility/backends/sequel/container/query_methods'
+      require 'mobility/backends/sequel/container/json_query_methods'
+      require 'mobility/backends/sequel/container/jsonb_query_methods'
 
       # @return [Symbol] name of container column
       attr_reader :column_name
@@ -47,6 +48,12 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
       # @option options [Symbol] column_name (:translations) Name of column on which to store translations
       def self.configure(options)
         options[:column_name] ||= :translations
+        options[:column_name] = options[:column_name].to_sym
+        column_name, db_schema = options[:column_name], options[:model_class].db_schema
+        options[:column_type] = db_schema[column_name] && (db_schema[column_name][:db_type]).to_sym
+        unless %i[json jsonb].include?(options[:column_type])
+          raise InvalidColumnType, "#{options[:column_name]} must be a column of type json or jsonb"
+        end
       end
       # @!endgroup
       #
@@ -56,6 +63,8 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
           yield l.to_sym unless read(l).nil?
         end
       end
+
+      backend_class = self
 
       setup do |attributes, options|
         column_name = options[:column_name]
@@ -73,9 +82,14 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
 
         plugin :defaults_setter
         attributes.each { |attribute| default_values[attribute.to_sym] = {} }
-      end
 
-      setup_query_methods(QueryMethods)
+        query_methods = backend_class.const_get("#{options[:column_type].capitalize}QueryMethods")
+        extend(Module.new do
+          define_method ::Mobility.query_method do
+            super().with_extend(query_methods.new(attributes, options))
+          end
+        end)
+      end
 
       private
 
@@ -94,6 +108,8 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
         end
         translations[locale.to_s][attribute] = value
       end
+
+      class InvalidColumnType < StandardError; end
     end
   end
 end

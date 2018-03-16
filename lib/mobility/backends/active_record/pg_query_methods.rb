@@ -7,11 +7,14 @@ Defines query methods for Postgres backends. Including class must define a
 single method, +matches+, which accepts a column, value and locale to
 match, and returns an Arel node.
 
-This module avoids 99% duplication between hstore and jsonb backend querying
-code.
+This module avoids a lot of duplication between hstore/json/jsonb/container
+backend querying code.
 
+@see Mobility::Backends::ActiveRecord::Json::QueryMethods
 @see Mobility::Backends::ActiveRecord::Jsonb::QueryMethods
 @see Mobility::Backends::ActiveRecord::Hstore::QueryMethods
+@see Mobility::Backends::ActiveRecord::Container::JsonQueryMethods
+@see Mobility::Backends::ActiveRecord::Container::JsonbQueryMethods
 
 =end
       module PgQueryMethods

@@ -54,7 +54,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.4.3'
+gem 'mobility', '~> 0.5.0'
 ```
 
 Mobility is cryptographically signed. To be sure the gem you install hasn't
@@ -796,8 +796,8 @@ class](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Column).
 
 Mobility also supports JSON and Hstore storage options, if you are using
 PostgreSQL as your database. To use this option, create column(s) on the model
-table for each translated attribute, and set your backend to `:json` (on master
-branch only), `:jsonb` or `:hstore`. If you are using Sequel, note that you
+table for each translated attribute, and set your backend to `:json`, `:jsonb`
+or `:hstore`. If you are using Sequel, note that you
 will need to enable the [pg_json](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html)
 or
 [pg_hstore](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html)

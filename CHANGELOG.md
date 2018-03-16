@@ -2,6 +2,17 @@
 
 ## 0.4
 
+### 0.5.0 (March 16, 2018)
+* Support PostgreSQL json column format as Json backend and dynamically in
+  Container backend ([#182](https://github.com/shioyama/mobility/pull/182) and
+  [#184](https://github.com/shioyama/mobility/pull/184), respectively)
+* Fall through to `I18n.fallbacks` when defined
+  ([#180](https://github.com/shioyama/mobility/pull/180))
+* Improve comments in Rails initializer
+  ([#186](https://github.com/shioyama/mobility/pull/186))
+* Use pragma comments to freeze strings everywhere
+  ([#177](https://github.com/shioyama/mobility/pull/177))
+
 ### 0.4.3 (February 18, 2018)
 * Add missing require in container backend
   ([#174](https://github.com/shioyama/mobility/pull/174))

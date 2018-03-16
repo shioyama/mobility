@@ -13,8 +13,8 @@ private methods:
   returns an SQL expression which checks that the column has a value in the
   locale
 
-(The +matches+ method is implemented slightly differently for hstore and
-jsonb columns.)
+(The +matches+ and +has_locale+ methods are implemented slightly differently
+for hstore/json/jsonb/container backends.)
 
 =end
       module PgQueryMethods

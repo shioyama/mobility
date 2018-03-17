@@ -68,7 +68,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             send(association_name).destroy(translation)
           end
         end
-        after_destroy :mobility_destroy_key_value_translations
 
         module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"
         unless const_defined?(module_name)
@@ -98,13 +97,12 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       end
 
       module DestroyKeyValueTranslations
-        private
-
-        # Clean up *all* leftover translations of this model, only once.
-        def mobility_destroy_key_value_translations
-          [:string, :text].freeze.each do |type|
-            Mobility::ActiveRecord.const_get("#{type.capitalize}Translation").
-              where(translatable: self).destroy_all
+        def self.included(model_class)
+          model_class.after_destroy do
+            [:string, :text].each do |type|
+              Mobility::ActiveRecord.const_get("#{type.capitalize}Translation").
+                where(translatable: self).destroy_all
+            end
           end
         end
       end

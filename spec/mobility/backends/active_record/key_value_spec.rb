@@ -328,12 +328,6 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
         expect(Mobility::ActiveRecord::TextTranslation.count).to eq(1)
         expect(Mobility::ActiveRecord::StringTranslation.count).to eq(1)
       end
-
-      it "only destroys translations once when cleaning up" do
-        article = Article.create(title: "foo title", content: "foo content")
-        expect(article).to receive(:mobility_destroy_key_value_translations).once.and_call_original
-        article.destroy!
-      end
     end
 
     describe ".configure" do

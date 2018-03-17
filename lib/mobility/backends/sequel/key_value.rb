@@ -83,23 +83,8 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
         include callback_methods
 
+        include DestroyKeyValueTranslations
         include Mobility::Sequel::ColumnChanges.new(*attributes)
-
-        private
-
-        # Clean up *all* leftover translations of this model, only once.
-        def self.mobility_key_value_callbacks_module
-          @mobility_key_value_destroy_callbacks_module ||= Module.new do
-            def after_destroy
-              super
-              [:string, :text].freeze.each do |type|
-                Mobility::Sequel.const_get("#{type.capitalize}Translation").
-                  where(translatable_id: id, translatable_type: self.class.name).destroy
-              end
-            end
-          end
-        end unless respond_to?(:mobility_key_value_callbacks_module, true)
-        include mobility_key_value_callbacks_module
       end
 
       setup_query_methods(QueryMethods)
@@ -118,6 +103,17 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         cache.each_value do |translation|
           next unless present?(translation.value)
           translation.id ? translation.save : model.send("add_#{singularize(association_name)}", translation)
+        end
+      end
+
+      # Clean up *all* leftover translations of this model, only once.
+      module DestroyKeyValueTranslations
+        def after_destroy
+          super
+          [:string, :text].freeze.each do |type|
+            Mobility::Sequel.const_get("#{type.capitalize}Translation").
+              where(translatable_id: id, translatable_type: self.class.name).destroy
+          end
         end
       end
 

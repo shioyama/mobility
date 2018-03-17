@@ -33,7 +33,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       # @option options [Class] class_name Translation model class
       def initialize(model, attribute, options = {})
         super
-        @class_name       = options[:class_name]
+        @class_name = options[:class_name]
       end
 
       # @!group Backend Configuration

@@ -22,7 +22,7 @@ different languages. For examples of what Mobility can do, see the
 <a href="#companies-using-mobility">Companies using Mobility</a> section below.
 
 Storage of translations is handled by customizable "backends" which encapsulate
-different storage strategies. The default, preferred way to store translations
+different storage strategies. The default way to store translations
 is to put them all in a set of two shared tables, but many alternatives are
 also supported, including [translatable
 columns](http://dejimata.com/2017/3/3/translating-with-mobility#strategy-1) and

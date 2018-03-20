@@ -23,7 +23,7 @@ module Mobility
       end
 
       def has_locale(key, locale)
-        build_op(column_name).has_key?(locale) & build_op(column_name)[locale].has_key?(key.to_s)
+        build_op(column_name)[locale][key.to_s] !~ nil
       end
 
       def build_op(key)

@@ -3,10 +3,20 @@ module Mobility
 =begin
 
 A backend-agnostic uniqueness validator for ActiveRecord translated attributes.
+To use the validator, you must +extend Mobility+ before calling +validates+
+(see example below).
 
 @note This validator does not support case sensitivity, since doing so would
   significantly complicate implementation.
 
+@example Validating uniqueness on translated model
+  class Post < ActiveRecord::Base
+    extend Mobility
+    translates :title
+
+    # This must come *after* extending Mobility.
+    validates :title, uniqueness: true
+  end
 =end
     class UniquenessValidator < ::ActiveRecord::Validations::UniquenessValidator
       # @param [ActiveRecord::Base] record Translated model

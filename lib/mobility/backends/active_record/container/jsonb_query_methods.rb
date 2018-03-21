@@ -19,14 +19,11 @@ module Mobility
       def matches(key, value, locale)
         build_infix(:'->',
                     build_infix(:'->', column, quote(locale)),
-                    quote(key)).eq(quote(value.to_json))
+                    quote(key)).eq(value && quote(value.to_json))
       end
 
       def has_locale(key, locale)
-        build_infix(:'?', column, quote(locale)).and(
-          build_infix(:'?',
-                      build_infix(:'->', column, quote(locale)),
-                      quote(key)))
+        matches(key, nil, locale).not
       end
     end
   end

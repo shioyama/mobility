@@ -11,6 +11,10 @@ module Mobility
       def matches(key, value, locale)
         build_infix(:'->', arel_table[key], quote(locale)).eq(quote(value.to_s))
       end
+
+      def has_locale(key, locale)
+        build_infix(:'?', arel_table[key], quote(locale))
+      end
     end
   end
 end

@@ -3,9 +3,15 @@ module Mobility
     module ActiveRecord
 =begin
 
-Defines query methods for Postgres backends. Including class must define a
-single method, +matches+, which accepts a column, value and locale to
-match, and returns an Arel node.
+Defines query methods for Postgres backends. Including class must define two
+private methods:
+
+- a private method +matches+ which takes an attribute, a value and a locale to
+  match, and returns an Arel node checking that the attribute has the specified
+  value in the specified locale
+- a private method +has_locale+ which takes an attribute and a locale and
+  returns an Arel node checking that a value exists for the attribute in the
+  specified locale
 
 This module avoids a lot of duplication between hstore/json/jsonb/container
 backend querying code.
@@ -101,8 +107,8 @@ backend querying code.
           raise NotImplementedError
         end
 
-        def has_locale(key, locale)
-          build_infix(:'?', arel_table[key], quote(locale))
+        def has_locale(_key, _locale)
+          raise NotImplementedError
         end
 
         def build_infix(*args)

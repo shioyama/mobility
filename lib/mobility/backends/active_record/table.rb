@@ -20,6 +20,7 @@ columns to that table.
 
 @example Model with table backend
   class Post < ActiveRecord::Base
+    extend Mobility
     translates :title, backend: :table
   end
 
@@ -45,6 +46,7 @@ columns to that table.
 
 @example Model with multiple translation tables
   class Post < ActiveRecord::Base
+    extend Mobility
     translates :title,   backend: :table, table_name: :post_title_translations,   association_name: :title_translations
     translates :content, backend: :table, table_name: :post_content_translations, association_name: :content_translations
   end

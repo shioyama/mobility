@@ -19,6 +19,7 @@ or locales.)
 
 @example
   class Post < ActiveRecord::Base
+    extend Mobility
     translates :title, backend: :column
   end
 

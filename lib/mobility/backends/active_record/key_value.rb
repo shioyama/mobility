@@ -12,6 +12,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
 @example
   class Post < ActiveRecord::Base
+    extend Mobility
     translates :title, backend: :key_value, association_name: :translations, type: :string
   end
 

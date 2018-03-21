@@ -11,6 +11,7 @@ Implements {Mobility::Backends::Serialized} backend for ActiveRecord models.
 
 @example Define attribute with serialized backend
   class Post < ActiveRecord::Base
+    extend Mobility
     translates :title, backend: :serialized, format: :yaml
   end
 

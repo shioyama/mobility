@@ -37,6 +37,7 @@ the current locale was +nil+.
 
 @example With default fallbacks enabled (falls through to default locale)
   class Post
+    extend Mobility
     translates :title, fallbacks: true
   end
 
@@ -54,6 +55,7 @@ the current locale was +nil+.
 
 @example With additional fallbacks enabled
   class Post
+    extend Mobility
     translates :title, fallbacks: { :'en-US' => 'de-DE', :pt => 'de-DE' }
   end
 
@@ -70,6 +72,7 @@ the current locale was +nil+.
 
 @example Passing fallback option when reading value
   class Post
+    extend Mobility
     translates :title, fallbacks: true
   end
 
@@ -88,6 +91,7 @@ the current locale was +nil+.
 
 @example Fallbacks disabled
   class Post
+    extend Mobility
     translates :title, fallbacks: { :'fr' => 'en' }, locale_accessors: true
   end
 

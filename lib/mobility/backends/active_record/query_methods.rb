@@ -21,21 +21,23 @@ models. For details see backend-specific subclasses.
 
         # @param [ActiveRecord::Relation] relation Relation being extended
         # @note Only want to define this once, even if multiple QueryMethods
-        #   modules are included, so define it here in extended method
+        #   modules are included, so include it here into the singleton class.
         def extended(relation)
-          unless relation.methods(false).include?(:mobility_where_chain)
-            relation.define_singleton_method(:mobility_where_chain) do
-              @mobility_where_chain ||= Class.new(::ActiveRecord::QueryMethods::WhereChain)
-            end
-
-            relation.define_singleton_method :where do |opts = :chain, *rest|
-              opts == :chain ? mobility_where_chain.new(spawn) : super(opts, *rest)
-            end
-          end
+          relation.singleton_class.include WhereChainable
         end
 
         def extract_attributes(opts)
           opts.is_a?(Hash) && (opts.keys.map(&:to_s) & @attributes).presence
+        end
+      end
+
+      module WhereChainable
+        def where(opts = :chain, *rest)
+          opts == :chain ? mobility_where_chain.new(spawn) : super
+        end
+
+        def mobility_where_chain
+          @mobility_where_chain ||= Class.new(::ActiveRecord::QueryMethods::WhereChain)
         end
       end
     end

@@ -2,6 +2,10 @@
 
 ## 0.4
 
+### 0.5.1 (March 21, 2018)
+* Fix issues with Dirty plugin in ActiveRecord 5.2.0.rc2
+  ([#166](https://github.com/shioyama/mobility/pull/166))
+
 ### 0.5.0 (March 16, 2018)
 * Support PostgreSQL json column format as Json backend and dynamically in
   Container backend ([#182](https://github.com/shioyama/mobility/pull/182) and

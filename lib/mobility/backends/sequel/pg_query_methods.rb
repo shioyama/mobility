@@ -4,14 +4,13 @@ module Mobility
 =begin
 
 Defines query methods for Postgres backends. Including class must define two
-private methods:
+methods:
 
-- a private method +matches+ which takes a key (column name), value and
-  locale and returns an SQL expression, and checks that the column has the
-  specified value in the specified locale
-- a private method +has_locale+ which takes a key (column name) and locale, and
-  returns an SQL expression which checks that the column has a value in the
-  locale
+- a method +matches+ which takes a key (column name), value and locale and
+  returns an SQL expression, and checks that the column has the specified value
+  in the specified locale
+- a method +has_locale+ which takes a key (column name) and locale, and returns
+  an SQL expression which checks that the column has a value in the locale
 
 (The +matches+ and +has_locale+ methods are implemented slightly differently
 for hstore/json/jsonb/container backends.)

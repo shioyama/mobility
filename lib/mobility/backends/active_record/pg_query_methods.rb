@@ -4,12 +4,12 @@ module Mobility
 =begin
 
 Defines query methods for Postgres backends. Including class must define two
-private methods:
+methods:
 
-- a private method +matches+ which takes an attribute, a value and a locale to
+- a method +matches+ which takes an attribute, a value and a locale to
   match, and returns an Arel node checking that the attribute has the specified
   value in the specified locale
-- a private method +has_locale+ which takes an attribute and a locale and
+- a method +has_locale+ which takes an attribute and a locale and
   returns an Arel node checking that a value exists for the attribute in the
   specified locale
 
@@ -101,8 +101,6 @@ backend querying code.
           }.inject(&:and)
         end
 
-        private
-
         def matches(_key, _value, _locale)
           raise NotImplementedError
         end
@@ -110,6 +108,8 @@ backend querying code.
         def has_locale(_key, _locale)
           raise NotImplementedError
         end
+
+        private
 
         def build_infix(*args)
           arel_table.grouping(Arel::Nodes::InfixOperation.new(*args))

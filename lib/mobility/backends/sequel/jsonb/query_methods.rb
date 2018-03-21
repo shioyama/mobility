@@ -9,8 +9,6 @@ module Mobility
     class Sequel::Jsonb::QueryMethods < Sequel::QueryMethods
       include Sequel::PgQueryMethods
 
-      private
-
       def matches(key, value, locale)
         build_op(key)[locale] =~ value.to_json
       end
@@ -18,6 +16,8 @@ module Mobility
       def has_locale(key, locale)
         build_op(key).has_key?(locale)
       end
+
+      private
 
       def build_op(key)
         ::Sequel.pg_jsonb_op(key)

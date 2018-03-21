@@ -16,8 +16,6 @@ module Mobility
         define_query_methods
       end
 
-      private
-
       def matches(key, value, locale)
         build_op(column_name)[locale][key.to_s] =~ value.to_json
       end
@@ -25,6 +23,8 @@ module Mobility
       def has_locale(key, locale)
         build_op(column_name).has_key?(locale) & build_op(column_name)[locale].has_key?(key.to_s)
       end
+
+      private
 
       def build_op(key)
         ::Sequel.pg_jsonb_op(key)

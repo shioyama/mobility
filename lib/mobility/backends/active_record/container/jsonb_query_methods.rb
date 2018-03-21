@@ -14,8 +14,6 @@ module Mobility
         @column      = arel_table[@column_name]
       end
 
-      private
-
       def matches(key, value, locale)
         build_infix(:'->',
                     build_infix(:'->', column, quote(locale)),

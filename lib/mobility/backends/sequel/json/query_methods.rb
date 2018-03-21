@@ -9,8 +9,6 @@ module Mobility
     class Sequel::Json::QueryMethods < Sequel::QueryMethods
       include Sequel::PgQueryMethods
 
-      private
-
       def matches(key, value, locale)
         build_op(key).get_text(locale) =~ value.to_s
       end
@@ -18,6 +16,8 @@ module Mobility
       def has_locale(key, locale)
         build_op(key).get_text(locale) !~ nil
       end
+
+      private
 
       def build_op(key)
         ::Sequel.pg_json_op(key)

@@ -7,8 +7,6 @@ module Mobility
     class ActiveRecord::Json::QueryMethods < ActiveRecord::QueryMethods
       include ActiveRecord::PgQueryMethods
 
-      private
-
       def matches(key, value, locale)
         build_locale_infix(key, locale).eq(value.to_s)
       end
@@ -16,6 +14,8 @@ module Mobility
       def has_locale(key, locale)
         build_locale_infix(key, locale).eq(nil).not
       end
+
+      private
 
       def build_locale_infix(key, locale)
         build_infix(:'->>', arel_table[key], quote(locale))

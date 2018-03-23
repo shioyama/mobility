@@ -101,8 +101,7 @@ Some useful methods on strings, borrowed in parts from Sequel and ActiveSupport.
     end
 
     def blank?(object)
-      return true if object.nil?
-      object.respond_to?(:empty?) ? !!object.empty? : !object
+      object.nil? || object == ""
     end
 
     def presence(object)

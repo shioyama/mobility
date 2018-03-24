@@ -8,12 +8,44 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
 
   destination File.expand_path("../tmp", __FILE__)
 
+  after(:each) { connection.drop_table :post_translations if connection.data_source_exists?(:post_translations) }
   after(:all) { prepare_destination }
 
   describe "--backend=table" do
     let(:setup_generator) do
       prepare_destination
       run_generator %w(Post title:string:index content:text --backend=table)
+    end
+
+    shared_examples_for "long index name truncator" do
+      it "truncates index to length required by database" do
+        # Choose maximum length attribute name such that without truncation its full index name will be too long for db
+        name = 'a'*(connection.allowed_index_name_length - "index_post_translations_on_".length - "_and_locale".length)
+
+        prepare_destination
+        run_generator ["Post", "#{name}:string:index", "--backend=table"]
+
+        expect(destination_root).to have_structure {
+          directory "db" do
+            directory "migrate" do
+              migration "create_post_#{name}_translations_for_mobility_table_backend" do
+                contains "add_index :post_translations, [:#{name}, :locale], name: :index_"
+              end
+            end
+          end
+        }
+
+        load Dir[File.join(destination_root, "**", "*.rb")].first
+        migration = "CreatePost#{name.capitalize}TranslationsForMobilityTableBackend".constantize.new
+        migration.verbose = false
+
+        # check that migrating doesn't raise an error
+        expect { migration.migrate :up }.not_to raise_error
+
+        index = connection.indexes("post_translations").find { |i| i.columns.include? name }
+        expect(index).not_to be_nil
+        expect(index.name).to match /^index_[a-z0-9]{40}$/
+      end
     end
 
     context "translations table does not yet exist" do
@@ -40,17 +72,26 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                 contains "add_index :post_translations, :post_id, name: :index_post_translations_on_post_id"
                 contains "add_index :post_translations, :locale, name: :index_post_translations_on_locale"
                 contains "add_index :post_translations, [:post_id, :locale], name: :index_post_translations_on_post_id_and_locale, unique: true"
-                contains "add_index :post_translations, [:title, :locale]"
+                contains "add_index :post_translations, [:title, :locale], name: :index_post_translations_on_title_and_locale"
               end
             end
           end
         }
       end
+
+      context "index name is too long for database", db: [:mysql, :postgres] do
+        it_behaves_like "long index name truncator"
+      end
     end
 
     context "translation table already exists" do
-      before { ActiveRecord::Base.connection.create_table :post_translations }
-      after  { ActiveRecord::Base.connection.drop_table   :post_translations }
+      before do
+        connection.create_table :post_translations do |t|
+          t.string :locale
+          t.integer :post_id
+          t.timestamps
+        end
+      end
 
       it "generates table translations migration adding columns to existing translations table" do
         version_string_ = version_string
@@ -66,12 +107,16 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                   contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
                 end
                 contains "add_column :post_translations, :title, :string"
-                contains "add_index :post_translations, [:title, :locale]"
+                contains "add_index :post_translations, [:title, :locale], name: :index_post_translations_on_title_and_locale"
                 contains "add_column :post_translations, :content, :text"
               end
             end
           end
         }
+      end
+
+      context "index name is too long for database", db: [:mysql, :postgres] do
+        it_behaves_like "long index name truncator"
       end
     end
   end
@@ -88,13 +133,13 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
     context "model table exists" do
       before do
         @available_locales = I18n.available_locales
-        ActiveRecord::Base.connection.create_table :foos
+        connection.create_table :foos
         I18n.available_locales = [:en, :ja, :de]
         run_generator %w(Foo title:string:index content:text --backend=column)
       end
       after do
         I18n.available_locales = @available_locales
-        ActiveRecord::Base.connection.drop_table :foos
+        connection.drop_table :foos
       end
 
       it "generates column translations migration adding columns for each locale to model table" do
@@ -139,5 +184,9 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
     describe "--backend=#{backend_name}" do
       it_behaves_like "backend with no translations generator", backend_name
     end
+  end
+
+  def connection
+    ActiveRecord::Base.connection
   end
 end if Mobility::Loaded::Rails

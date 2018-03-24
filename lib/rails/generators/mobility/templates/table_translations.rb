@@ -17,12 +17,12 @@ class <%= migration_class_name %> < <%= activerecord_migration_class %>
       t.timestamps null: false
     end
 
-    add_index :<%= table_name %>, :<%= foreign_key %>, name: :<%= translation_index_name %>
-    add_index :<%= table_name %>, :locale, name: :<%= translation_locale_index_name %>
-    add_index :<%= table_name %>, [:<%= foreign_key %>, :locale], name: :<%= translation_unique_index_name %>, unique: true
+    add_index :<%= table_name %>, :<%= foreign_key %>, name: :<%= translation_index_name(foreign_key) %>
+    add_index :<%= table_name %>, :locale, name: :<%= translation_index_name("locale") %>
+    add_index :<%= table_name %>, [:<%= foreign_key %>, :locale], name: :<%= translation_index_name(foreign_key, "locale") %>, unique: true
 
 <%- attributes_with_index.each do |attribute| -%>
-    add_index :<%= table_name %>, [:<%= attribute.index_name %><%= attribute.inject_index_options %>, :locale]
+  add_index :<%= table_name %>, [:<%= attribute.index_name %><%= attribute.inject_index_options %>, :locale], name: :<%= translation_index_name(attribute.index_name, "locale") %>
 <%- end -%>
   end
 end

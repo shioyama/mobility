@@ -26,16 +26,8 @@ module Mobility
         "#{model_table_name.singularize}_id"
       end
 
-      def translation_index_name
-        truncate_index_name("index_#{table_name}_on_#{foreign_key}")
-      end
-
-      def translation_locale_index_name
-        truncate_index_name("index_#{table_name}_on_locale")
-      end
-
-      def translation_unique_index_name
-        truncate_index_name("index_#{table_name}_on_#{foreign_key}_and_locale")
+      def translation_index_name(column, *columns)
+        truncate_index_name("index_#{table_name}_on_#{[column, *columns].join('_and_')}")
       end
     end
   end

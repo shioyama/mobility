@@ -181,7 +181,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
     end
   end
 
-  %w[hstore jsonb serialized key_value].each do |backend_name|
+  %w[hstore json jsonb serialized key_value container].each do |backend_name|
     describe "--backend=#{backend_name}" do
       it_behaves_like "backend with no translations generator", backend_name
     end

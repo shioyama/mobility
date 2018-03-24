@@ -22,7 +22,7 @@ class <%= migration_class_name %> < <%= activerecord_migration_class %>
     add_index :<%= table_name %>, [:<%= foreign_key %>, :locale], name: :<%= translation_unique_index_name %>, unique: true
 
 <%- attributes_with_index.each do |attribute| -%>
-    add_index :<%= table_name %>, :<%= attribute.index_name %><%= attribute.inject_index_options %>
+    add_index :<%= table_name %>, [:<%= attribute.index_name %><%= attribute.inject_index_options %>, :locale]
 <%- end -%>
   end
 end

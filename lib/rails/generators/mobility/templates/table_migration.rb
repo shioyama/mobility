@@ -9,7 +9,7 @@ class <%= migration_class_name %> < <%= activerecord_migration_class %>
   <%- else -%>
     add_column :<%= table_name %>, :<%= attribute.name %>, :<%= attribute.type %><%= attribute.inject_options %>
     <%- if attribute.has_index? -%>
-    add_index :<%= table_name %>, :<%= attribute.index_name %><%= attribute.inject_index_options %>
+    add_index :<%= table_name %>, [:<%= attribute.index_name %><%= attribute.inject_index_options %>, :locale]
     <%- end -%>
   <%- end -%>
 <% end -%>

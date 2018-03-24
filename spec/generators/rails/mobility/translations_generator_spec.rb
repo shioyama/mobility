@@ -40,7 +40,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                 contains "add_index :post_translations, :post_id, name: :index_post_translations_on_post_id"
                 contains "add_index :post_translations, :locale, name: :index_post_translations_on_locale"
                 contains "add_index :post_translations, [:post_id, :locale], name: :index_post_translations_on_post_id_and_locale, unique: true"
-                contains "add_index :post_translations, :title"
+                contains "add_index :post_translations, [:title, :locale]"
               end
             end
           end
@@ -66,7 +66,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                   contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
                 end
                 contains "add_column :post_translations, :title, :string"
-                contains "add_index :post_translations, :title"
+                contains "add_index :post_translations, [:title, :locale]"
                 contains "add_column :post_translations, :content, :text"
               end
             end

@@ -29,8 +29,9 @@ skipped.
 Other backends are not supported, for obvious reasons:
 * the +key_value+ backend does not need any model-specific migrations, simply
   run the install generator.
-* +jsonb+, +hstore+ and +serialized+ backends simply require a single column on
-  a model table, which can be added with the normal Rails migration generator.
+* +json+, +jsonb+, +hstore+, +serialized+, and +container+ backends simply
+  require a single column on a model table, which can be added with the normal
+  Rails migration generator.
 
 =end
   class TranslationsGenerator < ::Rails::Generators::NamedBase

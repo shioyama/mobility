@@ -39,7 +39,7 @@ Other backends are not supported, for obvious reasons:
     BACKEND_OPTIONS = { type: :string, desc: "Backend to use for translations (defaults to Mobility.default_backend)" }.freeze
     argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
 
-    class_option(:backend, BACKEND_OPTIONS)
+    class_option(:backend, BACKEND_OPTIONS.dup)
     invoke_from_option :backend
 
     def self.class_options(options = nil)

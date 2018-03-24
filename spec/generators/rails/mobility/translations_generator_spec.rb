@@ -8,10 +8,11 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
 
   destination File.expand_path("../tmp", __FILE__)
 
-  after(:each) { connection.drop_table :post_translations if connection.data_source_exists?(:post_translations) }
   after(:all) { prepare_destination }
 
   describe "--backend=table" do
+    after(:each) { connection.drop_table :post_translations if connection.data_source_exists?(:post_translations) }
+
     let(:setup_generator) do
       prepare_destination
       run_generator %w(Post title:string:index content:text --backend=table)

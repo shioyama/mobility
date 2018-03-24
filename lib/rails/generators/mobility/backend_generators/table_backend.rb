@@ -25,10 +25,6 @@ module Mobility
       def foreign_key
         "#{model_table_name.singularize}_id"
       end
-
-      def translation_index_name(column, *columns)
-        truncate_index_name("index_#{table_name}_on_#{[column, *columns].join('_and_')}")
-      end
     end
   end
 end

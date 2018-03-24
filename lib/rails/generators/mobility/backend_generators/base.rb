@@ -30,6 +30,10 @@ module Mobility
         attributes.select { |a| !a.reference? && a.has_index? }
       end
 
+      def translation_index_name(column, *columns)
+        truncate_index_name("index_#{table_name}_on_#{[column, *columns].join('_and_')}")
+      end
+
       private
 
       def check_data_source!

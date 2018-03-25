@@ -70,7 +70,6 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                 contains "t.string  :locale, null: false"
                 contains "t.integer :post_id, null: false"
                 contains "t.timestamps null: false"
-                contains "add_index :post_translations, :post_id, name: :index_post_translations_on_post_id"
                 contains "add_index :post_translations, :locale, name: :index_post_translations_on_locale"
                 contains "add_index :post_translations, [:post_id, :locale], name: :index_post_translations_on_post_id_and_locale, unique: true"
                 contains "add_index :post_translations, [:title, :locale], name: :index_post_translations_on_title_and_locale"

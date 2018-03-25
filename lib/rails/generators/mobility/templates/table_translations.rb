@@ -17,7 +17,6 @@ class <%= migration_class_name %> < <%= activerecord_migration_class %>
       t.timestamps null: false
     end
 
-    add_index :<%= table_name %>, :<%= foreign_key %>, name: :<%= translation_index_name(foreign_key) %>
     add_index :<%= table_name %>, :locale, name: :<%= translation_index_name("locale") %>
     add_index :<%= table_name %>, [:<%= foreign_key %>, :locale], name: :<%= translation_index_name(foreign_key, "locale") %>, unique: true
 

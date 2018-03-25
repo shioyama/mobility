@@ -7,11 +7,11 @@ module Mobility
       include ActiveRecord::PgQueryMethods
 
       def matches(key, value, locale)
-        build_infix(:'->', arel_table[key], quote(locale)).eq(quote(value.to_s))
+        build_infix(:'->', arel_table[column_name(key)], quote(locale)).eq(quote(value.to_s))
       end
 
       def has_locale(key, locale)
-        build_infix(:'?', arel_table[key], quote(locale))
+        build_infix(:'?', arel_table[column_name(key)], quote(locale))
       end
     end
   end

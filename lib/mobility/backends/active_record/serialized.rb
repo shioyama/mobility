@@ -43,7 +43,8 @@ Implements {Mobility::Backends::Serialized} backend for ActiveRecord models.
 
       setup do |attributes, options|
         coder = { yaml: YAMLCoder, json: JSONCoder }[options[:format]]
-        attributes.each { |attribute| serialize attribute, coder }
+        column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
+        attributes.each { |attribute| serialize (column_affix % attribute), coder }
       end
 
       setup_query_methods(QueryMethods)
@@ -52,7 +53,7 @@ Implements {Mobility::Backends::Serialized} backend for ActiveRecord models.
       # Returns column value as a hash
       # @return [Hash]
       def translations
-        model.read_attribute(attribute)
+        model.read_attribute(column_name)
       end
 
       %w[yaml json].each do |format|

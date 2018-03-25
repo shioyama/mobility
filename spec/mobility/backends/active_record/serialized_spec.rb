@@ -4,11 +4,15 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
   require "mobility/backends/active_record/serialized"
   extend Helpers::ActiveRecord
 
+  column_options = { prefix: 'my_', suffix: '_i18n' }
+  column_affix = "#{column_options[:prefix]}%s#{column_options[:suffix]}"
+  let(:default_options) { { presence: false, **column_options } }
+
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
       extend Mobility
       self.table_name = 'serialized_posts'
-    end)
+    end), column_options
   end
 
   context "with standard plugins applied" do
@@ -19,9 +23,9 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
 
     describe "serialized backend without cache" do
       context "yaml format" do
-        before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, presence: false }
+        before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, **default_options }
         include_accessor_examples 'SerializedPost'
-        include_serialization_examples 'SerializedPost'
+        include_serialization_examples 'SerializedPost', column_affix: column_affix
         include_dup_examples 'SerializedPost'
         include_cache_key_examples 'SerializedPost'
 
@@ -31,7 +35,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
             backend = post.mobility.backend_for("title")
             backend.write(:en, { foo: :bar } )
             post.save
-            expect(post.read_attribute(:title)).to match_hash({ en: "{:foo=>:bar}" })
+            expect(post[column_affix % "title"]).to match_hash({ en: "{:foo=>:bar}" })
           end
         end
 
@@ -41,7 +45,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
           post.title = "foo"
           post.save
           post.reload if ENV['RAILS_VERSION'] < '5.0' # don't ask me why
-          expect(post.title_before_type_cast).to eq("---\n:en: foo\n")
+          expect(post.public_send("#{(column_affix % "title")}_before_type_cast")).to eq("---\n:en: foo\n")
         end
 
         it "does not cache reads" do
@@ -60,9 +64,9 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
       end
 
       context "json format" do
-        before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false, presence: false }
+        before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false, **default_options }
         include_accessor_examples 'SerializedPost'
-        include_serialization_examples 'SerializedPost'
+        include_serialization_examples 'SerializedPost', column_affix: column_affix
 
         # SANITY CHECK
         it "serializes as JSON" do
@@ -70,15 +74,15 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
           post.title = "foo"
           post.save
           post.reload if ENV['RAILS_VERSION'] < '5.0' # don't ask me why
-          expect(post.title_before_type_cast).to eq("{\"en\":\"foo\"}")
+          expect(post.public_send("#{column_affix % "title"}_before_type_cast")).to eq("{\"en\":\"foo\"}")
         end
       end
     end
 
     describe "serialized backend with cache" do
-      before { SerializedPost.translates :title, :content, backend: :serialized, presence: false }
+      before { SerializedPost.translates :title, :content, backend: :serialized, **default_options }
       include_accessor_examples 'SerializedPost'
-      include_serialization_examples 'SerializedPost'
+      include_serialization_examples 'SerializedPost', column_affix: column_affix
 
       it "uses cache for reads" do
         post = SerializedPost.new
@@ -89,7 +93,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
     end
 
     describe "mobility scope (.i18n)" do
-      before { SerializedPost.translates :title, backend: :serialized }
+      before { SerializedPost.translates :title, backend: :serialized, **default_options }
 
       def error_msg(*attributes)
         "You cannot query on mobility attributes translated with the Serialized backend (#{attributes.join(", ")})."

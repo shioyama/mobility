@@ -1,8 +1,8 @@
-shared_examples_for "Mobility backend" do |backend_class, model_class, attribute="title"|
+shared_examples_for "Mobility backend" do |backend_class, model_class, attribute="title", **options|
   let(:backend) do
     model_class = model_class.constantize if model_class.is_a?(String)
 
-    options = { model_class: model_class }
+    options = { model_class: model_class, **options }
     backend_class.configure(options) if backend_class.respond_to?(:configure)
     backend_class.setup_model(model_class, [attribute], options)
 

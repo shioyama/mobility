@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mobility
   module Backends
     module ActiveRecord
@@ -24,11 +26,12 @@ backend querying code.
 
 =end
       module PgQueryMethods
-        attr_reader :arel_table
+        attr_reader :arel_table, :column_affix
 
         def initialize(attributes, options)
           super
-          @arel_table = options[:model_class].arel_table
+          @arel_table   = options[:model_class].arel_table
+          @column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
 
           q = self
 
@@ -117,6 +120,10 @@ backend querying code.
 
         def quote(value)
           Arel::Nodes.build_quoted(value.to_s)
+        end
+
+        def column_name(attribute)
+          column_affix % attribute
         end
       end
     end

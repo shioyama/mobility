@@ -20,11 +20,12 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
       end
 
       def translations
-        model.read_attribute(attribute)
+        model.read_attribute(column_name)
       end
 
-      setup do |attributes|
-        attributes.each { |attribute| store attribute, coder: Coder }
+      setup do |attributes, options = {}|
+        affix = "#{options[:prefix]}%s#{options[:suffix]}"
+        attributes.each { |attribute| store (affix % attribute), coder: Coder }
       end
 
       class Coder

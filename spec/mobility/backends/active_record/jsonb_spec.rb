@@ -8,21 +8,25 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
     JsonbPost.extend Mobility
   end
 
+  column_options = { prefix: 'my_', suffix: '_i18n' }
+  column_affix = "#{column_options[:prefix]}%s#{column_options[:suffix]}"
+  let(:default_options) { { presence: false, cache: false, **column_options } }
+
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
       extend Mobility
       self.table_name = 'jsonb_posts'
-    end)
+    end), column_options
   end
 
   context "with standard plugins applied" do
     let(:backend) { post.mobility.backend_for("title") }
 
-    before { JsonbPost.translates :title, :content, backend: :jsonb, presence: false, cache: false }
+    before { JsonbPost.translates :title, :content, backend: :jsonb, **default_options }
     let(:post) { JsonbPost.new }
 
     include_accessor_examples 'JsonbPost'
-    include_serialization_examples 'JsonbPost'
+    include_serialization_examples 'JsonbPost', column_affix: column_affix
     include_querying_examples 'JsonbPost'
     include_validation_examples 'JsonbPost'
     include_dup_examples 'JsonbPost'
@@ -33,7 +37,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
         backend = post.mobility.backend_for("title")
         backend.write(:en, { foo: :bar } )
         post.save
-        expect(post[:title]).to eq({ "en" => { "foo" => "bar" }})
+        expect(post[column_affix % "title"]).to eq({ "en" => { "foo" => "bar" }})
       end
 
       shared_examples_for "jsonb translated value" do |name, value|
@@ -67,10 +71,10 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
   context "with dirty plugin applied" do
     let(:backend) { post.mobility.backend_for("title") }
 
-    before { JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false, dirty: true }
+    before { JsonbPost.translates :title, :content, backend: :jsonb, **default_options }
     let(:post) { JsonbPost.new }
 
     include_accessor_examples 'JsonbPost'
-    include_serialization_examples 'JsonbPost'
+    include_serialization_examples 'JsonbPost', column_affix: column_affix
   end
 end if Mobility::Loaded::ActiveRecord

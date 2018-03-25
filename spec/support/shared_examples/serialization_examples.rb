@@ -1,9 +1,11 @@
 # The class defined by model_class_name is assumed to have two attributes,
 # defaulting to names 'title' and 'content', which are serialized.
 #
-shared_examples_for "AR Model with serialized translations" do |model_class_name, attribute1=:title, attribute2=:content|
+shared_examples_for "AR Model with serialized translations" do |model_class_name, attribute1=:title, attribute2=:content, column_affix: '%s'|
   let(:model_class) { model_class_name.constantize }
   let(:backend) { instance.mobility.backend_for(attribute1) }
+  let(:column1) { column_affix % attribute1 }
+  let(:column2) { column_affix % attribute2 }
 
   describe "#read" do
     let(:instance) { model_class.new }
@@ -17,7 +19,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
     context "with serialized column" do
       it "returns translation from serialized hash" do
-        instance.send :write_attribute, attribute1, { ja: "あああ" }
+        instance.send :write_attribute, column1, { ja: "あああ" }
         instance.save
         instance.reload
 
@@ -28,8 +30,8 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
     context "multiple serialized columns have translations" do
       it "returns translation from serialized hash" do
-        instance.send :write_attribute, attribute1, { ja: "あああ" }
-        instance.send :write_attribute, attribute2, { en: "aaa" }
+        instance.send :write_attribute, column1, { ja: "あああ" }
+        instance.send :write_attribute, column2, { en: "aaa" }
         instance.save
         instance.reload
 
@@ -47,26 +49,26 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
     it "assigns to serialized hash" do
       backend.write(:en, "foo")
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
       backend.write(:fr, "bar")
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo", fr: "bar" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "foo", fr: "bar" })
     end
 
     it "deletes keys with nil values when saving", rails_version_geq: '5.0' do
       backend.write(:en, "foo")
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
       backend.write(:en, nil)
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: nil })
+      expect(instance.read_attribute(column1)).to match_hash({ en: nil })
       instance.save
       expect(backend.read(:en)).to eq(nil)
-      expect(instance.read_attribute(attribute1)).to match_hash({})
+      expect(instance.read_attribute(column1)).to match_hash({})
     end
 
     it "deletes keys with blank values when saving" do
       backend.write(:en, "foo")
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
       instance.save
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
       backend.write(:en, "")
       instance.save
 
@@ -77,7 +79,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       expect(instance.send(attribute1)).to eq(nil)
       instance.reload
       expect(backend.read(:en)).to eq(nil)
-      expect(instance.read_attribute(attribute1)).to eq({})
+      expect(instance.read_attribute(column1)).to eq({})
     end
 
     it "correctly stores serialized attributes" do
@@ -88,13 +90,13 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       backend = instance.mobility.backend_for(attribute1)
       expect(instance.send(attribute1)).to eq("foo")
       Mobility.with_locale(:fr) { expect(instance.send(attribute1)).to eq("bar") }
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo", fr: "bar" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "foo", fr: "bar" })
 
       backend.write(:en, "")
       instance.save
       instance = model_class.first
       expect(instance.send(attribute1)).to eq(nil)
-      expect(instance.read_attribute(attribute1)).to match_hash({ fr: "bar" })
+      expect(instance.read_attribute(column1)).to match_hash({ fr: "bar" })
     end
   end
 
@@ -105,14 +107,14 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       expect(instance.send(attribute1)).to eq(nil)
       expect(backend.read(:en)).to eq(nil)
       instance.save
-      expect(instance.read_attribute(attribute1)).to eq({})
+      expect(instance.read_attribute(column1)).to eq({})
     end
 
     it "saves changes to translations" do
       instance.send(:"#{attribute1}=", "foo")
       instance.save
       instance = model_class.first
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
     end
   end
 
@@ -122,10 +124,10 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
     it "updates changes to translations" do
       instance.send(:"#{attribute1}=", "foo")
       instance.save
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "foo" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
       instance = model_class.first
       instance.update(attribute1 => "bar")
-      expect(instance.read_attribute(attribute1)).to match_hash({ en: "bar" })
+      expect(instance.read_attribute(column1)).to match_hash({ en: "bar" })
     end
   end
 end

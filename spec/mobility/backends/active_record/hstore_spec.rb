@@ -8,21 +8,25 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
     HstorePost.extend Mobility
   end
 
+  column_options = { prefix: 'my_', suffix: '_i18n' }
+  column_affix = "#{column_options[:prefix]}%s#{column_options[:suffix]}"
+  let(:default_options) { { presence: false, cache: false, **column_options } }
+
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
       extend Mobility
       self.table_name = 'hstore_posts'
-    end)
+    end), column_options
   end
 
   context "with standard plugins applied" do
     let(:backend) { post.mobility.backend_for("title") }
 
-    before { HstorePost.translates :title, :content, backend: :hstore, cache: false, presence: false }
+    before { HstorePost.translates :title, :content, backend: :hstore, **default_options }
     let(:post) { HstorePost.new }
 
     include_accessor_examples 'HstorePost'
-    include_serialization_examples 'HstorePost'
+    include_serialization_examples 'HstorePost', column_affix: column_affix
     include_querying_examples 'HstorePost'
     include_validation_examples 'HstorePost'
     include_dup_examples 'HstorePost'
@@ -34,7 +38,7 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
         backend = post.mobility.backend_for("title")
         backend.write(:en, { foo: :bar } )
         post.save
-        expect(post.read_attribute(:title)).to match_hash({ en: "{:foo=>:bar}" })
+        expect(post[column_affix % "title"]).to match_hash({ en: "{:foo=>:bar}" })
       end
     end
   end
@@ -42,10 +46,10 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
   context "with dirty plugin applied" do
     let(:backend) { post.mobility.backend_for("title") }
 
-    before { HstorePost.translates :title, :content, backend: :hstore, cache: false, presence: false, dirty: true }
+    before { HstorePost.translates :title, :content, backend: :hstore, **default_options }
     let(:post) { HstorePost.new }
 
     include_accessor_examples 'HstorePost'
-    include_serialization_examples 'HstorePost'
+    include_serialization_examples 'HstorePost', column_affix: column_affix
   end
 end if Mobility::Loaded::ActiveRecord

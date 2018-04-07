@@ -20,7 +20,7 @@ module Mobility
       private
 
       def build_op(key)
-        ::Sequel.pg_jsonb_op(key)
+        ::Sequel.pg_jsonb_op(column_name(key))
       end
     end
   end

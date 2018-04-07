@@ -49,18 +49,20 @@ Sequel serialization plugin.
 
       setup do |attributes, options|
         format = options[:format]
+        column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
+        columns = attributes.map { |attribute| (column_affix % attribute).to_sym }
+
         plugin :serialization
         plugin :serialization_modification_detection
 
-        attributes.each do |attribute_|
-          attribute = attribute_.to_sym
-          self.serialization_map[attribute] = Serialized.serializer_for(format)
-          self.deserialization_map[attribute] = Serialized.deserializer_for(format)
+        columns.each do |column|
+          self.serialization_map[column] = Serialized.serializer_for(format)
+          self.deserialization_map[column] = Serialized.deserializer_for(format)
         end
 
         method_overrides = Module.new do
           define_method :initialize_set do |values|
-            attributes.each { |attribute| self[attribute.to_sym] = {}.send(:"to_#{format}") }
+            columns.each { |column| self[column] = {}.send(:"to_#{format}") }
             super(values)
           end
         end
@@ -74,13 +76,12 @@ Sequel serialization plugin.
       # Returns deserialized column value
       # @return [Hash]
       def translations
-        attribute_ = attribute.to_sym
-        if model.deserialized_values.has_key?(attribute_)
-          model.deserialized_values[attribute_]
+        if model.deserialized_values.has_key?(column_name)
+          model.deserialized_values[column_name]
         elsif model.frozen?
-          deserialize_value(attribute_, serialized_value)
+          deserialize_value(serialized_value)
         else
-          model.deserialized_values[attribute_] = deserialize_value(attribute_, serialized_value)
+          model.deserialized_values[column_name] = deserialize_value(serialized_value)
         end
       end
 
@@ -96,12 +97,16 @@ Sequel serialization plugin.
 
       private
 
-      def deserialize_value(column, value)
-        model.send(:deserialize_value, column, value)
+      def deserialize_value(value)
+        model.send(:deserialize_value, column_name, value)
       end
 
       def serialized_value
-        model[attribute.to_sym]
+        model[column_name]
+      end
+
+      def column_name
+        super.to_sym
       end
     end
   end

@@ -17,8 +17,11 @@ for hstore/json/jsonb/container backends.)
 
 =end
       module PgQueryMethods
-        def initialize(attributes, _)
+        attr_reader :column_affix
+
+        def initialize(attributes, options)
           super
+          @column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
           define_query_methods
         end
 
@@ -81,6 +84,10 @@ for hstore/json/jsonb/container backends.)
 
         def has_locale(_key, _locale)
           raise NotImplementedError
+        end
+
+        def column_name(attribute)
+          (column_affix % attribute).to_sym
         end
       end
     end

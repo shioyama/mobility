@@ -84,7 +84,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         include callback_methods
 
         include DestroyKeyValueTranslations
-        include Mobility::Sequel::ColumnChanges.new(*attributes)
+        include Mobility::Sequel::ColumnChanges.new(attributes)
       end
 
       setup_query_methods(QueryMethods)

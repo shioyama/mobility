@@ -9,6 +9,10 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
     JsonbPost.extend Mobility
   end
 
+  column_options = { prefix: 'my_', suffix: '_i18n' }
+  column_affix = "#{column_options[:prefix]}%s#{column_options[:suffix]}"
+  let(:default_options) { { presence: false, cache: false, **column_options } }
+
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(Sequel::Model(:jsonb_posts)) do
       extend Mobility
@@ -18,11 +22,11 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
   context "with standard plugins applied" do
     let(:backend) { post.mobility.backend_for("title") }
 
-    before { JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false }
+    before { JsonbPost.translates :title, :content, backend: :jsonb, **default_options }
     let(:post) { JsonbPost.new }
 
     include_accessor_examples 'JsonbPost'
-    include_serialization_examples 'JsonbPost'
+    include_serialization_examples 'JsonbPost', column_affix: column_affix
     include_querying_examples 'JsonbPost'
     include_dup_examples 'JsonbPost'
 
@@ -31,7 +35,7 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
         backend = post.mobility.backend_for("title")
         backend.write(:en, { foo: :bar } )
         post.save
-        expect(post[:title]).to eq({ "en" => { "foo" => "bar" }})
+        expect(post[(column_affix % "title").to_sym]).to eq({ "en" => { "foo" => "bar" }})
       end
 
       shared_examples_for "jsonb translated value" do |name, value|
@@ -65,10 +69,10 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
   context "with dirty plugin applied" do
     let(:backend) { post.mobility.backend_for("title") }
 
-    before { JsonbPost.translates :title, :content, backend: :jsonb, cache: false, presence: false, dirty: true }
+    before { JsonbPost.translates :title, :content, backend: :jsonb, dirty: true, **default_options }
     let(:post) { JsonbPost.new }
 
     include_accessor_examples 'JsonbPost'
-    include_serialization_examples 'JsonbPost'
+    include_serialization_examples 'JsonbPost', column_affix: column_affix
   end
 end if Mobility::Loaded::Sequel && ENV['DB'] == 'postgres'

@@ -24,24 +24,27 @@ jsonb).
       end
 
       def translations
-        model[attribute.to_sym]
+        model[column_name.to_sym]
       end
 
-      setup do |attributes|
+      setup do |attributes, options|
+        column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
+        columns = attributes.map { |attribute| (column_affix % attribute).to_sym }
+
         before_validation = Module.new do
           define_method :before_validation do
-            attributes.each do |attribute|
-              self[attribute.to_sym].delete_if { |_, v| Util.blank?(v) }
+            columns.each do |column|
+              self[column].delete_if { |_, v| Util.blank?(v) }
             end
             super()
           end
         end
         include before_validation
-        include Mobility::Sequel::HashInitializer.new(*attributes)
-        include Mobility::Sequel::ColumnChanges.new(*attributes)
+        include Mobility::Sequel::HashInitializer.new(*columns)
+        include Mobility::Sequel::ColumnChanges.new(attributes, column_affix: column_affix)
 
         plugin :defaults_setter
-        attributes.each { |attribute| default_values[attribute.to_sym] = {} }
+        columns.each { |column| default_values[column] = {} }
       end
     end
   end

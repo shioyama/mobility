@@ -109,8 +109,8 @@ module Mobility
 
           DB.create_table? :serialized_posts do
             primary_key :id
-            String      :title,         size: 65535
-            String      :content,       size: 65535
+            String      :my_title_i18n,         size: 65535
+            String      :my_content_i18n,       size: 65535
             TrueClass   :published
             DateTime    :created_at, allow_null: false
             DateTime    :updated_at, allow_null: false
@@ -119,8 +119,8 @@ module Mobility
           if ENV['DB'] == 'postgres'
             DB.create_table? :jsonb_posts do
               primary_key :id
-              jsonb       :title,      default: '{}'
-              jsonb       :content,    default: '{}'
+              jsonb       :my_title_i18n,      default: '{}'
+              jsonb       :my_content_i18n,    default: '{}'
               TrueClass   :published
               DateTime    :created_at, allow_null: false
               DateTime    :updated_at, allow_null: false
@@ -128,8 +128,8 @@ module Mobility
 
             DB.create_table? :json_posts do
               primary_key :id
-              json        :title,      default: '{}'
-              json        :content,    default: '{}'
+              json        :my_title_i18n,      default: '{}'
+              json        :my_content_i18n,    default: '{}'
               TrueClass   :published
               DateTime    :created_at, allow_null: false
               DateTime    :updated_at, allow_null: false
@@ -146,8 +146,8 @@ module Mobility
             DB.run "CREATE EXTENSION IF NOT EXISTS hstore"
             DB.create_table? :hstore_posts do
               primary_key :id
-              hstore      :title,      default: ''
-              hstore      :content,    default: ''
+              hstore      :my_title_i18n,      default: ''
+              hstore      :my_content_i18n,    default: ''
               TrueClass   :published
               DateTime    :created_at, allow_null: false
               DateTime    :updated_at, allow_null: false

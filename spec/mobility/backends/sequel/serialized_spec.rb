@@ -4,6 +4,10 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
   require "mobility/backends/sequel/serialized"
   extend Helpers::Sequel
 
+  column_options = { prefix: 'my_', suffix: '_i18n' }
+  column_affix = "#{column_options[:prefix]}%s#{column_options[:suffix]}"
+  let(:default_options) { { presence: false, **column_options } }
+
   context "with no options applied" do
     include_backend_examples described_class, (Class.new(Sequel::Model(:serialized_posts)) do
       extend Mobility
@@ -19,9 +23,9 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
 
     describe "serialized backend without cache" do
       context "yaml format" do
-        before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, presence: false }
+        before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, **default_options }
         include_accessor_examples 'SerializedPost'
-        include_serialization_examples 'SerializedPost'
+        include_serialization_examples 'SerializedPost', column_affix: column_affix
         include_dup_examples 'SerializedPost'
 
         describe "non-text values" do
@@ -30,7 +34,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
             backend = post.mobility.backend_for("title")
             backend.write(:en, { foo: :bar } )
             post.save
-            expect(post[:title]).to eq({ en: "{:foo=>:bar}" }.to_yaml)
+            expect(post[(column_affix % "title").to_sym]).to eq({ en: "{:foo=>:bar}" }.to_yaml)
           end
         end
 
@@ -50,9 +54,9 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
       end
 
       context "json format" do
-        before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false, presence: false }
+        before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false, **default_options }
         include_accessor_examples 'SerializedPost'
-        include_serialization_examples 'SerializedPost'
+        include_serialization_examples 'SerializedPost', column_affix: column_affix
 
         describe "non-text values" do
           it "converts non-string types to strings when saving" do
@@ -60,7 +64,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
             backend = post.mobility.backend_for("title")
             backend.write(:en, { foo: :bar } )
             post.save
-            expect(post[:title]).to eq({ en: "{:foo=>:bar}" }.to_json)
+            expect(post[(column_affix % "title").to_sym]).to eq({ en: "{:foo=>:bar}" }.to_json)
           end
         end
 
@@ -68,9 +72,9 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
     end
 
     describe "serialized backend with cache" do
-      before { SerializedPost.translates :title, :content, backend: :serialized, presence: false }
+      before { SerializedPost.translates :title, :content, backend: :serialized, **default_options }
       include_accessor_examples 'SerializedPost'
-      include_serialization_examples 'SerializedPost'
+      include_serialization_examples 'SerializedPost', column_affix: column_affix
 
       it "uses cache for reads" do
         post = SerializedPost.new
@@ -81,7 +85,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
     end
 
     describe "mobility scope (.i18n)" do
-      before { SerializedPost.translates :title, backend: :serialized }
+      before { SerializedPost.translates :title, backend: :serialized, **default_options }
 
       def error_msg(*attributes)
         "You cannot query on mobility attributes translated with the Serialized backend (#{attributes.join(", ")})."
@@ -105,7 +109,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
         end
 
         it "raises error with multiple serialized attributes defined separatly" do
-          SerializedPost.translates :content, backend: :serialized
+          SerializedPost.translates :content, backend: :serialized, **default_options
           expect { SerializedPost.i18n.where(content: "foo") }.to raise_error(ArgumentError, error_msg("content"))
           expect { SerializedPost.i18n.where(title: "foo")   }.to raise_error(ArgumentError, error_msg("title"))
         end

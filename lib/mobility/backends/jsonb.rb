@@ -6,7 +6,9 @@ Stores translations as hash on Postgres jsonb column.
 
 ==Backend Options
 
-This backend has no options.
+===+prefix+ and +suffix+
+
+Prefix and suffix to add to attribute name to generate jsonb column name.
 
 @see Mobility::Backends::ActiveRecord::Jsonb
 @see Mobility::Backends::Sequel::Jsonb

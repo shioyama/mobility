@@ -7,7 +7,9 @@ Stores translations as hash on Postgres hstore column.
 
 ==Backend Options
 
-This backend has no options.
+===+prefix+ and +suffix+
+
+Prefix and suffix to add to attribute name to generate hstore column name.
 
 @see Mobility::Backends::ActiveRecord::Hstore
 @see Mobility::Backends::Sequel::Hstore

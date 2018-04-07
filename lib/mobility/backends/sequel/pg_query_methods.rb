@@ -40,6 +40,14 @@ for hstore/json/jsonb/container backends.)
           }.inject(invert ? :| : :&)
         end
 
+        def matches(_key, _value, _locale)
+          raise NotImplementedError
+        end
+
+        def has_locale(_key, _locale)
+          raise NotImplementedError
+        end
+
         private
 
         def define_query_methods
@@ -78,13 +86,6 @@ for hstore/json/jsonb/container backends.)
           end
         end
 
-        def matches(_key, _value, _locale)
-          raise NotImplementedError
-        end
-
-        def has_locale(_key, _locale)
-          raise NotImplementedError
-        end
 
         def column_name(attribute)
           (column_affix % attribute).to_sym

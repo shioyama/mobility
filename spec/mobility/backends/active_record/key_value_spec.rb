@@ -10,7 +10,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
       Article.extend Mobility
     end
 
-    include_backend_examples described_class, 'Article'
+    include_backend_examples described_class, 'Article', type: :text
   end
 
   context "with standard plugins applied" do
@@ -23,8 +23,8 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
       cache_ = cache
       Article.class_eval do
         extend Mobility
-        translates :title, :content, backend: :key_value, cache: cache_
-        translates :subtitle, backend: :key_value
+        translates :title, :content, backend: :key_value, type: :text, cache: cache_
+        translates :subtitle, backend: :key_value, type: :text
       end
     end
 
@@ -351,12 +351,14 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
         })
       end
 
-      it "raises ArgumentError if type is not string or text" do
-        expect { described_class.configure(type: :foo) }.to raise_error(ArgumentError)
+      it "raises ArgumentError if type has no corresponding model class" do
+        expect { described_class.configure(type: "integer") }
+          .to raise_error(ArgumentError,
+                          "You must define a Mobility::ActiveRecord::IntegerTranslation class.")
       end
 
-      it "sets default association_name, class_name and type" do
-        options = {}
+      it "sets default association_name and class_name from type" do
+        options = { type: :text }
         described_class.configure(options)
         expect(options).to eq({
           association_name: :text_translations,

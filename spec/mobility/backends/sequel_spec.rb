@@ -7,7 +7,7 @@ describe "Mobility::Backends::Sequel", orm: :sequel do
       Comment.dataset = DB[:comments]
       Comment.extend Mobility
       Comment.translates :content, backend: :column
-      Comment.translates :title, :author, backend: :key_value
+      Comment.translates :title, :author, backend: :key_value, type: :text
       @comment1 = Comment.create(content: "foo content 1", title: "foo title 1", author: "Foo author 1")
       @comment2 = Comment.create(                          title: "foo title 2", author: "Foo author 2")
       Mobility.with_locale(:ja) { @comment1.update(content: "コンテンツ 1", title: "タイトル 1", author: "オーサー 1") }

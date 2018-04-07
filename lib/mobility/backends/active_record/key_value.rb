@@ -32,17 +32,16 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       require 'mobility/backends/active_record/key_value/query_methods'
 
       # @!group Backend Configuration
-      # @option options [Symbol] type (:text) Column type to use
-      # @option options [Symbol] association_name (:text_translations) Name of association method
-      # @option options [String,Class] class_name ({Mobility::ActiveRecord::TextTranslation}) Translation class
-      # @raise [ArgumentError] if type is not either :text or :string
+      # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
+      # @raise (see Mobility::Backends::KeyValue::ClassMethods#configure)
       def self.configure(options)
         super
-        type = options[:type]
-        options[:class_name] ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
-        options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
-        options[:association_name] ||= :"#{options[:type]}_translations"
-        %i[type association_name].each { |key| options[key] = options[key].to_sym }
+        if type = options[:type]
+          options[:association_name] ||= :"#{options[:type]}_translations"
+          options[:class_name]       ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
+        end
+      rescue NameError
+        raise ArgumentError, "You must define a Mobility::ActiveRecord::#{type.capitalize}Translation class."
       end
       # @!endgroup
 

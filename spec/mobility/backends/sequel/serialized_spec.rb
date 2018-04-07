@@ -97,7 +97,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
         end
 
         it "does not raise error for queries on attributes translated with other backends" do
-          SerializedPost.translates :subtitle, backend: :key_value
+          SerializedPost.translates :subtitle, backend: :key_value, type: :text
 
           post = SerializedPost.create(subtitle: "foo")
           expect(SerializedPost.i18n.where(subtitle: "foo").select_all(:serialized_posts).all).to eq([post])

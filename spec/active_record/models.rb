@@ -7,7 +7,7 @@ end
 class FallbackPost < ActiveRecord::Base
   self.table_name = "posts"
   extend Mobility
-  translates :title, :content, backend: :key_value, cache: true, locale_accessors: true, dirty: true, fallbacks: true
+  translates :title, :content, backend: :key_value, type: :text, cache: true, locale_accessors: true, dirty: true, fallbacks: true
 end
 
 class MultitablePost < ActiveRecord::Base

@@ -75,5 +75,5 @@ RSpec.configure do |config|
   end
 
   config.order = "random"
-  config.filter_run_excluding orm: lambda { |v| v != orm.to_sym }, db: lambda { |v| !Array(v).include?(db.to_sym) }
+  config.filter_run_excluding orm: lambda { |v| !Array(v).include?(orm.to_sym) }, db: lambda { |v| !Array(v).include?(db.to_sym) }
 end

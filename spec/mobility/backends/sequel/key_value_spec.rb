@@ -14,7 +14,7 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
     backend_class_with_cache = Class.new(described_class)
     backend_class_with_cache.apply_plugin(:cache)
 
-    include_backend_examples backend_class_with_cache, 'Article'
+    include_backend_examples backend_class_with_cache, 'Article', type: :text
   end
 
   context "with standard plugins applied" do
@@ -28,8 +28,8 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
       Article.dataset = DB[:articles]
       Article.class_eval do
         extend Mobility
-        translates :title, :content, backend: :key_value
-        translates :subtitle, backend: :key_value
+        translates :title, :content, backend: :key_value, type: :text
+        translates :subtitle, backend: :key_value, type: :text
       end
     end
 
@@ -377,12 +377,15 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
         })
       end
 
-      it "raises ArgumentError if type is not string or text" do
-        expect { described_class.configure(type: :foo) }.to raise_error(ArgumentError)
+      it "raises ArgumentError if type has no corresponding model class" do
+        expect { described_class.configure(type: "integer") }
+          .to raise_error(ArgumentError,
+                          "You must define a Mobility::Sequel::IntegerTranslation class.")
       end
 
-      it "sets default association_name, class_name and type" do
-        options = {}
+
+      it "sets default association_name and class_name from type" do
+        options = { type: :text }
         described_class.configure(options)
         expect(options).to eq({
           association_name: :text_translations,

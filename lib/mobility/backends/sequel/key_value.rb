@@ -37,19 +37,18 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       end
 
       # @!group Backend Configuration
-      # @option options [Symbol,String] type (:text) Column type to use
-      # @option options [Symbol] associaiton_name (:text_translations) Name of association method
-      # @option options [Symbol] class_name ({Mobility::Sequel::TextTranslation}) Translation class
+      # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
+      # @raise (see Mobility::Backends::KeyValue::ClassMethods#configure)
       # @raise [CacheRequired] if cache is disabled
-      # @raise [ArgumentError] if type is not either :text or :string
       def self.configure(options)
-        super
         raise CacheRequired, "Cache required for Sequel::KeyValue backend" if options[:cache] == false
-        type = options[:type]
-        options[:class_name] ||= Mobility::Sequel.const_get("#{type.capitalize}Translation")
-        options[:class_name] = options[:class_name].constantize if options[:class_name].is_a?(String)
-        options[:association_name] ||= :"#{options[:type]}_translations"
-        %i[type association_name].each { |key| options[key] = options[key].to_sym }
+        super
+        if type = options[:type]
+          options[:association_name] ||= :"#{options[:type]}_translations"
+          options[:class_name]       ||= Mobility::Sequel.const_get("#{type.capitalize}Translation")
+        end
+      rescue NameError
+        raise ArgumentError, "You must define a Mobility::Sequel::#{type.capitalize}Translation class."
       end
       # @!endgroup
 

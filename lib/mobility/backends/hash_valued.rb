@@ -9,13 +9,13 @@ Defines read and write methods that access the value at a key with value
 =end
     module HashValued
       # @!macro backend_constructor
-      # @option options [Symbol] prefix Prefix added to generate column
+      # @option options [Symbol] column_prefix Prefix added to generate column
       #   name from attribute name
-      # @option options [Symbol] suffix Suffix added to generate column
+      # @option options [Symbol] column_suffix Suffix added to generate column
       #   name from attribute name
       def initialize(_model, _attribute, options = {})
         super
-        @column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
+        @column_affix = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
       end
 
       # @!group Backend Accessors

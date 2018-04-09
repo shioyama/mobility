@@ -31,7 +31,7 @@ backend querying code.
         def initialize(attributes, options)
           super
           @arel_table   = options[:model_class].arel_table
-          @column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
+          @column_affix = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
 
           q = self
 

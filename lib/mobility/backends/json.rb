@@ -6,7 +6,7 @@ Stores translations as hash on Postgres json column.
 
 ==Backend Options
 
-===+prefix+ and +suffix+
+===+column_prefix+ and +column_suffix+
 
 Prefix and suffix to add to attribute name to generate json column name.
 

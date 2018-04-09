@@ -21,7 +21,7 @@ for hstore/json/jsonb/container backends.)
 
         def initialize(attributes, options)
           super
-          @column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
+          @column_affix = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
           define_query_methods
         end
 

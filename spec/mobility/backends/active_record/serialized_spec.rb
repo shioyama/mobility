@@ -4,8 +4,8 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
   require "mobility/backends/active_record/serialized"
   extend Helpers::ActiveRecord
 
-  column_options = { prefix: 'my_', suffix: '_i18n' }
-  column_affix = "#{column_options[:prefix]}%s#{column_options[:suffix]}"
+  column_options = { column_prefix: 'my_', column_suffix: '_i18n' }
+  column_affix = "#{column_options[:column_prefix]}%s#{column_options[:column_suffix]}"
   let(:default_options) { { presence: false, **column_options } }
 
   context "with no plugins applied" do

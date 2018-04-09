@@ -9,8 +9,8 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
     JsonbPost.extend Mobility
   end
 
-  column_options = { prefix: 'my_', suffix: '_i18n' }
-  column_affix = "#{column_options[:prefix]}%s#{column_options[:suffix]}"
+  column_options = { column_prefix: 'my_', column_suffix: '_i18n' }
+  column_affix = "#{column_options[:column_prefix]}%s#{column_options[:column_suffix]}"
   let(:default_options) { { presence: false, cache: false, **column_options } }
 
   context "with no plugins applied" do

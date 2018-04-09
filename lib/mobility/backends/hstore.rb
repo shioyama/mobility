@@ -7,7 +7,7 @@ Stores translations as hash on Postgres hstore column.
 
 ==Backend Options
 
-===+prefix+ and +suffix+
+===+column_prefix+ and +column_suffix+
 
 Prefix and suffix to add to attribute name to generate hstore column name.
 

@@ -43,7 +43,7 @@ Implements {Mobility::Backends::Serialized} backend for ActiveRecord models.
 
       setup do |attributes, options|
         coder = { yaml: YAMLCoder, json: JSONCoder }[options[:format]]
-        column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
+        column_affix = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
         attributes.each { |attribute| serialize (column_affix % attribute), coder }
       end
 

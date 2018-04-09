@@ -49,7 +49,7 @@ Sequel serialization plugin.
 
       setup do |attributes, options|
         format = options[:format]
-        column_affix = "#{options[:prefix]}%s#{options[:suffix]}"
+        column_affix = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
         columns = attributes.map { |attribute| (column_affix % attribute).to_sym }
 
         plugin :serialization

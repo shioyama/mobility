@@ -183,7 +183,8 @@ columns to that table.
         # Returns translation in a given locale, or nil if none exist
         # @param [Symbol, String] locale
         def in_locale(locale)
-          find { |t| t.locale == locale.to_s }
+          locale = locale.to_s
+          find { |t| t.locale == locale }
         end
       end
     end

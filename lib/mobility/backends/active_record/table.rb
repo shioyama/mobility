@@ -163,7 +163,7 @@ columns to that table.
       # Returns translation for a given locale, or builds one if none is present.
       # @param [Symbol] locale
       def translation_for(locale, _)
-        translation = translations.in(locale)
+        translation = translations.in_locale(locale)
         translation ||= translations.build(locale: locale)
         translation
       end
@@ -182,7 +182,7 @@ columns to that table.
       module TranslationFinderExtension
         # Returns translation in a given locale, or nil if none exist
         # @param [Symbol, String] locale
-        def in(locale)
+        def in_locale(locale)
           find { |t| t.locale == locale.to_s }
         end
       end

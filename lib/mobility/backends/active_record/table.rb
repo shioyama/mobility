@@ -133,7 +133,8 @@ columns to that table.
           foreign_key: options[:foreign_key],
           dependent:   :destroy,
           autosave:    true,
-          inverse_of:  :translated_model
+          inverse_of:  :translated_model,
+          extend:      TranslationFinderExtension
 
         translation_class.belongs_to :translated_model,
           class_name:  name,
@@ -159,8 +160,10 @@ columns to that table.
 
       setup_query_methods(QueryMethods)
 
+      # Returns translation for a given locale, or builds one if none is present.
+      # @param [Symbol] locale
       def translation_for(locale, _)
-        translation = translations.find { |t| t.locale == locale.to_s }
+        translation = translations.in(locale)
         translation ||= translations.build(locale: locale)
         translation
       end
@@ -173,6 +176,14 @@ columns to that table.
             attrs = t.attribute_names & self.class.translated_attribute_names
             send(association_name).destroy(t) if attrs.map(&t.method(:send)).none?
           end
+        end
+      end
+
+      module TranslationFinderExtension
+        # Returns translation in a given locale, or nil if none exist
+        # @param [Symbol, String] locale
+        def in(locale)
+          find { |t| t.locale == locale.to_s }
         end
       end
     end

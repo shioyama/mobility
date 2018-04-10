@@ -134,7 +134,7 @@ columns to that table.
           dependent:   :destroy,
           autosave:    true,
           inverse_of:  :translated_model,
-          extend:      TranslationFinderExtension
+          extend:      TranslationsHasManyExtension
 
         translation_class.belongs_to :translated_model,
           class_name:  name,
@@ -142,7 +142,10 @@ columns to that table.
           inverse_of:  association_name,
           touch: true
 
-        before_save { mobility_destroy_empty_table_translations(association_name) }
+        before_save do
+          required_attributes = self.class.translated_attribute_names & translation_class.attribute_names
+          send(association_name).destroy_empty_translations(required_attributes)
+        end
 
         module_name = "MobilityArTable#{association_name.to_s.camelcase}"
         unless const_defined?(module_name)
@@ -154,8 +157,6 @@ columns to that table.
           end
           include const_set(module_name, dupable)
         end
-
-        include DestroyEmptyTranslations
       end
 
       setup_query_methods(QueryMethods)
@@ -168,23 +169,17 @@ columns to that table.
         translation
       end
 
-      module DestroyEmptyTranslations
-        private
-
-        def mobility_destroy_empty_table_translations(association_name)
-          send(association_name).each do |t|
-            attrs = t.attribute_names & self.class.translated_attribute_names
-            send(association_name).destroy(t) if attrs.map(&t.method(:send)).none?
-          end
-        end
-      end
-
-      module TranslationFinderExtension
+      module TranslationsHasManyExtension
         # Returns translation in a given locale, or nil if none exist
         # @param [Symbol, String] locale
         def in_locale(locale)
           locale = locale.to_s
           find { |t| t.locale == locale }
+        end
+
+        # Destroys translations with all empty values
+        def destroy_empty_translations(required_attributes)
+          each { |t| destroy(t) if required_attributes.map(&t.method(:send)).none? }
         end
       end
     end

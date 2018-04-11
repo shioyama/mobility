@@ -107,8 +107,12 @@ possibilities [below](#backends)).
 
 You will likely also want to set default values for the various translation
 options described below. You can set these defaults by assigning values to keys
-on the `config.default_options` hash, like this (to set the default value for
-the `dirty` option to `true`):
+on the `config.default_options` hash. Below, we turn on the Dirty plugin by
+default, so it will be enabled for all models.
+
+You can also set defaults for backend-specific options. Below, we set the
+default `type` option for the KeyValue backend to `:string` (this is
+unnecessary and will be ignored if you are using a different backend).
 
 ```diff
  Mobility.configure do |config|
@@ -116,11 +120,12 @@ the `dirty` option to `true`):
    config.accessor_method = :translates
    config.query_method    = :i18n
 +  config.default_options[:dirty] = true
++  config.default_options[:type]  = :string
 end
 ```
 
-Other configuration options are
-described in the [API
+We will assume the configuration above in the examples that follow. Other
+configuration options are described in the [API
 docs](http://www.rubydoc.info/gems/mobility/Mobility/Configuration).
 
 See [Getting Started](#quickstart) to get started translating your models.
@@ -136,8 +141,7 @@ You can extend `Mobility` just like in ActiveRecord, or you can use the
 ```ruby
 class Word < ::Sequel::Model
   plugin :mobility
-  translates :name,    type: :string
-  translates :meaning, type: :text
+  translates :name, :meaning
 end
 ```
 
@@ -161,15 +165,12 @@ of options, like this:
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name,    type: :string
-  translates :meaning, type: :text
+  translates :name, :meaning
 end
 ```
 
-You now have translated attributes `name` (as a string column) and `meaning`
-(as a text column) on the model `Word`. You can set their values like you
-would any other attribute:
-
+You now have translated attributes `name` and `meaning` on the model `Word`.
+You can set their values like you would any other attribute:
 
 ```ruby
 word = Word.new
@@ -368,7 +369,7 @@ reading and writing from the backend instance this way.
 
 The `write` methods do not call underlying backend's methods to persist the change.
 This is up to the user (e.g. with ActiveRecord you should call `save` write
-the changes to the database.
+the changes to the database).
 
 ### Setting the Locale
 
@@ -416,8 +417,8 @@ translated attributes on a class:
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name,    type: :string, fallbacks: { de: :ja, fr: :ja }, locale_accessors: true
-  translates :meaning, type: :text,   fallbacks: { de: :ja, fr: :ja }, locale_accessors: true
+  translates :name,    fallbacks: { de: :ja, fr: :ja }, locale_accessors: true
+  translates :meaning, fallbacks: { de: :ja, fr: :ja }, locale_accessors: true
 end
 ```
 
@@ -511,7 +512,7 @@ Another option is to assign a default value, which will be used if the result of
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name, type: :string, default: 'foo'
+  translates :name, default: 'foo'
 end
 
 Mobility.locale = :ja
@@ -559,7 +560,7 @@ dirty tracking is not specific to AR and works for non-persisted models as well)
 ```ruby
 class Post < ApplicationRecord
   extend Mobility
-  translates :title, type: :string, dirty: true
+  translates :title, dirty: true
 end
 ```
 
@@ -644,7 +645,7 @@ false` when defining an attribute, like this:
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name, type: :string, cache: false
+  translates :name, cache: false
 end
 ```
 

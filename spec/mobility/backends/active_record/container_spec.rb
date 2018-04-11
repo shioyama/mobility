@@ -68,9 +68,9 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       m = ActiveRecord::Migration.new
       m.verbose = false
       m.create_table :json_container_posts do |t|
-        t.json :json_translations, default: {}
+        t.json :json_translations, default: {}, null: false
         t.boolean :published
-        t.timestamps
+        t.timestamps null: false
       end
     end
     before(:each) do
@@ -94,7 +94,7 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       m.create_table :string_column_posts do |t|
         t.string :foo
         t.boolean :published
-        t.timestamps
+        t.timestamps null: false
       end
     end
     after(:all) do

@@ -88,8 +88,8 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
       before do
         connection.create_table :post_translations do |t|
           t.string :locale
-          t.integer :post_id
-          t.timestamps
+          t.integer :post_id, null: false
+          t.timestamps null: false
         end
       end
 

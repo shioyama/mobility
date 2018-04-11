@@ -16,7 +16,7 @@ module Mobility
           DB.create_table? :post_metadatas do
             primary_key :id
             String      :metadata
-            Integer     :post_id
+            Integer     :post_id,    allow_null: false
             DateTime    :created_at, allow_null: false
             DateTime    :updated_at, allow_null: false
           end
@@ -31,8 +31,8 @@ module Mobility
 
           DB.create_table? :article_translations do
             primary_key :id
-            Integer     :article_id
-            String      :locale
+            Integer     :article_id, allow_null: false
+            String      :locale,     allow_null: false
             String      :title
             String      :content, size: 65535
             DateTime    :created_at, allow_null: false
@@ -48,45 +48,45 @@ module Mobility
 
           DB.create_table? :multitable_post_translations do
             primary_key :id
-            Integer     :multitable_post_id
-            String      :locale
+            Integer     :multitable_post_id, allow_null: false
+            String      :locale,             allow_null: false
             String      :title
-            DateTime    :created_at, allow_null: false
-            DateTime    :updated_at, allow_null: false
+            DateTime    :created_at,         allow_null: false
+            DateTime    :updated_at,         allow_null: false
           end
 
 
           DB.create_table? :multitable_post_foo_translations do
             primary_key :id
-            Integer     :multitable_post_id
-            String      :locale
+            Integer     :multitable_post_id, allow_null: false
+            String      :locale,             allow_null: false
             String      :foo
-            DateTime    :created_at, allow_null: false
-            DateTime    :updated_at, allow_null: false
+            DateTime    :created_at,         allow_null: false
+            DateTime    :updated_at,         allow_null: false
           end
 
           DB.create_table? :mobility_text_translations do
             primary_key :id
-            String      :locale,            null: false
-            String      :key,               null: false
-            String      :value,             null: false, size: 65535
-            Integer     :translatable_id,   null: false
-            String      :translatable_type, null: false
-            DateTime    :created_at, allow_null: false
-            DateTime    :updated_at, allow_null: false
+            String      :locale,            allow_null: false
+            String      :key
+            String      :value
+            Integer     :translatable_id,   allow_null: false
+            String      :translatable_type, allow_null: false
+            DateTime    :created_at,        allow_null: false
+            DateTime    :updated_at,        allow_null: false
             index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_text_translations_on_keys
             index [:translatable_id, :translatable_type, :key], name: :index_mobility_text_translations_on_translatable_attribute
           end
 
           DB.create_table? :mobility_string_translations do
             primary_key :id
-            String      :locale,            null: false
-            String      :key,               null: false
-            String      :value,             null: false
-            Integer     :translatable_id,   null: false
-            String      :translatable_type, null: false
-            DateTime    :created_at, allow_null: false
-            DateTime    :updated_at, allow_null: false
+            String      :locale,            allow_null: false
+            String      :key,               allow_null: false
+            String      :value
+            Integer     :translatable_id,   allow_null: false
+            String      :translatable_type, allow_null: false
+            DateTime    :created_at,        allow_null: false
+            DateTime    :updated_at,        allow_null: false
             index [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_string_translations_on_keys
             index [:translatable_id, :translatable_type, :key], name: :index_mobility_string_translations_on_translatable_attribute
             index [:translatable_type, :key, :value, :locale], name: :index_mobility_string_translations_on_query_keys
@@ -109,48 +109,48 @@ module Mobility
 
           DB.create_table? :serialized_posts do
             primary_key :id
-            String      :my_title_i18n,         size: 65535
-            String      :my_content_i18n,       size: 65535
+            String      :my_title_i18n,   size: 65535
+            String      :my_content_i18n, size: 65535
             TrueClass   :published
-            DateTime    :created_at, allow_null: false
-            DateTime    :updated_at, allow_null: false
+            DateTime    :created_at,                   allow_null: false
+            DateTime    :updated_at,                   allow_null: false
           end
 
           if ENV['DB'] == 'postgres'
             DB.create_table? :jsonb_posts do
               primary_key :id
-              jsonb       :my_title_i18n,      default: '{}'
-              jsonb       :my_content_i18n,    default: '{}'
+              jsonb       :my_title_i18n,   default: '{}', allow_null: false
+              jsonb       :my_content_i18n, default: '{}', allow_null: false
               TrueClass   :published
-              DateTime    :created_at, allow_null: false
-              DateTime    :updated_at, allow_null: false
+              DateTime    :created_at,                     allow_null: false
+              DateTime    :updated_at,                     allow_null: false
             end
 
             DB.create_table? :json_posts do
               primary_key :id
-              json        :my_title_i18n,      default: '{}'
-              json        :my_content_i18n,    default: '{}'
+              json        :my_title_i18n,   default: '{}', allow_null: false
+              json        :my_content_i18n, default: '{}', allow_null: false
               TrueClass   :published
-              DateTime    :created_at, allow_null: false
-              DateTime    :updated_at, allow_null: false
+              DateTime    :created_at,                     allow_null: false
+              DateTime    :updated_at,                     allow_null: false
             end
 
             DB.create_table? :container_posts do
               primary_key :id
-              jsonb       :translations, default: '{}'
+              jsonb       :translations, default: '{}',    allow_null: false
               TrueClass   :published
-              DateTime    :created_at, allow_null: false
-              DateTime    :updated_at, allow_null: false
+              DateTime    :created_at,                     allow_null: false
+              DateTime    :updated_at,                     allow_null: false
             end
 
             DB.run "CREATE EXTENSION IF NOT EXISTS hstore"
             DB.create_table? :hstore_posts do
               primary_key :id
-              hstore      :my_title_i18n,      default: ''
-              hstore      :my_content_i18n,    default: ''
+              hstore      :my_title_i18n, default: '',   allow_null: false
+              hstore      :my_content_i18n, default: '', allow_null: false
               TrueClass   :published
-              DateTime    :created_at, allow_null: false
-              DateTime    :updated_at, allow_null: false
+              DateTime    :created_at,                   allow_null: false
+              DateTime    :updated_at,                   allow_null: false
             end
           end
         end

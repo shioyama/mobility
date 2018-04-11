@@ -263,7 +263,7 @@ option when defining translated attributes on the model class:
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name, type: :string, locale_accessors: [:en, :ja]
+  translates :name, locale_accessors: [:en, :ja]
 end
 ```
 
@@ -303,7 +303,7 @@ For example, if we define `Word` this way:
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name, type: :string, fallthrough_accessors: true
+  translates :name, fallthrough_accessors: true
 end
 ```
 

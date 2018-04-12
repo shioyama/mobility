@@ -271,6 +271,11 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
         # we're searching for negative matches
         expect(Article.i18n.where.not(title: nil).to_sql).not_to match /OUTER/
       end
+
+      it "works with other joins" do
+        article = Article.create(title: "foo")
+        expect(Article.i18n.joins(:translations).find_by(title: "foo")).to eq(article)
+      end
     end
   end
 

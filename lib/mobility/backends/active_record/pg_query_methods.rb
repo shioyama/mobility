@@ -76,14 +76,13 @@ backend querying code.
           locale = Mobility.locale
           keys.map { |key|
             values = opts.delete(key)
-
             next has_locale(key, locale).not if values.nil?
 
-            Array.wrap(values).map { |value|
-              value.nil? ?
-                has_locale(key, locale).not :
-                matches(key, value, locale)
-            }.inject(&:or)
+            nils, vals = Array.wrap(values).uniq.partition(&:nil?)
+
+            clauses = vals.map { |value| matches(key, value, locale) }
+            clauses << has_locale(key, locale).not unless nils.empty?
+            clauses.inject(&:or)
           }.inject(&:and)
         end
 
@@ -98,7 +97,7 @@ backend querying code.
           keys.map { |key|
             values = opts.delete(key)
 
-            Array.wrap(values).map { |value|
+            Array.wrap(values).uniq.map { |value|
               matches(key, value, locale).not
             }.inject(has_locale(key, locale), &:and)
           }.inject(&:and)

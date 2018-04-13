@@ -136,6 +136,16 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
         expect(query_scope.where(attribute1 => ["foo", "baz"])).to match_array([@instance1, @instance3])
         expect(query_scope.where(attribute1 => ["foo", nil])).to match_array([@instance1, @instance4, @ja_instance1])
       end
+
+      it "collapses clauses in array of values" do
+        instance = model_class.create(attribute1 => "baz")
+        expect(query_scope.where(attribute1 => ["foo", nil, nil])).to match_array([@instance1, @instance4, @ja_instance1])
+        expect(query_scope.where(attribute1 => ["foo", "foo", nil])).to match_array([@instance1, @instance4, @ja_instance1])
+        aggregate_failures do
+          expect(query_scope.where(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where(attribute1 => ["foo", nil, nil]).to_sql)
+          expect(query_scope.where(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where(attribute1 => ["foo", "foo", nil]).to_sql)
+        end
+      end
     end
 
     context "with single table inheritance" do
@@ -189,6 +199,16 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
       aggregate_failures do
         expect(query_scope.where.not(attribute1 => ["foo", "bar"])).to match_array([instance])
         expect(query_scope.where.not(attribute1 => ["foo", nil])).to match_array([instance, @instance5, @instance6])
+      end
+    end
+
+    it "collapses clauses in array of values" do
+      instance = model_class.create(attribute1 => "baz")
+      expect(query_scope.where.not(attribute1 => ["foo", nil, nil])).to match_array([instance, @instance5, @instance6])
+      expect(query_scope.where.not(attribute1 => ["foo", "foo", nil])).to match_array([instance, @instance5, @instance6])
+      aggregate_failures do
+        expect(query_scope.where.not(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where.not(attribute1 => ["foo", nil, nil]).to_sql)
+        expect(query_scope.where.not(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where.not(attribute1 => ["foo", "foo", nil]).to_sql)
       end
     end
   end

@@ -29,6 +29,10 @@ models. For details see backend-specific subclasses.
         def extract_attributes(opts)
           opts.is_a?(Hash) && (opts.keys.map(&:to_s) & @attributes).presence
         end
+
+        def collapse(value)
+          value.is_a?(Array) ? value.uniq : value
+        end
       end
 
       module WhereChainable

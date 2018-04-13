@@ -28,7 +28,9 @@ module Mobility
       def convert_opts(opts)
         if i18n_keys = extract_attributes(opts)
           opts = opts.with_indifferent_access
-          i18n_keys.each { |attr| opts[Column.column_name_for(attr)] = opts.delete(attr) }
+          i18n_keys.each do |attr|
+            opts[Column.column_name_for(attr)] = collapse opts.delete(attr)
+          end
         end
         opts
       end

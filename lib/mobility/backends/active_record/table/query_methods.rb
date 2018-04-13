@@ -24,7 +24,9 @@ module Mobility
           define_method :not do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
               opts = opts.with_indifferent_access
-              i18n_keys.each { |attr| opts["#{translation_class.table_name}.#{attr}"] = opts.delete(attr) }
+              i18n_keys.each do |attr|
+                opts["#{translation_class.table_name}.#{attr}"] = q.collapse opts.delete(attr)
+              end
               super(opts, *rest).send("join_#{association_name}")
             else
               super(opts, *rest)
@@ -94,7 +96,9 @@ module Mobility
               # array with at least one nil value.
               outer_join: opts.values_at(*i18n_keys).compact.all? { |v| !Array(v).all? }
             }
-            i18n_keys.each { |attr| opts["#{translation_class.table_name}.#{attr}"] = opts.delete(attr) }
+            i18n_keys.each do |attr|
+              opts["#{translation_class.table_name}.#{attr}"] = q.collapse opts.delete(attr)
+            end
             super(opts, *rest).send("join_#{association_name}", options)
           else
             super(opts, *rest)

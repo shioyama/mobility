@@ -21,7 +21,9 @@ module Mobility
           define_method :not do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
               opts = opts.with_indifferent_access
-              i18n_keys.each { |attr| opts["#{attr}_#{association_name}"] = { value: opts.delete(attr) }}
+              i18n_keys.each do |attr|
+                opts["#{attr}_#{association_name}"] = { value: q.collapse(opts.delete(attr)) }
+              end
               super(opts, *rest).send(:"join_#{association_name}", *i18n_keys)
             else
               super(opts, *rest)
@@ -55,7 +57,9 @@ module Mobility
           if i18n_keys = q.extract_attributes(opts)
             opts = opts.with_indifferent_access
             i18n_nulls = i18n_keys.reject { |key| opts[key] && Array(opts[key]).all? }
-            i18n_keys.each { |attr| opts["#{attr}_#{association_name}"] = { value: opts.delete(attr) }}
+            i18n_keys.each do |attr|
+              opts["#{attr}_#{association_name}"] = { value: q.collapse(opts.delete(attr)) }
+            end
             super(opts, *rest).
               send("join_#{association_name}", *(i18n_keys - i18n_nulls)).
               send("join_#{association_name}", *i18n_nulls, outer_join: true)

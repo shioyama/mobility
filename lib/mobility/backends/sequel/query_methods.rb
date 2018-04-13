@@ -25,6 +25,10 @@ models. For details see backend-specific subclasses.
         def extract_attributes(cond)
           cond.is_a?(Hash) && Util.presence(cond.keys & @attributes)
         end
+
+        def collapse(value)
+          value.is_a?(Array) ? value.uniq : value
+        end
       end
     end
   end

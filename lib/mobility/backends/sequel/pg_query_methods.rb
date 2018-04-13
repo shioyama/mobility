@@ -35,7 +35,7 @@ for hstore/json/jsonb/container backends.)
         def create_query!(cond, keys, invert = false)
           keys.map { |key|
             values = cond.delete(key)
-            values = [values] unless values.is_a?(Array)
+            values = values.is_a?(Array) ? values.uniq : [values]
             values.map { |value| create_query_op(key, value, invert) }.inject(&:|)
           }.inject(invert ? :| : :&)
         end

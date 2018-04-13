@@ -40,7 +40,9 @@ module Mobility
             if i18n_keys = q.extract_attributes(conds.first)
               cond = conds.first.dup
               outer_join = method_name == "or" || i18n_keys.all? { |key| cond[key].nil? }
-              i18n_keys.each { |attr| cond[::Sequel[translation_class.table_name][attr]] = cond.delete(attr) }
+              i18n_keys.each do |attr|
+                cond[::Sequel[translation_class.table_name][attr]] = q.collapse cond.delete(attr)
+              end
               super(cond, &block).send("join_#{association_name}", outer_join: outer_join)
             else
               super(*conds, &block)

@@ -38,7 +38,9 @@ module Mobility
             if i18n_keys = q.extract_attributes(conds.first)
               cond = conds.first.dup
               i18n_nulls = i18n_keys.select { |key| cond[key].nil? }
-              i18n_keys.each { |attr| cond[::Sequel[:"#{attr}_#{association_name}"][:value]] = cond.delete(attr) }
+              i18n_keys.each do |attr|
+                cond[::Sequel[:"#{attr}_#{association_name}"][:value]] = q.collapse cond.delete(attr)
+              end
               super(cond, &block).
                 send("join_#{association_name}", *(i18n_keys - i18n_nulls), outer_join: method_name == "or").
                 send("join_#{association_name}", *i18n_nulls, outer_join: true)

@@ -336,6 +336,14 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       it "returns records with matching translated attribute values" do
         expect(query_scope.where(attribute1 => ["foo", "baz"]).select_all(table_name).all).to match_array([@instance1, @instance3])
       end
+
+      it "collapses clauses in array of values" do
+        expect(query_scope.where(attribute1 => ["foo", "foo"]).select_all(table_name).all).to match_array([@instance1])
+        aggregate_failures do
+          expect(query_scope.where(attribute1 => ["foo", "foo", nil]).sql).to eq(query_scope.where(attribute1 => ["foo", nil]).sql)
+          expect(query_scope.where(attribute1 => ["foo", nil, nil]).sql).to eq(query_scope.where(attribute1 => ["foo", nil]).sql)
+        end
+      end
     end
   end
 

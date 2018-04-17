@@ -8,14 +8,21 @@ module Mobility
 Defines query methods for Postgres backends. Including class must define two
 methods:
 
-- a method +matches+ which takes a key (column name), value and locale and
-  returns an SQL expression, and checks that the column has the specified value
+- a method +matches+ which takes a key (column name) and a locale to match and
+  returns an SQL expression checking that the column has the specified value
   in the specified locale
-- a method +has_locale+ which takes a key (column name) and locale, and returns
+- a method +exists+ which takes a key (column name) and locale, and returns
   an SQL expression which checks that the column has a value in the locale
+- a method +quote+ which quotes the value to be matched
 
-(The +matches+ and +has_locale+ methods are implemented slightly differently
-for hstore/json/jsonb/container backends.)
+(The +matches+ and +exists+ methods are implemented slightly differently for
+hstore/json/jsonb/container backends.)
+
+@see Mobility::Backends::Sequel::Json::QueryMethods
+@see Mobility::Backends::Sequel::Jsonb::QueryMethods
+@see Mobility::Backends::Sequel::Hstore::QueryMethods
+@see Mobility::Backends::Sequel::Container::JsonQueryMethods
+@see Mobility::Backends::Sequel::Container::JsonbQueryMethods
 
 =end
       module PgQueryMethods
@@ -37,16 +44,20 @@ for hstore/json/jsonb/container backends.)
         def create_query!(cond, keys, invert = false)
           keys.map { |key|
             values = cond.delete(key)
-            values = values.is_a?(Array) ? values.uniq : [values]
-            values.map { |value| create_query_op(key, value, invert) }.inject(&:|)
+            values = values.is_a?(Array) ? values.uniq: [values]
+            create_query_op(key, values, invert)
           }.inject(invert ? :| : :&)
         end
 
-        def matches(_key, _value, _locale)
+        def matches(_key, _locale)
           raise NotImplementedError
         end
 
-        def has_locale(_key, _locale)
+        def exists(_key, _locale)
+          raise NotImplementedError
+        end
+
+        def quote(_value)
           raise NotImplementedError
         end
 
@@ -78,13 +89,17 @@ for hstore/json/jsonb/container backends.)
           end
         end
 
-        def create_query_op(key, value, invert)
+        def create_query_op(key, values, invert)
           locale = Mobility.locale.to_s
+          values = values.map(&method(:quote))
+          values = values.first if values.size == 1
+
+          match = matches(key, locale) =~ values
 
           if invert
-            has_locale(key, locale) & ~matches(key, value, locale)
+            exists(key, locale) & ~match
           else
-            value.nil? ? ~has_locale(key, locale) : matches(key, value, locale)
+            values.nil? ? ~exists(key, locale) : match
           end
         end
 

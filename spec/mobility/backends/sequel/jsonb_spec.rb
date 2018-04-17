@@ -30,6 +30,19 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
     include_querying_examples 'JsonbPost'
     include_dup_examples 'JsonbPost'
 
+    it "uses existence operator instead of NULL match" do
+      aggregate_failures do
+        expect(JsonbPost.i18n.where(title: nil).sql).to match /\?/
+        expect(JsonbPost.i18n.where(title: nil).sql).not_to match /NULL/
+        expect(JsonbPost.i18n.exclude(title: "foo").sql).to match /\?/
+        expect(JsonbPost.i18n.exclude(title: "foo").sql).not_to match /NULL/
+      end
+    end
+
+    it "treats array of nils like nil" do
+      expect(JsonbPost.i18n.where(title: nil).sql).to eq(JsonbPost.i18n.where(title: [nil]).sql)
+    end
+
     describe "non-text values" do
       it "stores non-string types as-is when saving" do
         backend = post.mobility.backend_for("title")

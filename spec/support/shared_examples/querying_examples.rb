@@ -288,7 +288,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
         @instance1 = model_class.create(attribute1 => "foo"                                               )
         @instance2 = model_class.create(attribute1 => "foo", attribute2 => "foo content"                  )
         @instance3 = model_class.create(attribute1 => "foo", attribute2 => "foo content", published: false)
-        @instance4 = model_class.create(                          attribute2 => "foo content"                  )
+        @instance4 = model_class.create(                     attribute2 => "foo content"                  )
         @instance5 = model_class.create(attribute1 => "bar", attribute2 => "bar content"                  )
         @instance6 = model_class.create(attribute1 => "bar",                              published: true )
       end
@@ -323,7 +323,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
             @ja_instance1 = model_class.create(attribute1 => "foo ja", attribute2 => "foo content ja")
             @ja_instance2 = model_class.create(attribute1 => "foo",    attribute2 => "foo content"   )
             @ja_instance3 = model_class.create(attribute1 => "foo"                                   )
-            @ja_instance4 = model_class.create(                             attribute2 => "foo"      )
+            @ja_instance4 = model_class.create(                        attribute2 => "foo"           )
           end
         end
 
@@ -360,6 +360,14 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
         aggregate_failures do
           expect(query_scope.where(attribute1 => ["foo", "foo", nil]).sql).to eq(query_scope.where(attribute1 => ["foo", nil]).sql)
           expect(query_scope.where(attribute1 => ["foo", nil, nil]).sql).to eq(query_scope.where(attribute1 => ["foo", nil]).sql)
+        end
+      end
+
+      it "uses IN when matching array of two or more non-nil values" do
+        aggregate_failures do
+          expect(query_scope.where(attribute1 => ["foo", "bar"]).sql).to match /\sIN\s/
+          expect(query_scope.where(attribute1 => "foo").sql).not_to match /\sIN\s/
+          expect(query_scope.where(attribute1 => nil).sql).not_to match /\sIN\s/
         end
       end
     end

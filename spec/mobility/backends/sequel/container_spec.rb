@@ -25,6 +25,19 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
     include_querying_examples 'ContainerPost'
     include_dup_examples 'ContainerPost'
 
+    it "uses existence operator instead of NULL match" do
+      aggregate_failures do
+        expect(ContainerPost.i18n.where(title: nil).sql).to match /\?/
+        expect(ContainerPost.i18n.where(title: nil).sql).not_to match /NULL/
+        expect(ContainerPost.i18n.exclude(title: "foo").sql).to match /\?/
+        expect(ContainerPost.i18n.exclude(title: "foo").sql).not_to match /NULL/
+      end
+    end
+
+    it "treats array of nils like nil" do
+      expect(ContainerPost.i18n.where(title: nil).sql).to eq(ContainerPost.i18n.where(title: [nil]).sql)
+    end
+
     describe "non-text values" do
       it "stores non-string types as-is when saving" do
         backend = post.mobility.backend_for("title")

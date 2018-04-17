@@ -16,12 +16,16 @@ module Mobility
         define_query_methods
       end
 
-      def matches(key, value, locale)
-        build_op(column_name)[locale].get_text(key.to_s) =~ value.to_s
+      def matches(key, locale)
+        build_op(column_name)[locale].get_text(key.to_s)
       end
 
-      def has_locale(key, locale)
-        build_op(column_name)[locale].get_text(key.to_s) !~ nil
+      def exists(key, locale)
+        matches(key, locale) !~ nil
+      end
+
+      def quote(value)
+        value && value.to_s
       end
 
       private

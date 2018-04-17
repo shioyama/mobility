@@ -9,12 +9,16 @@ module Mobility
     class Sequel::Hstore::QueryMethods < Sequel::QueryMethods
       include Sequel::PgQueryMethods
 
-      def matches(key, value, locale)
-        build_op(key)[locale] =~ value.to_s
+      def matches(key, locale)
+        build_op(key)[locale]
       end
 
-      def has_locale(key, locale)
+      def exists(key, locale)
         build_op(key).has_key?(locale)
+      end
+
+      def quote(value)
+        value && value.to_s
       end
 
       private

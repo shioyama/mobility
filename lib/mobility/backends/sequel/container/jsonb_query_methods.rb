@@ -16,12 +16,16 @@ module Mobility
         define_query_methods
       end
 
-      def matches(key, value, locale)
-        build_op(column_name)[locale][key.to_s] =~ value.to_json
+      def matches(key, locale)
+        build_op(column_name)[locale][key.to_s]
       end
 
-      def has_locale(key, locale)
+      def exists(key, locale)
         build_op(column_name).has_key?(locale) & build_op(column_name)[locale].has_key?(key.to_s)
+      end
+
+      def quote(value)
+        value && value.to_json
       end
 
       private

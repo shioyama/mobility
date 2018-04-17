@@ -42,7 +42,7 @@ backend querying code.
           define_method :where! do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
               opts = opts.with_indifferent_access
-              query = q.create_where_query!(opts, i18n_keys)
+              query = q.create_query!(opts, i18n_keys)
 
               opts.empty? ? super(query) : super(opts, *rest).where(query)
             else
@@ -59,7 +59,7 @@ backend querying code.
             define_method :not do |opts, *rest|
               if i18n_keys = q.extract_attributes(opts)
                 opts = opts.with_indifferent_access
-                query = q.create_not_query!(opts, i18n_keys)
+                query = q.create_query!(opts, i18n_keys, inverse: true)
 
                 super(opts, *rest).where(query)
               else
@@ -70,44 +70,18 @@ backend querying code.
           relation.mobility_where_chain.include(mod)
         end
 
-        # Create +where+ query for options hash, translated keys and arel_table
-        # @note This is a destructive operation, it will modify +opts+.
+        # Create +where+ query for specified key and value
         #
+        # @note This is a destructive operation, it will modify +opts+.
         # @param [Hash] opts Hash of attribute/value pairs
         # @param [Array] keys Translated attribute names
+        # @option [Boolean] inverse (false) If true, create a +not+ query
+        #   instead of a +where+ query
         # @return [Arel::Node] Arel node to pass to +where+
-        def create_where_query!(opts, keys)
-          locale = Mobility.locale
+        def create_query!(opts, keys, inverse: false)
           keys.map { |key|
-            values = opts.delete(key)
-            nils, vals = Array.wrap(values).uniq.partition(&:nil?)
-
-            next absent(key, locale) if vals.empty?
-
-            node = matches(key, locale)
-            vals = vals.map(&method(:quote))
-
-            query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
-            query = query.or(absent(key, locale)) unless nils.empty?
-            query
-          }.inject(&:and)
-        end
-
-        # Create +not+ query for options hash and translated keys
-        # @note This is a destructive operation, it will modify +opts+.
-        #
-        # @param [Hash] opts Hash of attribute/value pairs
-        # @param [Array] keys Translated attribute names
-        # @return [Arel::Node] Arel node to pass to +where+
-        def create_not_query!(opts, keys)
-          locale = Mobility.locale
-          keys.map { |key|
-            values = opts.delete(key)
-            vals = Array.wrap(values).uniq.map(&method(:quote))
-            node = matches(key, locale)
-
-            query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
-            query.not.and(exists(key, locale))
+            values = Array.wrap(opts.delete(key)).uniq
+            send(inverse ? :not_query : :where_query, key, values, Mobility.locale)
           }.inject(&:and)
         end
 
@@ -139,6 +113,39 @@ backend querying code.
 
         def column_name(attribute)
           column_affix % attribute
+        end
+
+        # Create +where+ query for specified key and values
+        #
+        # @param [String] key Translated attribute name
+        # @param [Array] values Values to match
+        # @param [Symbol] locale Locale to query for
+        # @return [Arel::Node] Arel node to pass to +where+
+        def where_query(key, values, locale)
+          nils, vals = values.partition(&:nil?)
+
+          return absent(key, locale) if vals.empty?
+
+          node = matches(key, locale)
+          vals = vals.map(&method(:quote))
+
+          query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
+          query = query.or(absent(key, locale)) unless nils.empty?
+          query
+        end
+
+        # Create +not+ query for specified key and values
+        #
+        # @param [String] key Translated attribute name
+        # @param [Array] values Values to match
+        # @param [Symbol] locale Locale to query for
+        # @return [Arel::Node] Arel node to pass to +where+
+        def not_query(key, values, locale)
+          vals = values.map(&method(:quote))
+          node = matches(key, locale)
+
+          query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
+          query.not.and(exists(key, locale))
         end
       end
     end

@@ -32,6 +32,19 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
     include_dup_examples 'JsonbPost'
     include_cache_key_examples 'JsonbPost'
 
+    it "uses existence operator instead of NULL match" do
+      aggregate_failures do
+        expect(JsonbPost.i18n.where(title: nil).to_sql).to match /\?/
+        expect(JsonbPost.i18n.where(title: nil).to_sql).not_to match /NULL/
+        expect(JsonbPost.i18n.where.not(title: "foo").to_sql).to match /\?/
+        expect(JsonbPost.i18n.where.not(title: "foo").to_sql).not_to match /NULL/
+      end
+    end
+
+    it "treats array of nils like nil" do
+      expect(JsonbPost.i18n.where(title: nil).to_sql).to eq(JsonbPost.i18n.where(title: [nil]).to_sql)
+    end
+
     describe "non-text values" do
       it "stores non-string types as-is when saving", rails_version_geq: '5.0' do
         backend = post.mobility.backend_for("title")

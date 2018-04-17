@@ -8,12 +8,16 @@ module Mobility
 Defines query methods for Postgres backends. Including class must define two
 methods:
 
-- a method +matches+ which takes an attribute, a value and a locale to
-  match, and returns an Arel node checking that the attribute has the specified
-  value in the specified locale
-- a method +has_locale+ which takes an attribute and a locale and
+- a method +matches+ which takes an attribute, and a locale to match, and
+  returns an Arel node which is used to check that the attribute has the
+  specified value in the specified locale
+- a method +exists+ which takes an attribute and a locale and
   returns an Arel node checking that a value exists for the attribute in the
   specified locale
+- a method +quote+ which quotes the value to be matched
+- an optional method +absent+ which takes an attribute and a locale and returns
+  an Arel node checking that the value for the attribute does not exist in the
+  specified locale. Defaults to +exists(key, locale).not+.
 
 This module avoids a lot of duplication between hstore/json/jsonb/container
 backend querying code.
@@ -76,13 +80,16 @@ backend querying code.
           locale = Mobility.locale
           keys.map { |key|
             values = opts.delete(key)
-            next has_locale(key, locale).not if values.nil?
-
             nils, vals = Array.wrap(values).uniq.partition(&:nil?)
 
-            clauses = vals.map { |value| matches(key, value, locale) }
-            clauses << has_locale(key, locale).not unless nils.empty?
-            clauses.inject(&:or)
+            next absent(key, locale) if vals.empty?
+
+            node = matches(key, locale)
+            vals = vals.map(&method(:quote))
+
+            query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
+            query = query.or(absent(key, locale)) unless nils.empty?
+            query
           }.inject(&:and)
         end
 
@@ -96,19 +103,28 @@ backend querying code.
           locale = Mobility.locale
           keys.map { |key|
             values = opts.delete(key)
+            vals = Array.wrap(values).uniq.map(&method(:quote))
+            node = matches(key, locale)
 
-            Array.wrap(values).uniq.map { |value|
-              matches(key, value, locale).not
-            }.inject(has_locale(key, locale), &:and)
+            query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
+            query.not.and(exists(key, locale))
           }.inject(&:and)
         end
 
-        def matches(_key, _value, _locale)
+        def matches(_key, _locale)
           raise NotImplementedError
         end
 
-        def has_locale(_key, _locale)
+        def exists(_key, _locale)
           raise NotImplementedError
+        end
+
+        def quote(_value)
+          raise NotImplementedError
+        end
+
+        def absent(key, locale)
+          exists(key, locale).not
         end
 
         private
@@ -117,7 +133,7 @@ backend querying code.
           arel_table.grouping(Arel::Nodes::InfixOperation.new(*args))
         end
 
-        def quote(value)
+        def build_quoted(value)
           Arel::Nodes.build_quoted(value.to_s)
         end
 

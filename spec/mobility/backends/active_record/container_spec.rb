@@ -27,6 +27,19 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
     include_dup_examples 'ContainerPost'
     include_cache_key_examples 'ContainerPost'
 
+    it "uses existence operator instead of NULL match" do
+      aggregate_failures do
+        expect(ContainerPost.i18n.where(title: nil).to_sql).to match /\?/
+        expect(ContainerPost.i18n.where(title: nil).to_sql).not_to match /NULL/
+        expect(ContainerPost.i18n.where.not(title: "foo").to_sql).to match /\?/
+        expect(ContainerPost.i18n.where.not(title: "foo").to_sql).not_to match /NULL/
+      end
+    end
+
+    it "treats array of nils like nil" do
+      expect(ContainerPost.i18n.where(title: nil).to_sql).to eq(ContainerPost.i18n.where(title: [nil]).to_sql)
+    end
+
     describe "non-text values" do
       it "stores non-string types as-is when saving", rails_version_geq: '5.0' do
         backend = post.mobility.backend_for("title")

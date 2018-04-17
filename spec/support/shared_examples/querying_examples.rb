@@ -211,6 +211,24 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
         expect(query_scope.where.not(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where.not(attribute1 => ["foo", "foo", nil]).to_sql)
       end
     end
+
+    it "uses IN when matching array of two or more non-nil values" do
+      aggregate_failures "where" do
+        expect(query_scope.where(attribute1 => ["foo", "bar"]).to_sql).to match /\sIN\s/
+        expect(query_scope.where(attribute1 => ["foo", "bar", nil]).to_sql).to match /\sIN\s/
+        expect(query_scope.where(attribute1 => ["foo", nil]).to_sql).not_to match /\sIN\s/
+        expect(query_scope.where(attribute1 => "foo").to_sql).not_to match /\sIN\s/
+        expect(query_scope.where(attribute1 => nil).to_sql).not_to match /\sIN\s/
+      end
+
+      aggregate_failures "where not" do
+        expect(query_scope.where.not(attribute1 => ["foo", "bar"]).to_sql).to match /\sIN\s/
+        expect(query_scope.where.not(attribute1 => ["foo", "bar", nil]).to_sql).to match /\sIN\s/
+#        expect(query_scope.where.not(attribute1 => ["foo", nil]).to_sql).not_to match /\sIN\s/
+        expect(query_scope.where.not(attribute1 => "foo").to_sql).not_to match /\sIN\s/
+        expect(query_scope.where.not(attribute1 => nil).to_sql).not_to match /\sIN\s/
+      end
+    end
   end
 end
 

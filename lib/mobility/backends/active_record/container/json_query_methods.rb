@@ -10,18 +10,23 @@ module Mobility
 
       def initialize(_attributes, options)
         super
-        @column_name = options[:column_name]
-        @column      = arel_table[@column_name]
+        @column = arel_table[options[:column_name]]
       end
 
-      def matches(key, value, locale)
-        build_infix(:'->>',
-                    build_infix(:'->', column, quote(locale)),
-                    quote(key)).eq(value && value.to_s)
+      def matches(key, locale)
+        build_infix(:'->>', build_infix(:'->', column, build_quoted(locale)), build_quoted(key))
       end
 
-      def has_locale(key, locale)
-        matches(key, nil, locale).not
+      def exists(key, locale)
+        matches(key, locale).eq(nil).not
+      end
+
+      def absent(key, locale)
+        matches(key, locale).eq(nil)
+      end
+
+      def quote(value)
+        value.to_s
       end
     end
   end

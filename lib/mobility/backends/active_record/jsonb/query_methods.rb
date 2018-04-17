@@ -7,12 +7,16 @@ module Mobility
     class ActiveRecord::Jsonb::QueryMethods < ActiveRecord::QueryMethods
       include ActiveRecord::PgQueryMethods
 
-      def matches(key, value, locale)
-        build_infix(:'->', arel_table[column_name(key)], quote(locale)).eq(quote(value.to_json))
+      def matches(key, locale)
+        build_infix(:'->', arel_table[column_name(key)], build_quoted(locale))
       end
 
-      def has_locale(key, locale)
-        build_infix(:'?', arel_table[column_name(key)], quote(locale))
+      def exists(key, locale)
+        build_infix(:'?', arel_table[column_name(key)], build_quoted(locale))
+      end
+
+      def quote(value)
+        build_quoted(value.to_json)
       end
     end
   end

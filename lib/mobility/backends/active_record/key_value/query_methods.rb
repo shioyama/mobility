@@ -38,7 +38,7 @@ module Mobility
       def define_join_method(association_name, translation_class)
         define_method :"join_#{association_name}" do |*attributes, **options|
           attributes.inject(self) do |relation, attribute|
-            t = translation_class.arel_table.alias(:"#{attribute}_#{association_name}")
+            t = translation_class.arel_table.alias("#{attribute}_#{association_name}")
             m = arel_table
             join_type = options[:outer_join] ? Arel::Nodes::OuterJoin : Arel::Nodes::InnerJoin
             relation.joins(m.join(t, join_type).

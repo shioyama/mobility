@@ -153,7 +153,7 @@ with other backends.
         plugin.apply(self, options[name])
       end
 
-      names.each do |name|
+      each do |name|
         define_backend(name)
         define_reader(name) if %i[accessor reader].include?(method)
         define_writer(name) if %i[accessor writer].include?(method)

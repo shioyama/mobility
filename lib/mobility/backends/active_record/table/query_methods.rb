@@ -24,10 +24,11 @@ module Mobility
           define_method :not do |opts, *rest|
             if i18n_keys = q.extract_attributes(opts)
               opts = opts.with_indifferent_access
+              locale = opts.delete(:locale) || Mobility.locale
               i18n_keys.each do |attr|
                 opts["#{translation_class.table_name}.#{attr}"] = q.collapse opts.delete(attr)
               end
-              super(opts, *rest).send("join_#{association_name}")
+              super(opts, *rest).send("join_#{association_name}", locale: locale)
             else
               super(opts, *rest)
             end
@@ -39,14 +40,13 @@ module Mobility
       private
 
       def define_join_method(association_name, translation_class, foreign_key: nil, table_name: nil, **)
-        define_method :"join_#{association_name}" do |**options|
+        define_method :"join_#{association_name}" do |locale:, outer_join: false|
           return self if joins_values.any? { |v| v.is_a?(Arel::Nodes::Join) && (v.left.name == table_name.to_s) }
           t = translation_class.arel_table
           m = arel_table
-          join_type = options[:outer_join] ? Arel::Nodes::OuterJoin : Arel::Nodes::InnerJoin
-          joins(m.join(t, join_type).
-                on(t[foreign_key].eq(m[:id]).
-                   and(t[:locale].eq(Mobility.locale))).join_sources)
+          join_type = outer_join ? Arel::Nodes::OuterJoin : Arel::Nodes::InnerJoin
+          matches_locale = locale.is_a?(Array) ? t[:locale].in(locale) : t[:locale].eq(locale)
+          joins(m.join(t, join_type).on(t[foreign_key].eq(m[:id]).and(matches_locale)).join_sources)
         end
       end
 
@@ -94,7 +94,8 @@ module Mobility
             options = {
               # We only need an OUTER JOIN if every value is either nil, or an
               # array with at least one nil value.
-              outer_join: opts.values_at(*i18n_keys).compact.all? { |v| !Array(v).all? }
+              outer_join: opts.values_at(*i18n_keys).compact.all? { |v| !Array(v).all? },
+              locale: opts.delete(:locale) || Mobility.locale
             }
             i18n_keys.each do |attr|
               opts["#{translation_class.table_name}.#{attr}"] = q.collapse opts.delete(attr)

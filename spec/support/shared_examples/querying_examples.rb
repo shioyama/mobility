@@ -45,6 +45,17 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
             expect(query_scope.where(attribute1 => "foo")).to eq([@ja_instance2])
           end
         end
+
+        it "returns result in locale specified by locale key" do
+          expect(query_scope.where(attribute1 => "foo", locale: :ja)).to match_array([@ja_instance2])
+          expect(query_scope.where.not(attribute1 => "foo", locale: :ja)).to match_array([@ja_instance1])
+          expect(query_scope.where.not(attribute1 => "foo", locale: :en)).to match_array([@instance2, @instance3, @instance4])
+        end
+
+        it "returns results in locales for array of locales" do
+          expect(query_scope.where(attribute1 => "foo", locale: [:en, :ja])).to match_array([@instance1, @instance5, @ja_instance2])
+          expect(query_scope.where.not(attribute1 => "foo", locale: [:en, :ja])).to match_array([@instance2, @instance3, @instance4, @ja_instance1])
+        end
       end
 
       context "with exists?" do
@@ -194,21 +205,23 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, attri
       expect(query_scope.where.not(attribute1 => "foo", published: true)).to eq([@instance6])
     end
 
-    it "works with array of values" do
-      instance = model_class.create(attribute1 => "baz")
-      aggregate_failures do
-        expect(query_scope.where.not(attribute1 => ["foo", "bar"])).to match_array([instance])
-        expect(query_scope.where.not(attribute1 => ["foo", nil])).to match_array([instance, @instance5, @instance6])
+    context "with array of values" do
+      it "collapses clauses in array of values" do
+        instance = model_class.create(attribute1 => "baz")
+        expect(query_scope.where.not(attribute1 => ["foo", nil, nil])).to match_array([instance, @instance5, @instance6])
+        expect(query_scope.where.not(attribute1 => ["foo", "foo", nil])).to match_array([instance, @instance5, @instance6])
+        aggregate_failures do
+          expect(query_scope.where.not(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where.not(attribute1 => ["foo", nil, nil]).to_sql)
+          expect(query_scope.where.not(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where.not(attribute1 => ["foo", "foo", nil]).to_sql)
+        end
       end
-    end
 
-    it "collapses clauses in array of values" do
-      instance = model_class.create(attribute1 => "baz")
-      expect(query_scope.where.not(attribute1 => ["foo", nil, nil])).to match_array([instance, @instance5, @instance6])
-      expect(query_scope.where.not(attribute1 => ["foo", "foo", nil])).to match_array([instance, @instance5, @instance6])
-      aggregate_failures do
-        expect(query_scope.where.not(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where.not(attribute1 => ["foo", nil, nil]).to_sql)
-        expect(query_scope.where.not(attribute1 => ["foo", nil]).to_sql).to eq(query_scope.where.not(attribute1 => ["foo", "foo", nil]).to_sql)
+      it "returns records with matching translated attribute values" do
+        instance = model_class.create(attribute1 => "baz")
+        aggregate_failures do
+          expect(query_scope.where.not(attribute1 => ["foo", "bar"])).to match_array([instance])
+          expect(query_scope.where.not(attribute1 => ["foo", nil])).to match_array([instance, @instance5, @instance6])
+        end
       end
     end
 

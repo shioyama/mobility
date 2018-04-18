@@ -4,12 +4,23 @@ require "mobility/backends/active_record/query_methods"
 module Mobility
   module Backends
     class ActiveRecord::Column::QueryMethods < ActiveRecord::QueryMethods
-      def initialize(attributes, _)
+      attr_reader :arel_table
+
+      def initialize(attributes, options)
         super
+        @arel_table = options[:model_class].arel_table
+
         q = self
 
         define_method :where! do |opts, *rest|
-          super(q.convert_opts(opts), *rest)
+          if i18n_keys = q.extract_attributes(opts)
+            opts = opts.with_indifferent_access
+            query = q.create_query!(opts, i18n_keys, locale: opts.delete(:locale))
+
+            opts.empty? ? super(query) : super(opts, *rest).where(query)
+          else
+            super(opts, *rest)
+          end
         end
       end
 
@@ -19,20 +30,34 @@ module Mobility
 
         mod = Module.new do
           define_method :not do |opts, *rest|
-            super(q.convert_opts(opts), *rest)
+            if i18n_keys = q.extract_attributes(opts)
+              opts = opts.with_indifferent_access
+              query = q.create_query!(opts, i18n_keys, inverse: true, locale: opts.delete(:locale))
+
+              opts.empty? ? super(query) : super(opts, *rest).where.not(query)
+            else
+              super(opts, *rest)
+            end
           end
         end
         relation.mobility_where_chain.include(mod)
       end
 
-      def convert_opts(opts)
-        if i18n_keys = extract_attributes(opts)
-          opts = opts.with_indifferent_access
-          i18n_keys.each do |attr|
-            opts[Column.column_name_for(attr)] = collapse opts.delete(attr)
-          end
-        end
-        opts
+      def create_query!(opts, keys, inverse: false, **options)
+        keys.map { |key|
+          nils, vals = Array.wrap(opts.delete(key)).uniq.partition(&:nil?)
+
+          Array.wrap(options[:locale] || Mobility.locale).map { |locale|
+            column_name = Column.column_name_for(key, locale)
+            node = arel_table[column_name]
+
+            next node.eq(nil) if vals.empty?
+
+            query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
+            query = query.or(node.eq(nil)) unless nils.empty?
+            query
+          }.inject(&(inverse ? :and : :or))
+        }.inject(&(inverse ? :or : :and))
       end
     end
   end

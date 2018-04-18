@@ -53,11 +53,17 @@ module Mobility
 
             next node.eq(nil) if vals.empty?
 
-            query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
+            query = node_in(node, vals)
             query = query.or(node.eq(nil)) unless nils.empty?
             query
           }.inject(&(inverse ? :and : :or))
         }.inject(&(inverse ? :or : :and))
+      end
+
+      private
+
+      def node_in(node, vals)
+        vals.size == 1 ? node.eq(vals.first) : node.in(vals)
       end
     end
   end

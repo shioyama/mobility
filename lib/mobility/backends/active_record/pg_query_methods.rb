@@ -129,9 +129,7 @@ backend querying code.
           locales.map { |locale|
             next absent(key, locale) if vals.empty?
 
-            node = matches(key, locale)
-
-            query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
+            query = node_in(matches(key, locale), vals)
             query = query.or(absent(key, locale)) unless nils.empty?
             query
           }.inject(&:or)
@@ -147,11 +145,12 @@ backend querying code.
           vals = values.map(&method(:quote))
 
           locales.map { |locale|
-            node = matches(key, locale)
-
-            query = vals.size == 1 ? node.eq(vals.first) : node.in(vals)
-            query.not.and(exists(key, locale))
+            node_in(matches(key, locale), vals).not.and(exists(key, locale))
           }.inject(&:or)
+        end
+
+        def node_in(node, vals)
+          vals.size == 1 ? node.eq(vals.first) : node.in(vals)
         end
       end
     end

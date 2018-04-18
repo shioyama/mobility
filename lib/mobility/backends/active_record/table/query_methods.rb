@@ -40,7 +40,7 @@ module Mobility
       private
 
       def define_join_method(association_name, translation_class, foreign_key: nil, table_name: nil, **)
-        define_method :"join_#{association_name}" do |locale:, outer_join: false, **options|
+        define_method :"join_#{association_name}" do |locale:, outer_join: false|
           return self if joins_values.any? { |v| v.is_a?(Arel::Nodes::Join) && (v.left.name == table_name.to_s) }
           t = translation_class.arel_table
           m = arel_table

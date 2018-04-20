@@ -15,24 +15,24 @@ and also to cache translation *records* in {Mobility::Backends::Table} and
       class TranslationCacher < Module
         # @param [Symbol] fetch_method Name of translation fetch method to cache
         def initialize(fetch_method)
-          define_method fetch_method do |locale, **options|
-            return super(locale, options) if options.delete(:cache) == false
-            if cache.has_key?(locale)
-              cache[locale]
-            else
-              cache[locale] = super(locale, options)
+          class_eval <<-EOM, __FILE__, __LINE__ + 1
+            def #{fetch_method} locale, **options
+              return super(locale, options) if options.delete(:cache) == false
+              if cache.has_key?(locale)
+                cache[locale]
+              else
+                cache[locale] = super(locale, options)
+              end
             end
-          end
+          EOM
 
-          define_method :cache do
-            @cache ||= {}
-          end
+          include CacheMethods
+        end
 
-          define_method :clear_cache do
-            @cache = {}
-          end
-
-          private :cache, :clear_cache
+        module CacheMethods
+          private
+          def cache;       @cache ||= {}; end
+          def clear_cache; @cache = {};   end
         end
       end
     end

@@ -56,7 +56,7 @@ module Mobility
         define_method :where! do |opts, *rest|
           if i18n_keys = q.extract_attributes(opts)
             opts = opts.with_indifferent_access
-            i18n_nulls = i18n_keys.reject { |key| opts[key] && Array(opts[key]).all? }
+            i18n_nulls = i18n_keys.reject { |key| opts[key] && [*opts[key]].all? }
             i18n_keys.each do |attr|
               opts["#{attr}_#{association_name}"] = { value: q.collapse(opts.delete(attr)) }
             end

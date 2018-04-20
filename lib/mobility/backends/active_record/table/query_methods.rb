@@ -94,7 +94,7 @@ module Mobility
             options = {
               # We only need an OUTER JOIN if every value is either nil, or an
               # array with at least one nil value.
-              outer_join: opts.values_at(*i18n_keys).compact.all? { |v| !Array(v).all? }
+              outer_join: opts.values_at(*i18n_keys).compact.all? { |v| ![*v].all? }
             }
             i18n_keys.each do |attr|
               opts["#{translation_class.table_name}.#{attr}"] = q.collapse opts.delete(attr)

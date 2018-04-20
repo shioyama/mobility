@@ -25,7 +25,7 @@ To use the validator, you must +extend Mobility+ before calling +validates+
       def validate_each(record, attribute, value)
         klass = record.class
 
-        if ((Array(options[:scope]) + [attribute]).map(&:to_s) & klass.translated_attribute_names).present?
+        if (([*options[:scope]] + [attribute]).map(&:to_s) & klass.translated_attribute_names).present?
           warn %{
 WARNING: The Mobility uniqueness validator for translated attributes does not
 support case-insensitive validation. This option will be ignored for: #{attribute}
@@ -50,7 +50,7 @@ support case-insensitive validation. This option will be ignored for: #{attribut
       private
 
       def mobility_scope_relation(record, relation)
-        Array(options[:scope]).inject(relation) do |scoped_relation, scope_item|
+        [*options[:scope]].inject(relation) do |scoped_relation, scope_item|
           scoped_relation.where(scope_item => record.send(scope_item))
         end
       end

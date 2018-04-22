@@ -40,7 +40,10 @@ module Mobility
 
       def define_join_method(association_name, translation_class, foreign_key: nil, table_name: nil, **)
         define_method :"join_#{association_name}" do |**options|
-          return self if joins_values.any? { |v| v.is_a?(Arel::Nodes::Join) && (v.left.name == table_name.to_s) }
+          if join = joins_values.find { |v| (Arel::Nodes::Join === v) && (v.left.name == table_name.to_s) }
+            return self if (options[:outer_join] || Arel::Nodes::InnerJoin === join)
+            self.joins_values = joins_values - [join]
+          end
           t = translation_class.arel_table
           m = arel_table
           join_type = options[:outer_join] ? Arel::Nodes::OuterJoin : Arel::Nodes::InnerJoin
@@ -67,26 +70,15 @@ module Mobility
         # When deciding whether to use an outer or inner join, array-valued
         # conditions are treated as nil if they have any values.
         #
-        # Article.where(title: nil, content: ["foo", nil])            #=> OUTER JOIN (all nil or array with nil)
-        # Article.where(title: "foo", content: ["foo", nil])          #=> INNER JOIN (one non-nil)
-        # Article.where(title: ["foo", "bar"], content: ["foo", nil]) #=> INNER JOIN (one non-nil array)
+        # Article.where(title: nil, content: ["foo", nil])                  #=> OUTER JOIN (all nil or array with nil)
+        # Article.where(title: "foo", content: ["foo", nil])                #=> INNER JOIN (one non-nil)
+        # Article.where(title: ["foo", "bar"], content: ["foo", nil])       #=> INNER JOIN (one non-nil array)
         #
-        # Note that if you call `where` multiple times, you may end up with an
-        # outer join when a (faster) inner join would have worked fine:
+        # The logic also applies when a query has more than one where clause.
         #
-        # Article.where(title: nil).where(content: "foo")          #=> OUTER JOIN
-        # Article.where(title: [nil, "foo"]).where(content: "foo") #=> OUTER JOIN
-        #
-        # In this case, we are searching for a match on the article_translations table
-        # which has a NULL title and a content equal to "foo". Since we need a positive
-        # match for content, there must be an English translation on the article, thus
-        # we can use an inner join. However, Mobility will use an outer join since we don't
-        # want to modify the existing relation which has already been joined.
-        #
-        # To avoid this problem, simply make sure to either order your queries to place nil
-        # values last, or include all queried attributes in a single `where`:
-        #
-        # Article.where(title: nil, content: "foo") #=> INNER JOIN
+        # Article.where(title: nil).where(content: nil)    #=> OUTER JOIN (all nils)
+        # Article.where(title: nil).where(content: "foo")  #=> INNER JOIN (one non-nil)
+        # Article.where(title: "foo").where(content: nil)  #=> INNER JOIN (one non-nil)
         #
         define_method :where! do |opts, *rest|
           if i18n_keys = q.extract_attributes(opts)

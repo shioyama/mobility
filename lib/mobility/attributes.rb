@@ -169,6 +169,10 @@ with other backends.
       names.each(&block)
     end
 
+    def inspect
+      "#<Attributes (#{backend_name}) @names=#{names.join(", ")}>"
+    end
+
     # Process options passed into accessor method before calling backend, and
     # return locale
     # @deprecated This method was mainly used internally but is no longer

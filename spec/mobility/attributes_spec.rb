@@ -251,4 +251,11 @@ describe Mobility::Attributes do
       expect(attributes.backend_name).to eq(:null)
     end
   end
+
+  describe "#inspect" do
+    it "returns backend name and attribute names" do
+      attributes = described_class.new("title", "content", backend: :null)
+      expect(attributes.inspect).to eq("#<Attributes (null) @names=title, content>")
+    end
+  end
 end

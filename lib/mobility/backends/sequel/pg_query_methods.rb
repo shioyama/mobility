@@ -5,8 +5,8 @@ module Mobility
     module Sequel
 =begin
 
-Defines query methods for Postgres backends. Including class must define two
-methods:
+Internal module builder defining query methods for Postgres backends. Including
+class must define three methods:
 
 - a method +matches+ which takes a key (column name) and a locale to match and
   returns an SQL expression checking that the column has the specified value
@@ -15,8 +15,8 @@ methods:
   an SQL expression which checks that the column has a value in the locale
 - a method +quote+ which quotes the value to be matched
 
-(The +matches+ and +exists+ methods are implemented slightly differently for
-hstore/json/jsonb/container backends.)
+(The +matches+/+exists+/+quote+ methods are implemented slightly differently
+for hstore/json/jsonb/container backends.)
 
 @see Mobility::Backends::Sequel::Json::QueryMethods
 @see Mobility::Backends::Sequel::Jsonb::QueryMethods
@@ -108,6 +108,7 @@ hstore/json/jsonb/container backends.)
           (column_affix % attribute).to_sym
         end
       end
+      private_constant :PgQueryMethods
     end
   end
 end

@@ -143,7 +143,7 @@ module Mobility
     # @!group Configuration Methods
     # @return [Mobility::Configuration] Mobility configuration
     def config
-      @configuration ||= Mobility::Configuration.new
+      @configuration ||= Configuration.new
     end
 
     # (see Mobility::Configuration#accessor_method)
@@ -271,7 +271,7 @@ instead.}
     include Translates
 
     def mobility
-      @mobility ||= Mobility::Accumulator.new
+      @mobility ||= Accumulator.new
     end
 
     def translated_attribute_names
@@ -283,6 +283,7 @@ instead.}
       super
     end
   end
+  private_constant :ClassMethods, :InstanceMethods
 
   class BackendRequired < ArgumentError; end
   class InvalidLocale < I18n::InvalidLocale; end

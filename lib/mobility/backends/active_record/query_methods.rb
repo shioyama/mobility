@@ -44,6 +44,7 @@ models. For details see backend-specific subclasses.
           @mobility_where_chain ||= Class.new(::ActiveRecord::QueryMethods::WhereChain)
         end
       end
+      private_constant :QueryMethods, :WhereChainable
     end
   end
 end

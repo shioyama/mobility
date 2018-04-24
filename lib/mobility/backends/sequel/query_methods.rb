@@ -30,6 +30,7 @@ models. For details see backend-specific subclasses.
           value.is_a?(Array) ? value.uniq : value
         end
       end
+      private_constant :QueryMethods
     end
   end
 end

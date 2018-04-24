@@ -5,8 +5,8 @@ module Mobility
     module ActiveRecord
 =begin
 
-Defines query methods for Postgres backends. Including class must define two
-methods:
+Internal module builder defining query methods for Postgres backends. Including
+class must define the following methods:
 
 - a method +matches+ which takes an attribute, and a locale to match, and
   returns an Arel node which is used to check that the attribute has the
@@ -148,6 +148,7 @@ backend querying code.
           query.not.and(exists(key, locale))
         end
       end
+      private_constant :PgQueryMethods
     end
   end
 end

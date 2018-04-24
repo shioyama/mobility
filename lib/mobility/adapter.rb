@@ -16,4 +16,5 @@ Provides interface to access attributes across all backends of an instance.
       @model.send(Backend.method_name(attribute))
     end
   end
+  private_constant :Adapter
 end

@@ -42,5 +42,7 @@ Defines read and write methods that access the value at a key with value
         @column_name ||= (@column_affix % attribute)
       end
     end
+
+    private_constant :HashValued
   end
 end

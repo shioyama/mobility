@@ -2,7 +2,6 @@
 require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/hash_valued"
-require "mobility/backend/stringify_locale"
 require "mobility/sequel/column_changes"
 
 module Mobility
@@ -16,7 +15,14 @@ jsonb).
     class Sequel::PgHash
       include Sequel
       include HashValued
-      include StringifyLocale
+
+      def read(locale, options = {})
+        super(locale.to_s, options)
+      end
+
+      def write(locale, value, options = {})
+        super(locale.to_s, value, options)
+      end
 
       # @!macro backend_iterator
       def each_locale

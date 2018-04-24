@@ -2,8 +2,7 @@ module Mobility
 =begin
 
 Class to access Mobility across backends. In particular, keeps a record of
-which {Attributes} modules have been included on the model class. It is also a
-simple delegator, so any missing method will be delegated to the model class.
+which {Attributes} modules have been included on the model class.
 
 =end
   class Accumulator

@@ -8,16 +8,15 @@ method is called.
 =end
     class BackendResetter < Mobility::BackendResetter
 
-      # @param [Class] model_class Class of model to which backend resetter will be applied
-      def included(model_class)
+      # (see Mobility::BackendResetter#initialize)
+      def initialize(attribute_names, &block)
+        super
+
         model_reset_method = @model_reset_method
 
-        mod = Module.new do
-          define_method :refresh do
-            super().tap { instance_eval(&model_reset_method) }
-          end
+        define_method :refresh do
+          super().tap { instance_eval(&model_reset_method) }
         end
-        model_class.include mod
       end
     end
   end

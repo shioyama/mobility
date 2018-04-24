@@ -11,16 +11,15 @@ Backend resetter for ActiveRecord models. Adds hook on +reload+ event to
 =end
     class BackendResetter < Mobility::ActiveModel::BackendResetter
 
-      # @param [Class] model_class Class of model to which backend resetter will be applied
-      def included(model_class)
+      # (see Mobility::BackendResetter#initialize)
+      def initialize(attribute_names, &block)
+        super
+
         model_reset_method = @model_reset_method
 
-        mod = Module.new do
-          define_method :reload do |*args|
-            super(*args).tap { instance_eval(&model_reset_method) }
-          end
+        define_method :reload do |*args|
+          super(*args).tap { instance_eval(&model_reset_method) }
         end
-        model_class.include mod
       end
     end
   end

@@ -1,6 +1,6 @@
 # Mobility Changelog
 
-## 0.4
+## 0.5
 
 ### 0.5.1 (March 21, 2018)
 * Fix issues with Dirty plugin in ActiveRecord 5.2.0.rc2
@@ -16,6 +16,8 @@
   ([#186](https://github.com/shioyama/mobility/pull/186))
 * Use pragma comments to freeze strings everywhere
   ([#177](https://github.com/shioyama/mobility/pull/177))
+
+## 0.4
 
 ### 0.4.3 (February 18, 2018)
 * Add missing require in container backend

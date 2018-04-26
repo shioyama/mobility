@@ -73,13 +73,6 @@ The proc can accept zero to three arguments (see examples below)
           default = options.has_key?(:default) ? options.delete(:default) : default_option
           if (value = super(locale, options)).nil?
             return default unless default.is_a?(Proc)
-            # TODO: Remove in v1.0
-            if default.parameters.any? { |n, v| [:keyreq, :keyopt].include?(n) && [:model, :attribute, :locale, :options].include?(v) }
-              warn %{
-WARNING: Passing keyword arguments to a Proc in the Default plugin is
-deprecated. See the API documentation for details.}
-              return default.call(model: model, attribute: attribute, locale: locale, options: options)
-            end
             args = [attribute, locale, options]
             args = args.first(default.arity) unless default.arity < 0
             model.instance_exec(*args, &default)

@@ -173,20 +173,6 @@ with other backends.
       "#<Attributes (#{backend_name}) @names=#{names.join(", ")}>"
     end
 
-    # Process options passed into accessor method before calling backend, and
-    # return locale
-    # @deprecated This method was mainly used internally but is no longer
-    #   needed. It will be removed in the next major release.
-    # @param [Hash] options Options hash passed to accessor method
-    # @return [Symbol] locale
-    # TODO: Remove in v1.0
-    def self.process_options!(options)
-      (options[:locale] || Mobility.locale).tap { |locale|
-        Mobility.enforce_available_locales!(locale)
-        options[:locale] &&= !!locale
-      }.to_sym
-    end
-
     private
 
     def define_backend(attribute)

@@ -1,5 +1,43 @@
 # Mobility Changelog
 
+## 0.6
+
+### 0.6.1 (April 26, 2018)
+
+* Add column_prefix/column_suffix options to hash backends
+  ([#200](https://github.com/shioyama/mobility/pull/199) and
+  [#201](https://github.com/shioyama/mobility/pull/201))
+* Require specifying type for KeyValue backends
+  ([#200](https://github.com/shioyama/mobility/pull/200))
+* Remove table backend index on foreign key alone
+  ([#198](https://github.com/shioyama/mobility/pull/198))
+* Test/cleanup index name truncation in backend generators
+  ([#197](https://github.com/shioyama/mobility/pull/197))
+* Improve translations generators
+  ([#196](https://github.com/shioyama/mobility/pull/196))
+* Enforce null: false constraint on columns consistently
+  ([#205](https://github.com/shioyama/mobility/pull/205))
+* Add extension to find translations in a locale for Table backend
+  ([#202](https://github.com/shioyama/mobility/pull/202))
+* Ignore non-arel nodes in joins_values
+  ([#206](https://github.com/shioyama/mobility/pull/206))
+* Collapse duplicates in array-valued query hash
+  ([#207](https://github.com/shioyama/mobility/pull/207))
+* Remove unneeded anonymous module in backend resetters
+  ([#213](https://github.com/shioyama/mobility/pull/213))
+* Make constants private
+  ([#214](https://github.com/shioyama/mobility/pull/214))
+* Use IN when querying on array values with PG backends
+  ([#209](https://github.com/shioyama/mobility/pull/209))
+* Remove some deprecated methods
+  ([#215](https://github.com/shioyama/mobility/pull/215))
+* Explicitly implement matches/has_locale methods everywhere
+  ([#194](https://github.com/shioyama/mobility/pull/194))
+* Refactor Mobility::Backends::AR::QueryMethods using MobilityWhereChain module
+  ([#193](https://github.com/shioyama/mobility/pull/193))
+* Add missing documentation
+  ([#192](https://github.com/shioyama/mobility/pull/192))
+
 ## 0.5
 
 ### 0.5.1 (March 21, 2018)

@@ -15,7 +15,7 @@ Defines read and write methods that access the value at a key with value
       #   name from attribute name
       def initialize(_model, _attribute, options = {})
         super
-        @column_affix = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
+        @column_affix = options[:column_affix]
       end
 
       # @!group Backend Accessors
@@ -34,6 +34,16 @@ Defines read and write methods that access the value at a key with value
       # @!macro backend_iterator
       def each_locale
         translations.each { |l, _| yield l }
+      end
+
+      def self.included(backend_class)
+        backend_class.extend ClassMethods
+      end
+
+      module ClassMethods
+        def configure(options)
+          options[:column_affix] = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
+        end
       end
 
       private

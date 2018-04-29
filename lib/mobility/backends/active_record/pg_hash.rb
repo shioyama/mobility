@@ -25,8 +25,7 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
         end
 
         setup do |attributes, options = {}|
-          affix = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
-          attributes.each { |attribute| store (affix % attribute), coder: Coder }
+          attributes.each { |attribute| store (options[:column_affix] % attribute), coder: Coder }
         end
 
         class Coder

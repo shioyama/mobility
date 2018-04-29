@@ -35,8 +35,7 @@ jsonb).
         end
 
         setup do |attributes, options|
-          column_affix = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
-          columns = attributes.map { |attribute| (column_affix % attribute).to_sym }
+          columns = attributes.map { |attribute| (options[:column_affix] % attribute).to_sym }
 
           before_validation = Module.new do
             define_method :before_validation do
@@ -48,7 +47,7 @@ jsonb).
           end
           include before_validation
           include Mobility::Sequel::HashInitializer.new(*columns)
-          include Mobility::Sequel::ColumnChanges.new(attributes, column_affix: column_affix)
+          include Mobility::Sequel::ColumnChanges.new(attributes, column_affix: options[:column_affix])
 
           plugin :defaults_setter
           columns.each { |column| default_values[column] = {} }

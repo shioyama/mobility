@@ -18,13 +18,13 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
 
       require 'mobility/backends/sequel/table/query_methods'
 
-      # @return [Symbol] class for translations
-      attr_reader :translation_class
+      def translation_class
+        self.class.translation_class
+      end
 
-      # @!macro backend_constructor
-      def initialize(model, attribute, options = {})
-        super
-        @translation_class = options[:model_class].const_get(options[:subclass_name])
+      # @return [Symbol] class for translations
+      def self.translation_class
+        @translation_class ||= options[:model_class].const_get(options[:subclass_name])
       end
 
       # @!group Backend Configuration

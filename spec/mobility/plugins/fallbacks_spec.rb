@@ -6,7 +6,7 @@ describe Mobility::Plugins::Fallbacks do
     let(:backend_class) do
       backend_class = stub_const 'MyBackend', Class.new
       backend_class.include(Mobility::Backend)
-      backend_class.class_eval do
+      backend_subclass = backend_class.build_subclass(fallbacks: fallbacks) do
         def read(locale, **options)
           Mobility.enforce_available_locales!(locale)
           return "bar" if options[:bar]
@@ -19,16 +19,13 @@ describe Mobility::Plugins::Fallbacks do
           }[attribute][locale]
         end
       end
-      backend_class = Class.new(backend_class).include(described_class.new(fallbacks))
-      backend_class
+      Class.new(backend_subclass).include(described_class.new(fallbacks))
     end
     let(:object) { (stub_const 'MobilityModel', Class.new).include(Mobility).new }
+    subject { backend_class.new(object, "title") }
 
     context "fallbacks is a hash" do
       let(:fallbacks) { { :'en-US' => 'de-DE', :pt => 'de-DE' } }
-      subject do
-        backend_class.new(object, "title", fallbacks: fallbacks)
-      end
 
       it "returns value when value is not nil" do
         expect(subject.read(:ja)).to eq("フー")
@@ -75,9 +72,6 @@ describe Mobility::Plugins::Fallbacks do
 
     context "fallbacks is true" do
       let(:fallbacks) { true }
-      subject do
-        backend_class.new(object, "title", fallbacks: fallbacks)
-      end
 
       it "uses default fallbacks" do
         original_default_locale = I18n.default_locale
@@ -89,7 +83,6 @@ describe Mobility::Plugins::Fallbacks do
 
     context "fallbacks is falsey" do
       let(:fallbacks) { nil }
-      subject { backend_class.new(object, "title", fallbacks: fallbacks) }
 
       it "does not use fallbacks when fallback option is false or nil" do
         original_default_locale = I18n.default_locale

@@ -160,7 +160,7 @@ with other backends.
       end
 
       model_class.mobility << self
-      backend_class.setup_model(model_class, names, options)
+      backend_class.setup_model(model_class, names)
     end
 
     # Yield each attribute name to block
@@ -176,10 +176,10 @@ with other backends.
     private
 
     def define_backend(attribute)
-      backend_class_, options_ = backend_class, options
+      backend_class_ = backend_class
       define_method Backend.method_name(attribute) do
         @mobility_backends ||= {}
-        @mobility_backends[attribute] ||= backend_class_.new(self, attribute, options_)
+        @mobility_backends[attribute] ||= backend_class_.new(self, attribute)
       end
     end
 

@@ -126,23 +126,29 @@ describe Mobility::Backend do
 
       it "stores setup as block which is called in model class" do
         model_class = Class.new
-        backend_class.setup_model(model_class, ["title"], { foo: "bar" })
+        backend_class.build_subclass(foo: "bar").setup_model(model_class, ["title"])
         expect(model_class.foo).to eq("foo")
         expect(model_class.new.bar).to eq("bar")
       end
 
       it "passes attributes and options to setup block when called on class" do
         model_class = Class.new
-        backend_class.setup_model(model_class, ["title"], { foo: "bar" })
+        backend_class.build_subclass(foo: "bar").setup_model(model_class, ["title"])
         expect(model_class.new.my_attributes).to eq(["title"])
         expect(model_class.new.my_options).to eq({ foo: "bar" })
       end
 
       it "assigns setup block to descendants" do
         model_class = Class.new
-        other_backend = Class.new(backend_class)
-        other_backend.setup_model(model_class, ["title"], { foo: "bar" })
+        subclass = backend_class.build_subclass(foo: "bar")
+        Class.new(subclass).setup_model(model_class, ["title"])
         expect(model_class.foo).to eq("foo")
+      end
+
+      it "assigns options to descendants" do
+        model_class = Class.new
+        subclass = backend_class.build_subclass(foo: "bar")
+        expect(Class.new(subclass).options).to eq(foo: "bar")
       end
 
       it "concatenates blocks when called multiple times" do
@@ -160,7 +166,7 @@ describe Mobility::Backend do
           end
         end
         model_class = Class.new
-        backend_class.setup_model(model_class, ["title", "content"], { foo: "bar" })
+        backend_class.build_subclass(foo: "bar").setup_model(model_class, ["title", "content"])
 
         aggregate_failures do
           expect(model_class.foo).to eq("foo2")

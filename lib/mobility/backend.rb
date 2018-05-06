@@ -66,7 +66,7 @@ On top of this, a backend will normally:
     # @!macro [new] backend_constructor
     #   @param model Model on which backend is defined
     #   @param [String] attribute Backend attribute
-    def initialize(model, attribute, **_)
+    def initialize(model, attribute)
       @model = model
       @attribute = attribute
     end
@@ -106,6 +106,11 @@ On top of this, a backend will normally:
       Util.present?(read(locale, options))
     end
 
+    # @return [Hash] options
+    def options
+      self.class.options
+    end
+
     # Extend included class with +setup+ method and other class methods
     def self.included(base)
       base.extend Setup
@@ -142,13 +147,14 @@ On top of this, a backend will normally:
 
       def inherited(subclass)
         subclass.instance_variable_set(:@setup_block, @setup_block)
+        subclass.instance_variable_set(:@options, @options)
       end
 
       # Call setup block on a class with attributes and options.
       # @param model_class Class to be setup-ed
       # @param [Array<String>] attribute_names
       # @param [Hash] options
-      def setup_model(model_class, attribute_names, **options)
+      def setup_model(model_class, attribute_names)
         return unless setup_block = @setup_block
         model_class.class_exec(attribute_names, options, &setup_block)
       end
@@ -158,10 +164,25 @@ On top of this, a backend will normally:
       # Build a subclass of this backend class for a given set of options
       # @param [Hash] options
       # @return [Class] backend subclass
-      def build_subclass(options)
+      def build_subclass(options = {}, &block)
         configure(options) if respond_to?(:configure)
         options.freeze
-        Class.new(self) { @options = options }
+        Class.new(self) do
+          @options = options
+          class_eval(&block) if block_given?
+        end
+      end
+
+      def option_reader(name)
+        module_eval <<-EOM, __FILE__, __LINE__ + 1
+        def self.#{name}
+          options[:#{name}]
+        end
+
+        def #{name}
+          self.class.options[:#{name}]
+        end
+        EOM
       end
 
       # {Attributes} uses this method to get a backend class specific to the

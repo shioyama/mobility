@@ -25,16 +25,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
       require 'mobility/backends/sequel/key_value/query_methods'
 
-      # @return [Class] translation model class
-      attr_reader :class_name
-
-      # @!macro backend_constructor
-      # @option options [Symbol] association_name Name of association
-      # @option options [Class] class_name Translation model class
-      def initialize(model, attribute, options = {})
-        super
-        @class_name = options[:class_name]
-      end
+      option_reader :class_name
 
       # @!group Backend Configuration
       # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)

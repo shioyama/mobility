@@ -14,8 +14,7 @@ describe "Mobility::Backends::Sequel::Column", orm: :sequel do
 
   context "with standard plugins applied" do
     let(:attributes) { %w[content author] }
-    let(:options) { {} }
-    let(:backend) { described_class.new(comment, attributes.first, options) }
+    let(:backend) { described_class.new(comment, attributes.first) }
     let(:comment) do
       Comment.create(content_en: "Good post!",
                      content_ja: "なかなか面白い記事",

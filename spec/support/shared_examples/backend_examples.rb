@@ -3,10 +3,9 @@ shared_examples_for "Mobility backend" do |backend_class, model_class, attribute
     model_class = model_class.constantize if model_class.is_a?(String)
 
     options = { model_class: model_class, **options }
-    backend_class.configure(options) if backend_class.respond_to?(:configure)
-    backend_class.setup_model(model_class, [attribute], options)
-
-    Class.new(backend_class).new(model_class.new, attribute, options)
+    klass = backend_class.build_subclass(options)
+    klass.setup_model(model_class, [attribute])
+    klass.new(model_class.new, attribute)
   end
 
   describe "accessors" do

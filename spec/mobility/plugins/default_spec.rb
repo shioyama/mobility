@@ -5,10 +5,10 @@ describe Mobility::Plugins::Default do
   describe "when included into a class" do
     let(:default) { 'default foo' }
     let(:backend_double) { double("backend") }
-    let(:backend) { backend_class.new("model", "title", default: default) }
+    let(:backend) { backend_class.new("model", "title") }
     let(:backend_class) do
       backend_double_ = backend_double
-      backend_class = Class.new(Mobility::Backends::Null) do
+      backend_class = Mobility::Backends::Null.build_subclass(default: default) do
         define_method :read do |*args|
           backend_double_.read(*args)
         end

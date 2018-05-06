@@ -11,15 +11,7 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
       require 'mobility/backends/sequel/container/json_query_methods'
       require 'mobility/backends/sequel/container/jsonb_query_methods'
 
-      # @return [Symbol] name of container column
-      attr_reader :column_name
-
-      # @!macro backend_constructor
-      # @option options [Symbol] column_name Name of container column
-      def initialize(model, attribute, options = {})
-        super
-        @column_name = options[:column_name]
-      end
+      option_reader :column_name
 
       # @!group Backend Accessors
       #

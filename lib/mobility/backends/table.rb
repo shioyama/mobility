@@ -67,16 +67,6 @@ set.
     module Table
       extend Backend::OrmDelegator
 
-      # @return [Symbol] name of the association method
-      attr_reader :association_name
-
-      # @!macro backend_constructor
-      # @option options [Symbol] association_name Name of association
-      def initialize(model, attribute, options = {})
-        super
-        @association_name = options[:association_name]
-      end
-
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, options = {})
@@ -102,6 +92,7 @@ set.
 
       def self.included(backend)
         backend.extend ClassMethods
+        backend.option_reader :association_name
       end
 
       module ClassMethods

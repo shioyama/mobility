@@ -46,16 +46,6 @@ other backends on model (otherwise one will overwrite the other).
     module KeyValue
       extend Backend::OrmDelegator
 
-      # @return [Symbol] name of the association
-      attr_reader :association_name
-
-      # @!macro backend_constructor
-      # @option options [Symbol] association_name Name of association
-      def initialize(model, attribute, options = {})
-        super
-        @association_name = options[:association_name]
-      end
-
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, options = {})
@@ -79,8 +69,9 @@ other backends on model (otherwise one will overwrite the other).
         model.send(association_name)
       end
 
-      def self.included(backend)
-        backend.extend ClassMethods
+      def self.included(backend_class)
+        backend_class.extend ClassMethods
+        backend_class.option_reader :association_name
       end
 
       module ClassMethods

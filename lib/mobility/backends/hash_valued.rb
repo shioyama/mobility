@@ -8,16 +8,6 @@ Defines read and write methods that access the value at a key with value
 
 =end
     module HashValued
-      # @!macro backend_constructor
-      # @option options [Symbol] column_prefix Prefix added to generate column
-      #   name from attribute name
-      # @option options [Symbol] column_suffix Suffix added to generate column
-      #   name from attribute name
-      def initialize(_model, _attribute, options = {})
-        super
-        @column_affix = options[:column_affix]
-      end
-
       # @!group Backend Accessors
       #
       # @!macro backend_reader
@@ -38,6 +28,7 @@ Defines read and write methods that access the value at a key with value
 
       def self.included(backend_class)
         backend_class.extend ClassMethods
+        backend_class.option_reader :column_affix
       end
 
       module ClassMethods
@@ -49,7 +40,7 @@ Defines read and write methods that access the value at a key with value
       private
 
       def column_name
-        @column_name ||= (@column_affix % attribute)
+        @column_name ||= (column_affix % attribute)
       end
     end
 

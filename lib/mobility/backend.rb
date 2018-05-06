@@ -118,6 +118,7 @@ On top of this, a backend will normally:
       def base.options
         @options
       end
+      base.option_reader :model_class
     end
 
     # @param [String] attribute

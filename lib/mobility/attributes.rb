@@ -144,9 +144,7 @@ with other backends.
     # @param klass [Class] Class of model
     def included(klass)
       @model_class = @options[:model_class] = klass
-      @backend_class = Class.new(get_backend_class(backend_name).for(model_class))
-
-      @backend_class.configure(options) if @backend_class.respond_to?(:configure)
+      @backend_class = get_backend_class(backend_name).for(model_class).build_subclass(options)
 
       Mobility.plugins.each do |name|
         plugin = get_plugin_class(name)

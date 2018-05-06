@@ -169,7 +169,6 @@ describe Mobility::Backend do
         end
       end
     end
-
   end
 
   describe ".method_name" do

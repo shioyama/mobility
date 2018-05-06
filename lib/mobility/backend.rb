@@ -106,10 +106,13 @@ On top of this, a backend will normally:
       Util.present?(read(locale, options))
     end
 
-    # Extend included class with +setup+ method
+    # Extend included class with +setup+ method and other class methods
     def self.included(base)
-      base.extend(Setup)
-      base.extend(ClassMethods)
+      base.extend Setup
+      base.extend ClassMethods
+      def base.options
+        @options
+      end
     end
 
     # @param [String] attribute
@@ -152,6 +155,15 @@ On top of this, a backend will normally:
     end
 
     module ClassMethods
+      # Build a subclass of this backend class for a given set of options
+      # @param [Hash] options
+      # @return [Class] backend subclass
+      def build_subclass(options)
+        configure(options) if respond_to?(:configure)
+        options.freeze
+        Class.new(self) { @options = options }
+      end
+
       # {Attributes} uses this method to get a backend class specific to the
       # model using the backend. Backend classes can override this method to
       # return a class specific to the model class using the backend (e.g.

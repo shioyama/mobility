@@ -48,10 +48,23 @@ describe Mobility::Attributes do
   describe "including Attributes in a model" do
     let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: Article } }
 
-    it "calls configure on backend class with options merged with default options" do
-      expect(backend_class).to receive(:configure).with(expected_options)
+    it "calls build_subclass on backend class with options merged with default options" do
+      expect(backend_class).to receive(:build_subclass).with(expected_options).and_return(Class.new(backend_class))
       attributes = described_class.new("title", backend: backend_class, foo: "bar")
       Article.include attributes
+    end
+
+    it "assigns options to backend class" do
+      attributes = described_class.new("title", backend: backend_class, foo: "bar")
+      Article.include attributes
+      expect(attributes.options).to eq(attributes.backend_class.options)
+      expect(attributes.backend_class.options).to eq(Mobility.default_options.merge(model_class: Article, foo: "bar"))
+    end
+
+    it "freezes options after inclusion into model class" do
+      attributes = described_class.new("title", backend: backend_class)
+      Article.include attributes
+      expect(attributes.options).to be_frozen
     end
 
     it "calls setup_model on backend class with model_class, attributes, and options merged with default options" do

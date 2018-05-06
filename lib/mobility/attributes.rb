@@ -143,6 +143,8 @@ with other backends.
     # backend setup block (see {Mobility::Backend::Setup#setup_model}).
     # @param klass [Class] Class of model
     def included(klass)
+      # If we've already been included and configured for a class, skip this
+      return if @model_class
       @model_class = @options[:model_class] = klass
       @backend_class = get_backend_class(backend_name).for(model_class).build_subclass(options)
 

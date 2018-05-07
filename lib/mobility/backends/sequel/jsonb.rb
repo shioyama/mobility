@@ -15,21 +15,21 @@ Implements the {Mobility::Backends::Jsonb} backend for Sequel models.
 
         # @!group Backend Accessors
         #
-        # @note Translation may be string, integer or boolean-valued since
-        #   value is stored on a JSON hash.
-        # @param [Symbol] locale Locale to read
-        # @param [Hash] options
-        # @return [String,Integer,Boolean] Value of translation
         # @!method read(locale, **options)
-
-        # @!group Backend Accessors
-        # @note Translation may be string, integer or boolean-valued since
-        #   value is stored on a JSON hash.
-        # @param [Symbol] locale Locale to write
-        # @param [String,Integer,Boolean] value Value to write
-        # @param [Hash] options
-        # @return [String,Integer,Boolean] Updated value
+        #   @note Translation may be string, integer or boolean-valued since
+        #     value is stored on a JSON hash.
+        #   @param [Symbol] locale Locale to read
+        #   @param [Hash] options
+        #   @return [String,Integer,Boolean] Value of translation
+        #
         # @!method write(locale, value, **options)
+        #   @note Translation may be string, integer or boolean-valued since
+        #     value is stored on a JSON hash.
+        #   @param [Symbol] locale Locale to write
+        #   @param [String,Integer,Boolean] value Value to write
+        #   @param [Hash] options
+        #   @return [String,Integer,Boolean] Updated value
+        # @!endgroup
 
         setup_query_methods(QueryMethods)
       end

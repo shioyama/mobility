@@ -44,22 +44,22 @@ passed to accessors to configure backend (see example below).
 =end
   module Translates
     # Defines mobility accessor on model class.
-    # @param [Array<String>] attributes
-    # @param [Hash] options
-    # @yield Yields to block with backend as context
     # @!method mobility_accessor(*attributes, **options)
+    #   @param [Array<String>] attributes
+    #   @param [Hash] options
+    #   @yield Yields to block with backend as context
 
     # Defines mobility reader and presence method on model class.
-    # @param [Array<String>] attributes
-    # @param [Hash] options
-    # @yield Yields to block with backend as context
     # @!method mobility_reader(*attributes, **options)
+    #   @param [Array<String>] attributes
+    #   @param [Hash] options
+    #   @yield Yields to block with backend as context
 
     # Defines mobility writer on model class.
-    # @param [Array<String>] attributes
-    # @param [Hash] options
-    # @yield Yields to block with backend as context
     # @!method mobility_writer(*attributes, **options)
+    #   @param [Array<String>] attributes
+    #   @param [Hash] options
+    #   @yield Yields to block with backend as context
     %w[accessor reader writer].each do |method|
       class_eval <<-EOM, __FILE__, __LINE__ + 1
         def mobility_#{method}(*args, **options, &block)

@@ -46,8 +46,9 @@ other backends on model (otherwise one will overwrite the other).
     module KeyValue
       extend Backend::OrmDelegator
 
-      # @return [Symbol] Name of the association
       # @!method association_name
+      #   Returns the name of the polymorphic association.
+      #   @return [Symbol] Name of the association
 
       # @!group Backend Accessors
       # @!macro backend_reader
@@ -55,7 +56,7 @@ other backends on model (otherwise one will overwrite the other).
         translation_for(locale, options).value
       end
 
-      # @!macro backend_reader
+      # @!macro backend_writer
       def write(locale, value, options = {})
         translation_for(locale, options).value = value
       end

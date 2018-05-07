@@ -8,8 +8,9 @@ Defines read and write methods that access the value at a key with value
 
 =end
     module HashValued
-      # @return [String] Affix to generate column names
       # @!method column_affix
+      #   Returns interpolation string used to generate column names.
+      #   @return [String] Affix to generate column names
 
       # @!group Backend Accessors
       #

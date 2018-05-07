@@ -18,8 +18,9 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
 
       require 'mobility/backends/sequel/table/query_methods'
 
-      # @return [Symbol] Name of translation subclass
       # @!method subclass_name
+      #   Returns translation subclass under model class namespace.
+      #   @return [Symbol] Name of translation subclass
       option_reader :subclass_name
 
       def translation_class

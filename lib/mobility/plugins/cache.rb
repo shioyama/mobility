@@ -37,9 +37,8 @@ Values are added to the cache in two ways:
       # @group Backend Accessors
       #
       # @!macro backend_reader
-      # @option options [Boolean] cache
-      #   *false* to disable cache.
       # @!method read(locale, value, options = {})
+      #   @option options [Boolean] cache *false* to disable cache.
       include TranslationCacher.new(:read)
 
       # @!macro backend_writer

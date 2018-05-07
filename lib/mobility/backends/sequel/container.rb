@@ -11,8 +11,8 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
       require 'mobility/backends/sequel/container/json_query_methods'
       require 'mobility/backends/sequel/container/jsonb_query_methods'
 
-      # @return [Symbol] (:translations) Name of translations column
       # @!method column_name
+      #   @return [Symbol] (:translations) Name of translations column
       option_reader :column_name
 
       # @!group Backend Accessors

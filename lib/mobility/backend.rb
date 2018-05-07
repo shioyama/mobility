@@ -106,8 +106,9 @@ On top of this, a backend will normally:
       Util.present?(read(locale, options))
     end
 
-    # @return [Class] Model class
     # @!method model_class
+    #   Returns name of model in which backend is used.
+    #   @return [Class] Model class
 
     # @return [Hash] options
     def options

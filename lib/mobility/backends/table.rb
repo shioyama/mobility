@@ -66,8 +66,9 @@ set.
 =end
     module Table
       extend Backend::OrmDelegator
-      # @return [Symbol] Name of the association
       # @!method association_name
+      #   Returns the name of the translations association.
+      #   @return [Symbol] Name of the association
 
       # @!group Backend Accessors
       # @!macro backend_reader

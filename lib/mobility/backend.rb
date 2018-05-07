@@ -106,6 +106,9 @@ On top of this, a backend will normally:
       Util.present?(read(locale, options))
     end
 
+    # @return [Class] Model class
+    # @!method model_class
+
     # @return [Hash] options
     def options
       self.class.options
@@ -174,6 +177,8 @@ On top of this, a backend will normally:
         end
       end
 
+      # Create instance and class methods to access value on options hash
+      # @param [Symbol] name Name of option reader
       def option_reader(name)
         module_eval <<-EOM, __FILE__, __LINE__ + 1
         def self.#{name}

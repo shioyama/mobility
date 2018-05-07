@@ -14,6 +14,8 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       require 'mobility/backends/active_record/container/json_query_methods'
       require 'mobility/backends/active_record/container/jsonb_query_methods'
 
+      # @return [Symbol] (:translations) Name of translations column
+      # @!method column_name
       option_reader :column_name
 
       # @!group Backend Accessors

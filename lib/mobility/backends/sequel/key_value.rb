@@ -25,6 +25,8 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
       require 'mobility/backends/sequel/key_value/query_methods'
 
+      # @return [Class] Translation class
+      # @!method class_name
       option_reader :class_name
 
       # @!group Backend Configuration

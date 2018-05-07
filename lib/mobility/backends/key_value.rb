@@ -46,6 +46,9 @@ other backends on model (otherwise one will overwrite the other).
     module KeyValue
       extend Backend::OrmDelegator
 
+      # @return [Symbol] Name of the association
+      # @!method association_name
+
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, options = {})

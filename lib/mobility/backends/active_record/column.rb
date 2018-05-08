@@ -34,8 +34,6 @@ or locales.)
       include ActiveRecord
       include Column
 
-      require 'mobility/backends/active_record/column/query_methods'
-
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, _ = {})
@@ -53,7 +51,9 @@ or locales.)
         available_locales.each { |l| yield(l) if present?(l) }
       end
 
-      setup_query_methods(QueryMethods)
+      def self.build_node(attr, locale)
+        model_class.arel_table[Column.column_name_for(attr, locale)]
+      end
 
       private
 

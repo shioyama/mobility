@@ -36,8 +36,6 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
       aggregate_failures do
         expect(JsonbPost.i18n.where(title: nil).to_sql).to match /\?/
         expect(JsonbPost.i18n.where(title: nil).to_sql).not_to match /NULL/
-        expect(JsonbPost.i18n.where.not(title: "foo").to_sql).to match /\?/
-        expect(JsonbPost.i18n.where.not(title: "foo").to_sql).not_to match /NULL/
       end
     end
 

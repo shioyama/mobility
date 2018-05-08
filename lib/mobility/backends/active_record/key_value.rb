@@ -29,21 +29,57 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       include ActiveRecord
       include KeyValue
 
-      require 'mobility/backends/active_record/key_value/query_methods'
-
-      # @!group Backend Configuration
-      # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
-      # @raise (see Mobility::Backends::KeyValue::ClassMethods#configure)
-      def self.configure(options)
-        super
-        if type = options[:type]
-          options[:association_name] ||= :"#{options[:type]}_translations"
-          options[:class_name]       ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
+      class << self
+        # @!group Backend Configuration
+        # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
+        # @raise (see Mobility::Backends::KeyValue::ClassMethods#configure)
+        def configure(options)
+          super
+          if type = options[:type]
+            options[:association_name] ||= :"#{options[:type]}_translations"
+            options[:class_name]       ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
+          end
+        rescue NameError
+          raise ArgumentError, "You must define a Mobility::ActiveRecord::#{type.capitalize}Translation class."
         end
-      rescue NameError
-        raise ArgumentError, "You must define a Mobility::ActiveRecord::#{type.capitalize}Translation class."
+        # @!endgroup
+
+        # @param [String] attr Attribute name
+        # @param [Symbol] _locale Locale
+        def build_node(attr, _locale)
+          class_name.arel_table.alias("#{attr}_#{association_name}")[:value]
+        end
+
+        # @param [ActiveRecord::Relation] relation Relation to scope
+        # @param [Hash] opts Hash of options for query
+        # @param [Symbol] locale Locale
+        # @option [Boolean] invert
+        def add_translations(relation, opts, locale, invert: false)
+          i18n_keys, i18n_nulls = partition_opts(opts)
+
+          relation = join_translations(relation, i18n_keys, locale)
+          join_translations(relation, i18n_nulls, locale, outer_join: !invert)
+        end
+
+        private
+
+        def partition_opts(opts)
+          opts.keys.partition { |key| opts[key] && [*opts[key]].all? }
+        end
+
+        def join_translations(relation, keys, locale, outer_join: false)
+          keys.inject(relation) do |r, key|
+            t = class_name.arel_table.alias("#{key}_#{association_name}")
+            m = model_class.arel_table
+            join_type = outer_join ? ::Arel::Nodes::OuterJoin : ::Arel::Nodes::InnerJoin
+            r.joins(m.join(t, join_type).
+                    on(t[:key].eq(key).
+                       and(t[:locale].eq(locale).
+                           and(t[:translatable_type].eq(model_class.base_class.name).
+                               and(t[:translatable_id].eq(m[:id]))))).join_sources)
+          end
+        end
       end
-      # @!endgroup
 
       setup do |attributes, options|
         association_name   = options[:association_name]
@@ -84,8 +120,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
         include DestroyKeyValueTranslations
       end
-
-      setup_query_methods(QueryMethods)
 
       # Returns translation for a given locale, or builds one if none is present.
       # @param [Symbol] locale

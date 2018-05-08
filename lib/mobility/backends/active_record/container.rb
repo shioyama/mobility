@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "mobility/backends/active_record"
+require "mobility/arel/nodes/pg_ops"
 
 module Mobility
   module Backends
@@ -10,9 +11,6 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
 =end
     class ActiveRecord::Container
       include ActiveRecord
-
-      require 'mobility/backends/active_record/container/json_query_methods'
-      require 'mobility/backends/active_record/container/jsonb_query_methods'
 
       # @!method column_name
       #   Returns name of json or jsonb column used to store translations
@@ -59,6 +57,20 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       end
       # @!endgroup
 
+      # @param [String] attr Attribute name
+      # @param [Symbol] locale Locale
+      def self.build_node(attr, locale)
+        column        = model_class.arel_table[column_name]
+        quoted_locale = build_quoted(locale)
+        quoted_attr   = build_quoted(attr)
+        case column_type
+        when :json
+          Arel::Nodes::Json.new(Arel::Nodes::JsonDashArrow.new(column, quoted_locale), quoted_attr)
+        when :jsonb
+          Arel::Nodes::Jsonb.new(Arel::Nodes::Jsonb.new(column, quoted_locale), quoted_attr)
+        end
+      end
+
       # @!macro backend_iterator
       def each_locale
         model[column_name].each do |l, v|
@@ -66,9 +78,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
         end
       end
 
-      backend_class = self
-
-      setup do |attributes, options|
+      setup do |_attributes, options|
         store options[:column_name], coder: Coder
 
         # Fix for duping depth-2 jsonb column in AR < 5.0
@@ -87,13 +97,6 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
             include const_set(module_name, dupable)
           end
         end
-
-        query_methods = backend_class.const_get("#{options[:column_type].capitalize}QueryMethods")
-        extend(Module.new do
-          define_method ::Mobility.query_method do
-            super().extending(query_methods.new(attributes, options))
-          end
-        end)
       end
 
       private

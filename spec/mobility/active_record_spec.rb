@@ -6,15 +6,6 @@ describe Mobility::ActiveRecord, orm: :active_record do
     Article.include Mobility::ActiveRecord
   end
 
-  describe ".i18n" do
-    it "extends class with .i18n scope method" do
-      scope = double('scope')
-      expect(Article).to receive(:all).and_return(scope)
-
-      expect(Article.i18n).to eq(scope)
-    end
-  end
-
   describe "#translated_attribute_names" do
     it "delegates to class" do
       Article.instance_eval do

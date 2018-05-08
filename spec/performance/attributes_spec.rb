@@ -13,7 +13,7 @@ describe Mobility::Attributes do
         extend Mobility
       end
       attributes = described_class.new(backend: :null)
-      expect { klass.include attributes }.to allocate_under(150).objects
+      expect { klass.include attributes }.to allocate_under(155).objects
     }
   end
 

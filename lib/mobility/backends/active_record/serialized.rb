@@ -30,8 +30,6 @@ Implements {Mobility::Backends::Serialized} backend for ActiveRecord models.
       include ActiveRecord
       include HashValued
 
-      require 'mobility/backends/active_record/serialized/query_methods'
-
       # @!group Backend Configuration
       # @param (see Backends::Serialized.configure)
       # @option (see Backends::Serialized.configure)
@@ -42,12 +40,15 @@ Implements {Mobility::Backends::Serialized} backend for ActiveRecord models.
       end
       # @!endgroup
 
+      def self.build_node(attr, _locale)
+        raise ArgumentError,
+          "You cannot query on mobility attributes translated with the Serialized backend (#{attr})."
+      end
+
       setup do |attributes, options|
         coder = { yaml: YAMLCoder, json: JSONCoder }[options[:format]]
         attributes.each { |attribute| serialize (options[:column_affix] % attribute), coder }
       end
-
-      setup_query_methods(QueryMethods)
 
       # @!group Cache Methods
       # Returns column value as a hash

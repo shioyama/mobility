@@ -31,8 +31,6 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       aggregate_failures do
         expect(ContainerPost.i18n.where(title: nil).to_sql).to match /\?/
         expect(ContainerPost.i18n.where(title: nil).to_sql).not_to match /NULL/
-        expect(ContainerPost.i18n.where.not(title: "foo").to_sql).to match /\?/
-        expect(ContainerPost.i18n.where.not(title: "foo").to_sql).not_to match /NULL/
       end
     end
 

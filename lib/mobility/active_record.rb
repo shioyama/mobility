@@ -12,7 +12,6 @@ Module loading ActiveRecord-specific classes for Mobility models.
 
     def self.included(model_class)
       model_class.class_eval do
-        extend QueryMethod.new(Mobility.query_method)
         unless const_defined?(:UniquenessValidator)
           const_set(:UniquenessValidator,
                     Class.new(::Mobility::ActiveRecord::UniquenessValidator))
@@ -20,16 +19,5 @@ Module loading ActiveRecord-specific classes for Mobility models.
         delegate :translated_attribute_names, to: :class
       end
     end
-
-    class QueryMethod < Module
-      def initialize(query_method)
-        module_eval <<-EOM, __FILE__, __LINE__ + 1
-          def #{query_method}
-            all
-          end
-        EOM
-      end
-    end
-    private_constant :QueryMethod
   end
 end

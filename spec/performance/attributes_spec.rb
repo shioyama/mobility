@@ -14,7 +14,7 @@ describe Mobility::Attributes do
       end
       expect {
         klass.include(described_class.new(backend: :null))
-      }.to allocate_under(150).objects
+      }.to allocate_under(170).objects
     }
   end
 

@@ -15,14 +15,14 @@ Implements the {Mobility::Backends::Json} backend for Sequel models.
 
         # @!group Backend Accessors
         #
-        # @!method read(locale, **options)
+        # @!method read(locale, options = {})
         #   @note Translation may be any json type, but querying will only work on
         #     string-typed values.
         #   @param [Symbol] locale Locale to read
         #   @param [Hash] options
         #   @return [String,Integer,Boolean] Value of translation
 
-        # @!method write(locale, value, **options)
+        # @!method write(locale, value, options = {})
         #   @note Translation may be any json type, but querying will only work
         #     on string-typed values.
         #   @param [Symbol] locale Locale to write

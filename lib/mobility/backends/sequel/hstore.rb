@@ -15,7 +15,7 @@ Implements the {Mobility::Backends::Hstore} backend for Sequel models.
 
         # @!group Backend Accessors
         # @!macro backend_reader
-        # @!method read(locale, **options)
+        # @!method read(locale, options = {})
 
         # @!group Backend Accessors
         # @!macro backend_writer

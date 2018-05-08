@@ -15,7 +15,7 @@ Implements the {Mobility::Backends::Hstore} backend for ActiveRecord models.
 
         # @!group Backend Accessors
         # @!macro backend_reader
-        # @!method read(locale, **options)
+        # @!method read(locale, options = {})
 
         # @!macro backend_writer
         def write(locale, value, options = {})

@@ -57,13 +57,13 @@ If no locales are passed as an option to the initializer,
         normalized_locale = Mobility.normalize_locale(locale)
 
         module_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{name}_#{normalized_locale}(**options)
+        def #{name}_#{normalized_locale}(options = {})
           return super() if options.delete(:super)
           warn "#{warning_message}" if options[:locale]
           #{name}(**options, locale: :'#{locale}')
         end
 
-        def #{name}_#{normalized_locale}?(**options)
+        def #{name}_#{normalized_locale}?(options = {})
           return super() if options.delete(:super)
           warn "#{warning_message}" if options[:locale]
           #{name}?(**options, locale: :'#{locale}')
@@ -76,7 +76,7 @@ If no locales are passed as an option to the initializer,
         normalized_locale = Mobility.normalize_locale(locale)
 
         module_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{name}_#{normalized_locale}=(value, **options)
+        def #{name}_#{normalized_locale}=(value, options = {})
           return super(value) if options.delete(:super)
           warn "#{warning_message}" if options[:locale]
           public_send(:#{name}=, value, **options, locale: :'#{locale}')

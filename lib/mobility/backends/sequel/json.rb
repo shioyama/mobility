@@ -6,7 +6,7 @@ module Mobility
 
 Implements the {Mobility::Backends::Json} backend for Sequel models.
 
-@see Mobility::Backends::Sequel::HashValued
+@see Mobility::Backends::HashValued
 
 =end
     module Sequel

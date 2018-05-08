@@ -6,7 +6,7 @@ module Mobility
 
 Implements the {Mobility::Backends::Hstore} backend for Sequel models.
 
-@see Mobility::Backends::Sequel::HashValued
+@see Mobility::Backends::HashValued
 
 =end
     module Sequel

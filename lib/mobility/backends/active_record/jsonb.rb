@@ -6,7 +6,7 @@ module Mobility
 
 Implements the {Mobility::Backends::Jsonb} backend for ActiveRecord models.
 
-@see Mobility::Backends::ActiveRecord::HashValued
+@see Mobility::Backends::HashValued
 
 =end
     module ActiveRecord

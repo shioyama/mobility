@@ -9,6 +9,7 @@ module Mobility
       module ClassMethods
         # @param [String] _attr Attribute name
         # @param [Symbol] _locale Locale
+        # @return Arel node for this translated attribute
         def build_node(_attr, _locale)
           raise NotImplementedError
         end

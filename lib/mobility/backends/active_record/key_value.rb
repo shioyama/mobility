@@ -46,6 +46,8 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
         # @param [String] attr Attribute name
         # @param [Symbol] _locale Locale
+        # @return [Arel::Attributes::Attribute] Arel attribute for aliased
+        #   translation table value column
         def build_node(attr, _locale)
           class_name.arel_table.alias("#{attr}_#{association_name}")[:value]
         end

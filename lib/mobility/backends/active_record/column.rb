@@ -51,6 +51,10 @@ or locales.)
         available_locales.each { |l| yield(l) if present?(l) }
       end
 
+      # @param [String] attr Attribute name
+      # @param [Symbol] locale Locale
+      # @return [Arel::Attributes::Attribute] Arel node for translation column
+      #   on model table
       def self.build_node(attr, locale)
         model_class.arel_table[Column.column_name_for(attr, locale)]
       end

@@ -21,6 +21,7 @@ Mobility.configure do |config|
   # ignored by models. (In most cases, you probably don't want to change this.)
   #
   # config.plugins = %i[
+  #   query
   #   cache
   #   dirty
   #   fallbacks

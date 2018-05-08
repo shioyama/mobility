@@ -33,6 +33,7 @@ which {Attributes} modules have been included on the model class.
 
     def initialize_dup(other)
       @modules = other.modules.dup
+      @backends = other.backends.dup
       super
     end
   end

@@ -83,6 +83,16 @@ describe Mobility do
           expect(model.translated_attribute_names).to eq(["title"])
           expect(subclass.translated_attribute_names).to match_array(["title", "content"])
         end
+
+        it "defines new backend class map independently of superclass" do
+          model.extend Mobility
+          model.translates :title, backend: :null
+          subclass = Class.new(model)
+          subclass.translates :content, backend: :null
+
+          expect(model.mobility.backends.keys).to eq([:title])
+          expect(subclass.mobility.backends.keys).to eq([:title, :content])
+        end
       end
     end
 

@@ -167,9 +167,11 @@ On top of this, a backend will normally:
 
     module ClassMethods
       # Build a subclass of this backend class for a given set of options
+      # @note This method also freezes the options hash to prevent it from
+      #   being changed.
       # @param [Hash] options
       # @return [Class] backend subclass
-      def build_subclass(options = {}, &block)
+      def with_options(options = {}, &block)
         configure(options) if respond_to?(:configure)
         options.freeze
         Class.new(self) do

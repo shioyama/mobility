@@ -48,8 +48,8 @@ describe Mobility::Attributes do
   describe "including Attributes in a model" do
     let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: Article } }
 
-    it "calls build_subclass on backend class with options merged with default options" do
-      expect(backend_class).to receive(:build_subclass).with(expected_options).and_return(Class.new(backend_class))
+    it "calls with_options on backend class with options merged with default options" do
+      expect(backend_class).to receive(:with_options).with(expected_options).and_return(Class.new(backend_class))
       attributes = described_class.new("title", backend: backend_class, foo: "bar")
       Article.include attributes
     end

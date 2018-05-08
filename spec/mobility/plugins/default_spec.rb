@@ -8,7 +8,7 @@ describe Mobility::Plugins::Default do
     let(:backend) { backend_class.new("model", "title") }
     let(:backend_class) do
       backend_double_ = backend_double
-      backend_class = Mobility::Backends::Null.build_subclass(default: default) do
+      backend_class = Mobility::Backends::Null.with_options(default: default) do
         define_method :read do |*args|
           backend_double_.read(*args)
         end

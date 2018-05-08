@@ -6,7 +6,7 @@ describe Mobility::Plugins::Fallbacks do
     let(:backend_class) do
       backend_class = stub_const 'MyBackend', Class.new
       backend_class.include(Mobility::Backend)
-      backend_subclass = backend_class.build_subclass(fallbacks: fallbacks) do
+      backend_subclass = backend_class.with_options(fallbacks: fallbacks) do
         def read(locale, **options)
           Mobility.enforce_available_locales!(locale)
           return "bar" if options[:bar]

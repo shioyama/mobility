@@ -3,7 +3,7 @@ shared_examples_for "Mobility backend" do |backend_class, model_class, attribute
     model_class = model_class.constantize if model_class.is_a?(String)
 
     options = { model_class: model_class, **options }
-    klass = backend_class.build_subclass(options)
+    klass = backend_class.with_options(options)
     klass.setup_model(model_class, [attribute])
     klass.new(model_class.new, attribute)
   end

@@ -146,7 +146,7 @@ with other backends.
       # If we've already been included and configured for a class, skip this
       return if @model_class
       @model_class = @options[:model_class] = klass
-      @backend_class = get_backend_class(backend_name).for(model_class).build_subclass(options)
+      @backend_class = get_backend_class(backend_name).for(model_class).with_options(options)
 
       Mobility.plugins.each do |name|
         plugin = get_plugin_class(name)

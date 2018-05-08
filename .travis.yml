@@ -37,7 +37,7 @@ matrix:
     - env: DB=sqlite3 ORM=sequel SEQUEL_VERSION=latest
 before_script:
   - bundle exec rake db:create db:up
-before_install: gem install bundler -v 1.12.5
+before_install: gem install bundler
 addons:
   postgresql: "9.4"
 services:

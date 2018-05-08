@@ -25,11 +25,6 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
       require 'mobility/backends/sequel/key_value/query_methods'
 
-      # @!method class_name
-      #   Returns translation class used in polymorphic association.
-      #   @return [Class] Translation class
-      option_reader :class_name
-
       # @!group Backend Configuration
       # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
       # @raise (see Mobility::Backends::KeyValue::ClassMethods#configure)

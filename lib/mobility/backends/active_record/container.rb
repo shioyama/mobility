@@ -19,6 +19,10 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       #   @return [Symbol] (:translations) Name of translations column
       option_reader :column_name
 
+      # @!method column_type
+      #   @return [Symbol] Either :json or :jsonb
+      option_reader :column_type
+
       # @!group Backend Accessors
       #
       # @note Translation may be a string, integer, boolean, hash or array

@@ -14,14 +14,8 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
     class Sequel::Table
       include Sequel
       include Table
-      include Util
 
       require 'mobility/backends/sequel/table/query_methods'
-
-      # @!method subclass_name
-      #   Returns translation subclass under model class namespace.
-      #   @return [Symbol] Name of translation subclass
-      option_reader :subclass_name
 
       def translation_class
         self.class.translation_class
@@ -40,11 +34,11 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
       # @raise [CacheRequired] if cache option is false
       def self.configure(options)
         raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
-        table_name = options[:model_class].table_name
-        options[:table_name]  ||= :"#{singularize(table_name)}_translations"
-        options[:foreign_key] ||= foreign_key(camelize(singularize(table_name.to_s.downcase)))
+        table_name = Util.singularize(options[:model_class].table_name)
+        options[:table_name]  ||= :"#{table_name}_translations"
+        options[:foreign_key] ||= Util.foreign_key(Util.camelize(table_name.downcase))
         if association_name = options[:association_name]
-          options[:subclass_name] ||= camelize(singularize(association_name))
+          options[:subclass_name] ||= Util.camelize(Util.singularize(association_name))
         else
           options[:association_name] = :translations
           options[:subclass_name] ||= :Translation

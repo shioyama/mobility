@@ -70,6 +70,18 @@ set.
       #   Returns the name of the translations association.
       #   @return [Symbol] Name of the association
 
+      # @!method subclass_name
+      #   Returns translation subclass under model class namespace.
+      #   @return [Symbol] Name of translation subclass
+
+      # @!method foreign_key
+      #   Returns foreign_key for translations association.
+      #   @return [Symbol] Name of foreign key
+
+      # @!method table_name
+      #   Returns name of table where translations are stored.
+      #   @return [Symbol] Name of translations table
+
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, options = {})
@@ -96,6 +108,9 @@ set.
       def self.included(backend)
         backend.extend ClassMethods
         backend.option_reader :association_name
+        backend.option_reader :subclass_name
+        backend.option_reader :foreign_key
+        backend.option_reader :table_name
       end
 
       module ClassMethods

@@ -50,6 +50,10 @@ other backends on model (otherwise one will overwrite the other).
       #   Returns the name of the polymorphic association.
       #   @return [Symbol] Name of the association
 
+      # @!method class_name
+      #   Returns translation class used in polymorphic association.
+      #   @return [Class] Translation class
+
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, options = {})
@@ -76,6 +80,7 @@ other backends on model (otherwise one will overwrite the other).
       def self.included(backend_class)
         backend_class.extend ClassMethods
         backend_class.option_reader :association_name
+        backend_class.option_reader :class_name
       end
 
       module ClassMethods

@@ -8,6 +8,9 @@ module Mobility
 Applies presence filter to values fetched from backend and to values set on
 backend. Included by default, but can be disabled with +presence: false+ option.
 
+@note For performance reasons, the presence plugin filters only for empty
+  strings, not other values continued "blank" like empty arrays.
+
 =end
     module Presence
       # Applies presence plugin to attributes.
@@ -22,9 +25,7 @@ backend. Included by default, but can be disabled with +presence: false+ option.
       # @option options [Boolean] presence
       #   *false* to disable presence filter.
       def read(locale, **options)
-        return super if options.delete(:presence) == false
-        value = super
-        value == false ? value : Util.presence(value)
+        options.delete(:presence) == false ? super : Presence[super]
       end
 
       # @group Backend Accessors
@@ -32,8 +33,15 @@ backend. Included by default, but can be disabled with +presence: false+ option.
       # @option options [Boolean] presence
       #   *false* to disable presence filter.
       def write(locale, value, **options)
-        return super if options.delete(:presence) == false
-        super(locale, value == false ? value : Util.presence(value), options)
+        if options.delete(:presence) == false
+          super
+        else
+          super(locale, Presence[value], options)
+        end
+      end
+
+      def self.[](value)
+        (value == "") ? nil : value
       end
     end
   end

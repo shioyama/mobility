@@ -176,37 +176,38 @@ with other backends.
     private
 
     def define_backend(attribute)
-      backend_class_ = backend_class
-      define_method Backend.method_name(attribute) do
-        @mobility_backends ||= {}
-        @mobility_backends[attribute] ||= backend_class_.new(self, attribute)
+      module_eval <<-EOM, __FILE__, __LINE__ + 1
+      def #{Backend.method_name(attribute)}
+        #{set_backend_inline(attribute)}
       end
+      EOM
     end
 
     def define_reader(attribute)
-      backend = Backend.method_name(attribute)
       class_eval <<-EOM, __FILE__, __LINE__ + 1
         def #{attribute}(**options)
           return super() if options.delete(:super)
           #{set_locale_from_options_inline}
-          #{backend}.read(locale, options)
+          #{set_backend_inline(attribute)}
+          @mobility_backends[:#{attribute}].read(locale, options)
         end
 
         def #{attribute}?(**options)
           return super() if options.delete(:super)
           #{set_locale_from_options_inline}
-          #{backend}.present?(locale, options)
+          #{set_backend_inline(attribute)}
+          @mobility_backends[:#{attribute}].present?(locale, options)
         end
       EOM
     end
 
     def define_writer(attribute)
-      backend = Backend.method_name(attribute)
       class_eval <<-EOM, __FILE__, __LINE__ + 1
         def #{attribute}=(value, **options)
           return super(value) if options.delete(:super)
           #{set_locale_from_options_inline}
-          #{backend}.write(locale, value, options)
+          #{set_backend_inline(attribute)}
+          @mobility_backends[:#{attribute}].write(locale, value, options)
         end
       EOM
     end
@@ -222,6 +223,13 @@ if options[:locale]
 else
   locale = Mobility.locale
 end
+EOL
+    end
+
+    def set_backend_inline(attribute)
+      <<-EOL
+@mobility_backends ||= {}
+@mobility_backends[:#{attribute}] ||= self.class.mobility.backends[:#{attribute}].new(self, "#{attribute}")
 EOL
     end
 

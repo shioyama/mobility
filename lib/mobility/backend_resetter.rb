@@ -20,8 +20,9 @@ Resets backend cache when reset events occur.
     # @raise [ArgumentError] if no block is provided.
     def initialize(attribute_names, &block)
       raise ArgumentError, "block required" unless block_given?
+      names = attribute_names.map(&:to_sym)
       @model_reset_method = Proc.new do
-        attribute_names.each do |name|
+        names.each do |name|
           if @mobility_backends && @mobility_backends[name]
             @mobility_backends[name].instance_eval(&block)
           end

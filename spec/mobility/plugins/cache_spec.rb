@@ -79,7 +79,7 @@ describe Mobility::Plugins::Cache do
     describe "resetting cache on actions" do
       shared_examples_for "cache that resets on model action" do |action, options = nil|
         it "updates backend cache on #{action}" do
-          backend = @article.mobility.backend_for("title")
+          backend = @article.mobility_backends[:title]
 
           aggregate_failures "reading and writing" do
             expect(backend.spy).to receive(:write).with(:en, "foo", {}).and_return("foo set")
@@ -97,8 +97,8 @@ describe Mobility::Plugins::Cache do
 
       shared_examples_for "cache that resets on model action with multiple backends" do |action, options = nil|
         it "updates cache on both backends on #{action}" do
-          title_backend = @article.mobility.backend_for("title")
-          content_backend = @article.mobility.backend_for("content")
+          title_backend = @article.mobility_backends[:title]
+          content_backend = @article.mobility_backends[:content]
 
           aggregate_failures "reading and writing" do
             expect(title_backend.spy).to receive(:write).with(:en, "foo", {}).and_return("foo set")

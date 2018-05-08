@@ -20,7 +20,7 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
   end
 
   context "with standard plugins applied" do
-    let(:backend) { post.mobility.backend_for("title") }
+    let(:backend) { post.mobility_backends[:title] }
 
     before { HstorePost.translates :title, :content, backend: :hstore, **default_options }
     let(:post) { HstorePost.new }
@@ -35,7 +35,7 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
     describe "non-text values" do
       it "converts non-string types to strings when saving" do
         post = HstorePost.new
-        backend = post.mobility.backend_for("title")
+        backend = post.mobility_backends[:title]
         backend.write(:en, { foo: :bar } )
         post.save
         expect(post[column_affix % "title"]).to match_hash({ en: "{:foo=>:bar}" })
@@ -44,7 +44,7 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
   end
 
   context "with dirty plugin applied" do
-    let(:backend) { post.mobility.backend_for("title") }
+    let(:backend) { post.mobility_backends[:title] }
 
     before { HstorePost.translates :title, :content, backend: :hstore, **default_options }
     let(:post) { HstorePost.new }

@@ -20,7 +20,7 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
   end
 
   context "with standard plugins applied" do
-    let(:backend) { post.mobility.backend_for("title") }
+    let(:backend) { post.mobility_backends[:title] }
 
     before { JsonbPost.translates :title, :content, backend: :jsonb, **default_options }
     let(:post) { JsonbPost.new }
@@ -45,7 +45,7 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
 
     describe "non-text values" do
       it "stores non-string types as-is when saving" do
-        backend = post.mobility.backend_for("title")
+        backend = post.mobility_backends[:title]
         backend.write(:en, { foo: :bar } )
         post.save
         expect(post[(column_affix % "title").to_sym]).to eq({ "en" => { "foo" => "bar" }})
@@ -80,7 +80,7 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
   end
 
   context "with dirty plugin applied" do
-    let(:backend) { post.mobility.backend_for("title") }
+    let(:backend) { post.mobility_backends[:title] }
 
     before { JsonbPost.translates :title, :content, backend: :jsonb, dirty: true, **default_options }
     let(:post) { JsonbPost.new }

@@ -20,7 +20,7 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
   end
 
   context "with standard plugins applied" do
-    let(:backend) { post.mobility.backend_for("title") }
+    let(:backend) { post.mobility_backends[:title] }
 
     before { JsonPost.translates :title, :content, backend: :json, **default_options }
     let(:post) { JsonPost.new }
@@ -34,7 +34,7 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
 
     describe "non-text values" do
       it "stores non-string types as-is when saving", rails_version_geq: '5.0' do
-        backend = post.mobility.backend_for("title")
+        backend = post.mobility_backends[:title]
         backend.write(:en, { foo: :bar } )
         post.save
         expect(post[column_affix % "title"]).to eq({ "en" => { "foo" => "bar" }})
@@ -43,7 +43,7 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
   end
 
   context "with dirty plugin applied" do
-    let(:backend) { post.mobility.backend_for("title") }
+    let(:backend) { post.mobility_backends[:title] }
 
     before { JsonPost.translates :title, :content, backend: :json, **default_options }
     let(:post) { JsonPost.new }

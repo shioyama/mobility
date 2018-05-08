@@ -25,7 +25,6 @@ in backends to define gem-dependent behavior.
 
 =end
 module Mobility
-  require "mobility/adapter"
   require "mobility/accumulator"
   require "mobility/attributes"
   require "mobility/backend"
@@ -244,17 +243,40 @@ EOL
     end
   end
 
+  class BackendsCache < Hash
+    def initialize(model)
+      mobility = model.class.mobility
+
+      super() do |hash, name|
+        if backend = mobility.backends[name]
+          backend.new(model, name.to_s).tap { |instance| hash[name] = instance }
+        elsif String === name
+          # Support fetching with string keys
+          self[name.to_sym]
+        else
+          raise KeyError, "No backend for: #{name}."
+        end
+      end
+    end
+  end
+  private_constant :BackendsCache
+
   module InstanceMethods
+    # Return hash of cached backend instances for this model.
+    # @return BackendsCache
+    def mobility_backends
+      @mobility_backends ||= BackendsCache.new(self)
+    end
+
     # Fetch backend for an attribute
-    # @deprecated Use mobility.backend_for(attribute) instead.
+    # @deprecated Use mobility_backends[:<attribute>] instead.
     # @param [String] attribute Attribute
     # TODO: Remove in v1.0
     def mobility_backend_for(attribute)
       warn %{
 WARNING: mobility_backend_for is deprecated and will be removed in the next
-major version of Mobility. Use <post>.mobility.backend_for(attributes)
-instead.}
-      mobility.backend_for(attribute)
+version of Mobility. Use <post>.<attribute>_backend instead.}
+      mobility_backends[attribute.to_sym]
     end
 
     def initialize_dup(other)
@@ -262,9 +284,21 @@ instead.}
       super
     end
 
+    # TODO: Remove in v1.0
     def mobility
+      warn %{
+WARNING: <post>.mobility is deprecated and will be removed in the next
+version of Mobility. To get backends, use <post>.<attribute>_backend instead.}
       @mobility ||= Adapter.new(self)
     end
+
+    # TODO: Remove in v1.0
+    class Adapter < Struct.new(:model)
+      def backend_for(attribute)
+        model.mobility_backends[attribute.to_sym]
+      end
+    end
+    private_constant :Adapter
   end
 
   module ClassMethods

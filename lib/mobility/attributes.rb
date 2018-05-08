@@ -143,8 +143,6 @@ with other backends.
     # backend setup block (see {Mobility::Backend::Setup#setup_model}).
     # @param klass [Class] Class of model
     def included(klass)
-      # If we've already been included and configured for a class, skip this
-      return if @model_class
       @model_class = @options[:model_class] = klass
       @backend_class = get_backend_class(backend_name).for(model_class).with_options(options)
 
@@ -178,7 +176,7 @@ with other backends.
     def define_backend(attribute)
       module_eval <<-EOM, __FILE__, __LINE__ + 1
       def #{Backend.method_name(attribute)}
-        #{set_backend_inline(attribute)}
+        mobility_backends[:#{attribute}]
       end
       EOM
     end
@@ -188,15 +186,13 @@ with other backends.
         def #{attribute}(**options)
           return super() if options.delete(:super)
           #{set_locale_from_options_inline}
-          #{set_backend_inline(attribute)}
-          @mobility_backends[:#{attribute}].read(locale, options)
+          mobility_backends[:#{attribute}].read(locale, options)
         end
 
         def #{attribute}?(**options)
           return super() if options.delete(:super)
           #{set_locale_from_options_inline}
-          #{set_backend_inline(attribute)}
-          @mobility_backends[:#{attribute}].present?(locale, options)
+          mobility_backends[:#{attribute}].present?(locale, options)
         end
       EOM
     end
@@ -206,8 +202,7 @@ with other backends.
         def #{attribute}=(value, **options)
           return super(value) if options.delete(:super)
           #{set_locale_from_options_inline}
-          #{set_backend_inline(attribute)}
-          @mobility_backends[:#{attribute}].write(locale, value, options)
+          mobility_backends[:#{attribute}].write(locale, value, options)
         end
       EOM
     end
@@ -223,13 +218,6 @@ if options[:locale]
 else
   locale = Mobility.locale
 end
-EOL
-    end
-
-    def set_backend_inline(attribute)
-      <<-EOL
-@mobility_backends ||= {}
-@mobility_backends[:#{attribute}] ||= self.class.mobility.backends[:#{attribute}].new(self, "#{attribute}")
 EOL
     end
 

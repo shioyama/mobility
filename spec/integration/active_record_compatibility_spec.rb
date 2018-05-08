@@ -40,7 +40,7 @@ describe "ActiveRecord compatibility", orm: :active_record do
     end
 
     it "resets cache when model is reloaded", rails_version_geq: '5.0' do
-      expect(post.mobility.backend_for("title")).to receive(:clear_cache).once
+      expect(post.mobility_backends[:title]).to receive(:clear_cache).once
       post.reload
     end
   end

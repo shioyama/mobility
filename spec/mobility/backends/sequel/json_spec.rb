@@ -20,7 +20,7 @@ describe "Mobility::Backends::Sequel::Json", orm: :sequel, db: :postgres do
   end
 
   context "with standard plugins applied" do
-    let(:backend) { post.mobility.backend_for("title") }
+    let(:backend) { post.mobility_backends[:title] }
 
     before { JsonPost.translates :title, :content, backend: :json, **default_options }
     let(:post) { JsonPost.new }
@@ -32,7 +32,7 @@ describe "Mobility::Backends::Sequel::Json", orm: :sequel, db: :postgres do
   end
 
   context "with dirty plugin applied" do
-    let(:backend) { post.mobility.backend_for("title") }
+    let(:backend) { post.mobility_backends[:title] }
 
     before { JsonPost.translates :title, :content, backend: :json, dirty: true, **default_options }
     let(:post) { JsonPost.new }

@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require "mobility/arel"
+
 module Mobility
 =begin
 

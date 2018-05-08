@@ -2,9 +2,9 @@ sudo: false
 language: ruby
 cache: bundler
 rvm:
-  - 2.2.9
-  - 2.3.6
+  - 2.3.7
   - 2.4.3
+  - 2.5.1
 env:
   - DB=postgres ORM=active_record RAILS_VERSION=4.2
   - DB=mysql ORM=active_record RAILS_VERSION=4.2

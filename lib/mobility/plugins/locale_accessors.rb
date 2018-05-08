@@ -56,28 +56,32 @@ If no locales are passed as an option to the initializer,
         warning_message = "locale passed as option to locale accessor will be ignored"
         normalized_locale = Mobility.normalize_locale(locale)
 
-        define_method "#{name}_#{normalized_locale}" do |**options|
+        module_eval <<-EOM, __FILE__, __LINE__ + 1
+        def #{name}_#{normalized_locale}(**options)
           return super() if options.delete(:super)
-          warn warning_message if options[:locale]
-          public_send(name, **options, locale: locale)
+          warn "#{warning_message}" if options[:locale]
+          #{name}(**options, locale: :'#{locale}')
         end
 
-        define_method "#{name}_#{normalized_locale}?" do |**options|
+        def #{name}_#{normalized_locale}?(**options)
           return super() if options.delete(:super)
-          warn warning_message if options[:locale]
-          public_send("#{name}?", **options, locale: locale)
+          warn "#{warning_message}" if options[:locale]
+          #{name}?(**options, locale: :'#{locale}')
         end
+        EOM
       end
 
       def define_writer(name, locale)
         warning_message = "locale passed as option to locale accessor will be ignored"
         normalized_locale = Mobility.normalize_locale(locale)
 
-        define_method "#{name}_#{normalized_locale}=" do |value, **options|
+        module_eval <<-EOM, __FILE__, __LINE__ + 1
+        def #{name}_#{normalized_locale}=(value, **options)
           return super(value) if options.delete(:super)
-          warn warning_message if options[:locale]
-          public_send("#{name}=", value, **options, locale: locale)
+          warn "#{warning_message}" if options[:locale]
+          public_send(:#{name}=, value, **options, locale: :'#{locale}')
         end
+        EOM
       end
     end
   end

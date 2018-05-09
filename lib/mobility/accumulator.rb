@@ -16,7 +16,12 @@ which {Attributes} modules have been included on the model class.
     # @param [Class] model_class Model class
     def initialize
       @modules  = []
-      @backends = {}
+      @backends = Hash.new do |_, key|
+        if String === key
+          warn "You're accessing a backend using a String key. Try using a Symbol instead."
+        end
+        raise KeyError, "no backend found with name: \"#{key}\""
+      end
     end
 
     # @return [Array<String>] Translated attributes defined on model
@@ -29,6 +34,12 @@ which {Attributes} modules have been included on the model class.
     def << backend_module
       modules << backend_module
       backend_module.names.each { |name| backends[name.to_sym] = backend_module.backend_class }
+    end
+
+    # @param [Symbol] name Attribute name
+    # @param [Symbol] locale Locale
+    def [](name, locale = Mobility.locale)
+      backends[name][name, locale]
     end
 
     def initialize_dup(other)

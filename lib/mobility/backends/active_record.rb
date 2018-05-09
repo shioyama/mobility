@@ -7,6 +7,12 @@ module Mobility
       end
 
       module ClassMethods
+        # @param [Symbol] name Attribute name
+        # @param [Symbol] locale Locale
+        def [](name, locale)
+          build_node(name.to_s, locale)
+        end
+
         # @param [String] _attr Attribute name
         # @param [Symbol] _locale Locale
         # @return Arel node for this translated attribute

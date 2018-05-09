@@ -106,9 +106,10 @@ default_fallbacks= will be removed in the next major version of Mobility.
       @fallbacks_generator = lambda { |fallbacks| Mobility::Fallbacks.build(fallbacks) }
       @default_accessor_locales = lambda { I18n.available_locales }
       @default_options = Options[{
-        cache: true,
+        cache:    true,
         presence: true,
-        query: true
+        query:    true,
+        default:  Plugins::OPTION_UNSET
       }]
       @plugins = %i[
         query

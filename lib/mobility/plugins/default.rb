@@ -65,7 +65,7 @@ The proc can accept zero to three arguments (see examples below)
       # @param [Attributes] attributes
       # @param [Object] option
       def self.apply(attributes, option)
-        attributes.backend_class.include(new(option))
+        attributes.backend_class.include(new(option)) unless option == Plugins::OPTION_UNSET
       end
 
       def initialize(default_option)

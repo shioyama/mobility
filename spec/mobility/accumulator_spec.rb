@@ -23,13 +23,20 @@ describe Mobility::Accumulator do
   end
 
   describe "#backends" do
-    it "returns backend class for given attribute name" do
+    before do
       attributes = Mobility::Attributes.new("foo", "bar", backend: :null)
       Class.new { include Mobility }.include(attributes)
       subject << attributes
+    end
 
+    it "returns backend class for given attribute name" do
       expect(subject.backends[:foo]).to be < Mobility::Backends::Null
       expect(subject.backends[:bar]).to be < Mobility::Backends::Null
+    end
+
+    it "raises KeyError for undefined backend" do
+      expect { subject.backends[:baz] }.to raise_error(KeyError, "no backend found with name: \"baz\"")
+
     end
   end
 end

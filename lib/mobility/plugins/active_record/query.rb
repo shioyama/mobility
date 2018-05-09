@@ -57,7 +57,7 @@ class to build ActiveRecord queries from Arel nodes.
                 locale = Mobility.locale
                 opts = where_opts.with_indifferent_access
 
-                maps = build_maps!(scope.mobility.modules, opts, locale, invert: invert)
+                maps = build_maps!(scope.mobility, opts, locale, invert: invert)
                 return yield if maps.empty?
 
                 base = opts.empty? ? scope : yield(opts)
@@ -66,14 +66,14 @@ class to build ActiveRecord queries from Arel nodes.
 
               private
 
-              def build_maps!(mods, opts, locale, invert:)
+              def build_maps!(interface, opts, locale, invert:)
                 keys = opts.keys.map(&:to_s)
-                mods.select { |mod| mod.options[:query] }.map { |mod|
+                interface.modules.select { |mod| mod.options[:query] }.map { |mod|
                   next if (mod_keys = mod.names & keys).empty?
 
                   mod_opts = opts.slice(*mod_keys)
                   predicates = mod_keys.map do |key|
-                    build_predicate(mod, key, locale, opts.delete(key), invert: invert)
+                    build_predicate(interface[key.to_sym], opts.delete(key), invert: invert)
                   end
 
                   ->(rel) do
@@ -84,9 +84,7 @@ class to build ActiveRecord queries from Arel nodes.
                 }.compact
               end
 
-              def build_predicate(mod, key, locale, values, invert:)
-                node = mod.backend_class.build_node(key, locale)
-
+              def build_predicate(node, values, invert:)
                 predicate = convert_to_predicate(node, values)
                 predicate = invert(predicate) if invert
                 predicate

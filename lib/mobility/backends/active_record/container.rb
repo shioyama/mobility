@@ -65,12 +65,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
         column        = model_class.arel_table[column_name]
         quoted_locale = build_quoted(locale)
         quoted_attr   = build_quoted(attr)
-        case column_type
-        when :json
-          Arel::Nodes::Json.new(Arel::Nodes::JsonDashArrow.new(column, quoted_locale), quoted_attr)
-        when :jsonb
-          Arel::Nodes::Jsonb.new(Arel::Nodes::Jsonb.new(column, quoted_locale), quoted_attr)
-        end
+        Arel::Nodes.const_get("#{column_type.capitalize}Container").new(column, quoted_locale, quoted_attr)
       end
 
       # @!macro backend_iterator

@@ -5,7 +5,9 @@ module Mobility
 =begin
 
 Defines value or proc to fall through to if return value from getter would
-otherwise be nil.
+otherwise be nil. This plugin is disabled by default but will be enabled if any
+value (other than +Mobility::Plugins::OPTION_UNSET+) is passed as the +default+
+option key.
 
 If default is a +Proc+, it will be called with the context of the model, and
 passed arguments:

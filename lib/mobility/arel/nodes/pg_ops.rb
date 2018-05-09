@@ -8,6 +8,7 @@ module Mobility
         JsonDashArrow
         JsonDashDoubleArrow
         JsonbDashArrow
+        JsonbDashDoubleArrow
         JsonbQuestion
         HstoreDashArrow
         HstoreQuestion
@@ -43,7 +44,7 @@ module Mobility
 
       class Jsonb < JsonbDashArrow
         def matches *args
-          JsonDashDoubleArrow.new(left, right).matches(*args)
+          JsonbDashDoubleArrow.new(left, right).matches(*args)
         end
 
         def lower
@@ -86,6 +87,10 @@ module Mobility
 
       def visit_Mobility_Arel_Nodes_JsonbDashArrow o, a
         json_infix o, a, '->'
+      end
+
+      def visit_Mobility_Arel_Nodes_JsonbDashDoubleArrow o, a
+        json_infix o, a, '->>'
       end
 
       def visit_Mobility_Arel_Nodes_JsonbQuestion o, a

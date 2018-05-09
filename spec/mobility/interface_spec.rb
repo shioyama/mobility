@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Accumulator do
+describe Mobility::Interface do
   let(:model_class) { double "model class" }
   let(:subject) { described_class.new }
 

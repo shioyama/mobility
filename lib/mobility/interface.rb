@@ -5,7 +5,7 @@ Class to access Mobility across backends. In particular, keeps a record of
 which {Attributes} modules have been included on the model class.
 
 =end
-  class Accumulator
+  class Interface
     # @return [Array<Attributes>]
     attr_reader :modules
 

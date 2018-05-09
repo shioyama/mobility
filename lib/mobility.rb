@@ -25,13 +25,13 @@ in backends to define gem-dependent behavior.
 
 =end
 module Mobility
-  require "mobility/accumulator"
   require "mobility/attributes"
   require "mobility/backend"
   require "mobility/backends"
   require "mobility/backend_resetter"
   require "mobility/configuration"
   require "mobility/fallbacks"
+  require "mobility/interface"
   require "mobility/loaded"
   require "mobility/plugins"
   require "mobility/translates"
@@ -305,7 +305,7 @@ version of Mobility. To get backends, use <post>.<attribute>_backend instead.}
     include Translates
 
     def mobility
-      @mobility ||= Accumulator.new
+      @mobility ||= Interface.new
     end
 
     def translated_attribute_names

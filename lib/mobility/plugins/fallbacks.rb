@@ -18,7 +18,7 @@ created for the model with the hash defining additional fallbacks. To set a
 default value for this hash, use set the value of `default_options[:fallbacks]`
 in your Mobility configuration (see below).
 
-In addition, fallbacks are disabled in certain situation. To explicitly disable
+In addition, fallbacks are disabled in certain situations. To explicitly disable
 fallbacks when reading and writing, you can pass the <tt>fallback: false</tt>
 option to the reader method. This can be useful to determine the actual
 value of the translated attribute, including a possible +nil+ value.

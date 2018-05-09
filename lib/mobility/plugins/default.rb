@@ -70,17 +70,26 @@ The proc can accept zero to three arguments (see examples below)
         attributes.backend_class.include(self) unless option == Plugins::OPTION_UNSET
       end
 
+      # Generate a default value for given parameters.
+      # @param [Object, Proc] default_value A default value or Proc
+      # @param [Symbol] locale
+      # @param [Hash] accessor_options
+      # @param [String] attribute
+      def self.[](default_value, locale:, accessor_options:, model:, attribute:)
+        return default_value unless default_value.is_a?(Proc)
+        args = [attribute, locale, accessor_options]
+        args = args.first(default_value.arity) unless default_value.arity < 0
+        model.instance_exec(*args, &default_value)
+      end
+
       # @!group Backend Accessors
       # @!macro backend_reader
-      # @option options [Boolean] default
+      # @option accessor_options [Boolean] default
       #   *false* to disable presence filter.
       def read(locale, accessor_options = {})
         default = accessor_options.has_key?(:default) ? accessor_options.delete(:default) : options[:default]
         if (value = super(locale, accessor_options)).nil?
-          return default unless default.is_a?(Proc)
-          args = [attribute, locale, accessor_options]
-          args = args.first(default.arity) unless default.arity < 0
-          model.instance_exec(*args, &default)
+          Default[default, locale: locale, accessor_options: accessor_options, model: model, attribute: attribute]
         else
           value
         end

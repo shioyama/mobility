@@ -117,7 +117,6 @@ On top of this, a backend will normally:
 
     # Extend included class with +setup+ method and other class methods
     def self.included(base)
-      base.extend Setup
       base.extend ClassMethods
       def base.options
         @options
@@ -133,7 +132,7 @@ On top of this, a backend will normally:
     end
 
     # Defines setup hooks for backend to customize model class.
-    module Setup
+    module ClassMethods
       # Assign block to be called on model class.
       # @yield [attribute_names, options]
       # @note When called multiple times, setup blocks will be appended
@@ -163,9 +162,7 @@ On top of this, a backend will normally:
         return unless setup_block = @setup_block
         model_class.class_exec(attribute_names, options, &setup_block)
       end
-    end
 
-    module ClassMethods
       # Build a subclass of this backend class for a given set of options
       # @note This method also freezes the options hash to prevent it from
       #   being changed.

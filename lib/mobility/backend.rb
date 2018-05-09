@@ -211,6 +211,12 @@ On top of this, a backend will normally:
       def apply_plugin(_)
         false
       end
+
+      # Show useful information about this backend class, if it has no name.
+      # @return [String]
+      def inspect
+        name ? super : "#<#{superclass.name}>"
+      end
     end
 
     Translation = Struct.new(:backend, :locale) do

@@ -177,6 +177,14 @@ describe Mobility::Backend do
     end
   end
 
+  describe ".inspect" do
+    it "returns superclass name" do
+      backend = stub_const 'MyBackend', Class.new
+      backend.include(described_class)
+      expect(Class.new(backend).inspect).to match(/MyBackend/)
+    end
+  end
+
   describe ".method_name" do
     it "returns <attribute>_translations" do
       expect(Mobility::Backend.method_name("foo")).to eq("foo_backend")

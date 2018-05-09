@@ -167,6 +167,8 @@ with other backends.
       names.each(&block)
     end
 
+    # Show useful information about this module.
+    # @return [String]
     def inspect
       "#<Attributes (#{backend_name}) @names=#{names.join(", ")}>"
     end

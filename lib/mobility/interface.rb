@@ -36,6 +36,8 @@ which {Attributes} modules have been included on the model class.
       backend_module.names.each { |name| backends[name.to_sym] = backend_module.backend_class }
     end
 
+    # Fetches attribute from backend class. The +[]+ method must be implemented
+    #   by backend class. For ActiveRecord, this returns an Arel node.
     # @param [Symbol] name Attribute name
     # @param [Symbol] locale Locale
     def [](name, locale = Mobility.locale)

@@ -60,27 +60,30 @@ The proc can accept zero to three arguments (see examples below)
   post.title(default: lambda { self.class.name.to_s })
   #=> "Post"
 =end
-    class Default < Module
+    module Default
       # Applies default plugin to attributes.
       # @param [Attributes] attributes
       # @param [Object] option
       def self.apply(attributes, option)
-        attributes.backend_class.include(new(option)) unless option == Plugins::OPTION_UNSET
+        attributes.backend_class.include(self) unless option == Plugins::OPTION_UNSET
       end
 
-      def initialize(default_option)
-        define_method :read do |locale, options = {}|
-          default = options.has_key?(:default) ? options.delete(:default) : default_option
-          if (value = super(locale, options)).nil?
-            return default unless default.is_a?(Proc)
-            args = [attribute, locale, options]
-            args = args.first(default.arity) unless default.arity < 0
-            model.instance_exec(*args, &default)
-          else
-            value
-          end
+      # @!group Backend Accessors
+      # @!macro backend_reader
+      # @option options [Boolean] default
+      #   *false* to disable presence filter.
+      def read(locale, accessor_options = {})
+        default = accessor_options.has_key?(:default) ? accessor_options.delete(:default) : options[:default]
+        if (value = super(locale, accessor_options)).nil?
+          return default unless default.is_a?(Proc)
+          args = [attribute, locale, accessor_options]
+          args = args.first(default.arity) unless default.arity < 0
+          model.instance_exec(*args, &default)
+        else
+          value
         end
       end
+      # @!endgroup
     end
   end
 end

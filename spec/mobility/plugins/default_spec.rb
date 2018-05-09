@@ -17,7 +17,7 @@ describe Mobility::Plugins::Default do
           backend_double_.write(*args)
         end
       end
-      Class.new(backend_class).include(described_class.new(default))
+      Class.new(backend_class).include(described_class)
     end
 
     describe "#read" do
@@ -95,10 +95,8 @@ describe Mobility::Plugins::Default do
     it "includes instance of default into backend class" do
       backend_class = double("backend class")
       attributes = instance_double(Mobility::Attributes, backend_class: backend_class)
-      default = instance_double(described_class)
 
-      expect(described_class).to receive(:new).with("default").and_return(default)
-      expect(backend_class).to receive(:include).with(default)
+      expect(backend_class).to receive(:include).with(described_class)
       described_class.apply(attributes, "default")
     end
   end

@@ -20,7 +20,7 @@ backend. Included by default, but can be disabled with +presence: false+ option.
         attributes.backend_class.include(self) if option
       end
 
-      # @group Backend Accessors
+      # @!group Backend Accessors
       # @!macro backend_reader
       # @option options [Boolean] presence
       #   *false* to disable presence filter.
@@ -28,7 +28,6 @@ backend. Included by default, but can be disabled with +presence: false+ option.
         options.delete(:presence) == false ? super : Presence[super]
       end
 
-      # @group Backend Accessors
       # @!macro backend_writer
       # @option options [Boolean] presence
       #   *false* to disable presence filter.
@@ -39,6 +38,7 @@ backend. Included by default, but can be disabled with +presence: false+ option.
           super(locale, Presence[value], options)
         end
       end
+      # @!endgroup
 
       def self.[](value)
         (value == "") ? nil : value

@@ -814,6 +814,10 @@ pages of the wiki and in the API documentation
 and
 [`Mobility::Backend::Hstore`](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Hstore)).
 
+*Note: The Json backend (`:json`) may also work with recent versions of MySQL
+with JSON column support, although this backend/db combination is not tested.
+See [this issue](https://github.com/shioyama/mobility/issues/226) for details.*
+
 Development
 -----------
 

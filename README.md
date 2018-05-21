@@ -162,7 +162,8 @@ of options, like this:
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name, :meaning
+  translates :name,    type: :string
+  translates :meaning, type: :text
 end
 ```
 

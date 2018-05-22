@@ -13,11 +13,11 @@ models. For details see backend-specific subclasses.
       class QueryMethods < Module
         # @param [Array<String>] attributes Translated attributes
         def initialize(attributes, _)
-          @attributes = attributes.map!(&:to_sym)
+          @attributes = attributes.map(&:to_sym)
 
-          attributes.each do |attribute|
+          @attributes.each do |attribute|
             define_method :"first_by_#{attribute}" do |value|
-              where(attribute.to_sym => value).select_all(model.table_name).first
+              where(attribute => value).select_all(model.table_name).first
             end
           end
         end

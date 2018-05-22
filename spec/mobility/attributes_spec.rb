@@ -1,10 +1,7 @@
 require "spec_helper"
 
 describe Mobility::Attributes do
-  before do
-    stub_const 'Article', Class.new
-    Article.extend Mobility
-  end
+  before { stub_const 'Article', Class.new }
 
   # In order to be able to stub methods on backend instance methods, which will be
   # hidden when the backend class is subclassed in Attributes, we inject a double
@@ -72,10 +69,117 @@ describe Mobility::Attributes do
       Article.include described_class.new("title", backend: backend_class)
     end
 
-    it "includes module in model_class.mobility" do
-      attributes = described_class.new("title", backend: backend_class)
-      Article.include attributes
-      expect(Article.mobility.modules).to eq([attributes])
+    describe "model class methods" do
+      %w[mobility_attributes translated_attribute_names].each do |method_name|
+        describe ".#{method_name}" do
+          it "returns attribute names" do
+            Article.include described_class.new("title", "content", backend: :null)
+            Article.include described_class.new("foo", backend: :null)
+
+            expect(Article.public_send(method_name)).to match_array(["title", "content", "foo"])
+          end
+        end
+      end
+
+      describe ".mobility_modules" do
+        it "returns attribute modules on class" do
+          modules = [
+            described_class.new("title", "content", backend: :null),
+            described_class.new("foo", backend: :null)]
+          modules.each { |mod| Article.include mod }
+          expect(Article.mobility_modules).to match_array(modules)
+        end
+      end
+
+      describe ".mobility_backend_class" do
+        it "returns backend class for attribute" do
+          backend_class1 = Class.new
+          backend_class1.include(Mobility::Backend)
+          backend_class2 = Class.new
+          backend_class2.include(Mobility::Backend)
+
+          mod1 = described_class.new("title", "content", backend: backend_class1)
+          mod2 = described_class.new("subtitle", backend: backend_class2)
+
+          Article.include mod1
+          Article.include mod2
+
+          expect(Article.mobility_backend_class("title")).to be < backend_class1
+          expect(Article.mobility_backend_class("content")).to be < backend_class1
+          expect(Article.mobility_backend_class("subtitle")).to be < backend_class2
+        end
+
+        it "handles new backends added after first called" do
+          backend_class1 = Class.new
+          backend_class1.include(Mobility::Backend)
+
+          mod = described_class.new("title", backend: :null)
+          Article.include mod
+
+          expect(Article.mobility_backend_class("title")).to eq(mod.backend_class)
+
+          other_mod = described_class.new("content", backend: :null)
+          Article.include other_mod
+
+          expect(Article.mobility_backend_class("content")).to eq(other_mod.backend_class)
+        end
+      end
+    end
+
+    describe "model instance methods" do
+      describe "#mobility_backends" do
+        it "returns instance of backend for attribute" do
+          mod1 = described_class.new("title", backend: :null)
+          mod2 = described_class.new("content", backend: :null, foo: :bar)
+          Article.include mod1
+          Article.include mod2
+          article1 = Article.new
+          article2 = Article.new
+
+          aggregate_failures do
+            expect(article1.mobility_backends).to eq({})
+            expect(article2.mobility_backends).to eq({})
+
+            article1.title
+
+            expect(article1.mobility_backends.keys).to eq([:title])
+            expect(article1.mobility_backends[:title].class).to eq(mod1.backend_class)
+            expect(article2.mobility_backends.size).to eq(0)
+
+            article2.content
+
+            expect(article1.mobility_backends.keys).to eq([:title])
+            expect(article1.mobility_backends[:title].class).to eq(mod1.backend_class)
+            expect(article2.mobility_backends.keys).to eq([:content])
+            expect(article2.mobility_backends[:content].class).to eq(mod2.backend_class)
+          end
+        end
+
+        it "maps string keys to symbol key values" do
+          mod = described_class.new("title", backend: :null)
+          Article.include mod
+
+          article = Article.new
+
+          aggregate_failures do
+            expect(article.mobility_backends[:title]).to be_a(Mobility::Backends::Null)
+            expect(article.mobility_backends["title"]).to be_a(Mobility::Backends::Null)
+            expect(article.mobility_backends.size).to eq(1)
+            expect(article.mobility_backends[:title]).to eq(article.mobility_backends["title"])
+          end
+        end
+
+        it "resets when model is duplicated" do
+          mod = described_class.new("title", backend: :null)
+          Article.include mod
+
+          article = Article.new
+          article.title
+          other = article.dup
+
+          expect(other.title_backend).not_to eq(article.title_backend)
+        end
+      end
     end
 
     describe "cache" do

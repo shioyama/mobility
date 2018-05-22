@@ -136,7 +136,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
   include Helpers
 
   let(:model_class) { constantize(model_class_name) }
-  let(:format) { model_class.mobility.modules.first.options[:format] }
+  let(:format) { model_class.mobility_modules.first.options[:format] }
   let(:backend) { instance.mobility_backends[attribute1.to_sym] }
   let(:column1) { (column_affix % attribute1).to_sym }
   let(:column2) { (column_affix % attribute2).to_sym }

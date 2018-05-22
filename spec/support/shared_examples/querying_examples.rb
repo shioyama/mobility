@@ -401,7 +401,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       @instance2 = model_class.create(attribute1 => "foo", attribute2 => "baz content", published: false )
       @instance3 = model_class.create(attribute1 => "bar", attribute2 => "foo content", published: false)
     end
-    let(:backend_class) { model_class.mobility.modules.first.backend_class.superclass }
+    let(:backend_class) { model_class.mobility_modules.first.backend_class.superclass }
 
     it "returns union of queries" do
       expect(query_scope.where(published: true).or(attribute1 => "foo").select_all(table_name).all).to match_array([@instance1, @instance2])

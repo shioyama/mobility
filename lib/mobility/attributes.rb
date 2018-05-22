@@ -134,13 +134,13 @@ with other backends.
       @method = method
       @options = Mobility.default_options.to_h.merge(backend_options)
       @names = attribute_names.map(&:to_s).freeze
-      raise Mobility::BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
+      raise BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
       @backend_name = backend
     end
 
-    # Setup backend class, include modules into model class, add this
-    # attributes module to shared {Mobility::Interface} and setup model with
-    # backend setup block (see {Mobility::Backend::Setup#setup_model}).
+    # Setup backend class, include modules into model class, include/extend
+    # shared modules and setup model with backend setup block (see
+    # {Mobility::Backend::Setup#setup_model}).
     # @param klass [Class] Class of model
     def included(klass)
       @model_class = @options[:model_class] = klass
@@ -157,7 +157,9 @@ with other backends.
         define_writer(name) if %i[accessor writer].include?(method)
       end
 
-      model_class.mobility << self
+      klass.include InstanceMethods
+      klass.extend ClassMethods
+
       backend_class.setup_model(model_class, names)
     end
 
@@ -238,5 +240,68 @@ EOL
       klass_name = key.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
       parent_class.const_get(klass_name)
     end
+
+    module InstanceMethods
+      # Return a new backend for an attribute name.
+      # @return [Hash] Hash of attribute names and backend instances
+      def mobility_backends
+        @mobility_backends ||= Hash.new do |hash, name|
+          next hash[name.to_sym] if String === name
+          hash[name] = self.class.mobility_backend_class(name).new(self, name.to_s)
+        end
+      end
+
+      def initialize_dup(other)
+        @mobility_backends = nil
+        super
+      end
+    end
+
+    module ClassMethods
+      # Return all {Mobility::Attribute} module instances from among ancestors
+      # of this model.
+      # @return [Array<Mobility::Attributes>] Attribute modules
+      def mobility_modules
+        ancestors.select { |mod| Attributes === mod }
+      end
+
+      # Return translated attribute names on this model.
+      # @return [Array<String>] Attribute names
+      def mobility_attributes
+        mobility_modules.map(&:names).flatten
+      end
+
+      # @!method translated_attribute_names
+      # @return (see #mobility_attributes)
+      alias translated_attribute_names mobility_attributes
+
+      # Return backend class for a given attribute name.
+      # @param [Symbol,String] Name of attribute
+      # @return [Class] Backend class
+      def mobility_backend_class(name)
+        @backends ||= BackendsCache.new(self)
+        @backends[name.to_sym]
+      end
+
+      class BackendsCache < Hash
+        def initialize(klass)
+          # Preload backend mapping
+          klass.mobility_modules.each do |mod|
+            mod.names.each { |name| self[name.to_sym] = mod.backend_class }
+          end
+
+          super() do |hash, name|
+            if mod = klass.mobility_modules.find { |m| m.names.include? name.to_s }
+              hash[name] = mod.backend_class
+            else
+              raise KeyError, "No backend for: #{name}."
+            end
+          end
+        end
+      end
+      private_constant :BackendsCache
+    end
   end
+
+  class BackendRequired < ArgumentError; end
 end

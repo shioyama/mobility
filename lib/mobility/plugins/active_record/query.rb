@@ -41,6 +41,14 @@ class to build ActiveRecord queries from Arel nodes.
             opts == :chain ? WhereChain.new(spawn) : super
           end
 
+          # Return backend node for attribute name.
+          # @param [Symbol,String] name Name of attribute
+          # @param [Symbol] locale Locale
+          # @return [Arel::Node] Arel node for this attribute in given locale
+          def backend_node(name, locale = Mobility.locale)
+            @klass.mobility_backend_class(name)[name, locale]
+          end
+
           class WhereChain < ::ActiveRecord::QueryMethods::WhereChain
             def not(opts, *rest)
               QueryBuilder.build(@scope, opts, invert: true) do |untranslated_opts|
@@ -57,7 +65,7 @@ class to build ActiveRecord queries from Arel nodes.
                 locale = Mobility.locale
                 opts = where_opts.with_indifferent_access
 
-                maps = build_maps!(scope.mobility, opts, locale, invert: invert)
+                maps = build_maps!(scope, opts, locale, invert: invert)
                 return yield if maps.empty?
 
                 base = opts.empty? ? scope : yield(opts)
@@ -66,14 +74,14 @@ class to build ActiveRecord queries from Arel nodes.
 
               private
 
-              def build_maps!(interface, opts, locale, invert:)
+              def build_maps!(scope, opts, locale, invert:)
                 keys = opts.keys.map(&:to_s)
-                interface.modules.select { |mod| mod.options[:query] }.map { |mod|
+                scope.mobility_modules.map { |mod|
                   next if (mod_keys = mod.names & keys).empty?
 
                   mod_opts = opts.slice(*mod_keys)
                   predicates = mod_keys.map do |key|
-                    build_predicate(interface[key.to_sym], opts.delete(key), invert: invert)
+                    build_predicate(scope.backend_node(key), opts.delete(key), invert: invert)
                   end
 
                   ->(rel) do

@@ -31,7 +31,6 @@ module Mobility
   require "mobility/backend_resetter"
   require "mobility/configuration"
   require "mobility/fallbacks"
-  require "mobility/interface"
   require "mobility/loaded"
   require "mobility/plugins"
   require "mobility/translates"
@@ -82,8 +81,9 @@ module Mobility
     def extended(model_class)
       return if model_class.respond_to? :mobility_accessor
 
-      model_class.include(InstanceMethods)
-      model_class.extend(ClassMethods)
+      model_class.extend Translates
+      #TODO: Remove in v1.0
+      model_class.include InstanceMethods
 
       if translates = Mobility.config.accessor_method
         model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
@@ -176,6 +176,7 @@ module Mobility
       config.public_send(:default_fallbacks, *args)
     end
 
+    # TODO: Make private in v1.0
     def new_fallbacks(*args)
       config.public_send(:new_fallbacks, *args)
     end
@@ -243,35 +244,11 @@ EOL
     end
   end
 
-  class BackendsCache < Hash
-    def initialize(model)
-      mobility = model.class.mobility
-
-      super() do |hash, name|
-        if backend = mobility.backends[name]
-          backend.new(model, name.to_s).tap { |instance| hash[name] = instance }
-        elsif String === name
-          # Support fetching with string keys
-          self[name.to_sym]
-        else
-          raise KeyError, "No backend for: #{name}."
-        end
-      end
-    end
-  end
-  private_constant :BackendsCache
-
+  # TODO: Remove entire module in v1.0
   module InstanceMethods
-    # Return hash of cached backend instances for this model.
-    # @return BackendsCache
-    def mobility_backends
-      @mobility_backends ||= BackendsCache.new(self)
-    end
-
     # Fetch backend for an attribute
     # @deprecated Use mobility_backends[:<attribute>] instead.
     # @param [String] attribute Attribute
-    # TODO: Remove in v1.0
     def mobility_backend_for(attribute)
       warn %{
 WARNING: mobility_backend_for is deprecated and will be removed in the next
@@ -279,12 +256,6 @@ version of Mobility. Use <post>.<attribute>_backend instead.}
       mobility_backends[attribute.to_sym]
     end
 
-    def initialize_dup(other)
-      @mobility_backends = nil
-      super
-    end
-
-    # TODO: Remove in v1.0
     def mobility
       warn %{
 WARNING: <post>.mobility is deprecated and will be removed in the next
@@ -292,7 +263,6 @@ version of Mobility. To get backends, use <post>.<attribute>_backend instead.}
       @mobility ||= Adapter.new(self)
     end
 
-    # TODO: Remove in v1.0
     class Adapter < Struct.new(:model)
       def backend_for(attribute)
         model.mobility_backends[attribute.to_sym]
@@ -301,25 +271,6 @@ version of Mobility. To get backends, use <post>.<attribute>_backend instead.}
     private_constant :Adapter
   end
 
-  module ClassMethods
-    include Translates
-
-    def mobility
-      @mobility ||= Interface.new
-    end
-
-    def translated_attribute_names
-      mobility.translated_attribute_names
-    end
-
-    def inherited(subclass)
-      subclass.instance_variable_set(:@mobility, mobility.dup)
-      super
-    end
-  end
-  private_constant :ClassMethods, :InstanceMethods
-
-  class BackendRequired < ArgumentError; end
   class InvalidLocale < I18n::InvalidLocale; end
   class NotImplementedError < StandardError; end
 end

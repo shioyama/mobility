@@ -205,7 +205,7 @@ columns to that table.
           touch: true
 
         before_save do
-          required_attributes = self.class.translated_attribute_names & translation_class.attribute_names
+          required_attributes = self.class.mobility_attributes & translation_class.attribute_names
           send(association_name).destroy_empty_translations(required_attributes)
         end
 

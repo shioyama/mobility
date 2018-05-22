@@ -31,33 +31,13 @@ describe Mobility do
       expect { Mobility.translates }.to raise_error(NoMethodError)
     end
 
-    context "with no translated attributes" do
-      it "does not include Attributes into model class" do
-        expect(Mobility::Attributes).not_to receive(:new)
-        model.extend Mobility
-      end
-
-      it "defines translated_attribute_names as empty array" do
-        model.extend Mobility
-        expect(MyModel.translated_attribute_names).to eq([])
-      end
-
-      it "defines Model.mobility as memoized interface" do
-        model.include Mobility
-        expect(MyModel.mobility).to be_a(Mobility::Interface)
-        expect(MyModel.mobility).to be(MyModel.mobility)
-      end
-    end
-
     context "with translated attributes" do
       it "includes backend module into model class" do
-        expect(Mobility::Attributes).to receive(:new).and_call_original
+        expect(Mobility::Attributes).to receive(:new).
+          with(:title, { method: :accessor, backend: :null, foo: :bar }).
+          and_call_original
         model.extend Mobility
         model.translates :title, backend: :null, foo: :bar
-        attributes = model.ancestors.find { |a| a.class == Mobility::Attributes }
-        expect(attributes).not_to be_nil
-        expect(attributes.names).to eq ["title"]
-        expect(attributes.options).to eq(Mobility.default_options.merge(foo: :bar, model_class: MyModel))
       end
 
       it "defines translated_attribute_names" do
@@ -83,30 +63,6 @@ describe Mobility do
           expect(model.translated_attribute_names).to eq(["title"])
           expect(subclass.translated_attribute_names).to match_array(["title", "content"])
         end
-
-        it "defines new backend class map independently of superclass" do
-          model.extend Mobility
-          model.translates :title, backend: :null
-          subclass = Class.new(model)
-          subclass.translates :content, backend: :null
-
-          expect(model.mobility.backends.keys).to eq([:title])
-          expect(subclass.mobility.backends.keys).to eq([:title, :content])
-        end
-      end
-    end
-
-    describe "duplicating model" do
-      let(:instance) do
-        model.extend Mobility
-        model.translates :title, backend: :null
-        # call title getter once to memoize backend
-        model.new.tap { |instance| instance.title }
-      end
-
-      it "resets memoized backends" do
-        other = instance.dup
-        expect(other.title_backend).not_to eq(instance.title_backend)
       end
     end
   end

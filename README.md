@@ -162,10 +162,21 @@ of options, like this:
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
+  translates :name, :meaning
+end
+```
+
+Note: When using the KeyValue backend, use the options hash to pass each attribute's type:
+
+```ruby
+class Word < ApplicationRecord
+  extend Mobility
   translates :name,    type: :string
   translates :meaning, type: :text
 end
 ```
+
+This is important because this is how Mobility knows to which of the [two translation tables](https://github.com/shioyama/mobility/wiki/KeyValue-Backend) it should save your translation.
 
 You now have translated attributes `name` and `meaning` on the model `Word`.
 You can set their values like you would any other attribute:

@@ -130,5 +130,4 @@ describe "ActiveRecord compatibility", orm: :active_record do
       expect(post.translated_attribute_names).to match_array(%w[title content])
     end
   end
-
 end

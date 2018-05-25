@@ -19,7 +19,7 @@ If the translation table already exists, it will create a migration adding
 columns to that table.
 
 @example Model with table backend
-  class Post < ActiveRecord::Base
+  class Post < ApplicationRecord
     extend Mobility
     translates :title, backend: :table
   end

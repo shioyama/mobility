@@ -5,8 +5,12 @@ module Mobility
 
 Adds a scope which enables querying on translated attributes using +where+ and
 +not+ as if they were normal attributes. Under the hood, this plugin uses the
-generic +build_node+ and +add_translations+ methods implemented in each backend
-class to build ActiveRecord queries from Arel nodes.
+generic +build_node+ and +apply_scope+ methods implemented in each backend
+class to build ActiveRecord queries from Arel nodes. The plugin also adds
++find_by_<attribute>+ shortcuts for translated attributes.
+
+The query scope applies to all translated attributes once the plugin has been
+enabled for any one attribute on the model.
 
 =end
     module ActiveRecord
@@ -18,8 +22,12 @@ class to build ActiveRecord queries from Arel nodes.
             unless const_defined?(:QueryMethod)
               const_set :QueryMethod, Module.new
               QueryMethod.module_eval <<-EOM, __FILE__, __LINE__ + 1
-                def #{Mobility.query_method}
-                  all.extending(QueryExtension)
+                def #{Mobility.query_method}(locale: Mobility.locale, &block)
+                  if block_given?
+                    VirtualRow.build_query(self, locale, &block)
+                  else
+                    all.extending(QueryExtension)
+                  end
                 end
               EOM
               private_constant :QueryMethod
@@ -29,6 +37,50 @@ class to build ActiveRecord queries from Arel nodes.
             model_class.extend FindByMethods.new(*attributes.names)
           end
         end
+
+        # Internal class to create a "clean room" for manipulating translated
+        # attribute nodes in an instance-eval'ed block. Inspired by Sequel's
+        # (much more sophisticated) virtual rows.
+        class VirtualRow < BasicObject
+          attr_reader :__vcols
+
+          def initialize(model_class, locale)
+            @model_class, @locale, @__vcols = model_class, locale, []
+          end
+
+          def method_missing(m, *)
+            if @model_class.mobility_attributes.include?(m.to_s)
+              @__vcols |= [m]
+              @model_class.mobility_backend_class(m).build_node(m, @locale)
+            elsif @model_class.column_names.include?(m.to_s)
+              @model_class.arel_table[m]
+            else
+              super
+            end
+          end
+
+          class << self
+            def build_query(klass, locale, &block)
+              row = new(klass, locale)
+              query = (block.arity == 0) ? row.instance_eval(&block) : block.call(row)
+              backends = row.__vcols.map { |a| klass.mobility_backend_class(a) }.uniq
+
+              if ::ActiveRecord::Relation === query
+                predicates = query.arel.constraints
+                apply_scopes(klass.all, backends, locale, predicates).merge(query)
+              else
+                apply_scopes(klass.all, backends, locale, query).where(query)
+              end
+            end
+
+            private
+
+            def apply_scopes(scope, backends, locale, predicates)
+              backends.inject(scope) { |r, b| b.apply_scope(r, predicates, locale) }
+            end
+          end
+        end
+        private_constant :VirtualRow
 
         module QueryExtension
           def where!(opts, *rest)
@@ -76,29 +128,23 @@ class to build ActiveRecord queries from Arel nodes.
 
               def build_maps!(scope, opts, locale, invert:)
                 keys = opts.keys.map(&:to_s)
-                scope.mobility_modules.map { |mod|
-                  next if (mod_keys = mod.names & keys).empty?
 
-                  mod_opts = opts.slice(*mod_keys)
-                  predicates = mod_keys.map do |key|
-                    build_predicate(scope.backend_node(key), opts.delete(key), invert: invert)
+                scope.mobility_modules.map { |mod|
+                  next if (i18n_keys = mod.names & keys).empty?
+
+                  predicates = i18n_keys.map do |key|
+                    build_predicate(scope.backend_node(key.to_sym, locale), opts.delete(key))
                   end
 
-                  ->(rel) do
-                    mod.backend_class.
-                      add_translations(rel, mod_opts, locale, invert: invert).
-                      where(predicates.inject(&:and))
+                  ->(relation) do
+                    relation = mod.backend_class.apply_scope(relation, predicates, locale, invert: invert)
+                    predicates = predicates.map(&method(:invert_predicate)) if invert
+                    relation.where(predicates.inject(&:and))
                   end
                 }.compact
               end
 
-              def build_predicate(node, values, invert:)
-                predicate = convert_to_predicate(node, values)
-                predicate = invert(predicate) if invert
-                predicate
-              end
-
-              def convert_to_predicate(node, values)
+              def build_predicate(node, values)
                 nils, vals = partition_values(values)
 
                 return node.eq(nil) if vals.empty?
@@ -113,7 +159,7 @@ class to build ActiveRecord queries from Arel nodes.
               end
 
               # Adapted from AR::Relation::WhereClause#invert_predicate
-              def invert(node)
+              def invert_predicate(node)
                 case node
                 when ::Arel::Nodes::In
                   ::Arel::Nodes::NotIn.new(node.left, node.right)

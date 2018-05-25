@@ -29,6 +29,8 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       include ActiveRecord
       include KeyValue
 
+      option_reader :table_alias
+
       class << self
         # @!group Backend Configuration
         # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
@@ -39,6 +41,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             options[:association_name] ||= :"#{options[:type]}_translations"
             options[:class_name]       ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
           end
+          options[:table_alias] = "#{options[:model_class]}_%s_#{options[:association_name]}"
         rescue NameError
           raise ArgumentError, "You must define a Mobility::ActiveRecord::#{type.capitalize}Translation class."
         end
@@ -49,37 +52,102 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         # @return [Arel::Attributes::Attribute] Arel attribute for aliased
         #   translation table value column
         def build_node(attr, _locale)
-          class_name.arel_table.alias("#{attr}_#{association_name}")[:value]
+          aliased_table = class_name.arel_table.alias(table_alias % attr)
+          Arel::Attribute.new(aliased_table, :value, self, attr.to_sym)
         end
 
+        # Joins translations using either INNER/OUTER join appropriate to the query.
         # @param [ActiveRecord::Relation] relation Relation to scope
-        # @param [Hash] opts Hash of options for query
+        # @param [Object] predicate Arel predicate
         # @param [Symbol] locale Locale
         # @option [Boolean] invert
-        def add_translations(relation, opts, locale, invert: false)
-          i18n_keys, i18n_nulls = partition_opts(opts)
-
-          relation = join_translations(relation, i18n_keys, locale)
-          join_translations(relation, i18n_nulls, locale, outer_join: !invert)
+        # @return [ActiveRecord::Relation] relation Relation with joins applied (if needed)
+        def apply_scope(relation, predicate, locale, invert: false)
+          visitor = Visitor.new(self)
+          visitor.accept(predicate).inject(relation) do |rel, (attr, join_type)|
+            join_type &&= ::Arel::Nodes::InnerJoin if invert
+            join_translations(rel, attr, locale, join_type)
+          end
         end
 
         private
 
-        def partition_opts(opts)
-          opts.keys.partition { |key| opts[key] && [*opts[key]].all? }
+        def join_translations(relation, key, locale, join_type)
+          return relation if already_joined?(relation, key, join_type)
+          m = model_class.arel_table
+          t = class_name.arel_table.alias(table_alias % key)
+          relation.joins(m.join(t, join_type).
+                         on(t[:key].eq(key).
+                            and(t[:locale].eq(locale).
+                                and(t[:translatable_type].eq(model_class.base_class.name).
+                                    and(t[:translatable_id].eq(m[:id]))))).join_sources)
         end
 
-        def join_translations(relation, keys, locale, outer_join: false)
-          keys.inject(relation) do |r, key|
-            t = class_name.arel_table.alias("#{key}_#{association_name}")
-            m = model_class.arel_table
-            join_type = outer_join ? ::Arel::Nodes::OuterJoin : ::Arel::Nodes::InnerJoin
-            r.joins(m.join(t, join_type).
-                    on(t[:key].eq(key).
-                       and(t[:locale].eq(locale).
-                           and(t[:translatable_type].eq(model_class.base_class.name).
-                               and(t[:translatable_id].eq(m[:id]))))).join_sources)
+        def already_joined?(relation, name, join_type)
+          if join = get_join(relation, name)
+            return true if (join_type == ::Arel::Nodes::OuterJoin) || (::Arel::Nodes::InnerJoin === join)
+            relation.joins_values = relation.joins_values - [join]
           end
+          false
+        end
+
+        def get_join(relation, name)
+          relation.joins_values.find do |v|
+            (::Arel::Nodes::Join === v) && (v.left.name == (table_alias % name))
+          end
+        end
+      end
+
+      # Internal class used to visit all nodes in a predicate clause and
+      # return a hash of key/value pairs corresponding to attributes (keys)
+      # and the respective join type (values) required for each attribute.
+      #
+      # Example:
+      #
+      #   class Post < ApplicationRecord
+      #     extend Mobility
+      #     translates :title, :content, backend: :key_value
+      #   end
+      #
+      #   backend_class = Post.mobility_backend_class(:title)
+      #   visitor = Mobility::Backends::ActiveRecord::KeyValue::Visitor.new(backend_class)
+      #
+      #   visitor.accept(title.eq("foo").and(content.eq(nil)))
+      #   #=> { title: Arel::Nodes::InnerJoin, content: Arel::Nodes::OuterJoin }
+      #
+      # The title predicate has a non-nil value, so we can use an INNER JOIN,
+      # whereas we are searching for nil content, which requires an OUTER JOIN.
+      #
+      class Visitor < Arel::Visitor
+        private
+
+        def visit_Arel_Nodes_Equality(object)
+          nils, nodes = [object.left, object.right].partition(&:nil?)
+          if hash = visit_collection(nodes)
+            hash.transform_values { nils.empty? ? INNER_JOIN : OUTER_JOIN }
+          end
+        end
+
+        def visit_collection(objects)
+          objects.map(&method(:visit)).compact.inject do |hash, visited|
+            visited.merge(hash) { |_, old, new| old == INNER_JOIN ? old : new }
+          end
+        end
+        alias :visit_Array :visit_collection
+
+        def visit_Arel_Nodes_Or(object)
+          [object.left, object.right].map(&method(:visit)).compact.inject(&:merge).
+            transform_values { OUTER_JOIN }
+        end
+
+        def visit_Mobility_Arel_Attribute(object)
+          if object.backend_class == backend_class
+            { object.attribute_name => INNER_JOIN }
+          end
+        end
+
+        def visit_default(_)
+          {}
         end
       end
 

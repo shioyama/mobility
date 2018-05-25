@@ -21,10 +21,11 @@ module Mobility
         end
 
         # @param [ActiveRecord::Relation] relation Relation to scope
+        # @param [Object] predicate Arel predicate
         # @param [Symbol] locale Locale
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] Relation with scope added
-        def add_translations(relation, _opts, _locale, invert: false)
+        def apply_scope(relation, _predicate, _locale, invert: false)
           relation
         end
 

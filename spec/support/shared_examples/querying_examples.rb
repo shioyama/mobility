@@ -1,4 +1,5 @@
 shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:title, a2=:content|
+  let(:backend_name) { model_class.mobility_modules.first.backend_name }
   let(:model_class) { model_class_name.constantize }
   let(:query_scope) { model_class.i18n }
 
@@ -230,12 +231,162 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
       end
     end
   end
+
+  describe "Arel queries" do
+    # Shortcut for passing block to e.g. Post.i18n
+    def query(&block); model_class.i18n(&block); end
+
+    context "single-block querying" do
+      let!(:i) { [
+        model_class.create(a1 => "foo"             ),
+        model_class.create(                        ),
+        model_class.create(             a2 => "bar"),
+        model_class.create(             a2 => "foo"),
+        model_class.create(a1 => "bar"             ),
+        model_class.create(a1 => "foo", a2 => "bar"),
+        model_class.create(a1 => "foo", a2 => "baz")
+      ] }
+
+      describe "equality" do
+        it "handles (a EQ 'foo')" do
+          expect(query { __send__(a1).eq("foo") }).to match_array([i[0], *i[5..6]])
+        end
+
+        it "handles (a EQ NULL)" do
+          expect(query { __send__(a1).eq(nil) }).to match_array(i[1..3])
+        end
+
+        # TODO: support equality across columns with JSONB/CONTAINER backends
+        it "handles (a EQ b)" do
+          skip "Not yet supported by #{backend_name}" if [:jsonb, :container].include?(backend_name)
+          matching = [
+            model_class.create(a1 => "foo", a2 => "foo"),
+            model_class.create(a1 => "bar", a2 => "bar")
+          ]
+          expect(query { __send__(a1).eq(__send__(a2)) }).to match_array(matching)
+        end
+      end
+
+      describe "not equal" do
+        it "handles (a NOT EQ 'foo')" do
+          expect(query { __send__(a1).not_eq("foo") }).to match_array([i[4]])
+        end
+
+        it "handles (a NOT EQ NULL)" do
+          expect(query { __send__(a1).not_eq(nil) }).to match_array([i[0], *i[4..6]])
+        end
+
+        context "with AND" do
+          it "handles ((a NOT EQ NULL) AND (b NOT EQ NULL))" do
+            expect(query {
+              __send__(a1).not_eq(nil).and(__send__(a2).not_eq(nil))
+            }).to match_array(i[5..6])
+          end
+        end
+
+        context "with OR" do
+          it "handles ((a NOT EQ NULL) OR (b NOT EQ NULL))" do
+            expect(query {
+              __send__(a1).not_eq(nil).or(__send__(a2).not_eq(nil))
+            }).to match_array([i[0], *i[2..6]])
+          end
+        end
+      end
+
+      describe "AND" do
+        it "handles (a AND b)" do
+          expect(query {
+            __send__(a1).eq("foo").and(__send__(a2).eq("bar"))
+          }).to match_array([i[5]])
+        end
+
+        it "handles (a AND b), where a is NULL-valued" do
+          expect(query {
+            __send__(a1).eq(nil).and(__send__(a2).eq("bar"))
+          }).to match_array([i[2]])
+        end
+
+        it "handles (a AND b), where both a and b are NULL-valued" do
+          expect(query {
+            __send__(a1).eq(nil).and(__send__(a2).eq(nil))
+          }).to match_array([i[1]])
+        end
+      end
+
+      describe "OR" do
+        it "handles (a OR b) on same attribute" do
+          expect(query {
+            __send__(a1).eq("foo").or(__send__(a1).eq("bar"))
+          }).to match_array([i[0], *i[4..6]])
+        end
+
+        it "handles (a OR b) on same attribute, where a is NULL-valued" do
+          expect(query {
+            __send__(a1).eq(nil).or(__send__(a1).eq("foo"))
+          }).to match_array([*i[0..3], *i[5..6]])
+        end
+
+        it "handles (a OR b) on two attributes" do
+          expect(query {
+            __send__(a1).eq("foo").or(__send__(a2).eq("bar"))
+          }).to match_array([i[0], i[2], *i[5..6]])
+        end
+
+        it "handles (a OR b) on two attributes, where a is NULL-valued" do
+          expect(query {
+            __send__(a1).eq(nil).or(__send__(a2).eq("bar"))
+          }).to match_array([*i[1..2], i[3], i[5]])
+        end
+
+        it "handles (a OR b) on two attributes, where both a and b are NULL-valued" do
+          expect(query {
+            __send__(a1).eq(nil).or(__send__(a2).eq(nil))
+          }).to match_array(i[0..4])
+        end
+      end
+
+      describe "combination of AND and OR" do
+        it "handles a AND (b OR c)" do
+          expect(query {
+            __send__(a1).eq("foo").and(
+              __send__(a2).eq("bar").or(__send__(a2).eq("baz")))
+          }).to match_array(i[5..6])
+        end
+
+        it "handles a AND (b OR c), where c is NULL-valued" do
+          expect(query {
+            __send__(a1).eq("foo").and(
+              __send__(a2).eq("bar").or(__send__(a2).eq(nil)))
+          }).to match_array([i[0], i[5]])
+        end
+
+        it "handles (a AND b) OR (c AND d), where b and d are NULL-valued" do
+          expect(query {
+            __send__(a1).eq("foo").or(__send__(a1).eq(nil)).and(
+              __send__(a2).eq("baz").or(__send__(a2).eq(nil)))
+          }).to match_array([*i[0..1], i[6]])
+        end
+      end
+
+      # TODO: support LIKE with JSONB/CONTAINER backends
+      describe "LIKE/ILIKE (matches)" do
+        it "includes partial string matches" do
+          skip "Not yet supported by #{backend_name}" if [:jsonb, :container].include?(backend_name)
+          foobar = model_class.create(a1 => "foobar")
+          barfoo = model_class.create(a1 => "barfoo")
+          expect(query { __send__(a1).matches("foo%") }).to match_array([i[0], *i[5..6], foobar])
+          expect(query { __send__(a1).matches("%foo") }).to match_array([i[0], *i[5..6], barfoo])
+        end
+      end
+    end
+  end
 end
 
 shared_examples_for "Sequel Model with translated dataset" do |model_class_name, a1=:title, a2=:content|
   let(:model_class) { constantize(model_class_name) }
   let(:table_name) { model_class.table_name }
   let(:query_scope) { model_class.i18n }
+  let(:backend_name) { model_class.mobility_modules.first.backend_name }
 
   describe ".where" do
     context "querying on one translated attribute" do
@@ -401,7 +552,6 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       @instance2 = model_class.create(a1 => "foo", a2 => "baz content", published: false)
       @instance3 = model_class.create(a1 => "bar", a2 => "foo content", published: false)
     end
-    let(:backend_class) { model_class.mobility_modules.first.backend_class.superclass }
 
     it "returns union of queries" do
       expect(query_scope.where(published: true).or(a1 => "foo").select_all(table_name).all).to match_array([@instance1, @instance2])
@@ -413,7 +563,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       # result which satisfies the second (or) condition. This is impossible to
       # avoid without modification of an earlier dataset, which is probably not
       # a good idea.
-      skip "Not supported by #{backend_class.name}" if [Mobility::Backends::Sequel::Table, Mobility::Backends::Sequel::KeyValue].include?(backend_class)
+      skip "Not supported by #{backend_name}" if [:table, :key_value].include?(backend_name)
       expect(query_scope.where(a1 => "foo").or(:published => false, a2 => "foo content").select_all(table_name).all).to match_array([@instance2, @instance3])
     end
   end

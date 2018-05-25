@@ -331,23 +331,27 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     end
 
     describe ".configure" do
-      it "sets association_name and class_name from string type" do
-        options = { type: :string }
+      it "sets association_name, class_name and table_alias from string type" do
+        options = { type: :string, model_class: Post }
         described_class.configure(options)
         expect(options).to eq({
           type: :string,
           class_name: Mobility::ActiveRecord::StringTranslation,
-          association_name: :string_translations
+          model_class: Post,
+          association_name: :string_translations,
+          table_alias: "Post_%s_string_translations"
         })
       end
 
-      it "sets association_name and class_name from text type" do
-        options = { type: :text }
+      it "sets association_name, class_name and table_alias from text type" do
+        options = { type: :text, model_class: Post }
         described_class.configure(options)
         expect(options).to eq({
           type: :text,
           class_name: Mobility::ActiveRecord::TextTranslation,
-          association_name: :text_translations
+          model_class: Post,
+          association_name: :text_translations,
+          table_alias: "Post_%s_text_translations"
         })
       end
 
@@ -358,12 +362,14 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
       end
 
       it "sets default association_name and class_name from type" do
-        options = { type: :text }
+        options = { type: :text, model_class: Post }
         described_class.configure(options)
         expect(options).to eq({
-          association_name: :text_translations,
+          type: :text,
           class_name: Mobility::ActiveRecord::TextTranslation,
-          type: :text
+          model_class: Post,
+          association_name: :text_translations,
+          table_alias: "Post_%s_text_translations"
         })
       end
     end
@@ -381,6 +387,37 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
           # we don't need an OUTER join when matching nil values since
           # we're searching for negative matches
           expect(Post.i18n.where.not(title: nil).to_sql).not_to match /OUTER/
+        end
+
+        describe "Arel queries" do
+          it "works on one attribute with non-null values" do
+            aggregate_failures do
+              Article.i18n { content.eq("bazcontent") }.tap do |relation|
+                expect(relation.to_sql).to match /INNER/
+                expect(relation.to_sql).not_to match /OUTER/
+              end
+            end
+          end
+
+          it "works on one attribute with null values" do
+            aggregate_failures do
+              Article.i18n { content.eq(nil) }.tap do |relation|
+                expect(relation.to_sql).to match /OUTER/
+                expect(relation.to_sql).not_to match /INNER/
+              end
+            end
+          end
+
+          # KeyValue must always OUTER JOIN on an OR combinator, otherwised
+          # predicate will be false even if one clause is true.
+          it "works on two attributes with non-null values" do
+            aggregate_failures do
+              Article.i18n { content.eq("bazcontent").or(subtitle.eq("foosubtitle")) }.tap do |relation|
+                expect(relation.to_sql).to match /OUTER/
+                expect(relation.to_sql).not_to match /INNER/
+              end
+            end
+          end
         end
       end
 

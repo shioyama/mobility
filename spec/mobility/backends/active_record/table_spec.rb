@@ -280,6 +280,67 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
         article = Article.create(title: "foo")
         expect(Article.i18n.joins(:translations).find_by(title: "foo")).to eq(article)
       end
+
+      describe "Arel queries" do
+        before { Article.translates :subtitle, backend: :table }
+
+        describe "uses correct join type" do
+          it "works on one attribute with non-null values" do
+            aggregate_failures do
+              Article.i18n { title.eq("footitle") }.tap do |relation|
+                expect(relation.to_sql).to match /INNER/
+                expect(relation.to_sql).not_to match /OUTER/
+              end
+            end
+          end
+
+          it "works on one attribute with null values" do
+            aggregate_failures do
+              Article.i18n { title.eq(nil) }.tap do |relation|
+                expect(relation.to_sql).to match /OUTER/
+                expect(relation.to_sql).not_to match /INNER/
+              end
+            end
+          end
+
+          it "works on two attributes with non-null values" do
+            Article.i18n { title.eq("footitle").or(subtitle.eq("barsubtitle")) }.tap do |relation|
+              expect(relation.to_sql).to match /INNER/
+              expect(relation.to_sql).not_to match /OUTER/
+            end
+          end
+
+          it "works on two attributes with null values" do
+            aggregate_failures do
+              Article.i18n { title.eq(nil).or(title.eq("footitle")) }.tap do |relation|
+                expect(relation.to_sql).to match /OUTER/
+                expect(relation.to_sql).not_to match /INNER/
+              end
+
+              Article.i18n { title.eq(nil).and(subtitle.eq(nil)) }.tap do |relation|
+                expect(relation.to_sql).to match /OUTER/
+                expect(relation.to_sql).not_to match /INNER/
+              end
+            end
+          end
+        end
+
+        # This checks that if we define attributes on the same table with
+        # different backend classes, querying will still correctly handle the
+        # case where we OR their nodes together and require that *both*
+        # predicates have non-nil arguments in order to apply an INNER join. In
+        # code, this corresponds to the check that:
+        #   +backend_class.table_name == object.backend_class.table_name+
+        it "uses outer join when OR-ing nodes on different backends with same table name" do
+          article1 = Article.create
+          article2 = Article.create(subtitle: "foo")
+
+          expect(Article.i18n { title.eq("foo").or(subtitle.eq(nil)) }.to_sql).to match /OUTER/
+          expect(Article.i18n { subtitle.eq(nil).or(title.eq("foo")) }.to_sql).to match /OUTER/
+          expect(Article.i18n { title.eq("foo").or(subtitle.eq(nil)) }).to eq([article1])
+          expect(Article.i18n { subtitle.eq(nil).or(title.eq("foo")) }).to eq([article1])
+        end
+      end
     end
   end
 

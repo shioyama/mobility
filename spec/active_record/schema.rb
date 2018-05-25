@@ -23,6 +23,7 @@ module Mobility
             t.string :locale
             t.integer :article_id
             t.string :title
+            t.string :subtitle
             t.text :content
             t.timestamps null: false
           end
@@ -80,6 +81,7 @@ module Mobility
             t.text :author_pt_br
             t.text :author_ru
             t.boolean :published
+            t.integer :article_id
             t.timestamps null: false
           end
 

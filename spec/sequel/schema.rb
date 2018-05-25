@@ -34,6 +34,7 @@ module Mobility
             Integer     :article_id, allow_null: false
             String      :locale,     allow_null: false
             String      :title
+            String      :subtitle
             String      :content, size: 65535
             DateTime    :created_at, allow_null: false
             DateTime    :updated_at, allow_null: false
@@ -103,6 +104,7 @@ module Mobility
             String      :author_pt_br
             String      :author_ru
             TrueClass   :published
+            Integer     :post_id
             DateTime    :created_at, allow_null: false
             DateTime    :updated_at, allow_null: false
           end

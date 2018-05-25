@@ -224,7 +224,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
       aggregate_failures "where not" do
         expect(query_scope.where.not(a1 => ["foo", "bar"]).to_sql).to match /\sIN\s/
         expect(query_scope.where.not(a1 => ["foo", "bar", nil]).to_sql).to match /\sIN\s/
-#        expect(query_scope.where.not(a1 => ["foo", nil]).to_sql).not_to match /\sIN\s/
+        expect(query_scope.where.not(a1 => ["foo", nil]).to_sql).not_to match /\sIN\s/
         expect(query_scope.where.not(a1 => "foo").to_sql).not_to match /\sIN\s/
         expect(query_scope.where.not(a1 => nil).to_sql).not_to match /\sIN\s/
       end

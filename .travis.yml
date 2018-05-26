@@ -40,6 +40,8 @@ before_script:
 before_install: gem install bundler
 addons:
   postgresql: "9.4"
+  apt:
+    update: true
 services:
   - postgresql
   - mysql

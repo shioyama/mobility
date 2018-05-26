@@ -62,7 +62,7 @@ enabled for any one attribute on the model.
           class << self
             def build_query(klass, locale, &block)
               row = new(klass, locale)
-              query = (block.arity == 0) ? row.instance_eval(&block) : block.call(row)
+              query = block.arity.zero? ? row.instance_eval(&block) : block.call(row)
 
               if ::ActiveRecord::Relation === query
                 predicates = query.arel.constraints

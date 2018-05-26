@@ -131,7 +131,7 @@ columns to that table.
         def apply_scope(relation, predicate, locale, invert: false)
           visitor = Visitor.new(self)
           if join_type = visitor.accept(predicate)
-            join_type &&= ::Arel::Nodes::InnerJoin if invert
+            join_type &&= Visitor::INNER_JOIN if invert
             join_translations(relation, locale, join_type)
           else
             relation

@@ -42,6 +42,7 @@ addons:
   postgresql: "9.4"
 services:
   - postgresql
+  - mysql
 notifications:
   webhooks:
     urls:

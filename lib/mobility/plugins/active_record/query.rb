@@ -42,15 +42,15 @@ enabled for any one attribute on the model.
         # attribute nodes in an instance-eval'ed block. Inspired by Sequel's
         # (much more sophisticated) virtual rows.
         class VirtualRow < BasicObject
-          attr_reader :__vcols
+          attr_reader :__backends
 
           def initialize(model_class, locale)
-            @model_class, @locale, @__vcols = model_class, locale, []
+            @model_class, @locale, @__backends = model_class, locale, []
           end
 
           def method_missing(m, *)
             if @model_class.mobility_attributes.include?(m.to_s)
-              @__vcols |= [m]
+              @__backends |= [@model_class.mobility_backend_class(m)]
               @model_class.mobility_backend_class(m).build_node(m, @locale)
             elsif @model_class.column_names.include?(m.to_s)
               @model_class.arel_table[m]
@@ -63,13 +63,12 @@ enabled for any one attribute on the model.
             def build_query(klass, locale, &block)
               row = new(klass, locale)
               query = (block.arity == 0) ? row.instance_eval(&block) : block.call(row)
-              backends = row.__vcols.map { |a| klass.mobility_backend_class(a) }.uniq
 
               if ::ActiveRecord::Relation === query
                 predicates = query.arel.constraints
-                apply_scopes(klass.all, backends, locale, predicates).merge(query)
+                apply_scopes(klass.all, row.__backends, locale, predicates).merge(query)
               else
-                apply_scopes(klass.all, backends, locale, query).where(query)
+                apply_scopes(klass.all, row.__backends, locale, query).where(query)
               end
             end
 

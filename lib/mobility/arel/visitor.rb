@@ -5,11 +5,11 @@ module Mobility
       INNER_JOIN = ::Arel::Nodes::InnerJoin
       OUTER_JOIN = ::Arel::Nodes::OuterJoin
 
-      attr_reader :backend_class
+      attr_reader :backend_class, :locale
 
-      def initialize(backend_class = nil)
+      def initialize(backend_class, locale)
         super()
-        @backend_class = backend_class
+        @backend_class, @locale = backend_class, locale
       end
 
       private

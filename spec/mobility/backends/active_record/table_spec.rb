@@ -340,6 +340,26 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
           expect(Article.i18n { title.eq("foo").or(subtitle.eq(nil)) }).to eq([article1])
           expect(Article.i18n { subtitle.eq(nil).or(title.eq("foo")) }).to eq([article1])
         end
+
+        it "combines multiple locales to use correct join type" do
+          post1 = Article.new(title: "foo en", subtitle: "bar en")
+          Mobility.with_locale(:ja) do
+            post1.title = "foo ja"
+            post1.subtitle = "bar ja"
+          end
+          post1.save
+
+          post2 = Article.create(title: "foo en")
+
+          Article.i18n(locale: :en) { |en|
+            Article.i18n(locale: :ja) { |ja|
+              en.title.eq("foo en").and(ja.title.eq(nil))
+            }
+          }.tap do |relation|
+            expect(relation.to_sql).to match /OUTER/
+            expect(relation.to_sql).to match /INNER/
+          end
+        end
       end
     end
   end

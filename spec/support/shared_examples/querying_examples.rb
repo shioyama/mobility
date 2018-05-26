@@ -234,7 +234,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
 
   describe "Arel queries" do
     # Shortcut for passing block to e.g. Post.i18n
-    def query(&block); model_class.i18n(&block); end
+    def query(*args, &block); model_class.i18n(*args, &block); end
 
     context "single-block querying" do
       let!(:i) { [
@@ -264,6 +264,28 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
             model_class.create(a1 => "bar", a2 => "bar")
           ]
           expect(query { __send__(a1).eq(__send__(a2)) }).to match_array(matching)
+        end
+
+        context "with locale option" do
+          it "handles (a EQ 'foo')" do
+            post1 = model_class.new(a1 => "foo en", a2 => "bar en")
+            Mobility.with_locale(:ja) do
+              post1.send("#{a1}=", "foo ja")
+              post1.send("#{a2}=", "bar ja")
+            end
+            post1.save
+
+            post2 = model_class.new(a1 => "baz en")
+            Mobility.with_locale(:'pt-BR') { post2.send("#{a1}=", "baz pt-br") }
+            post2.save
+
+            expect(query(locale: :en) { __send__(a1).eq("foo en") }).to match_array([post1])
+            expect(query(locale: :en) { __send__(a2).eq("bar en") }).to match_array([post1])
+            expect(query(locale: :ja) { __send__(a1).eq("foo ja") }).to match_array([post1])
+            expect(query(locale: :ja) { __send__(a2).eq("bar ja") }).to match_array([post1])
+            expect(query(locale: :en) { __send__(a1).eq("baz en") }).to match_array([post2])
+            expect(query(locale: :'pt-BR') { __send__(a1).eq("baz pt-br") }).to match_array([post2])
+          end
         end
       end
 
@@ -377,6 +399,55 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
           expect(query { __send__(a1).matches("foo%") }).to match_array([i[0], *i[5..6], foobar])
           expect(query { __send__(a1).matches("%foo") }).to match_array([i[0], *i[5..6], barfoo])
         end
+      end
+    end
+
+    context "multi-block querying" do
+      it "combines multiple locales with non-nil values" do
+        post1 = model_class.new(a1 => "foo en", a2 => "bar en")
+        Mobility.with_locale(:ja) do
+          post1.send("#{a1}=", "foo ja")
+          post1.send("#{a2}=", "bar ja")
+        end
+        post1.save
+
+        post2 = model_class.new(a1 => "baz en")
+        Mobility.with_locale(:'pt-BR') { post2.send("#{a1}=", "baz pt-br") }
+        post2.save
+
+        aggregate_failures do
+          expect(
+            query(locale: :en) { |en|
+              query(locale: :ja) { |ja|
+                en.__send__(a1).eq("foo en").and(ja.__send__(a2).eq("bar ja"))
+              }
+            }
+          ).to match_array([post1])
+
+          expect(
+            query(locale: :en) { |en|
+              query(locale: :'pt-BR') { |pt|
+                en.__send__(a1).eq("baz en").and(pt.__send__(a1).eq("baz pt-br"))
+              }
+            }
+          ).to match_array([post2])
+        end
+      end
+
+      it "combines multiple locales with nil and non-nil values" do
+        post1 = model_class.new(a1 => "foo en")
+        Mobility.with_locale(:ja) { post1.send("#{a1}=", "foo ja") }
+        post1.save
+
+        post2 = model_class.create(a1 => "foo en")
+
+        expect(
+          query(locale: :en) { |en|
+            query(locale: :ja) { |ja|
+              en.__send__(a1).eq("foo en").and(ja.__send__(a1).eq(nil))
+            }
+          }
+        ).to match_array([post2])
       end
     end
   end

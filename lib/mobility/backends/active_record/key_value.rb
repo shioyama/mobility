@@ -29,7 +29,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       include ActiveRecord
       include KeyValue
 
-      option_reader :table_alias
+      option_reader :table_alias_affix
 
       class << self
         # @!group Backend Configuration
@@ -41,7 +41,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             options[:association_name] ||= :"#{options[:type]}_translations"
             options[:class_name]       ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
           end
-          options[:table_alias] = "#{options[:model_class]}_%s_#{options[:association_name]}"
+          options[:table_alias_affix] = "#{options[:model_class]}_%s_#{options[:association_name]}"
         rescue NameError
           raise ArgumentError, "You must define a Mobility::ActiveRecord::#{type.capitalize}Translation class."
         end
@@ -49,11 +49,11 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
         # @param [String] attr Attribute name
         # @param [Symbol] _locale Locale
-        # @return [Arel::Attributes::Attribute] Arel attribute for aliased
+        # @return [Mobility::Arel::Attribute] Arel attribute for aliased
         #   translation table value column
-        def build_node(attr, _locale)
-          aliased_table = class_name.arel_table.alias(table_alias % attr)
-          Arel::Attribute.new(aliased_table, :value, self, attr.to_sym)
+        def build_node(attr, locale)
+          aliased_table = class_name.arel_table.alias(table_alias(attr, locale))
+          Arel::Attribute.new(aliased_table, :value, locale, self, attribute_name: attr.to_sym)
         end
 
         # Joins translations using either INNER/OUTER join appropriate to the query.
@@ -63,7 +63,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] relation Relation with joins applied (if needed)
         def apply_scope(relation, predicate, locale, invert: false)
-          visitor = Visitor.new(self)
+          visitor = Visitor.new(self, locale)
           visitor.accept(predicate).inject(relation) do |rel, (attr, join_type)|
             join_type &&= ::Arel::Nodes::InnerJoin if invert
             join_translations(rel, attr, locale, join_type)
@@ -72,10 +72,14 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
         private
 
+        def table_alias(attr, locale)
+          table_alias_affix % "#{attr}_#{locale}"
+        end
+
         def join_translations(relation, key, locale, join_type)
-          return relation if already_joined?(relation, key, join_type)
+          return relation if already_joined?(relation, key, locale, join_type)
           m = model_class.arel_table
-          t = class_name.arel_table.alias(table_alias % key)
+          t = class_name.arel_table.alias(table_alias(key, locale))
           relation.joins(m.join(t, join_type).
                          on(t[:key].eq(key).
                             and(t[:locale].eq(locale).
@@ -83,17 +87,17 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
                                     and(t[:translatable_id].eq(m[:id]))))).join_sources)
         end
 
-        def already_joined?(relation, name, join_type)
-          if join = get_join(relation, name)
+        def already_joined?(relation, name, locale, join_type)
+          if join = get_join(relation, name, locale)
             return true if (join_type == ::Arel::Nodes::OuterJoin) || (::Arel::Nodes::InnerJoin === join)
             relation.joins_values = relation.joins_values - [join]
           end
           false
         end
 
-        def get_join(relation, name)
+        def get_join(relation, name, locale)
           relation.joins_values.find do |v|
-            (::Arel::Nodes::Join === v) && (v.left.name == (table_alias % name))
+            (::Arel::Nodes::Join === v) && (v.left.name == (table_alias(name, locale)))
           end
         end
       end
@@ -141,7 +145,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
 
         def visit_Mobility_Arel_Attribute(object)
-          if object.backend_class == backend_class
+          if object.backend_class == backend_class && object.locale == locale
             { object.attribute_name => INNER_JOIN }
           end
         end

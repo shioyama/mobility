@@ -116,9 +116,10 @@ columns to that table.
 
         # @param [String] attr Attribute name
         # @param [Symbol] _locale Locale
-        # @return [Arel::Attributes::Attribute] Arel node for column on translation table
-        def build_node(attr, _locale)
-          Arel::Attribute.new(model_class.const_get(subclass_name).arel_table, attr, self)
+        # @return [Mobility::Arel::Attribute] Arel node for column on translation table
+        def build_node(attr, locale)
+          aliased_table = model_class.const_get(subclass_name).arel_table.alias(table_alias(locale))
+          Arel::Attribute.new(aliased_table, attr, locale, self)
         end
 
         # Joins translations using either INNER/OUTER join appropriate to the
@@ -129,7 +130,7 @@ columns to that table.
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] relation Relation with joins applied (if needed)
         def apply_scope(relation, predicate, locale, invert: false)
-          visitor = Visitor.new(self)
+          visitor = Visitor.new(self, locale)
           if join_type = visitor.accept(predicate)
             join_type &&= Visitor::INNER_JOIN if invert
             join_translations(relation, locale, join_type)
@@ -140,25 +141,29 @@ columns to that table.
 
         private
 
+        def table_alias(locale)
+          "#{locale}_#{table_name}"
+        end
+
         def join_translations(relation, locale, join_type)
-          return relation if already_joined?(relation, join_type)
-          t = model_class.const_get(subclass_name).arel_table
+          return relation if already_joined?(relation, locale, join_type)
           m = model_class.arel_table
+          t = model_class.const_get(subclass_name).arel_table.alias(table_alias(locale))
           relation.joins(m.join(t, join_type).
                          on(t[foreign_key].eq(m[:id]).
                             and(t[:locale].eq(locale))).join_sources)
         end
 
-        def already_joined?(relation, join_type)
-          if join = get_join(relation)
+        def already_joined?(relation, locale, join_type)
+          if join = get_join(relation, locale)
             return true if (join_type == Visitor::OUTER_JOIN) || (Visitor::INNER_JOIN === join)
             relation.joins_values = relation.joins_values - [join]
           end
           false
         end
 
-        def get_join(relation)
-          relation.joins_values.find { |v| (::Arel::Nodes::Join === v) && (v.left.name == table_name.to_s) }
+        def get_join(relation, locale)
+          relation.joins_values.find { |v| (::Arel::Nodes::Join === v) && (v.left.name == table_alias(locale).to_s) }
         end
       end
 
@@ -228,7 +233,8 @@ columns to that table.
           # different backends but the same table will correctly get an OUTER
           # join when required. Use options[:table_name] here since we don't
           # know if the other backend has a +table_name+ option accessor.
-          (backend_class.table_name == object.backend_class.options[:table_name]) && INNER_JOIN
+          (backend_class.table_name == object.backend_class.options[:table_name]) &&
+            (locale == object.locale) && INNER_JOIN
         end
       end
 

@@ -8,6 +8,7 @@ module Mobility
         JsonDashArrow
         JsonDashDoubleArrow
         JsonbDashArrow
+        JsonbDashDoubleArrow
         JsonbQuestion
         HstoreDashArrow
         HstoreQuestion
@@ -37,9 +38,45 @@ module Mobility
         end
       end
 
-      class Jsonb  < JsonbDashArrow;      end
-      class Hstore < HstoreDashArrow;     end
-      class Json   < JsonDashDoubleArrow; end
+      class Jsonb  < JsonbDashArrow
+        def lower
+          left.relation.lower JsonbDashDoubleArrow.new(left, right)
+        end
+      end
+
+      class Hstore < HstoreDashArrow
+        def lower
+          left.relation.lower self
+        end
+      end
+
+      class Json   < JsonDashDoubleArrow
+        def lower
+          left.relation.lower self
+        end
+      end
+
+      class JsonContainer < Json
+        def initialize(column, locale, attr)
+          @column = column
+          super(Arel::Nodes::JsonDashArrow.new(column, locale), attr)
+        end
+
+        def lower
+          @column.relation.lower JsonDashDoubleArrow.new(left, right)
+        end
+      end
+
+      class JsonbContainer < Jsonb
+        def initialize(column, locale, attr)
+          @column = column
+          super(Jsonb.new(column, locale), attr)
+        end
+
+        def lower
+          @column.relation.lower JsonbDashDoubleArrow.new(left, right)
+        end
+      end
     end
 
     module Visitors
@@ -73,6 +110,10 @@ module Mobility
 
       def visit_Mobility_Arel_Nodes_JsonbDashArrow o, a
         json_infix o, a, '->'
+      end
+
+      def visit_Mobility_Arel_Nodes_JsonbDashDoubleArrow o, a
+        json_infix o, a, '->>'
       end
 
       def visit_Mobility_Arel_Nodes_JsonbQuestion o, a

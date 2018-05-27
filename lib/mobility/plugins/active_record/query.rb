@@ -113,7 +113,7 @@ enabled for any one attribute on the model.
               def build(scope, where_opts, invert: false)
                 return yield unless Hash === where_opts
 
-                locale = Mobility.locale
+                locale = where_opts.delete(:locale) || Mobility.locale
                 opts = where_opts.with_indifferent_access
 
                 maps = build_maps!(scope, opts, locale, invert: invert)

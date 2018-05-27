@@ -46,6 +46,18 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
             expect(query_scope.where(a1 => "foo")).to eq([@ja_instance2])
           end
         end
+
+        it "returns correct result when querying with locale option" do
+          expect(query_scope.where(a1 => "foo", locale: :en)).to match_array([@instance1, @instance5])
+          expect(query_scope.where(a1 => "foo ja", locale: :ja)).to eq([@ja_instance1])
+          expect(query_scope.where(a1 => "foo", locale: :ja)).to eq([@ja_instance2])
+        end
+
+        it "returns correct result when querying with locale option twice in separate clauses" do
+          @ja_instance1.update(a1 => "foo en")
+          expect(query_scope.where(a1 => "foo ja", locale: :ja).where(a1 => "foo en", locale: :en)).to eq([@ja_instance1])
+          expect(query_scope.where(a1 => "foo", locale: :ja).where(a1 => nil, locale: :en)).to eq([@ja_instance2])
+        end
       end
 
       context "with exists?" do

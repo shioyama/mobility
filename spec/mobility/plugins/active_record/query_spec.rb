@@ -9,6 +9,23 @@ require "spec_helper"
 describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
   require "mobility/plugins/active_record/query"
 
+  describe "query methods" do
+    before do
+      stub_const 'Article', Class.new(ActiveRecord::Base)
+      Article.class_eval do
+        extend Mobility
+        translates :title, backend: :table
+      end
+    end
+
+    it "does not modify original opts hash" do
+      options = { title: "foo", locale: :en }
+      options_ = options.dup
+      Article.i18n.where(options_)
+      expect(options_).to eq(options)
+    end
+  end
+
   describe "virtual row handling" do
     before do
       stub_const 'Article', Class.new(ActiveRecord::Base)

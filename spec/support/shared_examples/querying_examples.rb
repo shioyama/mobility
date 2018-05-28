@@ -419,6 +419,13 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
           expect(query { __send__(a1).matches("%fOo", nil, true) }).to include(barfoo)
         end
       end
+
+      describe "LOWER" do
+        it "matches lowercase string values" do
+          foobar = model_class.create(a1 => "foObar")
+          expect(query { __send__(a1).lower.eq("foobar") }).to match_array([foobar])
+        end
+      end
     end
 
     context "multi-block querying" do

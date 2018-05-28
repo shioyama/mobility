@@ -21,6 +21,10 @@ module Mobility
           def eq(other)
             Equality.new self, quoted_node(other)
           end
+
+          def lower
+            super self
+          end
         end)
       end
 
@@ -37,11 +41,16 @@ module Mobility
         end
       end
 
-      class Jsonb  < JsonbDashArrow
+      class Jsonb < JsonbDashArrow
         def matches *args
           JsonDashDoubleArrow.new(left, right).matches(*args)
         end
+
+        def lower
+          JsonDashDoubleArrow.new(left, right).lower
+        end
       end
+
       class Hstore < HstoreDashArrow;     end
       class Json   < JsonDashDoubleArrow; end
     end

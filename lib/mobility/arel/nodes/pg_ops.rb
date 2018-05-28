@@ -37,7 +37,11 @@ module Mobility
         end
       end
 
-      class Jsonb  < JsonbDashArrow;      end
+      class Jsonb  < JsonbDashArrow
+        def matches *args
+          JsonDashDoubleArrow.new(left, right).matches(*args)
+        end
+      end
       class Hstore < HstoreDashArrow;     end
       class Json   < JsonDashDoubleArrow; end
     end

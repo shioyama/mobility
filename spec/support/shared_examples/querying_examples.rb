@@ -402,10 +402,8 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
         end
       end
 
-      # TODO: support LIKE with JSONB/CONTAINER backends
       describe "LIKE/ILIKE (matches)" do
         it "includes partial string matches" do
-          skip "Not yet supported by #{backend_name}" if [:jsonb, :container].include?(backend_name)
           foobar = model_class.create(a1 => "foobar")
           barfoo = model_class.create(a1 => "barfoo")
           expect(query { __send__(a1).matches("foo%") }).to match_array([i[0], *i[5..6], foobar])

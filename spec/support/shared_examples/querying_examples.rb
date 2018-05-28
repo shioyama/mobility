@@ -404,10 +404,19 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
 
       describe "LIKE/ILIKE (matches)" do
         it "includes partial string matches" do
-          foobar = model_class.create(a1 => "foobar")
-          barfoo = model_class.create(a1 => "barfoo")
+          foobar = model_class.create(a1 => "foObar")
+          barfoo = model_class.create(a1 => "barfOo")
           expect(query { __send__(a1).matches("foo%") }).to match_array([i[0], *i[5..6], foobar])
           expect(query { __send__(a1).matches("%foo") }).to match_array([i[0], *i[5..6], barfoo])
+        end
+
+        it "works with case_sensitive option" do
+          foobar = model_class.create(a1 => "foObar")
+          barfoo = model_class.create(a1 => "barfOo")
+          expect(query { __send__(a1).matches("foo%", nil, true) }).not_to include(foobar)
+          expect(query { __send__(a1).matches("foO%", nil, true) }).to include(foobar)
+          expect(query { __send__(a1).matches("%foo", nil, true) }).not_to include(barfoo)
+          expect(query { __send__(a1).matches("%fOo", nil, true) }).to include(barfoo)
         end
       end
     end

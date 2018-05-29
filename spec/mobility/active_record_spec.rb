@@ -15,45 +15,4 @@ describe Mobility::ActiveRecord, orm: :active_record do
       expect(Article.new.translated_attribute_names).to eq(["foo"])
     end
   end
-
-  describe "uniqueness validation" do
-    before do
-      opts = uniqueness_opts
-      Article.class_eval do
-        extend Mobility
-        translates :title, backend: :null
-        validates :title, uniqueness: opts
-      end
-    end
-    let(:article) do
-      Article.new
-    end
-
-    context "case_sensitive = false" do
-      let(:uniqueness_opts) { { case_sensitive: false } }
-
-      it "ignores option and emits warning" do
-        expect { expect(article.valid?).to eq(true) }.to output(
-          /#{%{
-WARNING: The Mobility uniqueness validator for translated attributes does not
-support case-insensitive validation. This option will be ignored for: title}}/).to_stderr
-      end
-    end
-
-    context "case_sensitive = nil" do
-      let(:uniqueness_opts) { { } }
-
-      it "does not emit warning" do
-        expect { expect(article.valid?).to eq(true) }.not_to output.to_stderr
-      end
-    end
-
-    context "case_sensitive = true" do
-      let(:uniqueness_opts) { { case_sensitive: true } }
-
-      it "does not emit warning" do
-        expect { expect(article.valid?).to eq(true) }.not_to output.to_stderr
-      end
-    end
-  end
 end if Mobility::Loaded::ActiveRecord

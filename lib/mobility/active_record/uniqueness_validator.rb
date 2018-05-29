@@ -26,12 +26,11 @@ To use the validator, you must +extend Mobility+ before calling +validates+
         klass = record.class
 
         if (([*options[:scope]] + [attribute]).map(&:to_s) & klass.mobility_attributes).present?
-          warn %{
-WARNING: The Mobility uniqueness validator for translated attributes does not
-support case-insensitive validation. This option will be ignored for: #{attribute}
-} if options[:case_sensitive] == false
           return unless value.present?
-          relation = klass.send(Mobility.query_method).where(attribute => value)
+          relation = klass.send(Mobility.query_method) do |m|
+            node = m.__send__(attribute)
+            options[:case_sensitive] == false ? node.lower.eq(value.downcase) : node.eq(value)
+          end
           relation = relation.where.not(klass.primary_key => record.id) if record.persisted?
           relation = mobility_scope_relation(record, relation)
           relation = relation.merge(options[:conditions]) if options[:conditions]
@@ -51,7 +50,9 @@ support case-insensitive validation. This option will be ignored for: #{attribut
 
       def mobility_scope_relation(record, relation)
         [*options[:scope]].inject(relation) do |scoped_relation, scope_item|
-          scoped_relation.where(scope_item => record.send(scope_item))
+          scoped_relation.send(Mobility.query_method) do |m|
+            m.__send__(scope_item).eq(record.send(scope_item))
+          end
         end
       end
     end

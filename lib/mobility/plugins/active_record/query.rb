@@ -22,7 +22,7 @@ enabled for any one attribute on the model.
             model_class.class_eval do
               extend QueryMethod
               extend FindByMethods.new(*attributes.names)
-              singleton_class.alias_method Mobility.query_method, :__mobility_query_scope__
+              singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_scope__
             end
           end
         end

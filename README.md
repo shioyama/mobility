@@ -667,13 +667,13 @@ complex implementations.
 
 ### <a name="querying"></a>Querying
 
-Database-backed Mobility backends also optionally support querying through
-`where` and other query methods (`not` and `find_by` for ActiveRecord models,
-`except` for Sequel models, etc). To query on these attributes, use the `i18n`
-class method, which will return a model relation extended with
-Mobility-specific query method overrides.
+Mobility backends also support querying on translated attributes, in two
+different ways. The first is via query methods like `where` (and `not` and
+`find_by` in ActiveRecord, and `except` in Sequel). To query this way, use the
+`i18n` class method, which will return a model relation or dataset extended
+with Mobility-specific query method overrides.
 
-So assuming a model:
+So for ActiveRecord, assuming a model:
 
 ```ruby
 class Post < ApplicationRecord
@@ -695,29 +695,29 @@ results in the SQL:
 
 ```sql
 SELECT "posts".* FROM "posts"
-INNER JOIN "mobility_string_translations" "title_mobility_string_translations"
-  ON "title_mobility_string_translations"."key" = 'title'
-  AND "title_mobility_string_translations"."locale" = 'en'
-  AND "title_mobility_string_translations"."translatable_type" = 'Post'
-  AND "title_mobility_string_translations"."translatable_id" = "posts"."id"
-INNER JOIN "mobility_text_translations" "content_mobility_text_translations"
-  ON "content_mobility_text_translations"."key" = 'content'
-  AND "content_mobility_text_translations"."locale" = 'en'
-  AND "content_mobility_text_translations"."translatable_type" = 'Post'
-  AND "content_mobility_text_translations"."translatable_id" = "posts"."id"
-WHERE "content_mobility_text_translations"."value" = 'bar'
-  AND "title_mobility_string_translations"."value" = 'foo'
+INNER JOIN "mobility_string_translations" "Post_title_en_string_translations"
+  ON "Post_title_en_string_translations"."key" = 'title'
+  AND "Post_title_en_string_translations"."locale" = 'en'
+  AND "Post_title_en_string_translations"."translatable_type" = 'Post'
+  AND "Post_title_en_string_translations"."translatable_id" = "posts"."id"
+INNER JOIN "mobility_text_translations" "Post_content_en_text_translations"
+  ON "Post_content_en_text_translations"."key" = 'content'
+  AND "Post_content_en_text_translations"."locale" = 'en'
+  AND "Post_content_en_text_translations"."translatable_type" = 'Post'
+  AND "Post_content_en_text_translations"."translatable_id" = "posts"."id"
+WHERE "Post_title_en_string_translations"."value" = 'foo'
+  AND "Post_content_en_text_translations"."value" = 'bar'
 ```
 
 As can be seen in the query above, behind the scenes Mobility joins two tables,
 one with string translations and one with text translations, and aliases the
-joins for each attribute so as to match the particular values passed in to the
-query. Details of how this is done can be found in the [Wiki page for the
-KeyValue
+joins for each attribute so as to match the particular model, attribute(s),
+locale(s) and value(s) passed in to the query. Details of how this is done can
+be found in the [Wiki page for the KeyValue
 backend](https://github.com/shioyama/mobility/wiki/KeyValue-Backend#querying).
 
-If you would prefer to avoid the `i18n` scope everywhere, define it as a
-default scope on your model:
+If you would prefer to avoid the `i18n` scope everywhere, you can define it as
+a default scope on your model:
 
 ```ruby
 class Post < ApplicationRecord
@@ -734,6 +734,29 @@ Now translated attributes can be queried just like normal attributes:
 Post.find_by(title: "Introducing Mobility")
 #=> finds post with English title "Introducing Mobility"
 ```
+
+If you want more fine-grained control over your queries, you can alternatively
+pass a block to the query method and call attribute names from the block scope
+to build Arel predicates:
+
+```ruby
+Post.i18n do |title, content|
+  title.matches("foo").and(content.matches("bar"))
+end
+```
+
+which generates the same SQL as above, except the `WHERE` clause becomes:
+
+```sql
+SELECT "posts".* FROM "posts"
+  ...
+WHERE "Post_title_en_string_translations"."value" ILIKE 'foo'
+  AND "Post_content_en_text_translations"."value" ILIKE 'bar'
+```
+
+The block-format query format is very powerful and allows you to build complex
+backend-independent queries on translated and untranslated attributes without
+having to deal with the details of how these translations are stored.
 
 <a name="backends"></a>Backends
 --------

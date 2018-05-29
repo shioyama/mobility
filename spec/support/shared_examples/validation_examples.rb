@@ -22,6 +22,14 @@ shared_examples_for "AR Model validation" do |model_class_name, attribute1=:titl
         @instance2 = model_class.new(attribute1 => "foo")
         expect(@instance2).not_to be_valid
       end
+
+      context "with default_scope defined" do
+        it "removes default_scope" do
+          model_class.class_eval { default_scope { none } }
+          model_class.create(attribute1 => "foo")
+          expect(model_class.new(attribute1 => "foo")).not_to be_valid
+        end
+      end
     end
 
     context "with untranslated scope on translated attribute" do

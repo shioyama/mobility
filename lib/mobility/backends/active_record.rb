@@ -20,13 +20,13 @@ module Mobility
           raise NotImplementedError
         end
 
-        # @param [ActiveRecord::Relation] relation Relation to scope
         # @param [Object] predicate Arel predicate
+        # @param [ActiveRecord::Relation] relation Relation to scope
         # @param [Symbol] locale Locale
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] Relation with scope added
-        def apply_scope(relation, _predicate, _locale, invert: false)
-          relation
+        def accept(predicate, relation, _locale, invert: false)
+          [predicate, relation]
         end
 
         private

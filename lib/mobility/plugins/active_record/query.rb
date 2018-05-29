@@ -5,7 +5,7 @@ module Mobility
 
 Adds a scope which enables querying on translated attributes using +where+ and
 +not+ as if they were normal attributes. Under the hood, this plugin uses the
-generic +build_node+ and +apply_scope+ methods implemented in each backend
+generic +build_node+ and +accept+ methods implemented in each backend
 class to build ActiveRecord queries from Arel nodes. The plugin also adds
 +find_by_<attribute>+ shortcuts for translated attributes.
 
@@ -64,17 +64,20 @@ enabled for any one attribute on the model.
               query = block.arity.zero? ? row.instance_eval(&block) : block.call(row)
 
               if ::ActiveRecord::Relation === query
-                predicates = query.arel.constraints
-                apply_scopes(klass.all, row.__backends, locale, predicates).merge(query)
+                query = query.clone
+                predicates, relation = accept(query.arel.constraints, klass.all, row.__backends, locale)
+                query.values[:where] = ::ActiveRecord::Relation::WhereClause.new([*predicates])
+                relation.merge(query)
               else
-                apply_scopes(klass.all, row.__backends, locale, query).where(query)
+                predicate, relation = accept(query, klass.all, row.__backends, locale)
+                relation.where(predicate)
               end
             end
 
             private
 
-            def apply_scopes(scope, backends, locale, predicates)
-              backends.inject(scope) { |r, b| b.apply_scope(r, predicates, locale) }
+            def accept(predicates, scope, backends, locale)
+              backends.inject([predicates, scope]) { |(p, r), b| b.accept(p, r, locale) }
             end
           end
         end
@@ -135,7 +138,7 @@ enabled for any one attribute on the model.
                   end
 
                   ->(relation) do
-                    relation = mod.backend_class.apply_scope(relation, predicates, locale, invert: invert)
+                    predicates, relation = mod.backend_class.accept(predicates, relation, locale, invert: invert)
                     predicates = predicates.map(&method(:invert_predicate)) if invert
                     relation.where(predicates.inject(&:and))
                   end

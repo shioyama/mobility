@@ -57,17 +57,18 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
 
         # Joins translations using either INNER/OUTER join appropriate to the query.
-        # @param [ActiveRecord::Relation] relation Relation to scope
         # @param [Object] predicate Arel predicate
+        # @param [ActiveRecord::Relation] relation Relation to scope
         # @param [Symbol] locale Locale
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] relation Relation with joins applied (if needed)
-        def apply_scope(relation, predicate, locale, invert: false)
+        def accept(predicate, relation, locale, invert: false)
           visitor = Visitor.new(self, locale)
-          visitor.accept(predicate).inject(relation) do |rel, (attr, join_type)|
+          visited = visitor.accept(predicate).inject(relation) do |rel, (attr, join_type)|
             join_type &&= ::Arel::Nodes::InnerJoin if invert
             join_translations(rel, attr, locale, join_type)
           end
+          [predicate, visited]
         end
 
         private

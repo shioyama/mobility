@@ -124,18 +124,18 @@ columns to that table.
 
         # Joins translations using either INNER/OUTER join appropriate to the
         # query.
-        # @param [ActiveRecord::Relation] relation Relation to scope
         # @param [Object] predicate Arel predicate
+        # @param [ActiveRecord::Relation] relation Relation to scope
         # @param [Symbol] locale Locale
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] relation Relation with joins applied (if needed)
-        def apply_scope(relation, predicate, locale, invert: false)
+        def accept(predicate, relation, locale, invert: false)
           visitor = Visitor.new(self, locale)
           if join_type = visitor.accept(predicate)
             join_type &&= Visitor::INNER_JOIN if invert
-            join_translations(relation, locale, join_type)
+            [predicate, join_translations(relation, locale, join_type)]
           else
-            relation
+            [predicate, relation]
           end
         end
 

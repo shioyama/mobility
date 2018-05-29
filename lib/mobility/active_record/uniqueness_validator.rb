@@ -27,7 +27,7 @@ To use the validator, you must +extend Mobility+ before calling +validates+
 
         if (([*options[:scope]] + [attribute]).map(&:to_s) & klass.mobility_attributes).present?
           return unless value.present?
-          relation = klass.send(Mobility.query_method) do |m|
+          relation = klass.__mobility_query_scope__ do |m|
             node = m.__send__(attribute)
             options[:case_sensitive] == false ? node.lower.eq(value.downcase) : node.eq(value)
           end
@@ -50,7 +50,7 @@ To use the validator, you must +extend Mobility+ before calling +validates+
 
       def mobility_scope_relation(record, relation)
         [*options[:scope]].inject(relation) do |scoped_relation, scope_item|
-          scoped_relation.send(Mobility.query_method) do |m|
+          scoped_relation.__mobility_query_scope__ do |m|
             m.__send__(scope_item).eq(record.send(scope_item))
           end
         end

@@ -26,6 +26,21 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
     end
   end
 
+  describe "query method" do
+    # NOTE: __mobility_query_scope__ is a public method for convenience, but is
+    # intended for internal use. For application code, use i18n or whatever you
+    # define in Mobility.query_method instead.
+    it "creates a __mobility_query_scope__ method" do
+      stub_const 'Article', Class.new(ActiveRecord::Base)
+      Article.class_eval do
+        extend Mobility
+        translates :title, backend: :table
+      end
+      article = Article.create(title: "foo")
+      expect(Article.__mobility_query_scope__.first).to eq(article)
+    end
+  end
+
   describe "virtual row handling" do
     before do
       stub_const 'Article', Class.new(ActiveRecord::Base)

@@ -19,22 +19,21 @@ enabled for any one attribute on the model.
           def apply(attributes)
             model_class = attributes.model_class
 
-            unless const_defined?(:QueryMethod)
-              const_set :QueryMethod, Module.new
-              QueryMethod.module_eval <<-EOM, __FILE__, __LINE__ + 1
-                def #{Mobility.query_method}(locale: Mobility.locale, &block)
-                  if block_given?
-                    VirtualRow.build_query(self, locale, &block)
-                  else
-                    all.extending(QueryExtension)
-                  end
-                end
-              EOM
-              private_constant :QueryMethod
+            model_class.class_eval do
+              extend QueryMethod
+              extend FindByMethods.new(*attributes.names)
+              singleton_class.alias_method Mobility.query_method, :__mobility_query_scope__
             end
+          end
+        end
 
-            model_class.extend QueryMethod
-            model_class.extend FindByMethods.new(*attributes.names)
+        module QueryMethod
+          def __mobility_query_scope__(locale: Mobility.locale, &block)
+            if block_given?
+              VirtualRow.build_query(self, locale, &block)
+            else
+              all.extending(QueryExtension)
+            end
           end
         end
 
@@ -79,7 +78,7 @@ enabled for any one attribute on the model.
             end
           end
         end
-        private_constant :VirtualRow
+        private_constant :QueryMethod, :VirtualRow
 
         module QueryExtension
           def where!(opts, *rest)

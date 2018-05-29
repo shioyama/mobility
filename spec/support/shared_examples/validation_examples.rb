@@ -2,25 +2,22 @@ shared_examples_for "AR Model validation" do |model_class_name, attribute1=:titl
   describe "Uniqueness validation" do
     context "without scope" do
       let(:model_class) do
-        model_class = model_class_name.constantize
-        model_class.class_eval do
-          validates attribute1, uniqueness: true
+        model_class_name.constantize.tap do |klass|
+          klass.class_eval { validates attribute1, uniqueness: true }
         end
-        model_class
       end
 
       it "is valid if no other record has same attribute value in same locale" do
-        @instance1 = model_class.create(attribute1 => "foo")
-        Mobility.with_locale(:ja) do
-          @instance2 = model_class.new(attribute1 => "foo")
+        model_class.create(attribute1 => "foo")
+        instance = Mobility.with_locale(:ja) do
+          model_class.new(attribute1 => "foo")
         end
-        expect(@instance2).to be_valid
+        expect(instance).to be_valid
       end
 
       it "is invalid if other record has same attribute value in same locale" do
-        @instance1 = model_class.create(attribute1 => "foo")
-        @instance2 = model_class.new(attribute1 => "foo")
-        expect(@instance2).not_to be_valid
+        model_class.create(attribute1 => "foo")
+        expect(model_class.new(attribute1 => "foo")).not_to be_valid
       end
 
       context "with default_scope defined" do
@@ -34,121 +31,98 @@ shared_examples_for "AR Model validation" do |model_class_name, attribute1=:titl
 
     context "with untranslated scope on translated attribute" do
       let(:model_class) do
-        model_class = model_class_name.constantize
-        model_class.class_eval do
-          validates attribute1, uniqueness: { scope: :published }
+        model_class_name.constantize.tap do |klass|
+          klass.class_eval { validates attribute1, uniqueness: { scope: :published } }
         end
-        model_class
       end
 
       it "is valid if no other record has same attribute value in same locale, for the same scope" do
-        @instance1 = model_class.create(attribute1 => "foo", published: true)
-        @instance2 = model_class.new(attribute1    => "foo", published: false)
-        expect(@instance2).to be_valid
+        model_class.create(attribute1 => "foo", published: true)
+        expect(model_class.new(attribute1 => "foo", published: false)).to be_valid
       end
 
       it "is invalid if other record has same attribute value in same locale, for the same scope" do
-        @instance1 = model_class.create(attribute1 => "foo", published: true)
-        @instance2 = model_class.new(attribute1    => "foo", published: true)
-        Mobility.with_locale(:ja) do
-          @instance3 = model_class.new(attribute1  => "foo", published: true)
-        end
-        expect(@instance2).not_to be_valid
-        expect(@instance3).to be_valid
+        model_class.create(attribute1 => "foo", published: true)
+        instance1 = model_class.new(attribute1 => "foo", published: true)
+        instance2 = Mobility.with_locale(:ja) { model_class.new(attribute1  => "foo", published: true) }
+        expect(instance1).not_to be_valid
+        expect(instance2).to be_valid
       end
     end
 
     context "with translated scope on translated attribute" do
       let(:model_class) do
-        model_class = model_class_name.constantize
-        model_class.class_eval do
-          validates attribute1, uniqueness: { scope: attribute2 }
+        model_class_name.constantize.tap do |klass|
+          klass.class_eval { validates attribute1, uniqueness: { scope: attribute2 } }
         end
-        model_class
       end
 
       it "is valid if no other record has same attribute value in same locale, for the same scope" do
-        @instance1 = model_class.create(attribute1 => "foo", attribute2 => "bar")
-        @instance2 = model_class.new(attribute1    => "foo", attribute2 => "baz")
-        expect(@instance2).to be_valid
+        model_class.create(attribute1 => "foo", attribute2 => "bar")
+        expect(model_class.new(attribute1 => "foo", attribute2 => "baz")).to be_valid
       end
 
       it "is invalid if other record has same attribute value in same locale, for the same scope" do
-        @instance1 = model_class.create(attribute1 => "foo", attribute2 => "bar")
-        @instance2 = model_class.new(attribute1    => "foo", attribute2 => "bar")
-        Mobility.with_locale(:ja) do
-          @instance3 = model_class.new(attribute1  => "foo", attribute2 => "bar")
-        end
-        expect(@instance2).not_to be_valid
-        expect(@instance3).to be_valid
+        model_class.create(attribute1 => "foo", attribute2 => "bar")
+        instance1 = model_class.new(attribute1 => "foo", attribute2 => "bar")
+        instance2 = Mobility.with_locale(:ja) { model_class.new(attribute1  => "foo", attribute2 => "bar") }
+        expect(instance1).not_to be_valid
+        expect(instance2).to be_valid
       end
     end
 
     context "with translated scope on untranslated attribute" do
       let(:model_class) do
-        model_class = model_class_name.constantize
-        model_class.class_eval do
-          validates :published, uniqueness: { :scope => attribute1 }
+        model_class_name.constantize.tap do |klass|
+          klass.class_eval { validates :published, uniqueness: { :scope => attribute1 } }
         end
-        model_class
       end
 
       it "is valid if no other record has same attribute value, for the same scope in same locale" do
-        @instance1 = model_class.create(published: true, attribute1 => "foo")
-        @instance2 = model_class.new(published: true,    attribute1 => "baz")
-        expect(@instance2).to be_valid
+        model_class.create(published: true, attribute1 => "foo")
+        expect(model_class.new(published: true, attribute1 => "baz")).to be_valid
       end
 
       it "is invalid if other record has same attribute value in same locale, for the same scope" do
-        @instance1 = model_class.create(published: true, attribute1 => "foo")
-        @instance2 = model_class.new(published:    true, attribute1 => "foo")
-        Mobility.with_locale(:ja) do
-          @instance3 = model_class.new(published:  true, attribute1 => "foo")
-        end
-        expect(@instance2).not_to be_valid
-        expect(@instance3).to be_valid
+        model_class.create(published: true, attribute1 => "foo")
+        instance1 = model_class.new(published: true, attribute1 => "foo")
+        instance2 = Mobility.with_locale(:ja) { model_class.new(published:  true, attribute1 => "foo") }
+        expect(instance1).not_to be_valid
+        expect(instance2).to be_valid
       end
     end
 
     context "case insensitive validation on translated attribute" do
       let(:model_class) do
-        model_class = model_class_name.constantize
-        model_class.class_eval do
-          validates attribute1, uniqueness: { case_sensitive: false }
+        model_class_name.constantize.tap do |klass|
+          klass.class_eval { validates attribute1, uniqueness: { case_sensitive: false } }
         end
-        model_class
       end
 
       it "is invalid if other record has same attribute LOWER(value)" do
-        @instance1 = model_class.create(published: true, attribute1 => "Foo")
-        @instance2 = model_class.new(published: true,    attribute1 => "foO")
-        expect(@instance2).not_to be_valid
+        model_class.create(published: true, attribute1 => "Foo")
+        expect(model_class.new(published: true, attribute1 => "foO")).not_to be_valid
       end
     end
 
     context "uniqueness validation on untranslated attribute" do
       let(:model_class) do
-        model_class = model_class_name.constantize
-        model_class.class_eval do
-          validates :published, uniqueness: true
+        model_class_name.constantize.tap do |klass|
+          klass.class_eval { validates :published, uniqueness: true }
         end
-        model_class
       end
 
       it "is valid if no other record has same attribute value" do
-        @instance1 = model_class.create(published: true)
-        @instance2 = model_class.new(published: false)
-        expect(@instance2).to be_valid
+        model_class.create(published: true)
+        expect(model_class.new(published: false)).to be_valid
       end
 
       it "is invalid if other record has same attribute value in same locale" do
-        @instance1 = model_class.create(published: true)
-        @instance2 = model_class.new(published: true)
-        Mobility.with_locale(:ja) do
-          @instance3 = model_class.new(published: true)
-        end
-        expect(@instance2).not_to be_valid
-        expect(@instance3).not_to be_valid
+        model_class.create(published: true)
+        instance1 = model_class.new(published: true)
+        instance2 = Mobility.with_locale(:ja) { model_class.new(published: true) }
+        expect(instance1).not_to be_valid
+        expect(instance2).not_to be_valid
       end
     end
   end

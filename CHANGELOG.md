@@ -2,6 +2,10 @@
 
 ## 0.7
 
+### 0.7.1 (May 30, 2018)
+* Revert unscoping in uniqueness validator
+  ([#244](https://github.com/shioyama/mobility/pull/244))
+
 ### 0.7.0 (May 30, 2018)
 
 * Restructure querying into plugin (ActiveRecord only)

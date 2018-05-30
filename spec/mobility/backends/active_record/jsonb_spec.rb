@@ -62,11 +62,12 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
         end
 
         it "queries on #{name} values" do
-          skip "arrays treated as array of values, not value to match" if name == :array
           post1 = JsonbPost.create(title: "foo")
           post2 = JsonbPost.create(title: value)
 
           expect(JsonbPost.i18n.find_by(title: "foo")).to eq(post1)
+
+          value = [value] if Array === value
           expect(JsonbPost.i18n.find_by(title: value)).to eq(post2)
         end
       end

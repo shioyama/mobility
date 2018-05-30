@@ -57,11 +57,14 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
         end
 
         it "queries on #{name} values" do
-          skip "arrays treated as array of values, not value to match" if name == :array
           post1 = ContainerPost.create(title: "foo")
           post2 = ContainerPost.create(title: value)
 
           expect(ContainerPost.i18n.find_by(title: "foo")).to eq(post1)
+
+          # Need to query on [["foo"]] for arrays, otherwise treated as set of
+          # values for IN.
+          value = [value] if Array === value
           expect(ContainerPost.i18n.find_by(title: value)).to eq(post2)
         end
       end

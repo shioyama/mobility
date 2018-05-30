@@ -49,7 +49,7 @@ To use the validator, you must +extend Mobility+ before calling +validates+
       private
 
       def mobility_scope_relation(record, relation)
-        [*options[:scope]].inject(relation.unscoped) do |scoped_relation, scope_item|
+        [*options[:scope]].inject(relation) do |scoped_relation, scope_item|
           scoped_relation.__mobility_query_scope__ do |m|
             m.__send__(scope_item).eq(record.send(scope_item))
           end

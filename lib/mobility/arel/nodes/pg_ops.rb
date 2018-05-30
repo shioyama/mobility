@@ -19,7 +19,7 @@ module Mobility
           include ::Arel::OrderPredications
           include ::Arel::AliasPredication
 
-          def eq(other)
+          def eq other
             Equality.new self, quoted_node(other)
           end
 
@@ -31,18 +31,18 @@ module Mobility
 
       # Needed for AR 4.2, can be removed when support is deprecated
       HstoreDashArrow.class_eval do
-        def quoted_node(other)
+        def quoted_node other
           other && super
         end
       end
 
       class Jsonb  < JsonbDashDoubleArrow
         def to_dash_arrow
-          JsonbDashArrow.new(left, right)
+          JsonbDashArrow.new left, right
         end
 
         def to_question
-          JsonbQuestion.new(left, right)
+          JsonbQuestion.new left, right
         end
 
         def eq other
@@ -50,7 +50,7 @@ module Mobility
           when NilClass
             to_question.not
           when Integer, Array, Hash
-            to_dash_arrow.eq(other.to_json)
+            to_dash_arrow.eq other.to_json
           else
             super
           end
@@ -59,7 +59,7 @@ module Mobility
 
       class Hstore < HstoreDashArrow
         def to_question
-          HstoreQuestion.new(left, right)
+          HstoreQuestion.new left, right
         end
 
         def eq other
@@ -70,16 +70,16 @@ module Mobility
       class Json < JsonDashDoubleArrow; end
 
       class JsonContainer < Json
-        def initialize(column, locale, attr)
-          left = Arel::Nodes::JsonDashArrow.new(column, locale)
-          super(left, attr)
+        def initialize column, locale, attr
+          left = Arel::Nodes::JsonDashArrow.new column, locale
+          super left, attr
         end
       end
 
       class JsonbContainer < Jsonb
-        def initialize(column, locale, attr)
+        def initialize column, locale, attr
           @column, @locale = column, locale
-          super(JsonbDashArrow.new(column, locale), attr)
+          super JsonbDashArrow.new(column, locale), attr
         end
 
         def eq other
@@ -119,7 +119,7 @@ module Mobility
 
       private
 
-      def json_infix(o, a, opr)
+      def json_infix o, a, opr
         visit(Nodes::Grouping.new(::Arel::Nodes::InfixOperation.new(opr, o.left, o.right)), a)
       end
     end

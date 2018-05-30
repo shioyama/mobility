@@ -268,7 +268,6 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
           expect(query { __send__(a1).eq(nil) }).to match_array(i[1..3])
         end
 
-        # TODO: support equality across columns with JSONB/CONTAINER backends
         it "handles (a EQ b)" do
           matching = [
             model_class.create(a1 => "foo", a2 => "foo"),

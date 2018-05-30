@@ -73,7 +73,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         private
 
         def table_alias(attr, locale)
-          table_alias_affix % "#{attr}_#{locale}"
+          table_alias_affix % "#{attr}_#{Mobility.normalize_locale(locale)}"
         end
 
         def join_translations(relation, key, locale, join_type)

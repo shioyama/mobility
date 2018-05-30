@@ -7,7 +7,7 @@
 * Restructure querying into plugin (ActiveRecord only)
   ([#216](https://github.com/shioyama/mobility/pull/216),
   [#225](https://github.com/shioyama/mobility/pull/225),
-  [#222](https://github.com/shioyama/mobility/pull/222),
+  [#222](https://github.com/shioyama/mobility/pull/222))
 * Support querying on multiple locales at once
   ([#232](https://github.com/shioyama/mobility/pull/232))
 * Allow passing locale to query methods
@@ -23,7 +23,8 @@
   ([#241](https://github.com/shioyama/mobility/pull/241))
 * Define options on subclassed backend class
   ([#218](https://github.com/shioyama/mobility/pull/218))
-* Add column_affix
+* Add column_affix when configuring options
+  ([#217](https://github.com/shioyama/mobility/pull/217))
 * Use module_eval to define locale_accessors
   ([#219](https://github.com/shioyama/mobility/pull/219))
 * Improve performance of getters/setters

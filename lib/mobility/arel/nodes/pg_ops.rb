@@ -55,6 +55,10 @@ module Mobility
             to_question.not
           when Integer, Array, Hash
             to_dash_arrow.eq other.to_json
+          when Jsonb
+            to_dash_arrow.eq other.to_dash_arrow
+          when JsonbDashArrow
+            to_dash_arrow.eq other
           else
             super
           end

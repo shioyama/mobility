@@ -67,6 +67,10 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
           value = [value] if Array === value
           expect(ContainerPost.i18n.find_by(title: value)).to eq(post2)
         end
+
+        it "uses -> operator when in a predicate with other jsonb column" do
+          expect(ContainerPost.i18n { title.eq(content) }.to_sql).not_to match("->>")
+        end
       end
 
       it_behaves_like "container translated value", :integer, 1

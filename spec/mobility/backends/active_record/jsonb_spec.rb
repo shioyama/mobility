@@ -69,6 +69,13 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
 
           value = [value] if Array === value
           expect(JsonbPost.i18n.find_by(title: value)).to eq(post2)
+
+          # Only use ->> operator when matching strings
+          expect(JsonbPost.i18n.where(title: value).to_sql).not_to match("->>")
+        end
+
+        it "uses -> operator when in a predicate with other jsonb column" do
+          expect(JsonbPost.i18n { title.eq(content) }.to_sql).not_to match("->>")
         end
       end
 

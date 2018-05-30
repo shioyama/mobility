@@ -63,13 +63,11 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       #   node for attribute on json or jsonb column
       def self.build_node(attr, locale)
         column        = model_class.arel_table[column_name]
-        quoted_locale = build_quoted(locale)
-        quoted_attr   = build_quoted(attr)
         case column_type
         when :json
-          Arel::Nodes::Json.new(Arel::Nodes::JsonDashArrow.new(column, quoted_locale), quoted_attr)
+          Arel::Nodes::JsonContainer.new(column, build_quoted(locale), build_quoted(attr))
         when :jsonb
-          Arel::Nodes::Jsonb.new(Arel::Nodes::Jsonb.new(column, quoted_locale), quoted_attr)
+          Arel::Nodes::JsonbContainer.new(column, build_quoted(locale), build_quoted(attr))
         end
       end
 

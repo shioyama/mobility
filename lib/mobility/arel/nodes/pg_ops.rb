@@ -29,12 +29,6 @@ module Mobility
         end)
       end
 
-      JsonbDashArrow.class_eval do
-        def quoted_node(other)
-          other && super(other.to_json)
-        end
-      end
-
       # Needed for AR 4.2, can be removed when support is deprecated
       HstoreDashArrow.class_eval do
         def quoted_node(other)
@@ -42,41 +36,59 @@ module Mobility
         end
       end
 
-      class Jsonb < JsonbDashArrow
-        def matches *args
-          JsonbDashDoubleArrow.new(left, right).matches(*args)
+      class Jsonb  < JsonbDashDoubleArrow
+        def to_dash_arrow
+          JsonbDashArrow.new(left, right)
         end
 
-        def lower
-          JsonDashDoubleArrow.new(left, right).lower
+        def to_question
+          JsonbQuestion.new(left, right)
+        end
+
+        def eq other
+          case other
+          when NilClass
+            to_question.not
+          when Integer, Array, Hash
+            to_dash_arrow.eq(other.to_json)
+          else
+            super
+          end
         end
       end
 
-      class Hstore < HstoreDashArrow;     end
-      class Json   < JsonDashDoubleArrow; end
+      class Hstore < HstoreDashArrow
+        def to_question
+          HstoreQuestion.new(left, right)
+        end
+
+        def eq other
+          other.nil? ? to_question.not : super
+        end
+      end
+
+      class Json < JsonDashDoubleArrow; end
+
+      class JsonContainer < Json
+        def initialize(column, locale, attr)
+          left = Arel::Nodes::JsonDashArrow.new(column, locale)
+          super(left, attr)
+        end
+      end
+
+      class JsonbContainer < Jsonb
+        def initialize(column, locale, attr)
+          @column, @locale = column, locale
+          super(JsonbDashArrow.new(column, locale), attr)
+        end
+
+        def eq other
+          other.nil? ? super.or(JsonbQuestion.new(@column, @locale).not) : super
+        end
+      end
     end
 
     module Visitors
-      def visit_Mobility_Arel_Nodes_Equality o, a
-        left, right = o.left, o.right
-
-        if right.nil?
-          case left
-          when Nodes::Jsonb
-            nodes = []
-            while Nodes::Jsonb === left
-              left, right = left.left, left.right
-              nodes << Nodes::JsonbQuestion.new(left, right).not
-            end
-            return visit(nodes.inject(&:or), a)
-          when Nodes::Hstore
-            return visit(Nodes::HstoreQuestion.new(left.left, left.right).not, a)
-          end
-        end
-
-        super o, a
-      end
-
       def visit_Mobility_Arel_Nodes_JsonDashArrow o, a
         json_infix o, a, '->'
       end

@@ -270,7 +270,6 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
 
         # TODO: support equality across columns with JSONB/CONTAINER backends
         it "handles (a EQ b)" do
-          skip "Not yet supported by #{backend_name}" if [:jsonb, :container].include?(backend_name)
           matching = [
             model_class.create(a1 => "foo", a2 => "foo"),
             model_class.create(a1 => "bar", a2 => "bar")

@@ -142,7 +142,7 @@ columns to that table.
         private
 
         def table_alias(locale)
-          "#{locale}_#{table_name}"
+          "#{table_name}_#{Mobility.normalize_locale(locale)}"
         end
 
         def join_translations(relation, locale, join_type)

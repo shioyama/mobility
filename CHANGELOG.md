@@ -1,8 +1,46 @@
 # Mobility Changelog
 
+## 0.7
+
+### 0.7.0 (May 30, 2018)
+
+* Restructure querying into plugin (ActiveRecord only)
+  ([#216](https://github.com/shioyama/mobility/pull/216),
+  [#225](https://github.com/shioyama/mobility/pull/225),
+  [#222](https://github.com/shioyama/mobility/pull/222),
+* Support querying on multiple locales at once
+  ([#232](https://github.com/shioyama/mobility/pull/232))
+* Allow passing locale to query methods
+  ([#233](https://github.com/shioyama/mobility/pull/233))
+* Support matches and lower predicate methods
+  ([#235](https://github.com/shioyama/mobility/pull/235))
+* Implement case-insensitive uniqueness validation
+  ([#236](https://github.com/shioyama/mobility/pull/236),
+  [#237](https://github.com/shioyama/mobility/pull/237))
+* Support equality predicates between jsonb nodes
+  ([#240](https://github.com/shioyama/mobility/pull/240))
+* Prefer -> operator when comparing jsonb columns
+  ([#241](https://github.com/shioyama/mobility/pull/241))
+* Define options on subclassed backend class
+  ([#218](https://github.com/shioyama/mobility/pull/218))
+* Add column_affix
+* Use module_eval to define locale_accessors
+  ([#219](https://github.com/shioyama/mobility/pull/219))
+* Improve performance of getters/setters
+  ([#220](https://github.com/shioyama/mobility/pull/220))
+* Do not include Default plugin by default
+  ([#223](https://github.com/shioyama/mobility/pull/223))
+* Add specific attribute types to basic usage example
+  ([#228](https://github.com/shioyama/mobility/pull/228)). Thanks
+  [thatguysimon](https://github.com/thatguysimon)!
+* Remove Mobility::Interface
+  ([#229](https://github.com/shioyama/mobility/pull/229))
+* Freeze attributes array
+  ([#230](https://github.com/shioyama/mobility/pull/230))
+
 ## 0.6
 
-### 0.6.1 (April 26, 2018)
+### 0.6.0 (April 26, 2018)
 
 * Add column_prefix/column_suffix options to hash backends
   ([#200](https://github.com/shioyama/mobility/pull/199) and

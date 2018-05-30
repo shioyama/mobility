@@ -75,15 +75,14 @@ module Mobility
 
       class JsonContainer < Json
         def initialize column, locale, attr
-          left = Arel::Nodes::JsonDashArrow.new column, locale
-          super left, attr
+          super(Arel::Nodes::JsonDashArrow.new(column, locale), attr)
         end
       end
 
       class JsonbContainer < Jsonb
         def initialize column, locale, attr
           @column, @locale = column, locale
-          super JsonbDashArrow.new(column, locale), attr
+          super(JsonbDashArrow.new(column, locale), attr)
         end
 
         def eq other

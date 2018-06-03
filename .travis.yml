@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 language: ruby
 cache: bundler
 rvm:
@@ -42,6 +42,11 @@ addons:
   postgresql: "9.4"
   apt:
     update: true
+    sources:
+      - mysql-5.7-trusty
+    packages:
+      - mysql-server
+      - mysql-client
 services:
   - postgresql
   - mysql

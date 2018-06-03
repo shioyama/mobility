@@ -51,7 +51,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.7.1'
+gem 'mobility', '~> 0.7.2'
 ```
 
 Mobility is cryptographically signed. To be sure the gem you install hasn't

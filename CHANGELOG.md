@@ -2,6 +2,10 @@
 
 ## 0.7
 
+### 0.7.2 (June 3, 2018)
+* Normalize locale in table aliases
+  ([#246](https://github.com/shioyama/mobility/pull/246))
+
 ### 0.7.1 (May 30, 2018)
 * Revert unscoping in uniqueness validator
   ([#244](https://github.com/shioyama/mobility/pull/244))

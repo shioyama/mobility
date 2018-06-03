@@ -2,7 +2,6 @@
 module Mobility
   module Arel
     module Nodes
-      class Unary  < ::Arel::Nodes::Unary;  end
       class Binary < ::Arel::Nodes::Binary; end
       class Grouping < ::Arel::Nodes::Grouping; end
 

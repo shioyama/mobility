@@ -19,10 +19,6 @@ module Mobility
           include ::Arel::OrderPredications
           include ::Arel::AliasPredication
 
-          def eq other
-            Equality.new self, quoted_node(other)
-          end
-
           def lower
             super self
           end

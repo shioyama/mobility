@@ -17,9 +17,7 @@ enabled for any one attribute on the model.
       module Query
         class << self
           def apply(attributes)
-            model_class = attributes.model_class
-
-            model_class.class_eval do
+            attributes.model_class.class_eval do
               extend QueryMethod
               extend FindByMethods.new(*attributes.names)
               singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_scope__

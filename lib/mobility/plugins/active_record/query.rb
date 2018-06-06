@@ -106,38 +106,42 @@ enabled for any one attribute on the model.
           end
 
           module QueryBuilder
+            IDENTITY = ->(x) { x }.freeze
+
             class << self
-              def build(scope, where_opts, invert: false)
+              def build(scope, where_opts, invert: false, &block)
                 return yield unless Hash === where_opts
 
                 opts = where_opts.with_indifferent_access
                 locale = opts.delete(:locale) || Mobility.locale
 
-                maps = build_maps!(scope, opts, locale, invert: invert)
-                return yield if maps.empty?
-
-                base = opts.empty? ? scope : yield(opts)
-                maps.inject(base) { |rel, map| map[rel] }
+                _build(scope, opts, locale, invert, &block)
               end
 
               private
 
-              def build_maps!(scope, opts, locale, invert:)
-                keys = opts.keys.map(&:to_s)
+              # Builds a translated relation for a given opts hash and optional
+              # invert boolean.
+              def _build(scope, opts, locale, invert)
+                keys, predicates = opts.keys.map(&:to_s), []
 
-                scope.mobility_modules.map { |mod|
-                  next if (i18n_keys = mod.names & keys).empty?
+                query_map = scope.mobility_modules.inject(IDENTITY) do |qm, mod|
+                  i18n_keys = (mod.names & keys)
+                  next qm if i18n_keys.empty?
 
-                  predicates = i18n_keys.map do |key|
+                  mod_predicates = i18n_keys.map do |key|
                     build_predicate(scope.backend_node(key.to_sym, locale), opts.delete(key))
                   end
+                  invert_predicates!(mod_predicates) if invert
+                  predicates += mod_predicates
 
-                  ->(relation) do
-                    relation = mod.backend_class.apply_scope(relation, predicates, locale, invert: invert)
-                    predicates = predicates.map(&method(:invert_predicate)) if invert
-                    relation.where(predicates.inject(&:and))
-                  end
-                }.compact
+                  ->(r) { mod.backend_class.apply_scope(qm[r], mod_predicates, locale, invert: invert) }
+                end
+
+                return yield unless query_map
+
+                relation = opts.empty? ? scope : yield(opts)
+                query_map[relation.where(predicates.inject(&:and))]
               end
 
               def build_predicate(node, values)
@@ -154,15 +158,19 @@ enabled for any one attribute on the model.
                 Array.wrap(values).uniq.partition(&:nil?)
               end
 
+              def invert_predicates!(predicates)
+                predicates.map!(&method(:invert_predicate))
+              end
+
               # Adapted from AR::Relation::WhereClause#invert_predicate
-              def invert_predicate(node)
-                case node
+              def invert_predicate(predicate)
+                case predicate
                 when ::Arel::Nodes::In
-                  ::Arel::Nodes::NotIn.new(node.left, node.right)
+                  ::Arel::Nodes::NotIn.new(predicate.left, predicate.right)
                 when ::Arel::Nodes::Equality
-                  ::Arel::Nodes::NotEqual.new(node.left, node.right)
+                  ::Arel::Nodes::NotEqual.new(predicate.left, predicate.right)
                 else
-                  ::Arel::Nodes::Not.new(node)
+                  ::Arel::Nodes::Not.new(predicate)
                 end
               end
             end

@@ -740,7 +740,7 @@ pass a block to the query method and call attribute names from the block scope
 to build Arel predicates:
 
 ```ruby
-Post.i18n do |title, content|
+Post.i18n do
   title.matches("foo").and(content.matches("bar"))
 end
 ```
@@ -756,7 +756,9 @@ WHERE "Post_title_en_string_translations"."value" ILIKE 'foo'
 
 The block-format query format is very powerful and allows you to build complex
 backend-independent queries on translated and untranslated attributes without
-having to deal with the details of how these translations are stored.
+having to deal with the details of how these translations are stored. This
+interface is not yet supported for Sequel models but is planned for the next
+release.
 
 <a name="backends"></a>Backends
 --------

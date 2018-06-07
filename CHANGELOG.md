@@ -2,6 +2,10 @@
 
 ## 0.7
 
+### 0.7.3 (June 7, 2018)
+* Fix uniqueness on Mobility model with no translated attributes ([#252](Fix
+  uniqueness on Mobility model with no translated attributes))
+
 ### 0.7.2 (June 3, 2018)
 * Normalize locale in table aliases
   ([#246](https://github.com/shioyama/mobility/pull/246))

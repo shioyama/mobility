@@ -178,6 +178,11 @@ describe Mobility do
         expect(Mobility.normalize_locale_accessor(:foo)).to eq("foo_fr")
       end
     end
+
+    it "raises ArgumentError for invalid attribute or locale" do
+      expect { described_class.normalize_locale_accessor(:"a-*-b") }.
+        to raise_error(ArgumentError, "\"a-*-b_en\" is not a valid accessor")
+    end
   end
 
   describe '.config' do

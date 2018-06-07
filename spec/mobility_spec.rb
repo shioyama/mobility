@@ -162,6 +162,10 @@ describe Mobility do
         end
       end
     end
+
+    it "normalizes locales with multiple dashes" do
+      expect(Mobility.normalize_locale(:"foo-bar-baz")).to eq("foo_bar_baz")
+    end
   end
 
   describe '.normalize_locale_accessor' do

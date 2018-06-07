@@ -37,6 +37,8 @@ module Mobility
 
   # General error for version compatibility conflicts
   class VersionNotSupportedError < ArgumentError; end
+  CALL_COMPILABLE_REGEXP = /\A[a-zA-Z_]\w*[!?]?\z/
+  private_constant :CALL_COMPILABLE_REGEXP
 
   begin
     require "rails"
@@ -206,13 +208,18 @@ module Mobility
     # @param [String,Symbol] attribute
     # @param [String,Symbol] locale
     # @return [String] Normalized locale accessor name
+    # @raise [ArgumentError] if generated accessor has an invalid format
     # @example
     #   Mobility.normalize_locale_accessor(:foo, :ja)
     #   #=> "foo_ja"
     #   Mobility.normalize_locale_accessor(:bar, "pt-BR")
     #   #=> "bar_pt_br"
     def normalize_locale_accessor(attribute, locale = Mobility.locale)
-      "#{attribute}_#{normalize_locale(locale)}"
+      "#{attribute}_#{normalize_locale(locale)}".tap do |accessor|
+        unless CALL_COMPILABLE_REGEXP.match(accessor)
+          raise ArgumentError, "#{accessor.inspect} is not a valid accessor"
+        end
+      end
     end
 
     # Raises InvalidLocale exception if the locale passed in is present but not available.

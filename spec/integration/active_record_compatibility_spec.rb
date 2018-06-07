@@ -130,4 +130,18 @@ describe "ActiveRecord compatibility", orm: :active_record do
       expect(post.translated_attribute_names).to match_array(%w[title content])
     end
   end
+
+  describe "uniqueness validation" do
+    it "works without any translated attributes" do
+      stub_const 'Article', Class.new(ActiveRecord::Base)
+      Article.class_eval do
+        extend Mobility
+        validates :slug, uniqueness: true
+      end
+
+      article = Article.create(slug: "foo")
+      expect(Article.new(slug: "bar")).to be_valid
+      expect(Article.new(slug: "foo")).not_to be_valid
+    end
+  end
 end

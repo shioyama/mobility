@@ -82,6 +82,7 @@ module Mobility
       return if model_class.respond_to? :mobility_accessor
 
       model_class.extend Translates
+      model_class.extend ClassMethods
       #TODO: Remove in v1.0
       model_class.include InstanceMethods
 
@@ -269,6 +270,14 @@ version of Mobility. To get backends, use <post>.<attribute>_backend instead.}
       end
     end
     private_constant :Adapter
+  end
+
+  module ClassMethods
+    # Return translated attribute names on this model.
+    # @return [Array<String>] Attribute names
+    def mobility_attributes
+      []
+    end
   end
 
   class InvalidLocale < I18n::InvalidLocale; end

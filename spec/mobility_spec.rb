@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Mobility do
   it 'has a version number' do
-    expect(Mobility::VERSION).not_to be nil
+    expect(described_class::VERSION).not_to be nil
   end
 
   describe "including Mobility in class" do
@@ -17,45 +17,45 @@ describe Mobility do
     end
 
     it "aliases mobility_accessor if Mobility.config.accessor_method is set" do
-      expect(Mobility.config).to receive(:accessor_method).and_return(:foo_translates)
-      model.extend Mobility
-      expect { Mobility.translates }.to raise_error(NoMethodError)
+      expect(described_class.config).to receive(:accessor_method).and_return(:foo_translates)
+      model.extend described_class
+      expect { described_class.translates }.to raise_error(NoMethodError)
       model.foo_translates :title, backend: :null, foo: :bar
       expect(model.new.methods).to include :title
       expect(model.new.methods).to include :title=
     end
 
     it "does not alias mobility_accessor to anything if Mobility.config.accessor_method is falsy" do
-      expect(Mobility.config).to receive(:accessor_method).and_return(nil)
-      model.extend Mobility
-      expect { Mobility.translates }.to raise_error(NoMethodError)
+      expect(described_class.config).to receive(:accessor_method).and_return(nil)
+      model.extend described_class
+      expect { described_class.translates }.to raise_error(NoMethodError)
     end
 
     context "with translated attributes" do
       it "includes backend module into model class" do
-        expect(Mobility::Attributes).to receive(:new).
+        expect(described_class::Attributes).to receive(:new).
           with(:title, { method: :accessor, backend: :null, foo: :bar }).
           and_call_original
-        model.extend Mobility
+        model.extend described_class
         model.translates :title, backend: :null, foo: :bar
       end
 
       it "defines translated_attribute_names" do
-        model.extend Mobility
+        model.extend described_class
         model.translates :title, backend: :null
         expect(MyModel.translated_attribute_names).to eq(["title"])
       end
 
       context "model subclass" do
         it "inherits translated_attribute_names" do
-          model.extend Mobility
+          model.extend described_class
           model.translates :title, backend: :null
           subclass = Class.new(model)
           expect(subclass.translated_attribute_names).to eq(["title"])
         end
 
         it "defines new translated attributes independently of superclass" do
-          model.extend Mobility
+          model.extend described_class
           model.translates :title, backend: :null
           subclass = Class.new(model)
           subclass.translates :content, backend: :null
@@ -70,9 +70,9 @@ describe Mobility do
   describe '.with_locale' do
     def perform_with_locale(locale)
       Thread.new do
-        Mobility.with_locale(locale) do
+        described_class.with_locale(locale) do
           Thread.pass
-          expect(locale).to eq(Mobility.locale)
+          expect(locale).to eq(described_class.locale)
         end
       end
     end
@@ -93,45 +93,45 @@ describe Mobility do
     end
 
     it "returns result" do
-      expect(Mobility.with_locale(:ja) { |locale| "returned-#{locale}" }).to eq("returned-ja")
+      expect(described_class.with_locale(:ja) { |locale| "returned-#{locale}" }).to eq("returned-ja")
     end
 
     context "something blows up" do
       it "sets locale back" do
-        Mobility.with_locale(:ja) { raise StandardError } rescue StandardError
-        expect(Mobility.locale).to eq(:en)
+        described_class.with_locale(:ja) { raise StandardError } rescue StandardError
+        expect(described_class.locale).to eq(:en)
       end
     end
   end
 
   describe ".locale" do
     it "returns locale if set" do
-      Mobility.locale = :de
-      expect(Mobility.locale).to eq(:de)
+      described_class.locale = :de
+      expect(described_class.locale).to eq(:de)
     end
 
     it "returns I18n.locale otherwise" do
-      Mobility.locale = nil
+      described_class.locale = nil
       I18n.locale = :de
-      expect(Mobility.locale).to eq(:de)
+      expect(described_class.locale).to eq(:de)
     end
   end
 
   describe '.locale=' do
     it "sets locale for locale in I18n.available_locales" do
-      Mobility.locale = :fr
-      expect(Mobility.locale).to eq(:fr)
+      described_class.locale = :fr
+      expect(described_class.locale).to eq(:fr)
     end
 
     it "converts string to symbol" do
-      Mobility.locale = "fr"
-      expect(Mobility.locale).to eq(:fr)
+      described_class.locale = "fr"
+      expect(described_class.locale).to eq(:fr)
     end
 
     it "raises Mobility::InvalidLocale for locale not in I18n.available_locales" do
       expect {
-        Mobility.locale = :es
-      }.to raise_error(Mobility::InvalidLocale)
+        described_class.locale = :es
+      }.to raise_error(described_class::InvalidLocale)
     end
 
     context "I18n.enforce_available_locales = false" do
@@ -143,7 +143,7 @@ describe Mobility do
 
       it "does not raise Mobility::InvalidLocale for locale not in I18n.available_locales" do
         expect {
-          Mobility.locale = :es
+          described_class.locale = :es
         }.not_to raise_error
       end
     end
@@ -151,50 +151,50 @@ describe Mobility do
 
   describe '.normalize_locale' do
     it "normalizes locale to lowercase string underscores" do
-      expect(Mobility.normalize_locale(:"pt-BR")).to eq("pt_br")
+      expect(described_class.normalize_locale(:"pt-BR")).to eq("pt_br")
     end
 
     it "normalizes current locale if passed no argument" do
-      Mobility.with_locale(:"pt-BR") do
+      described_class.with_locale(:"pt-BR") do
         aggregate_failures do
-          expect(Mobility.normalize_locale).to eq("pt_br")
-          expect(Mobility.normalized_locale).to eq("pt_br")
+          expect(described_class.normalize_locale).to eq("pt_br")
+          expect(described_class.normalized_locale).to eq("pt_br")
         end
       end
     end
 
     it "normalizes locales with multiple dashes" do
-      expect(Mobility.normalize_locale(:"foo-bar-baz")).to eq("foo_bar_baz")
+      expect(described_class.normalize_locale(:"foo-bar-baz")).to eq("foo_bar_baz")
     end
   end
 
   describe '.normalize_locale_accessor' do
     it "normalizes accessor to use lowercase locale with underscores" do
-      expect(Mobility.normalize_locale_accessor(:foo, :"pt-BR")).to eq("foo_pt_br")
+      expect(described_class.normalize_locale_accessor(:foo, :"pt-BR")).to eq("foo_pt_br")
     end
 
     it "defaults locale to Mobility.locale" do
-      Mobility.with_locale(:fr) do
-        expect(Mobility.normalize_locale_accessor(:foo)).to eq("foo_fr")
+      described_class.with_locale(:fr) do
+        expect(described_class.normalize_locale_accessor(:foo)).to eq("foo_fr")
       end
     end
   end
 
   describe '.config' do
     it 'initializes a new configuration' do
-      expect(Mobility.config).to be_a(Mobility::Configuration)
+      expect(described_class.config).to be_a(described_class::Configuration)
     end
 
     it 'memoizes configuration' do
-      expect(Mobility.config).to be(Mobility.config)
+      expect(described_class.config).to be(described_class.config)
     end
   end
 
   describe ".configure" do
     it "yields configuration" do
       expect { |block|
-        Mobility.configure &block
-      }.to yield_with_args(Mobility.config)
+        described_class.configure &block
+      }.to yield_with_args(described_class.config)
     end
   end
 
@@ -202,8 +202,8 @@ describe Mobility do
   %w[accessor_method query_method default_fallbacks new_fallbacks default_accessor_locales].each do |delegated_method|
     describe ".#{delegated_method}" do
       it "delegates to config" do
-        expect(Mobility.config).to receive(delegated_method).and_return("foo")
-        expect(Mobility.send(delegated_method)).to eq("foo")
+        expect(described_class.config).to receive(delegated_method).and_return("foo")
+        expect(described_class.send(delegated_method)).to eq("foo")
       end
     end
   end

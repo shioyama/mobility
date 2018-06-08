@@ -2,6 +2,10 @@
 
 ## 0.7
 
+### 0.7.5 (June 8, 2018)
+* Only return unique names from mobility_attributes
+  ([#256](https://github.com/shioyama/mobility/pull/256))
+
 ### 0.7.4 (June 8, 2018)
 * Handle locales with multiple dashes in locale accessors, or raise
   ArgumentError for invalid format

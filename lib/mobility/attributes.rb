@@ -268,7 +268,7 @@ EOL
       # Return translated attribute names on this model.
       # @return [Array<String>] Attribute names
       def mobility_attributes
-        mobility_modules.map(&:names).flatten
+        mobility_modules.map(&:names).flatten.uniq
       end
 
       # @!method translated_attribute_names

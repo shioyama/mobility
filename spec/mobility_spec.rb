@@ -164,11 +164,10 @@ describe Mobility do
     # @note Required since model may be loaded in initializer before Rails has
     #   updated I18n.available_locales.
     it "uses Rails i18n locales if Rails application is loaded" do
-      stub_const("Rails", double.as_null_object)
       allow(Rails).to receive_message_chain(:application, :config, :i18n, :available_locales).
         and_return([:ru, :cn])
       expect(described_class.available_locales).to eq([:ru, :cn])
-    end
+    end if Mobility::Loaded::Rails
   end
 
   describe '.normalize_locale' do

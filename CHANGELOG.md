@@ -2,6 +2,11 @@
 
 ## 0.7
 
+### 0.7.4 (June 8, 2018)
+* Handle locales with multiple dashes in locale accessors, or raise
+  ArgumentError for invalid format
+  ([#253](https://github.com/shioyama/mobility/pull/253))
+
 ### 0.7.3 (June 7, 2018)
 * Fix uniqueness on Mobility model with no translated attributes ([#252](Fix
   uniqueness on Mobility model with no translated attributes))

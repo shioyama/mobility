@@ -11,45 +11,7 @@ describe Mobility::Plugins::LocaleAccessors do
       end
     end
 
-    context "locales unset, uses I18n.available_locales" do
-      before do
-        @available_locales = I18n.available_locales
-        I18n.available_locales = [:en, :pt]
-      end
-      after do
-        I18n.available_locales = @available_locales
-      end
-      let(:model_class) do
-        base_model_class.include described_class.new(:title)
-        base_model_class
-      end
-
-      it_behaves_like "locale accessor", :title, :pt
-
-      it "raises NoMethodError if locale not in I18n.available_locales" do
-        model_class.include(described_class.new(:title))
-        instance = model_class.new
-        aggregate_failures do
-          expect { instance.title_de }.to raise_error(NoMethodError)
-          expect { instance.title_de? }.to raise_error(NoMethodError)
-          expect { instance.send(:title_de=, "value", {}) }.to raise_error(NoMethodError)
-        end
-      end
-
-      it "warns locale option will be ignored if called with locale" do
-        model_class.include(described_class.new(:title))
-        instance = model_class.new
-        warning_message = /locale passed as option to locale accessor will be ignored/
-        expect(instance).to receive(:title).with(locale: :pt).and_return("foo")
-        expect { expect(instance.title_pt(locale: :en)).to eq("foo") }.to output(warning_message).to_stderr
-        expect(instance).to receive(:title?).with(locale: :pt).and_return(true)
-        expect { expect(instance.title_pt?(locale: :en)).to eq(true) }.to output(warning_message).to_stderr
-        expect(instance).to receive(:title=).with("new foo", locale: :pt)
-        expect { instance.send(:title_pt=, "new foo", locale: :en)}.to output(warning_message).to_stderr
-      end
-    end
-
-    context "locales set" do
+    context "with locales set" do
       let(:model_class) do
         base_model_class.include described_class.new(:title, locales: [:cz, :de, :'pt-BR'])
       end
@@ -65,6 +27,17 @@ describe Mobility::Plugins::LocaleAccessors do
           expect { instance.title_en? }.to raise_error(NoMethodError)
           expect { instance.send(:title_en=, "value", {}) }.to raise_error(NoMethodError)
         end
+      end
+
+      it "warns locale option will be ignored if called with locale" do
+        instance = model_class.new
+        warning_message = /locale passed as option to locale accessor will be ignored/
+        expect(instance).to receive(:title).with(locale: :cz).and_return("foo")
+        expect { expect(instance.title_cz(locale: :en)).to eq("foo") }.to output(warning_message).to_stderr
+        expect(instance).to receive(:title?).with(locale: :cz).and_return(true)
+        expect { expect(instance.title_cz?(locale: :en)).to eq(true) }.to output(warning_message).to_stderr
+        expect(instance).to receive(:title=).with("new foo", locale: :cz)
+        expect { instance.send(:title_cz=, "new foo", locale: :en)}.to output(warning_message).to_stderr
       end
     end
 
@@ -83,7 +56,7 @@ describe Mobility::Plugins::LocaleAccessors do
           end
         end
         base_model_class.include mod
-        base_model_class.include described_class.new(:title)
+        base_model_class.include described_class.new(:title, locales: [:en])
 
         instance = base_model_class.new
 

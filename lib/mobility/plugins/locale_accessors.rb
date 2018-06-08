@@ -41,7 +41,7 @@ If no locales are passed as an option to the initializer,
 
       # @param [String] One or more attribute names
       # @param [Array<Symbol>] Locales
-      def initialize(*attribute_names, locales: I18n.available_locales)
+      def initialize(*attribute_names, locales:)
         attribute_names.each do |name|
           locales.each do |locale|
             define_reader(name, locale)

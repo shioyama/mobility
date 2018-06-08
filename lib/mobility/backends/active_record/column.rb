@@ -14,8 +14,8 @@ translatable columns to the model table with:
   rails generate mobility:translations post title:string
 
 The generated migration will add columns +title_<locale>+ for every locale in
-+I18n.available_locales+. (The generator can be run again to add new attributes
-or locales.)
++Mobility.available_locales+ (i.e. +I18n.available_locales+). (The generator
+can be run again to add new attributes or locales.)
 
 @example
   class Post < ActiveRecord::Base

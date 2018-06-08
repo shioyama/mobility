@@ -149,6 +149,28 @@ describe Mobility do
     end
   end
 
+  describe ".available_locales" do
+    around do |example|
+      @available_locales = I18n.available_locales
+      I18n.available_locales = [:en, :pt]
+      example.run
+      I18n.available_locales = @available_locales
+    end
+
+    it "defaults to I18n.available_locales" do
+      expect(described_class.available_locales).to eq([:en, :pt])
+    end
+
+    # @note Required since model may be loaded in initializer before Rails has
+    #   updated I18n.available_locales.
+    it "uses Rails i18n locales if Rails application is loaded" do
+      stub_const("Rails", double.as_null_object)
+      allow(Rails).to receive_message_chain(:application, :config, :i18n, :available_locales).
+        and_return([:ru, :cn])
+      expect(described_class.available_locales).to eq([:ru, :cn])
+    end
+  end
+
   describe '.normalize_locale' do
     it "normalizes locale to lowercase string underscores" do
       expect(described_class.normalize_locale(:"pt-BR")).to eq("pt_br")

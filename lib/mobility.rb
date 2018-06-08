@@ -117,7 +117,7 @@ module Mobility
     # Sets Mobility locale
     # @param [Symbol] locale Locale to set
     # @raise [InvalidLocale] if locale is nil or not in
-    #   +I18n.available_locales+ (if +I18n.enforce_available_locales+ is +true+)
+    #   +Mobility.available_locales+ (if +I18n.enforce_available_locales+ is +true+)
     # @return [Symbol] Locale
     def locale=(locale)
       set_locale(locale)
@@ -236,6 +236,22 @@ I18n.enforce_available_locales is false. In the past, Mobility would do nothing
 in this case, but as of the next major release Mobility will ignore the I18n
 setting and enforce available locales whenever this method is called.
 EOL
+      end
+    end
+
+    # Returns available locales. Defaults to I18n.available_locales, but will
+    # use Rails.application.config.i18n.available_locales if Rails is loaded
+    # and config is non-nil.
+    # @return [Array<Symbol>] Available locales
+    # @note The special case for Rails is necessary due to the fact that Rails
+    #   may load the model before setting +I18n.available_locales+. If we
+    #   simply default to +I18n.available_locales+, we may define many more
+    #   methods (in LocaleAccessors) than is really necessary.
+    def available_locales
+      if Loaded::Rails && Rails.application
+        Rails.application.config.i18n.available_locales || I18n.available_locales
+      else
+        I18n.available_locales
       end
     end
 

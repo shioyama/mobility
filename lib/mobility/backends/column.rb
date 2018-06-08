@@ -6,7 +6,7 @@ module Mobility
 
 Stores translated attribute as a column on the model table. To use this
 backend, ensure that the model table has columns named +<attribute>_<locale>+
-for every locale in +I18n.available_locales+.
+for every locale in +Mobility.available_locales+ (i.e. +I18n.available_locales+).
 
 If you are using Rails, you can use the +mobility:translations+ generator to
 create a migration adding these columns to the model table with:
@@ -14,7 +14,7 @@ create a migration adding these columns to the model table with:
   rails generate mobility:translations post title:string
 
 The generated migration will add columns +title_<locale>+ for every locale in
-+I18n.available_locales+. (The generator can be run again to add new attributes
++Mobility.available_locales+. (The generator can be run again to add new attributes
 or locales.)
 
 ==Backend Options

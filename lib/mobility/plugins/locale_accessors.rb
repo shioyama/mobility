@@ -10,7 +10,8 @@ locales directly with a method call, using a suffix including the locale:
   article.title_pt_br
 
 If no locales are passed as an option to the initializer,
-+I18n.available_locales+ will be used by default.
++Mobility.available_locales+ (i.e. +I18n.available_locales+, or Rails-set
+available locales for a Rails application) will be used by default.
 
 @example
   class Post

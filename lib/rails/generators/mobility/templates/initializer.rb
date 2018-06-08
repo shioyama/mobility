@@ -62,8 +62,9 @@ Mobility.configure do |config|
   # config.default_options[:default] = ...
 
   # Uncomment to enable locale_accessors by default on models. A true value
-  # will use the locales defined in I18n.available_locales. If you want
-  # something else, pass an array of locales instead.
+  # will use the locales defined either in
+  # Rails.application.config.i18n.available_locales or I18n.available_locales.
+  # If you want something else, pass an array of locales instead.
   #
   # config.default_options[:locale_accessors] = true
 

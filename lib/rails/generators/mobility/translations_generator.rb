@@ -23,7 +23,7 @@ For the +table+ backend, the generator will either create a translation table
 exists.
 
 For the +column+ backend, the generator will add columns for all locales in
-+I18n.available_locales+. If some columns already exist, they will simply be
++Mobility.available_locales+. If some columns already exist, they will simply be
 skipped.
 
 Other backends are not supported, for obvious reasons:

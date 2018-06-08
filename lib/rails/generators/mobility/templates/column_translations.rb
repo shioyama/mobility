@@ -1,7 +1,7 @@
 class <%= migration_class_name %> < <%= activerecord_migration_class %>
   def change
 <% attributes.each do |attribute| -%>
-<% I18n.available_locales.each do |locale| -%>
+<% Mobility.available_locales.each do |locale| -%>
 <% column_name = Mobility.normalize_locale_accessor(attribute.name, locale) -%>
 <% if connection.column_exists?(table_name, column_name) -%>
 <% warn "#{column_name} already exists, skipping." -%>

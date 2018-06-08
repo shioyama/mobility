@@ -78,6 +78,13 @@ describe Mobility::Attributes do
 
             expect(Article.public_send(method_name)).to match_array(["title", "content", "foo"])
           end
+
+          it "only returns unique attributes" do
+            Article.include described_class.new("title", backend: :null)
+            Article.include described_class.new("title", backend: :null)
+
+            expect(Article.public_send(method_name)).to eq(["title"])
+          end
         end
       end
 

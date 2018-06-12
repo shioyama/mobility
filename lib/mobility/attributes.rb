@@ -275,7 +275,7 @@ EOL
       # of this model.
       # @return [Array<Mobility::Attributes>] Attribute modules
       def mobility_modules
-        ancestors.select { |mod| Attributes === mod }
+        ancestors.grep(Attributes)
       end
 
       # Return translated attribute names on this model.

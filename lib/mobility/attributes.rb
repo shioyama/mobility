@@ -20,53 +20,61 @@ like including a module. Creating an instance like this:
 
   Attributes.new("title", backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
 
-will generate an anonymous module that behaves (approximately) like this:
+will generate an anonymous module that behaves approximately like this:
 
   Module.new do
-    def title_backend
-      # Create a subclass of Mobility::Backends::MyBackend and include in it:
+    def mobility_backends
+      # Returns a memoized hash with attribute name keys and backend instance
+      # values.  When a key is fetched from the hash, the hash calls
+      # +self.class.mobility_backend_class(name)+ (where +name+ is the
+      # attribute name) to get the backend class, then instantiate it (passing
+      # the model instance and attribute name to its initializer) and return it.
+      #
+      # The backend class returned from the class method
+      # +mobility_backend_class+ returns a subclass of
+      # +Mobility::Backends::MyBackend+ and includes into it:
+      #
       # - Mobility::Plugins::Cache (from the +cache: true+ option)
-      # - Mobility::Plugins::Fallbacks (from the +fallbacks: true+ option)
+      # - instance of Mobility::Plugins::Fallbacks (from the +fallbacks: true+ option)
       # - Mobility::Plugins::Presence (by default, disabled by +presence: false+)
-      # Then instantiate the backend, memoize it, and return it.
     end
 
-    def title(**options)
-      title_backend.read(Mobility.locale, **options).presence
+    def title(locale: Mobility.locale)
+      mobility_backends[:title].read(locale)
     end
 
-    def title?(**options)
-      title_backend.read(Mobility.locale, **options).present?
+    def title?(locale: Mobility.locale)
+      mobility_backends[:title].read(locale).present?
     end
 
-    def title=(value)
-      title_backend.write(Mobility.locale, value.presence)
+    def title=(value, locale: Mobility.locale)
+      mobility_backends[:title].write(locale, value)
     end
 
     # Start Locale Accessors
     #
-    def title_en(**options)
-      title_backend.read(:en, **options).presence
+    def title_en
+      title(locale: :en)
     end
 
-    def title_en?(**options)
-      title_backend.read(:en, **options).present?
+    def title_en?
+      title?(locale: :en)
     end
 
     def title_en=(value)
-      title_backend.write(:en, value.presence)
+      public_send(:title=, value, locale: :en)
     end
 
-    def title_ja(**options)
-      title_backend.read(:ja, **options).presence
+    def title_ja
+      title(locale: :ja)
     end
 
-    def title_ja?(**options)
-      title_backend.read(:ja, **options).present?
+    def title_ja?
+      title?(locale: :ja)
     end
 
     def title_ja=(value)
-      title_backend.write(:ja, value.presence)
+      public_send(:title=, value, locale: :ja)
     end
     # End Locale Accessors
   end
@@ -74,6 +82,10 @@ will generate an anonymous module that behaves (approximately) like this:
 Including this module into a model class will thus add the backend method, the
 reader, writer and presence methods, and the locale accessor so the model
 class. (These methods are in fact added to the model in an +included+ hook.)
+
+Note that some simplifications have been made above for readability. (In
+reality, all getters and setters accept an options hash which is passed along
+to the backend instance.)
 
 ==Setting up the Model Class
 
@@ -244,6 +256,7 @@ EOL
     module InstanceMethods
       # Return a new backend for an attribute name.
       # @return [Hash] Hash of attribute names and backend instances
+      # @api private
       def mobility_backends
         @mobility_backends ||= Hash.new do |hash, name|
           next hash[name.to_sym] if String === name

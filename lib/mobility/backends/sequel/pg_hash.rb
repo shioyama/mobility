@@ -3,6 +3,7 @@ require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/hash_valued"
 require "mobility/sequel/column_changes"
+require "mobility/sequel/hash_initializer"
 
 module Mobility
   module Backends

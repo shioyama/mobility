@@ -673,7 +673,7 @@ different ways. The first is via query methods like `where` (and `not` and
 `i18n` class method, which will return a model relation or dataset extended
 with Mobility-specific query method overrides.
 
-So for ActiveRecord, assuming a model:
+So for ActiveRecord, assuming a model using KeyValue as its default backend:
 
 ```ruby
 class Post < ApplicationRecord

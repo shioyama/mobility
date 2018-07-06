@@ -2,6 +2,11 @@
 
 ## 0.7
 
+### 0.7.6 (July 6, 2018)
+* Sequel pg_hash require hash_initializer
+  ([#260](https://github.com/shioyama/mobility/pull/260)). Thanks
+  [@Recca](https://github.com/Recca)!
+
 ### 0.7.5 (June 8, 2018)
 * Only return unique names from mobility_attributes
   ([#256](https://github.com/shioyama/mobility/pull/256))

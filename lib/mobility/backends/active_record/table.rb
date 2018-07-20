@@ -179,7 +179,10 @@ columns to that table.
       #   end
       #
       #   backend_class = Post.mobility_backend_class(:title)
-      #   visitor = Mobility::Backends::ActiveRecord::Table::Visitor.new(backend_class)
+      #   visitor = Mobility::Backends::ActiveRecord::Table::Visitor.new(backend_class, :en)
+      #
+      #   title   = backend_class.build_node("title", :en)   # arel node for title
+      #   content = backend_class.build_node("content", :en) # arel node for content
       #
       #   visitor.accept(title.eq(nil).and(content.eq(nil)))
       #   #=> Arel::Nodes::OuterJoin

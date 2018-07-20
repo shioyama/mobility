@@ -114,7 +114,10 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       #   end
       #
       #   backend_class = Post.mobility_backend_class(:title)
-      #   visitor = Mobility::Backends::ActiveRecord::KeyValue::Visitor.new(backend_class)
+      #   visitor = Mobility::Backends::ActiveRecord::KeyValue::Visitor.new(backend_class, :en)
+      #
+      #   title   = backend_class.build_node("title", :en)   # arel node for title
+      #   content = backend_class.build_node("content", :en) # arel node for content
       #
       #   visitor.accept(title.eq("foo").and(content.eq(nil)))
       #   #=> { title: Arel::Nodes::InnerJoin, content: Arel::Nodes::OuterJoin }

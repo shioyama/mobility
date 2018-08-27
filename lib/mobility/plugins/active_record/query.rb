@@ -89,6 +89,26 @@ enabled for any one attribute on the model.
             opts == :chain ? WhereChain.new(spawn) : super
           end
 
+          def order(opts, *rest)
+            case opts
+            when Symbol, String
+              mobility_attributes.include?(opts.to_s) ? order({ opts => :asc }, *rest) : super
+            when Hash
+              i18n_keys, keys = opts.keys.partition { |key| mobility_attributes.include?(key.to_s) }
+              return super if i18n_keys.empty?
+
+              base = keys.empty? ? self : super(opts.slice(keys))
+
+              i18n_keys.inject(base) do |query, key|
+                backend_class = @klass.mobility_backend_class(key)
+                dir, node = opts[key], backend_node(key)
+                backend_class.apply_scope(query, node).order(node.send(dir.downcase))
+              end
+            else
+              super
+            end
+          end
+
           # Return backend node for attribute name.
           # @param [Symbol,String] name Name of attribute
           # @param [Symbol] locale Locale
@@ -126,7 +146,7 @@ enabled for any one attribute on the model.
                 keys, predicates = opts.keys.map(&:to_s), []
 
                 query_map = scope.mobility_modules.inject(IDENTITY) do |qm, mod|
-                  i18n_keys = (mod.names & keys)
+                  i18n_keys = mod.names & keys
                   next qm if i18n_keys.empty?
 
                   mod_predicates = i18n_keys.map do |key|

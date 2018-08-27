@@ -244,6 +244,48 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
     end
   end
 
+  describe ".order" do
+    let!(:i) do
+      [
+        model_class.create(a1 => "foo0"),
+        model_class.create(a1 => "foo2", a2 => "foo1"),
+        model_class.create(a1 => "foo1", a2 => "bar2"),
+        model_class.create(a1 => "foo3", a2 => "bar1")
+      ]
+    end
+
+    it "orders records correctly with string argument" do
+      expect(query_scope.order(a1.to_s)).to eq([i[0], i[2], i[1], i[3]])
+    end
+
+    it "orders records correctly with symbol argument" do
+      expect(query_scope.order(a1.to_sym)).to eq([i[0], i[2], i[1], i[3]])
+    end
+
+    it "orders records correctly with 1-key hash argument" do
+      aggregate_failures "one attribute" do
+        expect(query_scope.order(a1 => :asc)).to eq([i[0], i[2], i[1], i[3]])
+        expect(query_scope.order(a1 => :desc)).to eq([i[3], i[1], i[2], i[0]])
+      end
+    end
+
+    it "orders records correctly with 2-key hash argument" do
+      skip "Not supported by #{backend_name}" if [:table, :key_value].include?(backend_name)
+
+      added = model_class.create(a1 => "foo2", a2 => "foo2")
+      expect(query_scope.order(a1 => :desc, a2 => :asc)).to eq([i[3], i[1], added, i[2], i[0]])
+    end
+
+    it "handles untranslated attributes" do
+      expect { query_scope.order(published: :desc) }.not_to raise_error
+    end
+
+    it "does not modify original hash" do
+      hash = { a1 => :asc }
+      expect { query_scope.order(hash) }.not_to change { hash }
+    end
+  end
+
   describe "Arel queries" do
     # Shortcut for passing block to e.g. Post.i18n
     def query(*args, &block); model_class.i18n(*args, &block); end

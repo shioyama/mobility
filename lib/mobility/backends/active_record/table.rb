@@ -129,7 +129,7 @@ columns to that table.
         # @param [Symbol] locale Locale
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] relation Relation with joins applied (if needed)
-        def apply_scope(relation, predicate, locale, invert: false)
+        def apply_scope(relation, predicate, locale = Mobility.locale, invert: false)
           visitor = Visitor.new(self, locale)
           if join_type = visitor.accept(predicate)
             join_type &&= Visitor::INNER_JOIN if invert

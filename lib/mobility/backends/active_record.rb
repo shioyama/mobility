@@ -25,7 +25,7 @@ module Mobility
         # @param [Symbol] locale Locale
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] Relation with scope added
-        def apply_scope(relation, _predicate, _locale, invert: false)
+        def apply_scope(relation, _predicate, _locale = Mobility.locale, invert: false)
           relation
         end
 

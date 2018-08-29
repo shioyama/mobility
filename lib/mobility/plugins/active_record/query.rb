@@ -138,7 +138,7 @@ enabled for any one attribute on the model.
                   ->(r) { mod.backend_class.apply_scope(qm[r], mod_predicates, locale, invert: invert) }
                 end
 
-                return yield unless query_map
+                return yield if query_map == IDENTITY
 
                 relation = opts.empty? ? scope : yield(opts)
                 query_map[relation.where(predicates.inject(&:and))]

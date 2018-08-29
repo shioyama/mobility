@@ -1,5 +1,7 @@
 require 'mobility/backends/sequel/pg_hash'
 
+Sequel.extension :pg_hstore, :pg_hstore_ops
+
 module Mobility
   module Backends
 =begin
@@ -11,8 +13,6 @@ Implements the {Mobility::Backends::Hstore} backend for Sequel models.
 =end
     module Sequel
       class Hstore < PgHash
-        require 'mobility/backends/sequel/hstore/query_methods'
-
         # @!group Backend Accessors
         # @!macro backend_reader
         # @!method read(locale, options = {})
@@ -24,7 +24,15 @@ Implements the {Mobility::Backends::Hstore} backend for Sequel models.
         end
         # @!endgroup
 
-        setup_query_methods(QueryMethods)
+        # @param [Symbol] name Attribute name
+        # @param [Symbol] locale Locale
+        # @return [Mobility::Backends::Sequel::Hstore::HStoreOp]
+        def self.build_op(attr, locale)
+          column_name = column_affix % attr
+          HStoreOp.new(column_name.to_sym)[locale.to_s]
+        end
+
+        class HStoreOp < ::Sequel::Postgres::HStoreOp; end
       end
     end
   end

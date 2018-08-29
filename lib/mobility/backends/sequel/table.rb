@@ -3,6 +3,7 @@ require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/key_value"
 require "mobility/sequel/model_translation"
+require "mobility/sequel/sql"
 
 module Mobility
   module Backends
@@ -21,31 +22,100 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         self.class.translation_class
       end
 
-      # @return [Symbol] class for translations
-      def self.translation_class
-        @translation_class ||= model_class.const_get(subclass_name)
-      end
-
-      # @!group Backend Configuration
-      # @option options [Symbol] association_name (:translations) Name of association method
-      # @option options [Symbol] table_name Name of translation table
-      # @option options [Symbol] foreign_key Name of foreign key
-      # @option options [Symbol] subclass_name Name of subclass to append to model class to generate translation class
-      # @raise [CacheRequired] if cache option is false
-      def self.configure(options)
-        raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
-        table_name = Util.singularize(options[:model_class].table_name)
-        options[:table_name]  ||= :"#{table_name}_translations"
-        options[:foreign_key] ||= Util.foreign_key(Util.camelize(table_name.downcase))
-        if association_name = options[:association_name]
-          options[:subclass_name] ||= Util.camelize(Util.singularize(association_name))
-        else
-          options[:association_name] = :translations
-          options[:subclass_name] ||= :Translation
+      class << self
+        # @return [Symbol] class for translations
+        def translation_class
+          @translation_class ||= model_class.const_get(subclass_name)
         end
-        %i[table_name foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }
+
+        # @!group Backend Configuration
+        # @option options [Symbol] association_name (:translations) Name of association method
+        # @option options [Symbol] table_name Name of translation table
+        # @option options [Symbol] foreign_key Name of foreign key
+        # @option options [Symbol] subclass_name Name of subclass to append to model class to generate translation class
+        # @raise [CacheRequired] if cache option is false
+        def configure(options)
+          raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
+          table_name = Util.singularize(options[:model_class].table_name)
+          options[:table_name]  ||= :"#{table_name}_translations"
+          options[:foreign_key] ||= Util.foreign_key(Util.camelize(table_name.downcase))
+          if association_name = options[:association_name]
+            options[:subclass_name] ||= Util.camelize(Util.singularize(association_name))
+          else
+            options[:association_name] = :translations
+            options[:subclass_name] ||= :Translation
+          end
+          %i[table_name foreign_key association_name subclass_name].each { |key| options[key] = options[key].to_sym }
+        end
+        # @!endgroup
+
+        # @param [Symbol] name Attribute name
+        # @param [Symbol] locale Locale
+        # @return [Sequel::SQL::QualifiedIdentifier]
+        def build_op(attr, locale)
+          ::Mobility::Sequel::SQL::QualifiedIdentifier.new(table_alias(locale), attr, locale, self, attribute_name: attr)
+        end
+
+        # @param [Sequel::Dataset] dataset Dataset to prepare
+        # @param [Object] predicate Predicate
+        # @param [Symbol] locale Locale
+        # @return [Sequel::Dataset] Prepared dataset
+        def prepare_dataset(dataset, predicate, locale)
+          join_translations(dataset, locale, visit(predicate, locale))
+        end
+
+        private
+
+        def join_translations(dataset, locale, join_type)
+          if joins = dataset.opts[:join]
+            return dataset if joins.any? { |clause| clause.table_expr.alias == table_alias(locale) }
+          end
+          dataset.join_table(join_type,
+                             translation_class.table_name,
+                             {
+                               locale: locale.to_s,
+                               foreign_key => ::Sequel[model_class.table_name][:id]
+                             },
+                             table_alias: table_alias(locale))
+        end
+
+        def visit(predicate, locale)
+          case predicate
+          when Array
+            visit_collection(predicate, locale)
+          when ::Mobility::Sequel::SQL::QualifiedIdentifier
+            visit_sql_identifier(predicate, locale)
+          when ::Sequel::SQL::BooleanExpression
+            visit_boolean(predicate, locale)
+          when ::Sequel::SQL::Expression
+            visit(predicate.args, locale)
+          else
+            nil
+          end
+        end
+
+        def visit_collection(collection, locale)
+          collection.map { |obj|
+            visit(obj, locale).tap do |visited|
+              return visited if visited == :inner
+            end
+          }.compact.first
+        end
+
+        def visit_sql_identifier(identifier, locale)
+          (table_alias(locale) == identifier.table) && :inner
+        end
+
+        def visit_boolean(boolean, locale)
+          if boolean.op == :'='
+            boolean.args.any? { |op| visit(op, locale) } && :inner
+          elsif boolean.op == :IS
+            boolean.args.any?(&:nil?) && :left_outer
+          else
+            visit(boolean.args, locale)
+          end
+        end
       end
-      # @!endgroup
 
       setup do |attributes, options|
         association_name = options[:association_name]
@@ -85,8 +155,6 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
 
         include Mobility::Sequel::ColumnChanges.new(attributes)
       end
-
-      setup_query_methods(QueryMethods)
 
       def translation_for(locale, _)
         translation = model.send(association_name).find { |t| t.locale == locale.to_s }

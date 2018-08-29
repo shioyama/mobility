@@ -141,10 +141,6 @@ columns to that table.
 
         private
 
-        def table_alias(locale)
-          "#{table_name}_#{Mobility.normalize_locale(locale)}"
-        end
-
         def join_translations(relation, locale, join_type)
           return relation if already_joined?(relation, locale, join_type)
           m = model_class.arel_table

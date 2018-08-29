@@ -29,8 +29,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       include ActiveRecord
       include KeyValue
 
-      option_reader :table_alias_affix
-
       class << self
         # @!group Backend Configuration
         # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
@@ -71,10 +69,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
 
         private
-
-        def table_alias(attr, locale)
-          table_alias_affix % "#{attr}_#{Mobility.normalize_locale(locale)}"
-        end
 
         def join_translations(relation, key, locale, join_type)
           return relation if already_joined?(relation, key, locale, join_type)

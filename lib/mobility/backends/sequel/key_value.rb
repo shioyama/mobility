@@ -6,6 +6,7 @@ require "mobility/sequel/column_changes"
 require "mobility/sequel/hash_initializer"
 require "mobility/sequel/string_translation"
 require "mobility/sequel/text_translation"
+require "mobility/sequel/sql"
 
 module Mobility
   module Backends
@@ -25,21 +26,95 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
       require 'mobility/backends/sequel/key_value/query_methods'
 
-      # @!group Backend Configuration
-      # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
-      # @raise (see Mobility::Backends::KeyValue::ClassMethods#configure)
-      # @raise [CacheRequired] if cache is disabled
-      def self.configure(options)
-        raise CacheRequired, "Cache required for Sequel::KeyValue backend" if options[:cache] == false
-        super
-        if type = options[:type]
-          options[:association_name] ||= :"#{options[:type]}_translations"
-          options[:class_name]       ||= Mobility::Sequel.const_get("#{type.capitalize}Translation")
+      class << self
+        # @!group Backend Configuration
+        # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
+        # @raise (see Mobility::Backends::KeyValue::ClassMethods#configure)
+        # @raise [CacheRequired] if cache is disabled
+        def configure(options)
+          raise CacheRequired, "Cache required for Sequel::KeyValue backend" if options[:cache] == false
+          super
+          if type = options[:type]
+            options[:association_name] ||= :"#{options[:type]}_translations"
+            options[:class_name]       ||= Mobility::Sequel.const_get("#{type.capitalize}Translation")
+          end
+          options[:table_alias_affix] = "#{options[:model_class]}_%s_#{options[:association_name]}"
+        rescue NameError
+          raise ArgumentError, "You must define a Mobility::Sequel::#{type.capitalize}Translation class."
         end
-      rescue NameError
-        raise ArgumentError, "You must define a Mobility::Sequel::#{type.capitalize}Translation class."
+        # @!endgroup
+
+        def build_op(attr, locale)
+          ::Mobility::Sequel::SQL::QualifiedIdentifier.new(table_alias(attr, locale), :value, locale, self, attribute_name: attr)
+        end
+
+        # @param [Sequel::Dataset] dataset Dataset to prepare
+        # @param [Object] predicate Predicate
+        # @param [Symbol] locale Locale
+        # @return [Sequel::Dataset] Prepared dataset
+        def prepare_dataset(dataset, predicate, locale)
+          visit(predicate, locale).inject(dataset) do |ds, (attr, join_type)|
+            join_translations(ds, attr, locale, join_type)
+          end
+        end
+
+        private
+
+        def join_translations(dataset, attr, locale, join_type)
+          dataset.join_table(join_type,
+                             class_name.table_name,
+                             {
+                               key: attr.to_s,
+                               locale: locale.to_s,
+                               translatable_type: model_class.name,
+                               translatable_id: ::Sequel[:"#{model_class.table_name}"][:id]
+                             },
+                             table_alias: table_alias(attr, locale))
+        end
+
+        def visit(predicate, locale)
+          case predicate
+          when Array
+            visit_collection(predicate, locale)
+          when ::Mobility::Sequel::SQL::QualifiedIdentifier
+            visit_sql_identifier(predicate, locale)
+          when ::Sequel::SQL::BooleanExpression
+            visit_boolean(predicate, locale)
+          when ::Sequel::SQL::Expression
+            visit(predicate.args, locale)
+          else
+            {}
+          end
+        end
+
+        def visit_boolean(boolean, locale)
+          if boolean.op == :IS
+            nils, ops = boolean.args.partition(&:nil?)
+            if hash = visit(ops, locale)
+              join_type = nils.empty? ? :inner : :left_outer
+              Hash[hash.keys.map { |key| [key, join_type] }]
+            else
+              {}
+            end
+          else
+            visit(boolean.args, locale)
+          end
+        end
+
+        def visit_collection(collection, locale)
+          collection.map { |p| visit(p, locale) }.compact.inject do |hash, visited|
+            visited.merge(hash) { |_, old, new| old == :inner ? old : new }
+          end
+        end
+
+        def visit_sql_identifier(identifier, locale)
+          if identifier.backend_class == self && identifier.locale == locale
+            { identifier.attribute_name => :inner }
+          else
+            {}
+          end
+        end
       end
-      # @!endgroup
 
       setup do |attributes, options|
         association_name   = options[:association_name]
@@ -74,8 +149,6 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         include DestroyKeyValueTranslations
         include Mobility::Sequel::ColumnChanges.new(attributes)
       end
-
-      setup_query_methods(QueryMethods)
 
       # Returns translation for a given locale, or initializes one if none is present.
       # @param [Symbol] locale

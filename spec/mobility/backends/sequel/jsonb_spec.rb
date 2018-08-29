@@ -34,8 +34,6 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
       aggregate_failures do
         expect(JsonbPost.i18n.where(title: nil).sql).to match /\?/
         expect(JsonbPost.i18n.where(title: nil).sql).not_to match /NULL/
-        expect(JsonbPost.i18n.exclude(title: "foo").sql).to match /\?/
-        expect(JsonbPost.i18n.exclude(title: "foo").sql).not_to match /NULL/
       end
     end
 
@@ -68,6 +66,9 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
 
           expect(JsonbPost.i18n.where(title: "foo").first).to eq(post1)
           expect(JsonbPost.i18n.where(title: value).first).to eq(post2)
+
+          # Only use ->> operator when matching strings
+          expect(JsonbPost.i18n.where(title: value).sql).not_to match("->>")
         end
       end
 

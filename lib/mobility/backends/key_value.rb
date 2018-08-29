@@ -81,6 +81,7 @@ other backends on model (otherwise one will overwrite the other).
         backend_class.extend ClassMethods
         backend_class.option_reader :association_name
         backend_class.option_reader :class_name
+        backend_class.option_reader :table_alias_affix
       end
 
       module ClassMethods
@@ -118,6 +119,10 @@ each translated model, or set a default option in your configuration.
           else
             super
           end
+        end
+
+        def table_alias(attr, locale)
+          table_alias_affix % "#{attr}_#{Mobility.normalize_locale(locale)}"
         end
       end
 

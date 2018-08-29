@@ -36,8 +36,6 @@ Sequel serialization plugin.
       include Sequel
       include HashValued
 
-      require 'mobility/backends/sequel/serialized/query_methods'
-
       # @!group Backend Configuration
       # @param (see Backends::Serialized.configure)
       # @option (see Backends::Serialized.configure)
@@ -47,6 +45,11 @@ Sequel serialization plugin.
         Serialized.configure(options)
       end
       # @!endgroup
+
+      def self.build_op(attr, _locale)
+        raise ArgumentError,
+          "You cannot query on mobility attributes translated with the Serialized backend (#{attr})."
+      end
 
       setup do |attributes, options|
         format = options[:format]
@@ -70,8 +73,6 @@ Sequel serialization plugin.
 
         include SerializationModificationDetectionFix
       end
-
-      setup_query_methods(QueryMethods)
 
       # Returns deserialized column value
       # @return [Hash]

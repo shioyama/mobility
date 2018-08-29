@@ -169,8 +169,19 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel do
     end
 
     describe "mobility scope (.i18n)" do
-      before { Article.translates :title, :content, backend: :table, cache: true }
       include_querying_examples('Article')
+
+      describe "joins" do
+        it "uses inner join for WHERE queries if query has at least one non-null attribute" do
+          expect(Article.i18n.where(title: "foo", content: nil).sql).not_to match(/OUTER/)
+          expect(Article.i18n.where(title: "foo").where(content: nil).sql).not_to match(/OUTER/)
+          #TODO: get this to pass
+          #expect(Article.i18n.where(content: nil).where(title: "foo").sql).not_to match(/OUTER/)
+          expect(Article.i18n.where(title: "foo", content: [nil, "bar"]).sql).not_to match(/OUTER/)
+          expect(Article.i18n.where(title: "foo").where(content: [nil, "bar"]).sql).not_to match(/OUTER/)
+          expect(Article.i18n.where(content: [nil, "bar"]).where(title: "foo").sql).not_to match(/OUTER/)
+        end
+      end
     end
   end
 end if Mobility::Loaded::Sequel

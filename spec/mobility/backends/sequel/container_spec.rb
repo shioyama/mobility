@@ -29,8 +29,6 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
       aggregate_failures do
         expect(ContainerPost.i18n.where(title: nil).sql).to match /\?/
         expect(ContainerPost.i18n.where(title: nil).sql).not_to match /NULL/
-        expect(ContainerPost.i18n.exclude(title: "foo").sql).to match /\?/
-        expect(ContainerPost.i18n.exclude(title: "foo").sql).not_to match /NULL/
       end
     end
 

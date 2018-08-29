@@ -357,23 +357,27 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
     end
 
     describe ".configure" do
-      it "sets association_name and class_name from string type" do
-        options = { type: :string }
+      it "sets association_name, class_name and table_alias_affix from string type" do
+        options = { type: :string, model_class: Post }
         described_class.configure(options)
         expect(options).to eq({
           type: :string,
           class_name: Mobility::Sequel::StringTranslation,
-          association_name: :string_translations
+          model_class: Post,
+          association_name: :string_translations,
+          table_alias_affix: "Post_%s_string_translations"
         })
       end
 
-      it "sets association_name and class_name from text type" do
-        options = { type: :text }
+      it "sets association_name, class_name and table_alias_affix from text type" do
+        options = { type: :text, model_class: Post }
         described_class.configure(options)
         expect(options).to eq({
           type: :text,
           class_name: Mobility::Sequel::TextTranslation,
-          association_name: :text_translations
+          model_class: Post,
+          association_name: :text_translations,
+          table_alias_affix: "Post_%s_text_translations"
         })
       end
 
@@ -384,13 +388,15 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
       end
 
 
-      it "sets default association_name and class_name from type" do
-        options = { type: :text }
+      it "sets default association_name, class_name and table_alias_affix from type" do
+        options = { type: :text, model_class: Post }
         described_class.configure(options)
         expect(options).to eq({
-          association_name: :text_translations,
+          type: :text,
           class_name: Mobility::Sequel::TextTranslation,
-          type: :text
+          model_class: Post,
+          association_name: :text_translations,
+          table_alias_affix: "Post_%s_text_translations"
         })
       end
     end

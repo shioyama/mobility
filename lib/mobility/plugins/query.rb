@@ -20,6 +20,9 @@ module Mobility
           if Loaded::ActiveRecord && attributes.model_class < ::ActiveRecord::Base
             require "mobility/plugins/active_record/query"
             ActiveRecord::Query.apply(attributes)
+          elsif Loaded::Sequel && attributes.model_class < ::Sequel::Model
+            require "mobility/plugins/sequel/query"
+            Sequel::Query.apply(attributes)
           end
         end
       end

@@ -706,29 +706,4 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       expect(query_scope.where(a1 => "foo").or(:published => false, a2 => "foo content").select_all(table_name).all).to match_array([@instance2, @instance3])
     end
   end
-
-  describe "Model.i18n.first_by_<translated attribute>" do
-    let(:finder_method) { :"first_by_#{a1}" }
-
-    it "finds correct translation if exists in current locale" do
-      Mobility.locale = :ja
-      instance = model_class.create(a1 => "タイトル")
-      Mobility.locale = :en
-      instance.send(:"#{a1}=", "Title")
-      instance.save
-      match = query_scope.send(finder_method, "Title")
-      expect(match.id).to eq(instance.id)
-      Mobility.locale = :ja
-      expect(query_scope.send(finder_method, "タイトル").id).to eq(instance.id)
-      expect(query_scope.send(finder_method, "foo")).to be_nil
-    end
-
-    it "returns nil if no matching translation exists in this locale" do
-      Mobility.locale = :ja
-      model_class.create(a1 => "タイトル")
-      Mobility.locale = :en
-      expect(query_scope.send(finder_method, "タイトル")).to eq(nil)
-      expect(query_scope.send(finder_method, "foo")).to be_nil
-    end
-  end
 end

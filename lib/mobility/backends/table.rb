@@ -125,6 +125,10 @@ set.
             super
           end
         end
+
+        def table_alias(locale)
+          "#{table_name}_#{Mobility.normalize_locale(locale)}"
+        end
       end
 
       # Simple hash cache to memoize translations as a hash so they can be

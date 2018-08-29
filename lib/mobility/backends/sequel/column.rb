@@ -13,8 +13,6 @@ Implements the {Mobility::Backends::Column} backend for Sequel models.
       include Sequel
       include Column
 
-      require 'mobility/backends/sequel/column/query_methods'
-
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, _options = nil)
@@ -34,7 +32,10 @@ Implements the {Mobility::Backends::Column} backend for Sequel models.
         available_locales.each { |l| yield(l) if present?(l) }
       end
 
-      setup_query_methods(QueryMethods)
+      def self.build_op(attr, locale)
+        ::Sequel::SQL::QualifiedIdentifier.new(model_class.table_name,
+                                               Column.column_name_for(attr, locale))
+      end
 
       private
 

@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+require "mobility/backends/sequel/json"
+require "mobility/backends/sequel/jsonb"
+
 module Mobility
   module Backends
 =begin
@@ -7,9 +11,6 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
 =end
     class Sequel::Container
       include Sequel
-
-      require 'mobility/backends/sequel/container/json_query_methods'
-      require 'mobility/backends/sequel/container/jsonb_query_methods'
 
       # @!method column_name
       #   @return [Symbol] (:translations) Name of translations column
@@ -58,8 +59,6 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
         end
       end
 
-      backend_class = self
-
       setup do |attributes, options|
         column_name = options[:column_name]
         before_validation = Module.new do
@@ -76,13 +75,6 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
 
         plugin :defaults_setter
         attributes.each { |attribute| default_values[attribute.to_sym] = {} }
-
-        query_methods = backend_class.const_get("#{options[:column_type].capitalize}QueryMethods")
-        extend(Module.new do
-          define_method ::Mobility.query_method do
-            super().with_extend(query_methods.new(attributes, options))
-          end
-        end)
       end
 
       private
@@ -104,6 +96,23 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
       end
 
       class InvalidColumnType < StandardError; end
+
+      # @param [Symbol] name Attribute name
+      # @param [Symbol] locale Locale
+      # @return [Mobility::Backends::Sequel::Container::JSONOp,Mobility::Backends::Sequel::Container::JSONBOp]
+      def self.build_op(attr, locale)
+        klass = const_get("#{options[:column_type].upcase}Op")
+        klass.new(klass.new(column_name.to_sym)[locale.to_s]).get_text(attr)
+      end
+
+      class JSONOp < ::Sequel::Postgres::JSONOp; end
+
+      class JSONBOp < Jsonb::JSONBOp
+        def to_question
+          left = @value.args[0].value
+          JSONBOp === left ? ::Sequel.&(super, left.to_question) : super
+        end
+      end
     end
   end
 end

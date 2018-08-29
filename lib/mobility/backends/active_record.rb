@@ -22,7 +22,7 @@ module Mobility
 
         # @param [ActiveRecord::Relation] relation Relation to scope
         # @param [Object] predicate Arel predicate
-        # @param [Symbol] locale Locale
+        # @param [Symbol] locale (Mobility.locale) Locale
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] Relation with scope added
         def apply_scope(relation, _predicate, _locale = Mobility.locale, invert: false)

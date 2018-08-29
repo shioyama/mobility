@@ -59,7 +59,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         # Joins translations using either INNER/OUTER join appropriate to the query.
         # @param [ActiveRecord::Relation] relation Relation to scope
         # @param [Object] predicate Arel predicate
-        # @param [Symbol] locale Locale
+        # @param [Symbol] locale (Mobility.locale) Locale
         # @option [Boolean] invert
         # @return [ActiveRecord::Relation] relation Relation with joins applied (if needed)
         def apply_scope(relation, predicate, locale = Mobility.locale, invert: false)

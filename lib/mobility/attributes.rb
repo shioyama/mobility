@@ -281,6 +281,13 @@ EOL
         mobility_modules.map(&:names).flatten.uniq
       end
 
+      # Return true if attribute name is translated on this model.
+      # @param [String, Symbol] Attribute name
+      # @return [Boolean]
+      def mobility_attribute?(name)
+        mobility_attributes.include?(name.to_s)
+      end
+
       # @!method translated_attribute_names
       # @return (see #mobility_attributes)
       alias translated_attribute_names mobility_attributes

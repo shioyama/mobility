@@ -88,6 +88,18 @@ describe Mobility::Attributes do
         end
       end
 
+      describe ".mobility_attribute?" do
+        it "returns true if and only if attribute name is translated" do
+          names = %w[title content]
+          Article.include described_class.new(*names, backend: :null)
+          names.each do |name|
+            expect(Article.mobility_attribute?(name)).to eq(true)
+            expect(Article.mobility_attribute?(name.to_sym)).to eq(true)
+          end
+          expect(Article.mobility_attribute?("foo")).to eq(false)
+        end
+      end
+
       describe ".mobility_modules" do
         it "returns attribute modules on class" do
           modules = [

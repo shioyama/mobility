@@ -46,7 +46,7 @@ enabled for any one attribute on the model.
           end
 
           def method_missing(m, *)
-            if @model_class.mobility_attributes.include?(m.to_s)
+            if @model_class.mobility_attribute?(m)
               @__backends |= [@model_class.mobility_backend_class(m)]
               @model_class.mobility_backend_class(m).build_node(m, @locale)
             elsif @model_class.column_names.include?(m.to_s)
@@ -92,9 +92,9 @@ enabled for any one attribute on the model.
           def order(opts, *rest)
             case opts
             when Symbol, String
-              mobility_attributes.include?(opts.to_s) ? order({ opts => :asc }, *rest) : super
+              @klass.mobility_attribute?(opts) ? order({ opts => :asc }, *rest) : super
             when Hash
-              i18n_keys, keys = opts.keys.partition { |key| mobility_attributes.include?(key.to_s) }
+              i18n_keys, keys = opts.keys.partition(&@klass.method(:mobility_attribute?))
               return super if i18n_keys.empty?
 
               base = keys.empty? ? self : super(opts.slice(keys))

@@ -24,8 +24,6 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       include KeyValue
       include Util
 
-      require 'mobility/backends/sequel/key_value/query_methods'
-
       class << self
         # @!group Backend Configuration
         # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)

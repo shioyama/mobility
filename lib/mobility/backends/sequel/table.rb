@@ -16,8 +16,6 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
       include Sequel
       include Table
 
-      require 'mobility/backends/sequel/table/query_methods'
-
       def translation_class
         self.class.translation_class
       end

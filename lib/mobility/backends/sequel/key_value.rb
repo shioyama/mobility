@@ -72,6 +72,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
                              table_alias: table_alias(attr, locale))
         end
 
+        # @return [Hash] Hash of attribute/join_type pairs
         def visit(predicate, locale)
           case predicate
           when Array

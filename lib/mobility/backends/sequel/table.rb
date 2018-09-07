@@ -79,6 +79,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
                              table_alias: table_alias(locale))
         end
 
+        # @return [Symbol] Join type
         def visit(predicate, locale)
           case predicate
           when Array

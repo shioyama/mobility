@@ -18,11 +18,52 @@ See ActiveRecord::Query plugin.
         end
 
         module QueryMethod
-          def __mobility_query_dataset__(*)
-            dataset.with_extend(QueryExtension)
+          def __mobility_query_dataset__(locale: Mobility.locale, &block)
+            if block_given?
+              VirtualRow.build_query(self, locale, &block)
+            else
+              dataset.with_extend(QueryExtension)
+            end
           end
         end
-        private_constant :QueryMethod
+
+        # Internal class to create a "clean room" for manipulating translated
+        # attribute nodes in an instance-eval'ed block. Inspired by Sequel's
+        # (much more sophisticated) virtual rows.
+        class VirtualRow < BasicObject
+          attr_reader :__backends
+
+          def initialize(model_class, locale)
+            @model_class, @locale, @__backends = model_class, locale, []
+          end
+
+          def method_missing(m, *)
+            if @model_class.mobility_attribute?(m)
+              @__backends |= [@model_class.mobility_backend_class(m)]
+              @model_class.mobility_backend_class(m).build_op(m.to_s, @locale)
+            elsif @model_class.columns.include?(m.to_s)
+              ::Sequel::SQL::QualifiedIdentifier.new(@model_class.table_name, m)
+            else
+              super
+            end
+          end
+
+          class << self
+            def build_query(klass, locale, &block)
+              row = new(klass, locale)
+              query = block.arity.zero? ? row.instance_eval(&block) : block.call(row)
+
+              prepare_datasets(klass.dataset, row.__backends, locale, query).where(query)
+            end
+
+            private
+
+            def prepare_datasets(dataset, backends, locale, predicates)
+              backends.inject(dataset) { |ds, b| b.prepare_dataset(ds, predicates, locale) }
+            end
+          end
+        end
+        private_constant :QueryMethod, :VirtualRow
 
         module QueryExtension
           %w[exclude or where].each do |method_name|

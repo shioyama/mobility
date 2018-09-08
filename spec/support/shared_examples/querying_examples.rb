@@ -719,4 +719,128 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       expect(query_scope.where(a1 => "foo").or(:published => false, a2 => "foo content").select_all(table_name).all).to match_array([@instance2, @instance3])
     end
   end
+
+  describe "dataset queries" do
+    # Shortcut for passing block to e.g. Post.i18n
+    def query(*args, &block); model_class.i18n(*args, &block); end
+
+    context "single-block querying" do
+      let!(:i) { [
+        model_class.create(a1 => "foo"             ),
+        model_class.create(                        ),
+        model_class.create(             a2 => "bar"),
+        model_class.create(             a2 => "foo"),
+        model_class.create(a1 => "bar"             ),
+        model_class.create(a1 => "foo", a2 => "bar"),
+        model_class.create(a1 => "foo", a2 => "baz")
+      ] }
+
+      describe "equality" do
+        it "handles (a EQ 'foo')" do
+          expect(query { __send__(a1) =~ "foo" }.select_all(table_name).all).to match_array([i[0], *i[5..6]])
+        end
+
+        it "handles (a EQ NULL)" do
+          expect(query { __send__(a1) =~ nil }.select_all(table_name).all).to match_array(i[1..3])
+        end
+
+        it "handles (a EQ b)" do
+          matching = [
+            model_class.create(a1 => "foo", a2 => "foo"),
+            model_class.create(a1 => "bar", a2 => "bar")
+          ]
+          expect(query { __send__(a1) =~ __send__(a2) }.select_all(table_name).all).to match_array(matching)
+        end
+
+        context "with locale option" do
+          it "handles (a EQ 'foo')" do
+            post1 = model_class.new(a1 => "foo en", a2 => "bar en")
+            Mobility.with_locale(:ja) do
+              post1.send("#{a1}=", "foo ja")
+              post1.send("#{a2}=", "bar ja")
+            end
+            post1.save
+
+            post2 = model_class.new(a1 => "baz en")
+            Mobility.with_locale(:'pt-BR') { post2.send("#{a1}=", "baz pt-br") }
+            post2.save
+
+            expect(query(locale: :en) { __send__(a1) =~ "foo en" }.select_all(table_name).all).to match_array([post1])
+            expect(query(locale: :en) { __send__(a2) =~ "bar en" }.select_all(table_name).all).to match_array([post1])
+            expect(query(locale: :ja) { __send__(a1) =~ "foo ja" }.select_all(table_name).all).to match_array([post1])
+            expect(query(locale: :ja) { __send__(a2) =~ "bar ja" }.select_all(table_name).all).to match_array([post1])
+            expect(query(locale: :en) { __send__(a1) =~ "baz en" }.select_all(table_name).all).to match_array([post2])
+            expect(query(locale: :'pt-BR') { __send__(a1) =~ "baz pt-br" }.select_all(table_name).all).to match_array([post2])
+          end
+        end
+      end
+
+      describe "not equal" do
+        it "handles (a != 'foo')" do
+          expect(query { __send__(a1) !~ "foo" }.select_all(table_name).all).to match_array([i[4]])
+        end
+
+        # @note For sequel, we need to use +invert+ to get NOT EQ NULL
+        it "handles (a NOT EQ NULL)" do
+          expect(query { __send__(a1) =~ nil }.invert.select_all(table_name).all).to match_array([i[0], *i[4..6]])
+        end
+      end
+
+      describe "AND" do
+        it "handles (a AND b)" do
+          expect(query {
+            (__send__(a1) =~ "foo") & (__send__(a2) =~ "bar")
+          }.select_all(table_name).all).to match_array([i[5]])
+        end
+      end
+
+      describe "OR" do
+        it "handles (a OR b) on same attribute" do
+          expect(query {
+            (__send__(a1) =~ "foo") | (__send__(a1) =~ "bar")
+          }.select_all(table_name).all).to match_array([i[0], *i[4..6]])
+        end
+
+        it "handles (a OR b) on two attributes" do
+          expect(query {
+            (__send__(a1) =~ "foo") | (__send__(a2) =~ "bar")
+          }.select_all(table_name).all).to match_array([i[0], i[2], *i[5..6]])
+        end
+      end
+
+      describe "combination of AND and OR" do
+        it "handles a AND (b OR c)" do
+          expect(query {
+            ((__send__(a1) =~ "foo") & (__send__(a2) =~ "bar")) | (__send__(a2) =~ "baz")
+          }.select_all(table_name).all).to match_array(i[5..6])
+        end
+      end
+
+      describe "ILIKE" do
+        it "matches case-insensitively, including partial string matches" do
+          foobar = model_class.create(a1 => "foObar")
+          barfoo = model_class.create(a1 => "barfOo")
+          expect(query { Sequel.ilike(__send__(a1), "foo%") }.select_all(table_name).all).
+            to match_array([i[0], *i[5..6], foobar])
+          expect(query { Sequel.ilike(__send__(a1), "%foo") }.select_all(table_name).all).
+            to match_array([i[0], *i[5..6], barfoo])
+        end
+      end
+
+      describe "LIKE" do
+        it "matches case-sensitively, including partial string matches" do
+          foobar = model_class.create(a1 => "foObar")
+          barfoo = model_class.create(a1 => "barfOo")
+          expect(query { Sequel.like(__send__(a1), "foo%") }.select_all(table_name).all).
+            not_to include(foobar)
+          expect(query { Sequel.like(__send__(a1), "foO%") }.select_all(table_name).all).
+            to include(foobar)
+          expect(query { Sequel.like(__send__(a1), "%foo") }.select_all(table_name).all).
+            not_to include(barfoo)
+          expect(query { Sequel.like(__send__(a1), "%fOo") }.select_all(table_name).all).
+            to include(barfoo)
+        end
+      end
+    end
+  end
 end

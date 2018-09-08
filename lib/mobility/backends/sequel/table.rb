@@ -110,6 +110,8 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
             boolean.args.any? { |op| visit(op, locale) } && :inner
           elsif boolean.op == :IS
             boolean.args.any?(&:nil?) && :left_outer
+          elsif boolean.op == :OR
+            boolean.args.any? { |op| visit(op, locale) } && :left_outer
           else
             visit(boolean.args, locale)
           end

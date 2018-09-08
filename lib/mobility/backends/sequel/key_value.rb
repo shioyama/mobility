@@ -91,10 +91,18 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             nils, ops = boolean.args.partition(&:nil?)
             if hash = visit(ops, locale)
               join_type = nils.empty? ? :inner : :left_outer
+              # TODO: simplify to hash.transform_values { join_type } when
+              #   support for Ruby 2.3 is deprecated
               Hash[hash.keys.map { |key| [key, join_type] }]
             else
               {}
             end
+          elsif boolean.op == :OR
+            hash = boolean.args.map { |op| visit(op, locale) }.
+              compact.inject(&:merge)
+            # TODO: simplify to hash.transform_values { :left_outer } when
+            #   support for Ruby 2.3 is deprecated
+            Hash[hash.keys.map { |key| [key, :left_outer] }]
           else
             visit(boolean.args, locale)
           end

@@ -104,7 +104,7 @@ module Mobility
             String      :author_pt_br
             String      :author_ru
             TrueClass   :published
-            Integer     :post_id
+            Integer     :article_id
             DateTime    :created_at, allow_null: false
             DateTime    :updated_at, allow_null: false
           end

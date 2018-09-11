@@ -932,6 +932,12 @@ Integrations
 * [friendly_id-mobility](https://github.com/shioyama/friendly_id-mobility): Use
   Mobility with [FriendlyId](https://github.com/norman/friendly_id).
 
+Tutorials
+---------
+
+- [Polyglot content in a rails
+  app](https://revs.runtime-revolution.com/polyglot-content-in-a-rails-app-aed823854955)
+
 More Information
 ----------------
 

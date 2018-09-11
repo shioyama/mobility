@@ -1,6 +1,16 @@
 # Mobility Changelog
 
-## 0.7
+## 0.8
+
+### 0.8.0 (September 11, 2018)
+* Support order clause on translated queries (ActiveRecord)
+  ([#261](https://github.com/shioyama/mobility/pull/261))
+* Restructure Sequel querying into plugin
+  ([#255](https://github.com/shioyama/mobility/pull/255),
+  [#267](https://github.com/shioyama/mobility/pull/267),
+  [#268](https://github.com/shioyama/mobility/pull/267))
+* Default locale to Mobility.locale in apply_scope
+  ([#263](https://github.com/shioyama/mobility/pull/263))
 
 ### 0.7.6 (July 6, 2018)
 * Sequel pg_hash require hash_initializer

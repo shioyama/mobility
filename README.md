@@ -51,7 +51,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.7.6'
+gem 'mobility', '~> 0.8.0'
 ```
 
 Mobility is cryptographically signed. To be sure the gem you install hasn't
@@ -756,9 +756,8 @@ WHERE "Post_title_en_string_translations"."value" ILIKE 'foo'
 
 The block-format query format is very powerful and allows you to build complex
 backend-independent queries on translated and untranslated attributes without
-having to deal with the details of how these translations are stored. This
-interface is not yet supported for Sequel models but is planned for the next
-release.
+having to deal with the details of how these translations are stored. The same
+interface is supported with Sequel to build datasets.
 
 <a name="backends"></a>Backends
 --------

@@ -937,6 +937,10 @@ Tutorials
 
 - [Polyglot content in a rails
   app](https://revs.runtime-revolution.com/polyglot-content-in-a-rails-app-aed823854955)
+- [Translating with
+  Mobility](https://dejimata.com/2017/3/3/translating-with-mobility)
+- [JSONify your Ruby
+  Translations](https://dejimata.com/2018/3/20/jsonify-your-ruby-translations)
 
 More Information
 ----------------

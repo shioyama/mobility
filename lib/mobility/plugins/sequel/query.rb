@@ -53,7 +53,12 @@ See ActiveRecord::Query plugin.
               row = new(klass, locale)
               query = block.arity.zero? ? row.instance_eval(&block) : block.call(row)
 
-              prepare_datasets(klass.dataset, row.__backends, locale, query).where(query)
+              if ::Sequel::Dataset === query
+                predicates = query.opts[:where]
+                prepare_datasets(query, row.__backends, locale, predicates)
+              else
+                prepare_datasets(klass.dataset, row.__backends, locale, query).where(query)
+              end
             end
 
             private

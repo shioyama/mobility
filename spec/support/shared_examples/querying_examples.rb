@@ -842,5 +842,38 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
         end
       end
     end
+
+    context "multi-block querying" do
+      it "combines multiple locales" do
+        post1 = model_class.new(a1 => "foo en", a2 => "bar en")
+        Mobility.with_locale(:ja) do
+          post1.send("#{a1}=", "foo ja")
+          post1.send("#{a2}=", "bar ja")
+        end
+        post1.save
+
+        post2 = model_class.new(a1 => "baz en")
+        Mobility.with_locale(:'pt-BR') { post2.send("#{a1}=", "baz pt-br") }
+        post2.save
+
+        aggregate_failures do
+          expect(
+            query(locale: :en) { |en|
+              query(locale: :ja) { |ja|
+                (en.__send__(a1) =~ "foo en") & (ja.__send__(a2) =~ "bar ja")
+              }
+            }.select_all(table_name).all
+          ).to match_array([post1])
+
+          expect(
+            query(locale: :en) { |en|
+              query(locale: :'pt-BR') { |pt|
+                (en.__send__(a1) =~ "baz en") & (pt.__send__(a1) =~ "baz pt-br")
+              }
+            }.select_all(table_name).all
+          ).to match_array([post2])
+        end
+      end
+    end
   end
 end

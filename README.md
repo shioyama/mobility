@@ -930,6 +930,9 @@ Integrations
 
 * [friendly_id-mobility](https://github.com/shioyama/friendly_id-mobility): Use
   Mobility with [FriendlyId](https://github.com/norman/friendly_id).
+* [mobility-ransack](https://github.com/shioyama/mobility-ransack): Search
+  attributes translated by Mobility with
+  [Ransack](https://github.com/activerecord-hackery/ransack).
 
 Tutorials
 ---------

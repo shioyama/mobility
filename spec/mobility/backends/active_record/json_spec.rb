@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :postgres do
+describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record do
   require "mobility/backends/active_record/json"
   extend Helpers::ActiveRecord
   before do

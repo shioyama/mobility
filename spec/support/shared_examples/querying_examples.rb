@@ -443,14 +443,16 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
       end
 
       describe "LIKE/ILIKE (matches)" do
-        it "includes partial string matches" do
-          foobar = model_class.create(a1 => "foObar")
-          barfoo = model_class.create(a1 => "barfOo")
-          expect(query { __send__(a1).matches("foo%") }).to match_array([i[0], *i[5..6], foobar])
-          expect(query { __send__(a1).matches("%foo") }).to match_array([i[0], *i[5..6], barfoo])
+        if ENV['DB'] != 'mysql'
+          it "includes partial string matches" do
+            foobar = model_class.create(a1 => "foObar")
+            barfoo = model_class.create(a1 => "barfOo")
+            expect(query { __send__(a1).matches("foo%") }).to match_array([i[0], *i[5..6], foobar])
+            expect(query { __send__(a1).matches("%foo") }).to match_array([i[0], *i[5..6], barfoo])
+          end
         end
 
-        if ENV['DB'] == 'postgres' && ::ActiveRecord::VERSION::STRING >= '5.0'
+        if (ENV['DB'] == 'mysql' || ENV['DB'] == 'postgres') && ::ActiveRecord::VERSION::STRING >= '5.0'
           it "works with case_sensitive option" do
             foobar = model_class.create(a1 => "foObar")
             barfoo = model_class.create(a1 => "barfOo")

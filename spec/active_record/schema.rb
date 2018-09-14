@@ -92,6 +92,15 @@ module Mobility
             t.timestamps null: false
           end
 
+          if ENV['DB'] == 'mysql'
+            create_table "json_posts" do |t|
+              t.json :my_title_i18n
+              t.json :my_content_i18n
+              t.boolean :published
+              t.timestamps null: false
+            end
+          end
+
           if ENV['DB'] == 'postgres'
             create_table "jsonb_posts" do |t|
               t.jsonb :my_title_i18n, default: {}

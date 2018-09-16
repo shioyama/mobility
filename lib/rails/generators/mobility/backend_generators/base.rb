@@ -9,7 +9,7 @@ module Mobility
       include ::Mobility::ActiveRecordMigrationCompatibility
 
       def create_migration_file
-        if self.class.migration_exists?(migration_dir, migration_file)
+        if behavior == :invoke && self.class.migration_exists?(migration_dir, migration_file)
           ::Kernel.warn "Migration already exists: #{migration_file}"
         else
           migration_template "#{template}.rb", "db/migrate/#{migration_file}.rb"

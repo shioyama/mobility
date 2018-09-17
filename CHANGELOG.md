@@ -11,6 +11,8 @@
   [#268](https://github.com/shioyama/mobility/pull/267))
 * Default locale to Mobility.locale in apply_scope
   ([#263](https://github.com/shioyama/mobility/pull/263))
+* Require Ruby version 2.3.7 or greater
+  ([#242](https://github.com/shioyama/mobility/pull/242))
 
 ### 0.7.6 (July 6, 2018)
 * Sequel pg_hash require hash_initializer

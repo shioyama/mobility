@@ -286,6 +286,61 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
     end
   end
 
+  describe ".pluck", rails_version_geq: '5.0' do
+    before do
+      [["foo0", "bar3", true],
+       ["foo2", "bar0", false],
+       ["foo0", "bar1", true],
+       ["foo1", "bar2", false],
+       ["foo3", "bar1", nil]].each do |(val1, val2, val3)|
+        model_class.create(a1 => val1, a2 => val2, :published => val3)
+      end
+    end
+    let(:ordered_results) { query_scope.order("#{model_class.table_name}.id asc") }
+
+    it "plucks individual attribute values" do
+      expect(ordered_results.pluck(a1)).to eq(["foo0", "foo2", "foo0", "foo1", "foo3"])
+    end
+
+    it "plucks pairs of attribute values" do
+      expect(ordered_results.pluck(a1, a2)).to eq(
+        [["foo0", "bar3"],
+         ["foo2", "bar0"],
+         ["foo0", "bar1"],
+         ["foo1", "bar2"],
+         ["foo3", "bar1"]]
+      )
+    end
+
+    it "plucks translated attributes mixed with untranslated attributes" do
+      expect(ordered_results.pluck(a1, :published, a2)).to eq(
+        [["foo0", true,  "bar3"],
+         ["foo2", false, "bar0"],
+         ["foo0", true,  "bar1"],
+         ["foo1", false, "bar2"],
+         ["foo3", nil,   "bar1"]]
+      )
+    end
+
+    it "plucks untranslated attributes only" do
+      expect(ordered_results.pluck(:published)).to eq([true, false, true, false, nil])
+    end
+
+    it "works with nil values" do
+      model_class.create(a1 => nil, a2 => "bar4")
+      model_class.create(a1 => "foo4", a2 => nil)
+      expect(ordered_results.pluck(a1, a2)).to eq(
+        [["foo0", "bar3"],
+         ["foo2", "bar0"],
+         ["foo0", "bar1"],
+         ["foo1", "bar2"],
+         ["foo3", "bar1"],
+         [nil,    "bar4"],
+         ["foo4", nil   ]]
+      )
+    end
+  end
+
   describe "Arel queries" do
     # Shortcut for passing block to e.g. Post.i18n
     def query(*args, &block); model_class.i18n(*args, &block); end

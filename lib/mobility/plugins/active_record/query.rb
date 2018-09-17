@@ -109,6 +109,22 @@ enabled for any one attribute on the model.
             end
           end
 
+          if ::ActiveRecord::VERSION::STRING >= '5.0'
+            def pluck(*attrs)
+              return super unless attrs.any?(&@klass.method(:mobility_attribute?))
+
+              keys = attrs.dup
+
+              base = keys.each_with_index.inject(self) do |query, (key, index)|
+                next query unless @klass.mobility_attribute?(key)
+                keys[index] = backend_node(key)
+                @klass.mobility_backend_class(key).apply_scope(query, backend_node(key))
+              end
+
+              base.pluck(*keys)
+            end
+          end
+
           # Return backend node for attribute name.
           # @param [Symbol,String] name Name of attribute
           # @param [Symbol] locale Locale

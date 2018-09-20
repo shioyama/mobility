@@ -97,6 +97,11 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             else
               {}
             end
+          elsif boolean.op == :'='
+            hash = visit(boolean.args, locale)
+            # TODO: simplify to hash.transform_values { :inner } when
+            #   support for Ruby 2.3 is deprecated
+            Hash[hash.keys.map { |key| [key, :inner] }]
           elsif boolean.op == :OR
             hash = boolean.args.map { |op| visit(op, locale) }.
               compact.inject(&:merge)
@@ -116,7 +121,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
         def visit_sql_identifier(identifier, locale)
           if identifier.backend_class == self && identifier.locale == locale
-            { identifier.attribute_name => :inner }
+            { identifier.attribute_name => :left_outer }
           else
             {}
           end

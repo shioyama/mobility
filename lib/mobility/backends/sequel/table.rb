@@ -102,16 +102,16 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         end
 
         def visit_sql_identifier(identifier, locale)
-          (table_alias(locale) == identifier.table) && :inner
+          (table_alias(locale) == identifier.table) && :inner || nil
         end
 
         def visit_boolean(boolean, locale)
           if boolean.op == :'='
-            boolean.args.any? { |op| visit(op, locale) } && :inner
+            boolean.args.any? { |op| visit(op, locale) } && :inner || nil
           elsif boolean.op == :IS
-            boolean.args.any?(&:nil?) && :left_outer
+            boolean.args.any?(&:nil?) && :left_outer || nil
           elsif boolean.op == :OR
-            boolean.args.any? { |op| visit(op, locale) } && :left_outer
+            boolean.args.any? { |op| visit(op, locale) } && :left_outer || nil
           else
             visit(boolean.args, locale)
           end

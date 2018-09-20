@@ -439,6 +439,15 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
           end
         end
       end
+
+      describe ".order" do
+        it "users OUTER JOIN" do
+          article1 = Article.create(title: "foo")
+          article2 = Article.create
+
+          expect(Article.i18n.order(:title)).to match_array([article1, article2])
+        end
+      end
     end
 
     describe "Model.i18n.find_by_<translated attribute>" do

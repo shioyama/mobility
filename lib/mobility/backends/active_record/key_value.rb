@@ -143,7 +143,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
         def visit_Mobility_Arel_Attribute(object)
           if object.backend_class == backend_class && object.locale == locale
-            { object.attribute_name => INNER_JOIN }
+            { object.attribute_name => OUTER_JOIN }
           end
         end
 

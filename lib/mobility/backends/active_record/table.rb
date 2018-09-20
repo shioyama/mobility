@@ -233,7 +233,7 @@ columns to that table.
           # join when required. Use options[:table_name] here since we don't
           # know if the other backend has a +table_name+ option accessor.
           (backend_class.table_name == object.backend_class.options[:table_name]) &&
-            (locale == object.locale) && INNER_JOIN
+            (locale == object.locale) && OUTER_JOIN || nil
         end
       end
 

@@ -2,6 +2,21 @@
 
 ## 0.8
 
+### 0.8.1 (September 25, 2018)
+* Default ActiveRecord Table/KeyValue backends to OUTER JOIN
+  ([#277](https://github.com/shioyama/mobility/pull/277))
+* Default Sequel Table/KeyValue backends to OUTER JOIN
+  ([#279](https://github.com/shioyama/mobility/pull/279))
+* Do not skip generator on `:revoke` behavior
+  ([#274](https://github.com/shioyama/mobility/pull/274)). Thanks
+  [mauriciopasquier](https://github.com/mauriciopasquier)!
+* Bump i18n dependency to allow versions up to 2.0
+  ([#280](https://github.com/shioyama/mobility/pull/280))
+* Use `references` and `foreign_key` in Table migration generator
+  ([#282](https://github.com/shioyama/mobility/pull/282) and
+  [#283](https://github.com/shioyama/mobility/pull/283)) Thanks
+  [omitter](https://github.com/omitter)!
+
 ### 0.8.0 (September 11, 2018)
 * Support order clause on translated queries (ActiveRecord)
   ([#261](https://github.com/shioyama/mobility/pull/261))

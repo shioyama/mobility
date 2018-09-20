@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'request_store', '~> 1.0'
-  spec.add_dependency 'i18n', '>= 0.6.10', '< 1.1'
+  spec.add_dependency 'i18n', '>= 0.6.10', '< 2'
   spec.add_development_dependency "database_cleaner", '~> 1.5', '>= 1.5.3'
   spec.add_development_dependency "rake", '~> 12', '>= 12.2.1'
   spec.add_development_dependency "rspec", "~> 3.0"

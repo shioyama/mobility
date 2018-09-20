@@ -155,7 +155,7 @@ with other backends.
       @model_class = @options[:model_class] = klass
       @backend_class = get_backend_class(backend_name).for(model_class).with_options(options)
 
-      Mobility.plugins.each do |name|
+      Mobility.plugins.uniq.each do |name|
         plugin = get_plugin_class(name)
         plugin.apply(self, options[name])
       end

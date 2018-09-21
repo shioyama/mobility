@@ -73,10 +73,19 @@ describe Mobility::Plugins::Fallbacks do
     context "fallbacks is true" do
       let(:fallbacks) { true }
 
+      # @note I18n changed its behavior in 1.1 (see: https://github.com/svenfuchs/i18n/pull/415)
+      #   To correctly test all versions, we actually generate fallbacks and
+      #   determine what the value should be, then check that it matches the
+      #   actual fallback value.
+      # TODO: Simplify this when support for I18n < 1.1 is dropped.
       it "uses default fallbacks" do
         original_default_locale = I18n.default_locale
         I18n.default_locale = :ja
-        expect(subject.read(:"en-US")).to eq("フー")
+        fallbacks = Mobility::Fallbacks.build({})
+        locales = fallbacks[:"en-US"]
+        # in I18n 1.1 value is nil here
+        value = locales.map { |locale| subject.read(locale, locale: true) }.compact.first
+        expect(subject.read(:"en-US")).to eq(value)
         I18n.default_locale = original_default_locale
       end
     end

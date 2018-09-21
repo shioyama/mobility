@@ -77,11 +77,6 @@ describe "ActiveRecord compatibility", orm: :active_record do
   describe "fallbacks" do
     let!(:post) { FallbackPost.create(title: "foo title") }
 
-    it "falls through to default locale with no options" do
-      Mobility.locale = :ja
-      expect(post.title).to eq("foo title")
-    end
-
     it "does not fall through to default locale when fallback: false option passed in" do
       Mobility.locale = :ja
       expect(post.title(fallback: false)).to eq(nil)

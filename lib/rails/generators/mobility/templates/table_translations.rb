@@ -12,7 +12,7 @@ class <%= migration_class_name %> < <%= activerecord_migration_class %>
 <% end -%>
 
       t.string  :locale, null: false
-      t.integer :<%= foreign_key %>, null: false
+      t.references :<%=model_table_name.singularize %>, null: false, foreign_key: true
 
       t.timestamps null: false
     end

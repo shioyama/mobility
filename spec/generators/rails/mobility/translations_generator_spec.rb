@@ -68,7 +68,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
                 contains "t.string :title"
                 contains "t.text :content"
                 contains "t.string  :locale, null: false"
-                contains "t.references :post, null: false, foreign_key: true"
+                contains "t.references :post, null: false, foreign_key: true, index: false"
                 contains "t.timestamps null: false"
                 contains "add_index :post_translations, :locale, name: :index_post_translations_on_locale"
                 contains "add_index :post_translations, [:post_id, :locale], name: :index_post_translations_on_post_id_and_locale, unique: true"

@@ -1,4 +1,9 @@
 ---
+version: "2"
+checks:
+  method-complexity:
+    config:
+      threshold: 6
 engines:
   duplication:
     enabled: true

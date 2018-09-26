@@ -11,3 +11,4 @@
 .ruby-version
 .byebug_history
 Guardfile
+*.gem

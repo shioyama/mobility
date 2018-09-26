@@ -14,10 +14,10 @@ module Mobility
         HstoreQuestion
       ].each do |name|
         const_set name, (Class.new(Binary) do
-          include ::Arel::Expressions
           include ::Arel::Predications
           include ::Arel::OrderPredications
           include ::Arel::AliasPredication
+          include ::Mobility::Arel::MobilityExpressions
 
           def lower
             super self

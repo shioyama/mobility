@@ -2,6 +2,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
   let(:backend_name) { model_class.mobility_modules.first.backend_name }
   let(:model_class) { model_class_name.constantize }
   let(:query_scope) { model_class.i18n }
+  let(:ordered_results) { query_scope.order("#{model_class.table_name}.id asc") }
 
   describe ".where" do
     context "querying on one translated attribute" do
@@ -296,7 +297,6 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
         model_class.create(a1 => val1, a2 => val2, :published => val3)
       end
     end
-    let(:ordered_results) { query_scope.order("#{model_class.table_name}.id asc") }
 
     it "plucks individual attribute values" do
       expect(ordered_results.pluck(a1)).to eq(["foo0", "foo2", "foo0", "foo1", "foo3"])
@@ -338,6 +338,46 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
          [nil,    "bar4"],
          ["foo4", nil   ]]
       )
+    end
+  end
+
+  describe ".select/.group", rails_version_geq: '5.0' do
+    before do
+      [["foo", "baz", true],
+       ["foo", "baz", false],
+       ["bar", "baz", true],
+       ["bar", "foo", false],
+       ["bar", "foo", nil]].each do |(val1, val2, val3)|
+        model_class.create(a1 => val1, a2 => val2, :published => val3)
+      end
+    end
+
+    describe "selecting translated attributes" do
+      it "returns value from attribute methods on results" do
+        selected = ordered_results.select(a1)
+        expect(selected[0].send(a1)).to eq("foo")
+        expect(selected[1].send(a1)).to eq("foo")
+        expect(selected[2].send(a1)).to eq("bar")
+        expect(selected[3].send(a1)).to eq("bar")
+        expect(selected[4].send(a1)).to eq("bar")
+      end
+    end
+
+    describe "counting translated attributes" do
+      it "counts total results" do
+        selected = query_scope.select(a1)
+        expect(selected.count).to eq(5)
+      end
+
+      it "works with count and group" do
+        selected = query_scope.select(a1).group(a1)
+        expect(selected.count).to eq({ "foo" => 2, "bar" => 3 })
+      end
+
+      it "works with count and group on two attributes" do
+        selected = query_scope.select(a1).group(a1, a2)
+        expect(selected.count).to eq({ ["foo", "baz"] => 2, ["bar", "baz"] => 1, ["bar", "foo"] => 2 })
+      end
     end
   end
 

@@ -22,7 +22,35 @@ enabled for any one attribute on the model.
               extend FindByMethods.new(*attributes.names)
               singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_scope__
             end
+            attributes.backend_class.include self
           end
+
+          def attribute_alias(attribute, locale = Mobility.locale)
+            "__mobility_%s_%s__"  % [attribute, ::Mobility.normalize_locale(locale)]
+          end
+        end
+
+        # @note We use +instance_variable_get+ here to get the +AttributeSet+
+        #   rather than the hash of attributes. Getting the full hash of
+        #   attributes is a performance hit and better to avoid if unnecessary.
+        # TODO: Improve this.
+        def read(locale, **)
+          if (model_attributes_defined? &&
+              model_attributes.key?(alias_ = Query.attribute_alias(attribute, locale)))
+            model_attributes[alias_].value
+          else
+            super
+          end
+        end
+
+        private
+
+        def model_attributes_defined?
+          model.instance_variable_defined?(:@attributes)
+        end
+
+        def model_attributes
+          model.instance_variable_get(:@attributes)
         end
 
         module QueryMethod
@@ -110,18 +138,24 @@ enabled for any one attribute on the model.
           end
 
           if ::ActiveRecord::VERSION::STRING >= '5.0'
-            def pluck(*attrs)
-              return super unless attrs.any?(&@klass.method(:mobility_attribute?))
+            %w[pluck group select].each do |method_name|
+              define_method method_name do |*attrs|
+                return super(*attrs) unless attrs.any?(&@klass.method(:mobility_attribute?))
 
-              keys = attrs.dup
+                keys = attrs.dup
 
-              base = keys.each_with_index.inject(self) do |query, (key, index)|
-                next query unless @klass.mobility_attribute?(key)
-                keys[index] = backend_node(key)
-                @klass.mobility_backend_class(key).apply_scope(query, backend_node(key))
+                base = keys.each_with_index.inject(self) do |query, (key, index)|
+                  next query unless @klass.mobility_attribute?(key)
+                  keys[index] = backend_node(key)
+                  if method_name == "select"
+                    keys[index] = keys[index]
+                      .as(::Mobility::Plugins::ActiveRecord::Query.attribute_alias(key.to_s))
+                  end
+                  @klass.mobility_backend_class(key).apply_scope(query, backend_node(key))
+                end
+
+                base.public_send(method_name, *keys)
               end
-
-              base.pluck(*keys)
             end
           end
 

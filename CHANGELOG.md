@@ -2,6 +2,11 @@
 
 ## 0.8
 
+### 0.8.2 (September 28, 2018)
+* Support pluck, select and group methods on translated attributes
+  ([#284](https://github.com/shioyama/mobility/pull/284),
+  [#285](https://github.com/shioyama/mobility/pull/285))
+
 ### 0.8.1 (September 25, 2018)
 * Default ActiveRecord Table/KeyValue backends to OUTER JOIN
   ([#277](https://github.com/shioyama/mobility/pull/277))

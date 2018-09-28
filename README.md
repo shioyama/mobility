@@ -51,7 +51,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.8.1'
+gem 'mobility', '~> 0.8.2'
 ```
 
 Mobility is cryptographically signed. To be sure the gem you install hasn't
@@ -715,6 +715,15 @@ joins for each attribute so as to match the particular model, attribute(s),
 locale(s) and value(s) passed in to the query. Details of how this is done can
 be found in the [Wiki page for the KeyValue
 backend](https://github.com/shioyama/mobility/wiki/KeyValue-Backend#querying).
+
+You can also use methods like `order`, `select`, `pluck` and `group` on
+translated attributes just as you would with normal attributes, and Mobility
+will handle generating the appropriate SQL:
+
+```ruby
+Post.i18n.pluck(:title)
+#=> ["foo", "bar", ...]
+```
 
 If you would prefer to avoid the `i18n` scope everywhere, you can define it as
 a default scope on your model:

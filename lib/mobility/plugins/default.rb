@@ -6,8 +6,7 @@ module Mobility
 
 Defines value or proc to fall through to if return value from getter would
 otherwise be nil. This plugin is disabled by default but will be enabled if any
-value (other than +Mobility::Plugins::OPTION_UNSET+) is passed as the +default+
-option key.
+value is passed as the +default+ option key.
 
 If default is a +Proc+, it will be called with the context of the model, and
 passed arguments:
@@ -65,9 +64,9 @@ The proc can accept zero to three arguments (see examples below)
     module Default
       # Applies default plugin to attributes.
       # @param [Attributes] attributes
-      # @param [Object] option
-      def self.apply(attributes, option)
-        attributes.backend_class.include(self) unless option == Plugins::OPTION_UNSET
+      # @param [Object] _option Ignored and plugin always applied.
+      def self.apply(attributes, _option)
+        attributes.backend_class.include(self)
       end
 
       # Generate a default value for given parameters.

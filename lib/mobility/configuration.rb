@@ -108,8 +108,7 @@ default_fallbacks= will be removed in the next major version of Mobility.
       @default_options = Options[{
         cache:    true,
         presence: true,
-        query:    true,
-        default:  Plugins::OPTION_UNSET
+        query:    true
       }]
       @plugins = %i[
         query

@@ -156,8 +156,10 @@ with other backends.
       @backend_class = get_backend_class(backend_name).for(model_class).with_options(options)
 
       Mobility.plugins.each do |name|
-        plugin = get_plugin_class(name)
-        plugin.apply(self, options[name])
+        if options.has_key?(name)
+          plugin = get_plugin_class(name)
+          plugin.apply(self, options[name])
+        end
       end
 
       each do |name|

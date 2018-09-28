@@ -31,6 +31,5 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
 
 =end
   module Plugins
-    OPTION_UNSET = Object.new
   end
 end

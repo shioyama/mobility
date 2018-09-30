@@ -193,6 +193,8 @@ enabled for any one attribute on the model.
               # Builds a translated relation for a given opts hash and optional
               # invert boolean.
               def _build(scope, opts, locale, invert)
+                return yield unless scope.respond_to?(:mobility_modules)
+
                 keys, predicates = opts.keys.map(&:to_s), []
 
                 query_map = scope.mobility_modules.inject(IDENTITY) do |qm, mod|

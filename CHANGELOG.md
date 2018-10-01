@@ -2,6 +2,10 @@
 
 ## 0.8
 
+### 0.8.3 (October 1, 2018)
+* Handle untranslated scopes in AR query module
+  ([#288](https://github.com/shioyama/mobility/pull/288))
+
 ### 0.8.2 (September 28, 2018)
 * Support pluck, select and group methods on translated attributes
   ([#284](https://github.com/shioyama/mobility/pull/284),

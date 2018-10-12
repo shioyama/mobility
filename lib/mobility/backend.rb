@@ -66,9 +66,9 @@ On top of this, a backend will normally:
     # @!macro [new] backend_constructor
     #   @param model Model on which backend is defined
     #   @param [String] attribute Backend attribute
-    def initialize(model, attribute)
-      @model = model
-      @attribute = attribute
+    def initialize(*args)
+      @model = args[0]
+      @attribute = args[1]
     end
 
     # @!macro [new] backend_reader

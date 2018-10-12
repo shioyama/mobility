@@ -15,4 +15,14 @@ describe Mobility::ActiveRecord, orm: :active_record do
       expect(Article.new.translated_attribute_names).to eq(["foo"])
     end
   end
+
+  # regression spec for https://github.com/shioyama/mobility/issues/258
+  describe "name error" do
+    it "resolves ActiveRecord to ::ActiveRecord in model class" do
+      aggregate_failures do
+        expect(Post.instance_eval("ActiveRecord")).to eq(::ActiveRecord)
+        expect(Post.class_eval("ActiveRecord")).to eq(::ActiveRecord)
+      end
+    end
+  end
 end if Mobility::Loaded::ActiveRecord

@@ -228,7 +228,7 @@ module Mobility
     def enforce_available_locales!(locale)
       # TODO: Remove conditional in v1.0
       if I18n.enforce_available_locales
-        raise Mobility::InvalidLocale.new(locale) unless (I18n.locale_available?(locale) || locale.nil?)
+        raise Mobility::InvalidLocale.new(locale) unless (locale.nil? || available_locales.include?(locale.to_sym))
       else
         warn <<-EOL
 WARNING: You called Mobility.enforce_available_locales! in a situation where

@@ -93,7 +93,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
               join_type = nils.empty? ? :inner : :left_outer
               # TODO: simplify to hash.transform_values { join_type } when
               #   support for Ruby 2.3 is deprecated
-              Hash[hash.keys.map { |key| [key, join_type] }]
+              ::Hash[hash.keys.map { |key| [key, join_type] }]
             else
               {}
             end
@@ -101,13 +101,13 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             hash = visit(boolean.args, locale)
             # TODO: simplify to hash.transform_values { :inner } when
             #   support for Ruby 2.3 is deprecated
-            Hash[hash.keys.map { |key| [key, :inner] }]
+            ::Hash[hash.keys.map { |key| [key, :inner] }]
           elsif boolean.op == :OR
             hash = boolean.args.map { |op| visit(op, locale) }.
               compact.inject(&:merge)
             # TODO: simplify to hash.transform_values { :left_outer } when
             #   support for Ruby 2.3 is deprecated
-            Hash[hash.keys.map { |key| [key, :left_outer] }]
+            ::Hash[hash.keys.map { |key| [key, :left_outer] }]
           else
             visit(boolean.args, locale)
           end

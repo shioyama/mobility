@@ -121,7 +121,7 @@ enabled for any one attribute on the model.
             case opts
             when Symbol, String
               @klass.mobility_attribute?(opts) ? order({ opts => :asc }, *rest) : super
-            when Hash
+            when ::Hash
               i18n_keys, keys = opts.keys.partition(&@klass.method(:mobility_attribute?))
               return super if i18n_keys.empty?
 
@@ -180,7 +180,7 @@ enabled for any one attribute on the model.
 
             class << self
               def build(scope, where_opts, invert: false, &block)
-                return yield unless Hash === where_opts
+                return yield unless ::Hash === where_opts
 
                 opts = where_opts.with_indifferent_access
                 locale = opts.delete(:locale) || Mobility.locale

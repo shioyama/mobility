@@ -255,7 +255,7 @@ EOL
       # @return [Hash] Hash of attribute names and backend instances
       # @api private
       def mobility_backends
-        @mobility_backends ||= Hash.new do |hash, name|
+        @mobility_backends ||= ::Hash.new do |hash, name|
           next hash[name.to_sym] if String === name
           hash[name] = self.class.mobility_backend_class(name).new(self, name.to_s)
         end
@@ -300,7 +300,7 @@ EOL
         @backends[name.to_sym]
       end
 
-      class BackendsCache < Hash
+      class BackendsCache < ::Hash
         def initialize(klass)
           # Preload backend mapping
           klass.mobility_modules.each do |mod|

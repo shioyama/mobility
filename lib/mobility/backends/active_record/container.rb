@@ -114,7 +114,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
 
       class Coder
         def self.dump(obj)
-          if obj.is_a? Hash
+          if obj.is_a? ::Hash
             obj.inject({}) do |translations, (locale, value)|
               value.each do |k, v|
                 (translations[locale] ||= {})[k] = v if v.present?

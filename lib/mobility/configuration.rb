@@ -126,7 +126,7 @@ default_fallbacks= will be removed in the next major version of Mobility.
 
     class ReservedOptionKey < Exception; end
 
-    class Options < Hash
+    class Options < ::Hash
       def []=(key, _)
         if RESERVED_OPTION_KEYS.include?(key)
           raise Configuration::ReservedOptionKey, "Default options may not contain the following reserved key: #{key}"

@@ -55,7 +55,7 @@ Implements the {Mobility::Backends::Jsonb} backend for Sequel models.
 
           def =~(other)
             case other
-            when Integer, Hash
+            when Integer, ::Hash
               to_dash_arrow =~ other.to_json
             when NilClass
               ~to_question

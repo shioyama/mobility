@@ -40,7 +40,7 @@ Format for serialization. Either +:yaml+ (default) or +:json+.
         def serializer_for(format)
           lambda do |obj|
             return if obj.nil?
-            if obj.is_a? Hash
+            if obj.is_a? ::Hash
               obj = obj.inject({}) do |translations, (locale, value)|
                 translations[locale] = value.to_s if Util.present?(value)
                 translations

@@ -152,12 +152,12 @@ the current locale was +nil+.
       end
 
       def convert_option_to_fallbacks(option)
-        if option.is_a?(Hash)
+        if option.is_a?(::Hash)
           Mobility.new_fallbacks(option)
         elsif option == true
           Mobility.new_fallbacks
         else
-          Hash.new { [] }
+          ::Hash.new { [] }
         end
       end
     end

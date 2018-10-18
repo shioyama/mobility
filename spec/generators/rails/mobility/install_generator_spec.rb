@@ -44,7 +44,8 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
               end
               contains "def change"
               contains "create_table :mobility_text_translations"
-              contains "t.text    :value"
+              contains "t.text :value"
+              contains "t.references :translatable, polymorphic: true, index: false"
               contains "add_index :mobility_text_translations"
               contains "name: :index_mobility_text_translations_on_keys"
               contains "name: :index_mobility_text_translations_on_translatable_attribute"
@@ -68,7 +69,8 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
               end
               contains "def change"
               contains "create_table :mobility_string_translations"
-              contains "t.string  :value"
+              contains "t.string :value"
+              contains "t.references :translatable, polymorphic: true, index: false"
               contains "add_index :mobility_string_translations"
               contains "name: :index_mobility_string_translations_on_keys"
               contains "name: :index_mobility_string_translations_on_translatable_attribute"

@@ -2,6 +2,10 @@
 
 ## 0.8
 
+### 0.8.4 (October 19, 2018)
+* Use references to define polymorphic associations in generator migrations
+  ([#292](https://github.com/shioyama/mobility/pull/292))
+
 ### 0.8.3 (October 1, 2018)
 * Handle untranslated scopes in AR query module
   ([#288](https://github.com/shioyama/mobility/pull/288))

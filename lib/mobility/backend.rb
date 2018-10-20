@@ -168,12 +168,11 @@ On top of this, a backend will normally:
       #   being changed.
       # @param [Hash] options
       # @return [Class] backend subclass
-      def with_options(options = {}, &block)
+      def with_options(options = {})
         configure(options) if respond_to?(:configure)
         options.freeze
         Class.new(self) do
           @options = options
-          class_eval(&block) if block_given?
         end
       end
 

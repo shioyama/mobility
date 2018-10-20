@@ -1,7 +1,7 @@
 shared_examples_for "locale accessor" do |attribute, locale|
   let(:options) { { these: "options" } }
 
-  it "handles getters and setters" do
+  it "handles getters and setters for locale=#{locale}" do
     instance = model_class.new
     normalized_locale = locale.to_s.gsub('-', '_').downcase.to_sym
 

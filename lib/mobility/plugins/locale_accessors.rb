@@ -29,60 +29,56 @@ available locales for a Rails application) will be used by default.
   #=> "title in fr"
 
 =end
-    class LocaleAccessors < Module
-      # Apply locale accessors plugin to attributes.
-      # @param [Attributes] attributes
-      # @param [Boolean] option
-      def self.apply(attributes, option)
-        if accessor_locales = option
-          accessor_locales = Mobility.config.default_accessor_locales if accessor_locales == true
-          attributes.model_class.include new(*attributes.names, locales: accessor_locales)
-        end
-      end
-
-      # @param [String] One or more attribute names
-      # @param [Array<Symbol>] Locales
-      def initialize(*attribute_names, locales:)
-        attribute_names.each do |name|
-          locales.each do |locale|
-            define_reader(name, locale)
-            define_writer(name, locale)
+    module LocaleAccessors
+      class << self
+        # Apply locale accessors plugin to attributes.
+        # @param [Attributes] attributes
+        # @param [Boolean] option
+        def apply(attributes, option)
+          if locales = option
+            locales = Mobility.config.default_accessor_locales if locales == true
+            attributes.names.each do |name|
+              locales.each do |locale|
+                define_reader(attributes, name, locale)
+                define_writer(attributes, name, locale)
+              end
+            end
           end
         end
-      end
 
-      private
+        private
 
-      def define_reader(name, locale)
-        warning_message = "locale passed as option to locale accessor will be ignored"
-        normalized_locale = Mobility.normalize_locale(locale)
+        def define_reader(mod, name, locale)
+          warning_message = "locale passed as option to locale accessor will be ignored"
+          normalized_locale = Mobility.normalize_locale(locale)
 
-        module_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{name}_#{normalized_locale}(options = {})
-          return super() if options.delete(:super)
-          warn "#{warning_message}" if options[:locale]
-          #{name}(**options, locale: :'#{locale}')
+          mod.module_eval <<-EOM, __FILE__, __LINE__ + 1
+          def #{name}_#{normalized_locale}(options = {})
+            return super() if options.delete(:super)
+            warn "#{warning_message}" if options[:locale]
+            #{name}(**options, locale: :'#{locale}')
+          end
+
+          def #{name}_#{normalized_locale}?(options = {})
+            return super() if options.delete(:super)
+            warn "#{warning_message}" if options[:locale]
+            #{name}?(**options, locale: :'#{locale}')
+          end
+          EOM
         end
 
-        def #{name}_#{normalized_locale}?(options = {})
-          return super() if options.delete(:super)
-          warn "#{warning_message}" if options[:locale]
-          #{name}?(**options, locale: :'#{locale}')
-        end
-        EOM
-      end
+        def define_writer(mod, name, locale)
+          warning_message = "locale passed as option to locale accessor will be ignored"
+          normalized_locale = Mobility.normalize_locale(locale)
 
-      def define_writer(name, locale)
-        warning_message = "locale passed as option to locale accessor will be ignored"
-        normalized_locale = Mobility.normalize_locale(locale)
-
-        module_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{name}_#{normalized_locale}=(value, options = {})
-          return super(value) if options.delete(:super)
-          warn "#{warning_message}" if options[:locale]
-          public_send(:#{name}=, value, **options, locale: :'#{locale}')
+          mod.module_eval <<-EOM, __FILE__, __LINE__ + 1
+          def #{name}_#{normalized_locale}=(value, options = {})
+            return super(value) if options.delete(:super)
+            warn "#{warning_message}" if options[:locale]
+            public_send(:#{name}=, value, **options, locale: :'#{locale}')
+          end
+          EOM
         end
-        EOM
       end
     end
   end

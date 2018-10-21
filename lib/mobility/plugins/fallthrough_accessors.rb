@@ -34,31 +34,36 @@ model class is generated.
   #=> "title in fr"
 
 =end
-    class FallthroughAccessors < Module
-      # Apply fallthrough accessors plugin to attributes.
-      # @param [Attributes] attributes
-      # @param [Boolean] option
-      def self.apply(attributes, option)
-        attributes.model_class.include new(*attributes.names) if option
-      end
-
-      # @param [String] One or more attributes
-      def initialize(*attributes)
-        method_name_regex = /\A(#{attributes.join('|')})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
-
-        define_method :method_missing do |method_name, *arguments, **options, &block|
-          if method_name =~ method_name_regex
-            attribute = $1.to_sym
-            locale, suffix = $2.split('_')
-            locale = "#{locale}-#{suffix.upcase}" if suffix
-            public_send("#{attribute}#{$4}", *arguments, **options, locale: locale.to_sym)
-          else
-            super(method_name, *arguments, &block)
-          end
+    module FallthroughAccessors
+      class << self
+        # Apply fallthrough accessors plugin to attributes.
+        # @param [Attributes] attributes
+        # @param [Boolean] option
+        def apply(attributes, option)
+          define_method_missing(attributes, attributes.names) if option
         end
 
-        define_method :respond_to_missing? do |method_name, include_private = false|
-          (method_name =~ method_name_regex) || super(method_name, include_private)
+        private
+
+        def define_method_missing(mod, *names)
+          method_name_regex = /\A(#{names.join('|')})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
+
+          mod.class_eval do
+            define_method :method_missing do |method_name, *arguments, **options, &block|
+              if method_name =~ method_name_regex
+                attribute = $1.to_sym
+                locale, suffix = $2.split('_')
+                locale = "#{locale}-#{suffix.upcase}" if suffix
+                public_send("#{attribute}#{$4}", *arguments, **options, locale: locale.to_sym)
+              else
+                super(method_name, *arguments, &block)
+              end
+            end
+
+            define_method :respond_to_missing? do |method_name, include_private = false|
+              (method_name =~ method_name_regex) || super(method_name, include_private)
+            end
+          end
         end
       end
     end

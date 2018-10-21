@@ -31,5 +31,12 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
 
 =end
   module Plugins
+    class << self
+      # @param [Symbol] backend Name of plugin to load.
+      def load_plugin(plugin)
+        require "mobility/plugins/#{plugin}"
+        Mobility.get_class_from_key(self, plugin)
+      end
+    end
   end
 end

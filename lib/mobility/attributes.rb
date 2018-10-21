@@ -153,11 +153,11 @@ with other backends.
     # @param klass [Class] Class of model
     def included(klass)
       @model_class = @options[:model_class] = klass
-      @backend_class = get_backend_class(backend_name).for(model_class).with_options(options)
+      @backend_class = Backends.load_backend(backend_name).for(model_class).with_options(options)
 
       Mobility.plugins.each do |name|
         if options.has_key?(name)
-          plugin = get_plugin_class(name)
+          plugin = Plugins.load_plugin(name)
           plugin.apply(self, options[name])
         end
       end
@@ -234,22 +234,6 @@ else
   locale = Mobility.locale
 end
 EOL
-    end
-
-    def get_backend_class(backend)
-      return backend if Module === backend
-      require "mobility/backends/#{backend}"
-      get_class_from_key(Mobility::Backends, backend)
-    end
-
-    def get_plugin_class(plugin)
-      require "mobility/plugins/#{plugin}"
-      get_class_from_key(Mobility::Plugins, plugin)
-    end
-
-    def get_class_from_key(parent_class, key)
-      klass_name = key.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
-      parent_class.const_get(klass_name)
     end
 
     module InstanceMethods

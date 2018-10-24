@@ -374,11 +374,24 @@ word.name_backend.read(:en)
 ```
 
 Internally, all methods for accessing translated attributes ultimately end up
-reading and writing from the backend instance this way.
+reading and writing from the backend instance this way.  (The `write` methods
+do not call underlying backend's methods to persist the change. This is up to
+the user, so e.g. with ActiveRecord you should call `save` write the changes to
+the database).
 
-The `write` methods do not call underlying backend's methods to persist the change.
-This is up to the user (e.g. with ActiveRecord you should call `save` write
-the changes to the database).
+Note that accessor methods are defined in an included module, so you can wrap
+reads or writes in custom logic:
+
+```ruby
+class Post < ApplicationRecord
+  extend Mobility
+  translates :title
+
+  def title(*)
+    super.reverse
+  end
+end
+```
 
 ### Setting the Locale
 

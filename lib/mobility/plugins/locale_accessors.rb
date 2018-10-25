@@ -30,55 +30,54 @@ available locales for a Rails application) will be used by default.
 
 =end
     module LocaleAccessors
-      class << self
-        # Apply locale accessors plugin to attributes.
-        # @param [Attributes] attributes
-        # @param [Boolean] option
-        def apply(attributes, option)
-          if locales = option
-            locales = Mobility.config.default_accessor_locales if locales == true
-            attributes.names.each do |name|
-              locales.each do |locale|
-                define_reader(attributes, name, locale)
-                define_writer(attributes, name, locale)
-              end
+      # Apply locale accessors plugin to attributes.
+      # @param [Attributes] attributes
+      # @param [Boolean] option
+      def initialize(*)
+        super
+        if locales = options[:locale_accessors]
+          locales = Mobility.config.default_accessor_locales if locales == true
+          names.each do |name|
+            locales.each do |locale|
+              define_locale_reader(name, locale)
+              define_locale_writer(name, locale)
             end
           end
         end
+      end
 
-        private
+      private
 
-        def define_reader(mod, name, locale)
-          warning_message = "locale passed as option to locale accessor will be ignored"
-          normalized_locale = Mobility.normalize_locale(locale)
+      def define_locale_reader(name, locale)
+        warning_message = "locale passed as option to locale accessor will be ignored"
+        normalized_locale = Mobility.normalize_locale(locale)
 
-          mod.module_eval <<-EOM, __FILE__, __LINE__ + 1
+        module_eval <<-EOM, __FILE__, __LINE__ + 1
           def #{name}_#{normalized_locale}(options = {})
             return super() if options.delete(:super)
             warn "#{warning_message}" if options[:locale]
-            #{name}(**options, locale: :'#{locale}')
+        #{name}(**options, locale: :'#{locale}')
           end
 
           def #{name}_#{normalized_locale}?(options = {})
             return super() if options.delete(:super)
             warn "#{warning_message}" if options[:locale]
-            #{name}?(**options, locale: :'#{locale}')
+        #{name}?(**options, locale: :'#{locale}')
           end
-          EOM
-        end
+        EOM
+      end
 
-        def define_writer(mod, name, locale)
-          warning_message = "locale passed as option to locale accessor will be ignored"
-          normalized_locale = Mobility.normalize_locale(locale)
+      def define_locale_writer(name, locale)
+        warning_message = "locale passed as option to locale accessor will be ignored"
+        normalized_locale = Mobility.normalize_locale(locale)
 
-          mod.module_eval <<-EOM, __FILE__, __LINE__ + 1
+        module_eval <<-EOM, __FILE__, __LINE__ + 1
           def #{name}_#{normalized_locale}=(value, options = {})
             return super(value) if options.delete(:super)
             warn "#{warning_message}" if options[:locale]
             public_send(:#{name}=, value, **options, locale: :'#{locale}')
           end
-          EOM
-        end
+        EOM
       end
     end
   end

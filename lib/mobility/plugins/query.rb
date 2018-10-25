@@ -7,23 +7,23 @@ module Mobility
 
 =end
     module Query
-      class << self
-        def apply(attributes, option)
-          if option
-            include_query_module(attributes)
+      def included(model_class)
+        super.tap do |backend_class|
+          if options[:query]
+            include_query_module(model_class, backend_class)
           end
         end
+      end
 
-        private
+      private
 
-        def include_query_module(attributes)
-          if Loaded::ActiveRecord && attributes.model_class < ::ActiveRecord::Base
-            require "mobility/plugins/active_record/query"
-            ActiveRecord::Query.apply(attributes)
-          elsif Loaded::Sequel && attributes.model_class < ::Sequel::Model
-            require "mobility/plugins/sequel/query"
-            Sequel::Query.apply(attributes)
-          end
+      def include_query_module(model_class, backend_class)
+        if Loaded::ActiveRecord && model_class < ::ActiveRecord::Base
+          require "mobility/plugins/active_record/query"
+          ActiveRecord::Query.apply(names, model_class, backend_class)
+        elsif Loaded::Sequel && model_class < ::Sequel::Model
+          require "mobility/plugins/sequel/query"
+          Sequel::Query.apply(model_class)
         end
       end
     end

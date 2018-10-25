@@ -9,8 +9,8 @@ See ActiveRecord::Query plugin.
     module Sequel
       module Query
         class << self
-          def apply(attributes)
-            attributes.model_class.class_eval do
+          def apply(model_class)
+            model_class.class_eval do
               extend QueryMethod
               singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_dataset__
             end

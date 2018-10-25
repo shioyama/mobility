@@ -17,7 +17,7 @@ Module builder adding translated attributes to #attributes hash on model
 instance. See {Mobility::Plugins::AttributeMethods} for further details.
 
 =end
-      class AttributeMethods < Module
+      class AttributeMethodsBuilder < Module
         def initialize(*attribute_names)
           include TranslatedAttributes
           define_method :translated_attributes do

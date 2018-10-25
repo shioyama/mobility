@@ -1,25 +1,17 @@
 require "spec_helper"
 
 describe Mobility::Attributes do
+  include Helpers::Backend
   before { stub_const 'Article', Class.new }
 
   # In order to be able to stub methods on backend instance methods, which will be
   # hidden when the backend class is subclassed in Attributes, we inject a double
   # and delegate read and write to the double. (Nice trick, eh?)
   #
-  let(:backend) { double("backend") }
-  let(:backend_class) do
-    backend_double = backend
-    Class.new(Mobility::Backends::Null) do
-      define_method :read do |*args|
-        backend_double.read(*args)
-      end
-
-      define_method :write do |*args|
-        backend_double.write(*args)
-      end
-    end
-  end
+  let(:listener) { double("backend") }
+  let(:backend_class) { backend_listener(listener) }
+  let(:backend) { backend_class.new }
+  let(:model_class) { Article }
 
   # These options disable all inclusion of modules into backend, which is useful
   # for many specs in this suite.
@@ -43,47 +35,47 @@ describe Mobility::Attributes do
   end
 
   describe "including Attributes in a model" do
-    let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: Article } }
+    let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: model_class } }
 
     it "calls with_options on backend class with options merged with default options" do
       expect(backend_class).to receive(:with_options).with(expected_options).and_return(Class.new(backend_class))
       attributes = described_class.new("title", backend: backend_class, foo: "bar")
-      Article.include attributes
+      model_class.include attributes
     end
 
     it "assigns options to backend class" do
       attributes = described_class.new("title", backend: backend_class, foo: "bar")
-      Article.include attributes
-      expect(attributes.options).to eq(attributes.backend_class.options)
-      expect(attributes.backend_class.options).to eq(Mobility.default_options.merge(model_class: Article, foo: "bar"))
+      model_class.include attributes
+      expect(attributes.options.merge(model_class: model_class)).to eq(attributes.backend_class.options)
+      expect(attributes.backend_class.options).to eq(Mobility.default_options.merge(model_class: model_class, foo: "bar"))
     end
 
-    it "freezes options after inclusion into model class" do
+    it "freezes backend options after inclusion into model class" do
       attributes = described_class.new("title", backend: backend_class)
-      Article.include attributes
-      expect(attributes.options).to be_frozen
+      model_class.include attributes
+      expect(backend_class.options).to be_frozen
     end
 
     it "calls setup_model on backend class with model_class and attributes" do
-      expect(backend_class).to receive(:setup_model).with(Article, ["title"])
-      Article.include described_class.new("title", backend: backend_class)
+      expect(backend_class).to receive(:setup_model).with(model_class, ["title"])
+      model_class.include described_class.new("title", backend: backend_class)
     end
 
     describe "model class methods" do
       %w[mobility_attributes translated_attribute_names].each do |method_name|
         describe ".#{method_name}" do
           it "returns attribute names" do
-            Article.include described_class.new("title", "content", backend: :null)
-            Article.include described_class.new("foo", backend: :null)
+            model_class.include described_class.new("title", "content", backend: backend_class)
+            model_class.include described_class.new("foo", backend: backend_class)
 
-            expect(Article.public_send(method_name)).to match_array(["title", "content", "foo"])
+            expect(model_class.public_send(method_name)).to match_array(["title", "content", "foo"])
           end
 
           it "only returns unique attributes" do
-            Article.include described_class.new("title", backend: :null)
-            Article.include described_class.new("title", backend: :null)
+            model_class.include described_class.new("title", backend: :null)
+            model_class.include described_class.new("title", backend: :null)
 
-            expect(Article.public_send(method_name)).to eq(["title"])
+            expect(model_class.public_send(method_name)).to eq(["title"])
           end
         end
       end
@@ -91,12 +83,12 @@ describe Mobility::Attributes do
       describe ".mobility_attribute?" do
         it "returns true if and only if attribute name is translated" do
           names = %w[title content]
-          Article.include described_class.new(*names, backend: :null)
+          model_class.include described_class.new(*names, backend: :null)
           names.each do |name|
-            expect(Article.mobility_attribute?(name)).to eq(true)
-            expect(Article.mobility_attribute?(name.to_sym)).to eq(true)
+            expect(model_class.mobility_attribute?(name)).to eq(true)
+            expect(model_class.mobility_attribute?(name.to_sym)).to eq(true)
           end
-          expect(Article.mobility_attribute?("foo")).to eq(false)
+          expect(model_class.mobility_attribute?("foo")).to eq(false)
         end
       end
 
@@ -105,8 +97,8 @@ describe Mobility::Attributes do
           modules = [
             described_class.new("title", "content", backend: :null),
             described_class.new("foo", backend: :null)]
-          modules.each { |mod| Article.include mod }
-          expect(Article.mobility_modules).to match_array(modules)
+          modules.each { |mod| model_class.include mod }
+          expect(model_class.mobility_modules).to match_array(modules)
         end
       end
 
@@ -120,12 +112,12 @@ describe Mobility::Attributes do
           mod1 = described_class.new("title", "content", backend: backend_class1)
           mod2 = described_class.new("subtitle", backend: backend_class2)
 
-          Article.include mod1
-          Article.include mod2
+          model_class.include mod1
+          model_class.include mod2
 
-          expect(Article.mobility_backend_class("title")).to be < backend_class1
-          expect(Article.mobility_backend_class("content")).to be < backend_class1
-          expect(Article.mobility_backend_class("subtitle")).to be < backend_class2
+          expect(model_class.mobility_backend_class("title")).to be < backend_class1
+          expect(model_class.mobility_backend_class("content")).to be < backend_class1
+          expect(model_class.mobility_backend_class("subtitle")).to be < backend_class2
         end
 
         it "handles new backends added after first called" do
@@ -133,14 +125,14 @@ describe Mobility::Attributes do
           backend_class1.include(Mobility::Backend)
 
           mod = described_class.new("title", backend: :null)
-          Article.include mod
+          model_class.include mod
 
-          expect(Article.mobility_backend_class("title")).to eq(mod.backend_class)
+          expect(model_class.mobility_backend_class("title")).to eq(mod.backend_class)
 
           other_mod = described_class.new("content", backend: :null)
-          Article.include other_mod
+          model_class.include other_mod
 
-          expect(Article.mobility_backend_class("content")).to eq(other_mod.backend_class)
+          expect(model_class.mobility_backend_class("content")).to eq(other_mod.backend_class)
         end
       end
     end
@@ -150,10 +142,10 @@ describe Mobility::Attributes do
         it "returns instance of backend for attribute" do
           mod1 = described_class.new("title", backend: :null)
           mod2 = described_class.new("content", backend: :null, foo: :bar)
-          Article.include mod1
-          Article.include mod2
-          article1 = Article.new
-          article2 = Article.new
+          model_class.include mod1
+          model_class.include mod2
+          article1 = model_class.new
+          article2 = model_class.new
 
           aggregate_failures do
             expect(article1.mobility_backends).to eq({})
@@ -176,9 +168,9 @@ describe Mobility::Attributes do
 
         it "maps string keys to symbol key values" do
           mod = described_class.new("title", backend: :null)
-          Article.include mod
+          model_class.include mod
 
-          article = Article.new
+          article = model_class.new
 
           aggregate_failures do
             expect(article.mobility_backends[:title]).to be_a(Mobility::Backends::Null)
@@ -190,9 +182,9 @@ describe Mobility::Attributes do
 
         it "resets when model is duplicated" do
           mod = described_class.new("title", backend: :null)
-          Article.include mod
+          model_class.include mod
 
-          article = Article.new
+          article = model_class.new
           article.title
           other = article.dup
 
@@ -201,31 +193,16 @@ describe Mobility::Attributes do
       end
     end
 
-    describe "cache" do
-      it "includes Plugins::Cache into backend when options[:cache] is not false" do
-        clean_options.delete(:cache)
-        attributes = described_class.new("title", backend: backend_class, **clean_options)
-        Article.include attributes
-        expect(attributes.backend_class.ancestors).to include(Mobility::Plugins::Cache)
-      end
-
-      it "does not include Plugins::Cache into backend when options[:cache] is false" do
-        attributes = described_class.new("title", backend: backend_class, **clean_options)
-        Article.include attributes
-        expect(attributes.backend_class.ancestors).not_to include(Mobility::Plugins::Cache)
-      end
-    end
-
     describe "defining attribute backend on model" do
       before do
-        Article.include described_class.new("title", backend: backend_class, foo: "bar")
+        model_class.include described_class.new("title", backend: backend_class, foo: "bar")
       end
-      let(:article) { Article.new }
-      let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: Article } }
+      let(:article) { model_class.new }
+      let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: model_class } }
 
       it "defines <attribute_name>_backend method which returns backend instance" do
         expect(backend_class).to receive(:new).once.with(article, "title").and_call_original
-        expect(article.mobility_backends[:title]).to be_a(Mobility::Backends::Null)
+        expect(article.mobility_backends[:title]).to be_a(backend_class)
       end
 
       it "memoizes backend instance" do
@@ -251,25 +228,25 @@ describe Mobility::Attributes do
             model_double.title = value
           end
         end
-        Article.include mod
+        model_class.include mod
       end
-      let(:article) { Article.new }
+      let(:article) { model_class.new }
 
       shared_examples_for "reader" do
         it "correctly maps getter method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+          expect(listener).to receive(:read).with(:de, {}).and_return("foo")
           expect(article.title).to eq("foo")
         end
 
         it "correctly maps presence method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+          expect(listener).to receive(:read).with(:de, {}).and_return("foo")
           expect(article.title?).to eq(true)
         end
 
         it "correctly maps locale through getter options and converts to boolean" do
-          expect(backend).to receive(:read).with(:fr, locale: true).and_return("foo")
+          expect(listener).to receive(:read).with(:fr, locale: true).and_return("foo")
           expect(article.title(locale: "fr")).to eq("foo")
         end
 
@@ -279,7 +256,7 @@ describe Mobility::Attributes do
 
         it "correctly maps other options to getter" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(backend).to receive(:read).with(:de, someopt: "someval").and_return("foo")
+          expect(listener).to receive(:read).with(:de, someopt: "someval").and_return("foo")
           expect(article.title(someopt: "someval")).to eq("foo")
         end
 
@@ -297,13 +274,13 @@ describe Mobility::Attributes do
       shared_examples_for "writer" do
         it "correctly maps setter method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(backend).to receive(:write).with(:de, "foo", {})
+          expect(listener).to receive(:write).with(:de, "foo", {})
           article.title = "foo"
         end
 
         it "correctly maps other options to setter" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(backend).to receive(:write).with(:de, "foo", someopt: "someval").and_return("foo")
+          expect(listener).to receive(:write).with(:de, "foo", someopt: "someval").and_return("foo")
           expect(article.send(:title=, "foo", someopt: "someval")).to eq("foo")
         end
 
@@ -314,14 +291,14 @@ describe Mobility::Attributes do
       end
 
       describe "method = :accessor" do
-        before { Article.include described_class.new("title", backend: backend_class) }
+        before { model_class.include described_class.new("title", backend: backend_class) }
 
         it_behaves_like "reader"
         it_behaves_like "writer"
       end
 
       describe "method = :reader" do
-        before { Article.include described_class.new("title", backend: backend_class, method: :reader) }
+        before { model_class.include described_class.new("title", backend: backend_class, method: :reader) }
 
         it_behaves_like "reader"
 
@@ -332,7 +309,7 @@ describe Mobility::Attributes do
       end
 
       describe "method = :writer" do
-        before { Article.include described_class.new("title", backend: backend_class, method: :writer) }
+        before { model_class.include described_class.new("title", backend: backend_class, method: :writer) }
 
         it_behaves_like "writer"
 
@@ -340,36 +317,6 @@ describe Mobility::Attributes do
           expect(model).to receive(:title).once.and_return("model foo")
           expect(article.title).to eq("model foo")
         end
-      end
-
-      # Note: this is important normalization so backends do not need
-      # to consider storing blank values.
-      it "converts blanks to nil when receiving from backend getter" do
-        Article.include described_class.new(:reader, "title", backend: backend_class)
-        allow(Mobility).to receive(:locale).and_return(:cz)
-        expect(backend).to receive(:read).with(:cz, {}).and_return("")
-        expect(article.title).to eq(nil)
-      end
-
-      it "converts blanks to nil when sending to backend setter" do
-        Article.include described_class.new(:writer, "title", backend: backend_class)
-        allow(Mobility).to receive(:locale).and_return(:fr)
-        expect(backend).to receive(:write).with(:fr, nil, {})
-        article.title = ""
-      end
-
-      it "does not convert false values to nil when receiving from backend getter" do
-        Article.include described_class.new(:reader, "title", backend: backend_class)
-        allow(Mobility).to receive(:locale).and_return(:cz)
-        expect(backend).to receive(:read).with(:cz, {}).and_return(false)
-        expect(article.title).to eq(false)
-      end
-
-      it "does not convert false values to nil when sending to backend setter" do
-        Article.include described_class.new(:writer, "title", backend: backend_class)
-        allow(Mobility).to receive(:locale).and_return(:fr)
-        expect(backend).to receive(:write).with(:fr, false, {})
-        article.title = false
       end
     end
   end

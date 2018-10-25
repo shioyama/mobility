@@ -22,8 +22,6 @@ AR::Dirty plugin adds support for the following persistence-specific methods
 
 =end
       module Dirty
-        include ActiveModel::Dirty
-
         # Builds module which patches a few AR methods to handle changes to
         # translated attributes just like normal attributes.
         class MethodsBuilder < ActiveModel::Dirty::MethodsBuilder
@@ -141,6 +139,10 @@ AR::Dirty plugin adds support for the following persistence-specific methods
               super
             end
           end
+        end
+
+        module BackendMethods
+          include ActiveModel::Dirty::BackendMethods
         end
       end
     end

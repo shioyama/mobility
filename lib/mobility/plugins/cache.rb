@@ -24,31 +24,32 @@ Values are added to the cache in two ways:
       # Applies cache plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
-      def self.apply(attributes, option)
-        if option
-          backend_class = attributes.backend_class
-          backend_class.include(self) unless backend_class.apply_plugin(:cache)
-
-          model_class = attributes.model_class
-          model_class.include BackendResetter.for(model_class).new(attributes.names) { clear_cache }
+      def included(model_class)
+        super.tap do |backend_class|
+          if options[:cache]
+            backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
+            model_class.include BackendResetter.for(model_class).new(names) { clear_cache }
+          end
         end
       end
 
-      # @group Backend Accessors
-      #
-      # @!macro backend_reader
-      # @!method read(locale, value, options = {})
-      #   @option options [Boolean] cache *false* to disable cache.
-      include TranslationCacher.new(:read)
+      module BackendMethods
+        # @group Backend Accessors
+        #
+        # @!macro backend_reader
+        # @!method read(locale, value, options = {})
+        #   @option options [Boolean] cache *false* to disable cache.
+        include TranslationCacher.new(:read)
 
-      # @!macro backend_writer
-      # @option options [Boolean] cache
-      #   *false* to disable cache.
-      def write(locale, value, **options)
-        return super if options.delete(:cache) == false
-        cache[locale] = super
+        # @!macro backend_writer
+        # @option options [Boolean] cache
+        #   *false* to disable cache.
+        def write(locale, value, **options)
+          return super if options.delete(:cache) == false
+          cache[locale] = super
+        end
+        # @!endgroup
       end
-      # @!endgroup
     end
   end
 end

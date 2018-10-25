@@ -41,11 +41,15 @@ Set each option on the default_options hash instead, like this:
       end
     end
 
-    # Plugins to apply. Order of plugins is important, as this becomes the
-    # order in which plugins modules are included into the backend class or
-    # attributes instance.
-    # @return [Array<Symbol>]
-    attr_accessor :plugins
+    # @param [Symbol] name Plugin name
+    def plugin(name)
+      attributes_class.plugin(name)
+    end
+
+    # @param [Symbol] name Plugin name
+    def plugins(*names)
+      names.each(&method(:plugin))
+    end
 
     # Generate new fallbacks instance
     # @note This method will call the proc defined in the variable set by the
@@ -113,17 +117,10 @@ default_fallbacks= will be removed in the next major version of Mobility.
         # when reading an attribute using accessor options.
         fallbacks: nil
       }]
-      @plugins = %i[
-        query
-        cache
-        dirty
-        fallbacks
-        presence
-        default
-        attribute_methods
-        fallthrough_accessors
-        locale_accessors
-      ]
+    end
+
+    def attributes_class
+      @attributes_class ||= Class.new(Attributes)
     end
 
     class ReservedOptionKey < Exception; end

@@ -122,42 +122,47 @@ the current locale was +nil+.
   end
 
 =end
-    class Fallbacks < Module
+    module Fallbacks
       # Applies fallbacks plugin to attributes. Completely disables fallbacks
       # on model if option is +false+.
       # @param [Attributes] attributes
       # @param [Boolean] option
-      def self.apply(attributes, option)
-        attributes.backend_class.include(new(option)) unless option == false
-      end
-
-      def initialize(fallbacks_option)
-        define_read(convert_option_to_fallbacks(fallbacks_option))
-      end
-
-      private
-
-      def define_read(fallbacks)
-        define_method :read do |locale, fallback: true, **options|
-          return super(locale, options) if !fallback || options[:locale]
-
-          locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
-          locales.each do |fallback_locale|
-            value = super(fallback_locale, options)
-            return value if Util.present?(value)
-          end
-
-          super(locale, options)
+      def included(model_class)
+        super.tap do |backend_class|
+          option = options[:fallbacks]
+          backend_class.include(Methods.new(option)) unless option == false
         end
       end
 
-      def convert_option_to_fallbacks(option)
-        if option.is_a?(::Hash)
-          Mobility.new_fallbacks(option)
-        elsif option == true
-          Mobility.new_fallbacks
-        else
-          ::Hash.new { [] }
+      class Methods < Module
+        def initialize(fallbacks_option)
+          define_read(convert_option_to_fallbacks(fallbacks_option))
+        end
+
+        private
+
+        def define_read(fallbacks)
+          define_method :read do |locale, fallback: true, **options|
+            return super(locale, options) if !fallback || options[:locale]
+
+            locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
+            locales.each do |fallback_locale|
+              value = super(fallback_locale, options)
+              return value if Util.present?(value)
+            end
+
+            super(locale, options)
+          end
+        end
+
+        def convert_option_to_fallbacks(option)
+          if option.is_a?(::Hash)
+            Mobility.new_fallbacks(option)
+          elsif option == true
+            Mobility.new_fallbacks
+          else
+            ::Hash.new { [] }
+          end
         end
       end
     end

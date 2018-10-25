@@ -20,6 +20,21 @@ require 'json'
 require 'mobility'
 require "mobility/backends/null"
 
+# Enable default plugins
+Mobility.configure do |config|
+  config.plugins *%i[
+    query
+    cache
+    dirty
+    fallbacks
+    presence
+    default
+    attribute_methods
+    fallthrough_accessors
+    locale_accessors
+  ]
+end
+
 I18n.enforce_available_locales = true
 I18n.available_locales = [:en, :'en-US', :ja, :fr, :de, :'de-DE', :cz, :pl, :pt, :'pt-BR']
 I18n.default_locale = :en
@@ -76,4 +91,7 @@ RSpec.configure do |config|
 
   config.order = "random"
   config.filter_run_excluding orm: lambda { |v| ![*v].include?(orm.to_sym) }, db: lambda { |v| ![*v].include?(db.to_sym) }
+end
+
+class TestAttributes < Mobility::Attributes
 end

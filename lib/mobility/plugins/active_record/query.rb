@@ -16,13 +16,13 @@ enabled for any one attribute on the model.
     module ActiveRecord
       module Query
         class << self
-          def apply(attributes)
-            attributes.model_class.class_eval do
+          def apply(names, model_class, backend_class)
+            model_class.class_eval do
               extend QueryMethod
-              extend FindByMethods.new(*attributes.names)
+              extend FindByMethods.new(*names)
               singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_scope__
             end
-            attributes.backend_class.include self
+            backend_class.include self
           end
 
           def attribute_alias(attribute, locale = Mobility.locale)

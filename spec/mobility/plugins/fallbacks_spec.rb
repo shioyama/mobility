@@ -2,139 +2,121 @@ require "spec_helper"
 require "mobility/plugins/fallbacks"
 
 describe Mobility::Plugins::Fallbacks do
-  describe "when included into a class" do
-    let(:backend_class) do
-      backend_class = stub_const 'MyBackend', Class.new
-      backend_class.include(Mobility::Backend)
-      backend_subclass = backend_class.with_options(fallbacks: fallbacks)
-      backend_subclass.class_eval do
-        def read(locale, **options)
-          Mobility.enforce_available_locales!(locale)
-          return "bar" if options[:bar]
-          {
-            "title" => {
-              :'de-DE' => "foo",
-              :ja => "フー",
-              :'pt' => ""
-            }
-          }[attribute][locale]
-        end
-      end
-      Class.new(backend_subclass).include(described_class.new(fallbacks))
-    end
-    let(:object) { (stub_const 'MobilityModel', Class.new).include(Mobility).new }
-    subject { backend_class.new(object, "title") }
+  include Helpers::Plugins
 
-    context "fallbacks is a hash" do
-      let(:fallbacks) { { :'en-US' => 'de-DE', :pt => 'de-DE' } }
+  context "fallbacks is a hash" do
+    plugin_setup fallbacks: { :'en-US' => 'de-DE', :pt => 'de-DE' }
 
-      it "returns value when value is not nil" do
-        expect(subject.read(:ja)).to eq("フー")
-      end
-
-      it "falls through to fallback locale when value is nil" do
-        expect(subject.read(:"en-US")).to eq("foo")
-      end
-
-      it "falls through to fallback locale when value is blank" do
-        expect(subject.read(:pt)).to eq("foo")
-      end
-
-      it "returns nil when no fallback is found" do
-        expect(subject.read(:fr)).to eq(nil)
-      end
-
-      it "returns nil when fallback: false option is passed" do
-        expect(subject.read(:"en-US", fallback: false)).to eq(nil)
-      end
-
-      it "falls through to fallback locale when fallback: true option is passed" do
-        expect(subject.read(:"en-US", fallback: true)).to eq("foo")
-      end
-
-      it "uses locale passed in as value of fallback option when present" do
-        expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
-      end
-
-      it "uses array of locales passed in as value of fallback options when present" do
-        expect(subject.read(:"en-US", fallback: [:pl, :'de-DE'])).to eq("foo")
-      end
-
-      it "passes options to getter in fallback locale" do
-        expect(subject.read(:'en-US', bar: true)).to eq("bar")
-      end
-
-      it "does not modify options passed in" do
-        options = { fallback: false }
-        subject.read(:"en-US", options)
-        expect(options).to eq({ fallback: false })
-      end
+    it "returns value when value is not nil" do
+      allow(listener).to receive(:read).once.with(:ja, {}).and_return("ja val")
+      expect(backend.read(:ja)).to eq("ja val")
     end
 
+    it "falls through to fallback locale when value is nil" do
+      allow(listener).to receive(:read).exactly(3).times do |locale|
+        { :'en-US' => nil, :en => nil, :'de-DE' => 'de val' }.fetch(locale)
+      end
+      expect(backend.read(:'en-US')).to eq("de val")
+    end
+
+    it "falls through to fallback locale when value is blank" do
+      allow(listener).to receive(:read).exactly(3).times do |locale|
+        { :'en-US' => '', :en => '', :'de-DE' => 'de val' }.fetch(locale)
+      end
+      expect(backend.read(:'en-US')).to eq("de val")
+    end
+
+    it "returns backend value when no fallback is found" do
+      expect(listener).to receive(:read).exactly(5).times do |locale|
+        { :'en-US' => '', :en => '', :'de-DE' => nil, :de => nil }.fetch(locale)
+      end
+      expect(backend.read(:'en-US')).to eq('')
+    end
+
+    it "returns backend value when fallback: false option is passed" do
+      expect(listener).to receive(:read).once.with(:'en-US', {}).and_return('')
+      expect(backend.read(:'en-US', fallback: false)).to eq('')
+    end
+
+    it "falls through to fallback locale when fallback: true option is passed" do
+      expect(listener).to receive(:read).exactly(2).times do |locale|
+        { :'en-US' => '', :en => 'en val' }.fetch(locale)
+      end
+      expect(backend.read(:'en-US', fallback: true)).to eq("en val")
+    end
+
+    it "uses locale passed in as value of fallback option when present" do
+      expect(listener).to receive(:read).exactly(2).times do |locale|
+        { :'en-US' => '', :ja => 'ja val' }.fetch(locale)
+      end
+      expect(backend.read(:'en-US', fallback: :ja)).to eq("ja val")
+    end
+
+    it "uses array of locales passed in as value of fallback options when present" do
+      expect(listener).to receive(:read).exactly(2).times do |locale|
+        { :'en-US' => '', :pl => 'pl val', :'de-DE' => 'de val' }.fetch(locale)
+      end
+      expect(backend.read(:"en-US", fallback: [:pl, :'de-DE'])).to eq("pl val")
+    end
+
+    it "passes options to getter in fallback locale" do
+      expect(listener).to receive(:read).once.with(:'en-US', foo: true).and_return("bar")
+      expect(backend.read(:'en-US', foo: true)).to eq("bar")
+    end
+
+    it "does not modify options passed in" do
+      options = { fallback: false }
+      allow(listener).to receive(:read).once
+      backend.read(:'en-US', options)
+      expect(options).to eq({ fallback: false })
+    end
+  end
+
+  if ENV['I18N_FALLBACKS']
     context "fallbacks is true" do
-      let(:fallbacks) { true }
+      plugin_setup fallbacks: true
 
-      # @note I18n changed its behavior in 1.1 (see: https://github.com/svenfuchs/i18n/pull/415)
-      #   To correctly test all versions, we actually generate fallbacks and
-      #   determine what the value should be, then check that it matches the
-      #   actual fallback value.
-      # TODO: Simplify this when support for I18n < 1.1 is dropped.
       it "uses default fallbacks" do
-        original_default_locale = I18n.default_locale
-        I18n.default_locale = :ja
-        fallbacks = Mobility::Fallbacks.build({})
-        locales = fallbacks[:"en-US"]
-        # in I18n 1.1 value is nil here
-        value = locales.map { |locale| subject.read(locale, locale: true) }.compact.first
-        expect(subject.read(:"en-US")).to eq(value)
-        I18n.default_locale = original_default_locale
-      end
-    end
-
-    context "fallbacks is falsey" do
-      let(:fallbacks) { nil }
-
-      it "does not use fallbacks when fallback option is false or nil" do
-        original_default_locale = I18n.default_locale
-        I18n.default_locale = :ja
-        expect(subject.read(:"en-US")).to eq(nil)
-        I18n.default_locale = original_default_locale
-        expect(subject.read(:"en-US", fallback: false)).to eq(nil)
-        I18n.default_locale = original_default_locale
-      end
-
-      it "uses locale passed in as value of fallback option when present" do
-        expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
-      end
-
-      it "uses array of locales passed in as value of fallback options when present" do
-        expect(subject.read(:"en-US", fallback: [:pl, :'de-DE'])).to eq("foo")
-      end
-
-      it "does not use fallbacks when fallback: true option is passed" do
-        expect(subject.read(:"en-US", fallback: true)).to eq(nil)
+        i18n_fallbacks = I18n.fallbacks
+        I18n.fallbacks = I18n::Locale::Fallbacks.new
+        I18n.fallbacks.map('en-US' => ['ja'])
+        allow(listener).to receive(:read) do |locale|
+          { :'en-US' => '', :en => '', :ja => 'ja val' }.fetch(locale)
+        end
+        expect(backend.read(:'en-US')).to eq('ja val')
+        I18n.fallbacks = i18n_fallbacks
       end
     end
   end
 
-  describe ".apply" do
-    let(:attributes) { instance_double(Mobility::Attributes, backend_class: backend_class) }
-    let(:backend_class) { double("backend class") }
-    let(:fallbacks) { instance_double(described_class) }
+  context "fallbacks is nil" do
+    plugin_setup fallbacks: nil
 
-    context "option value is not false" do
-      it "includes instance of fallbacks into backend class" do
-        expect(described_class).to receive(:new).with("option").and_return(fallbacks)
-        expect(backend_class).to receive(:include).with(fallbacks)
-        described_class.apply(attributes, "option")
-      end
+    it "does not use fallbacks when accessor fallback option is false or nil" do
+      expect(listener).to receive(:read).with(:'en-US', {}).once.and_return('')
+      expect(backend.read(:'en-US')).to eq('')
+      expect(listener).to receive(:read).with(:'en-US', {}).once.and_return('')
+      expect(backend.read(:'en-US', fallback: false)).to eq('')
     end
 
-    context "optoin value is false" do
-      it "does nothing" do
-        expect(attributes).not_to receive(:backend_class)
-        described_class.apply(attributes, false)
+    it "uses locale passed in as value of fallback option when present" do
+      allow(listener).to receive(:read) do |locale|
+        { :'en-US' => '', :en => '', :ja => 'ja val' }.fetch(locale)
       end
+      expect(backend.read(:"en-US", fallback: :ja)).to eq('ja val')
+    end
+
+    it "uses array of locales passed in as value of fallback options when present" do
+      expect(listener).to receive(:read).exactly(4).times do |locale|
+        { :'en-US' => '', :pl => 'pl val', :'de-DE' => 'de val' }.fetch(locale)
+      end
+      expect(backend.read(:'en-US', fallback: [:pl, :'de-DE'])).to eq('pl val')
+      expect(backend.read(:'en-US', fallback: [:'de-DE', :pl])).to eq('de val')
+    end
+
+    it "does not use fallbacks when fallback: true option is passed" do
+      expect(listener).to receive(:read).once.with(:'en-US', {}).and_return(nil)
+      expect(backend.read(:'en-US', fallback: true)).to eq(nil)
     end
   end
 end

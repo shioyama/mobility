@@ -24,21 +24,6 @@ value of the translated attribute if passed to it.
 
 =end
       module Dirty
-        # @!group Backend Accessors
-        # @!macro backend_writer
-        # @param [Hash] options
-        def write(locale, value, options = {})
-          locale_accessor = Mobility.normalize_locale_accessor(attribute, locale)
-          if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
-            model.send(:attributes_changed_by_setter).except!(locale_accessor)
-          elsif read(locale, options.merge(locale: true)) != value
-            model.send(:mobility_changed_attributes) << locale_accessor
-            model.send(:attribute_will_change!, locale_accessor)
-          end
-          super
-        end
-        # @!endgroup
-
         # Builds module which adds suffix/prefix methods for translated
         # attributes so they act like normal dirty-tracked attributes.
         class MethodsBuilder < Module
@@ -92,6 +77,23 @@ value of the translated attribute if passed to it.
               @mobility_changed_attributes ||= Set.new
             end
           end
+        end
+
+        module BackendMethods
+          # @!group Backend Accessors
+          # @!macro backend_writer
+          # @param [Hash] options
+          def write(locale, value, options = {})
+            locale_accessor = Mobility.normalize_locale_accessor(attribute, locale)
+            if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
+              model.send(:attributes_changed_by_setter).except!(locale_accessor)
+            elsif read(locale, options.merge(locale: true)) != value
+              model.send(:mobility_changed_attributes) << locale_accessor
+              model.send(:attribute_will_change!, locale_accessor)
+            end
+            super
+          end
+          # @!endgroup
         end
       end
     end

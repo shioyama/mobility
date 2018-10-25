@@ -47,6 +47,22 @@ module Helpers
     def include_cache_key_examples *args
       it_behaves_like "cache key", *args
     end
+
+    def backend_listener(listener)
+      Class.new.tap do |klass|
+        klass.class_eval do
+          include Mobility::Backend
+          define_method :read do |*args, **opts|
+            listener.read(*args, **opts)
+          end
+
+          define_method :write do |*args, **opts|
+            listener.write(*args, **opts)
+          end
+        end
+      end
+    end
+
   end
 
   module ActiveRecord
@@ -89,6 +105,42 @@ module Helpers
   module Generators
     def version_string
       "#{::ActiveRecord::VERSION::MAJOR}.#{::ActiveRecord::VERSION::MINOR}"
+    end
+  end
+
+  module Plugins
+    include Backend
+
+    def self.included(base)
+      base.extend ClassMethods
+    end
+
+    module ClassMethods
+      # Sets up attributes module with a listener to listen on reads/writes to the
+      # backend. Pass two separate arrays to create separate attributes modules.
+      def plugin_setup(attribute_name = "title", *other_names, **options)
+        plugins = options.keys & %i[query cache dirty fallbacks presence default attribute_methods fallthrough_accessors locale_accessors]
+
+        attribute_names = [attribute_name, *other_names]
+        let(:attribute_name) { attribute_name }
+        let(:attributes_class) do
+          Class.new(TestAttributes).tap do |attrs|
+            plugins.each { |plugin| attrs.plugin plugin }
+          end
+        end
+        let(:model_class) do
+          Class.new.tap do |klass|
+            klass.include attributes
+          end
+        end
+        let(:instance) { model_class.new }
+
+        let(:attributes) { attributes_class.new(*attribute_names, backend: backend_class, **options) }
+        let(:listener) { double(:backend) }
+        let(:backend_class) { backend_listener(listener) }
+        let(:backend) { instance.send("#{attribute_name}_backend") }
+        attribute_names.each { |name| let(:"#{name}_backend") { instance.send("#{name}_backend") } }
+      end
     end
   end
 end

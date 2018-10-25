@@ -65,8 +65,10 @@ The proc can accept zero to three arguments (see examples below)
       # Applies default plugin to attributes.
       # @param [Attributes] attributes
       # @param [Object] _option Ignored and plugin always applied.
-      def self.apply(attributes, _option)
-        attributes.backend_class.include(self)
+      def included(*)
+        super.tap do |backend_class|
+          backend_class.include(BackendMethods)
+        end
       end
 
       # Generate a default value for given parameters.
@@ -81,19 +83,21 @@ The proc can accept zero to three arguments (see examples below)
         model.instance_exec(*args, &default_value)
       end
 
-      # @!group Backend Accessors
-      # @!macro backend_reader
-      # @option accessor_options [Boolean] default
-      #   *false* to disable presence filter.
-      def read(locale, accessor_options = {})
-        default = accessor_options.has_key?(:default) ? accessor_options.delete(:default) : options[:default]
-        if (value = super(locale, accessor_options)).nil?
-          Default[default, locale: locale, accessor_options: accessor_options, model: model, attribute: attribute]
-        else
-          value
+      module BackendMethods
+        # @!group Backend Accessors
+        # @!macro backend_reader
+        # @option accessor_options [Boolean] default
+        #   *false* to disable presence filter.
+        def read(locale, accessor_options = {})
+          default = accessor_options.has_key?(:default) ? accessor_options.delete(:default) : options[:default]
+          if (value = super(locale, accessor_options)).nil?
+            Default[default, locale: locale, accessor_options: accessor_options, model: model, attribute: attribute]
+          else
+            value
+          end
         end
+        # @!endgroup
       end
-      # @!endgroup
     end
   end
 end

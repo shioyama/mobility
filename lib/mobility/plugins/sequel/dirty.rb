@@ -13,21 +13,6 @@ Automatically includes dirty plugin in model class when enabled.
 =end
     module Sequel
       module Dirty
-        # @!group Backend Accessors
-        # @!macro backend_writer
-        # @param [Hash] options
-        def write(locale, value, options = {})
-          locale_accessor = Mobility.normalize_locale_accessor(attribute, locale).to_sym
-          if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
-            super
-            [model.changed_columns, model.initial_values].each { |h| h.delete(locale_accessor) }
-          elsif read(locale, options.merge(fallback: false)) != value
-            model.will_change_column(locale_accessor)
-            super
-          end
-        end
-        # @!endgroup
-
         # Builds module which overrides dirty methods to handle translated as
         # well as normal (untranslated) attributes.
         class MethodsBuilder < Module
@@ -53,6 +38,24 @@ Automatically includes dirty plugin in model class when enabled.
             model_class.plugin :dirty
           end
         end
+
+        module BackendMethods
+          # @!group Backend Accessors
+          # @!macro backend_writer
+          # @param [Hash] options
+          def write(locale, value, options = {})
+            locale_accessor = Mobility.normalize_locale_accessor(attribute, locale).to_sym
+            if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
+              super
+              [model.changed_columns, model.initial_values].each { |h| h.delete(locale_accessor) }
+            elsif read(locale, options.merge(fallback: false)) != value
+              model.will_change_column(locale_accessor)
+              super
+            end
+          end
+          # @!endgroup
+        end
+
       end
     end
   end

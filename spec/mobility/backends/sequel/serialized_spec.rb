@@ -23,7 +23,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
 
     describe "serialized backend without cache" do
       context "yaml format" do
-        before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, **default_options }
+        before { SerializedPost.translates :title, :content, backend: :serialized, cache: false, **default_options }
         include_accessor_examples 'SerializedPost'
         include_serialization_examples 'SerializedPost', column_affix: column_affix
         include_dup_examples 'SerializedPost'

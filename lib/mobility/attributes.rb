@@ -108,10 +108,9 @@ with other backends.
 
 =end
   class Attributes < Module
-
-    # Method (accessor, reader or writer)
-    # @return [Symbol] method
-    attr_reader :method
+    def self.plugin(name)
+      include Plugins.load_plugin(name)
+    end
 
     # Attribute names for which accessors will be defined
     # @return [Array<String>] Array of names
@@ -129,22 +128,23 @@ with other backends.
     # @return [Symbol,Class] Name of backend, or backend class
     attr_reader :backend_name
 
-    # Model class
-    # @return [Class] Class of model
-    attr_reader :model_class
-
-    # @param [Symbol] method One of: [reader, writer, accessor]
     # @param [Array<String>] attribute_names Names of attributes to define backend for
+    # @param [Symbol] method One of: [reader, writer, accessor]
+    # @param [Symbol,Class] backend Backend to use
     # @param [Hash] backend_options Backend options hash
-    # @option backend_options [Class] model_class Class of model
     # @raise [ArgumentError] if method is not reader, writer or accessor
     def initialize(*attribute_names, method: :accessor, backend: Mobility.default_backend, **backend_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
-      @method = method
       @options = Mobility.default_options.to_h.merge(backend_options)
       @names = attribute_names.map(&:to_s).freeze
       raise BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
       @backend_name = backend
+
+      attribute_names.each do |name|
+        define_backend(name)
+        define_reader(name) if %i[accessor reader].include?(method)
+        define_writer(name) if %i[accessor writer].include?(method)
+      end
     end
 
     # Setup backend class, include modules into model class, include/extend
@@ -152,26 +152,16 @@ with other backends.
     # {Mobility::Backend::Setup#setup_model}).
     # @param klass [Class] Class of model
     def included(klass)
-      @model_class = @options[:model_class] = klass
-      @backend_class = Backends.load_backend(backend_name).for(model_class).with_options(options)
-
-      Mobility.plugins.each do |name|
-        if options.has_key?(name)
-          plugin = Plugins.load_plugin(name)
-          plugin.apply(self, options[name])
-        end
-      end
-
-      each do |name|
-        define_backend(name)
-        define_reader(name) if %i[accessor reader].include?(method)
-        define_writer(name) if %i[accessor writer].include?(method)
-      end
+      @backend_class = Backends.load_backend(backend_name)
+        .for(klass)
+        .with_options(options.merge(model_class: klass))
 
       klass.include InstanceMethods
       klass.extend ClassMethods
 
-      backend_class.setup_model(model_class, names)
+      backend_class.setup_model(klass, names)
+
+      backend_class
     end
 
     # Yield each attribute name to block

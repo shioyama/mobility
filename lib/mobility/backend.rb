@@ -9,8 +9,7 @@ Defines a minimum set of shared components included in any backend. These are:
 - a reader returning the +model+ on which the backend is defined ({#model})
 - a reader returning the +attribute+ for which the backend is defined
   ({#attribute})
-- a constructor setting these two elements (+model+, +attribute+), and
-  extracting fallbacks from the options hash ({#initialize})
+- a constructor setting these two elements (+model+, +attribute+)
 - a +setup+ method adding any configuration code to the model class
   ({Setup#setup})
 

@@ -46,7 +46,7 @@ Mobility.configure do |config|
   # No fallbacks are used by default. To define default fallbacks, uncomment
   # and set the default fallback option value here. A "true" value will use
   # whatever is defined by +I18n.fallbacks+ (if defined), or alternatively will
-  # fallback to your +I18n.default_locale+.
+  # fallback according to +I18n::Locale++Fallbacks+.
   #
   # config.default_options[:fallbacks] = true
 

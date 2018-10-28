@@ -88,7 +88,7 @@ default_fallbacks= will be removed in the next major version of Mobility.
     # @return [Symbol,Class]
     attr_accessor :default_backend
 
-    # Returns set of default accessor locles to use (defaults to
+    # Returns set of default accessor locales to use (defaults to
     # +I18n.available_locales+)
     # @return [Array<Symbol>]
     def default_accessor_locales

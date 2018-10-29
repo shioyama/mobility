@@ -32,6 +32,7 @@ module Mobility
   require "mobility/configuration"
   require "mobility/fallbacks"
   require "mobility/loaded"
+  require "mobility/plugin"
   require "mobility/plugins"
   require "mobility/translates"
 

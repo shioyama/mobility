@@ -35,11 +35,12 @@ model class is generated.
 
 =end
     module FallthroughAccessors
+      extend Plugin
+
       # Apply fallthrough accessors plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
-      def initialize(*)
-        super
+      initialize_hook do
         define_fallthrough_accessors(names) if options[:fallthrough_accessors]
       end
 

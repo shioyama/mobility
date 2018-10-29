@@ -7,11 +7,12 @@ module Mobility
 
 =end
     module Query
-      def included(model_class)
-        super.tap do |backend_class|
-          if options[:query]
-            include_query_module(model_class, backend_class)
-          end
+      extend Plugin
+
+      # Applies query plugin to attributes.
+      included_hook do |model_class, backend_class|
+        if options[:query]
+          include_query_module(model_class, backend_class)
         end
       end
 

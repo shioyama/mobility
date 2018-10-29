@@ -123,15 +123,13 @@ the current locale was +nil+.
 
 =end
     module Fallbacks
+      extend Plugin
+
       # Applies fallbacks plugin to attributes. Completely disables fallbacks
       # on model if option is +false+.
-      # @param [Attributes] attributes
-      # @param [Boolean] option
-      def included(model_class)
-        super.tap do |backend_class|
-          option = options[:fallbacks]
-          backend_class.include(Methods.new(option)) unless option == false
-        end
+      included_hook do |_, backend_class|
+        option = options[:fallbacks]
+        backend_class.include(Methods.new(option)) unless option == false
       end
 
       class Methods < Module

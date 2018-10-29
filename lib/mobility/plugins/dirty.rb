@@ -20,20 +20,19 @@ details.
 
 =end
     module Dirty
+      extend Plugin
+
       def self.included(attributes_class)
         attributes_class.plugin :fallthrough_accessors
       end
 
-      def initialize(*names, **options)
+      initialize_hook do
         options[:fallthrough_accessors] = true if options[:dirty] == true
-        super
       end
 
-      def included(model_class)
-        super.tap do |backend_class|
-          if options[:dirty]
-            include_dirty_modules(backend_class, model_class, *names)
-          end
+      included_hook do |model_class, backend_class|
+        if options[:dirty]
+          include_dirty_modules(backend_class, model_class, *names)
         end
       end
 

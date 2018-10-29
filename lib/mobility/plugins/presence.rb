@@ -13,13 +13,11 @@ backend.
 
 =end
     module Presence
+      extend Plugin
+
       # Applies presence plugin to attributes.
-      # @param [Attributes] attributes
-      # @param [Boolean] option
-      def included(*)
-        super.tap do |backend_class|
-          backend_class.include(BackendMethods) if options[:presence]
-        end
+      included_hook do |_, backend_class|
+        backend_class.include(BackendMethods) if options[:presence]
       end
 
       module BackendMethods

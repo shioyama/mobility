@@ -62,13 +62,11 @@ The proc can accept zero to three arguments (see examples below)
   #=> "Post"
 =end
     module Default
+      extend Plugin
+
       # Applies default plugin to attributes.
-      # @param [Attributes] attributes
-      # @param [Object] _option Ignored and plugin always applied.
-      def included(*)
-        super.tap do |backend_class|
-          backend_class.include(BackendMethods)
-        end
+      included_hook do |_, backend_class|
+        backend_class.include(BackendMethods)
       end
 
       # Generate a default value for given parameters.

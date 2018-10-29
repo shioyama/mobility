@@ -12,15 +12,12 @@ attributes only.
 
 =end
     module AttributeMethods
+      extend Plugin
+
       # Applies attribute_methods plugin for a given option value.
-      # @param [Attributes] attributes
-      # @param [Boolean] option Value of option
-      # @raise [ArgumentError] if model class does not support dirty tracking
-      def included(model_class)
-        super.tap do
-          if options[:attribute_methods]
-            include_attribute_methods_module(model_class, *names)
-          end
+      included_hook do |model_class|
+        if options[:attribute_methods]
+          include_attribute_methods_module(model_class, *names)
         end
       end
 

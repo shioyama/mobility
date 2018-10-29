@@ -21,15 +21,13 @@ Values are added to the cache in two ways:
 
 =end
     module Cache
+      extend Plugin
+
       # Applies cache plugin to attributes.
-      # @param [Attributes] attributes
-      # @param [Boolean] option
-      def included(model_class)
-        super.tap do |backend_class|
-          if options[:cache]
-            backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
-            model_class.include BackendResetter.for(model_class).new(names) { clear_cache }
-          end
+      included_hook do |model_class, backend_class|
+        if options[:cache]
+          backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
+          model_class.include BackendResetter.for(model_class).new(names) { clear_cache }
         end
       end
 

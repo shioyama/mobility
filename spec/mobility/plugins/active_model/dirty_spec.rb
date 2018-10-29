@@ -3,196 +3,189 @@ require "spec_helper"
 describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   require "mobility/plugins/active_model/dirty"
 
-  let(:backend_class) do
-    Class.new(Mobility::Backends::Null) do
-      def read(locale, **options)
+  include Helpers::Plugins
+  plugin_setup dirty: true
+
+  def define_backend_class
+    Class.new do
+      include Mobility::Backend
+      def read(locale, **)
         values[locale]
       end
 
-      def write(locale, value, **options)
+      def write(locale, value, **)
         values[locale] = value
       end
 
       private
-
-      def values
-        @values ||= {}
-      end
+      def values; @values ||= {}; end
     end
   end
 
-  before do
+  let(:model_class) do
     stub_const 'Article', Class.new {
       def save
         changes_applied
       end
     }
     Article.include ActiveModel::Dirty
-    Article.extend Mobility
-    Article.translates :title, backend: backend_class, dirty: true, cache: false
+    Article.include attributes
+    Article
   end
+  let(:backend_class) { define_backend_class }
 
   describe "tracking changes" do
     it "tracks changes in one locale" do
       Mobility.locale = :'pt-BR'
-      article = Article.new
 
       aggregate_failures "before change" do
-        expect(article.title).to eq(nil)
-        expect(article.changed?).to eq(false)
-        expect(article.changed).to eq([])
-        expect(article.changes).to eq({})
+        expect(instance.title).to eq(nil)
+        expect(instance.changed?).to eq(false)
+        expect(instance.changed).to eq([])
+        expect(instance.changes).to eq({})
       end
 
       aggregate_failures "set same value" do
-        article.title = nil
-        expect(article.title).to eq(nil)
-        expect(article.changed?).to eq(false)
-        expect(article.changed).to eq([])
-        expect(article.changes).to eq({})
+        instance.title = nil
+        expect(instance.title).to eq(nil)
+        expect(instance.changed?).to eq(false)
+        expect(instance.changed).to eq([])
+        expect(instance.changes).to eq({})
       end
 
-      article.title = "foo"
+      instance.title = "foo"
 
       aggregate_failures "after change" do
-        expect(article.title).to eq("foo")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_pt_br"])
-        expect(article.changes).to eq({ "title_pt_br" => [nil, "foo"] })
+        expect(instance.title).to eq("foo")
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to eq(["title_pt_br"])
+        expect(instance.changes).to eq({ "title_pt_br" => [nil, "foo"] })
       end
     end
 
     it "tracks previous changes in one locale" do
-      article = Article.new
-      article.title = "foo"
-      article.save
+      instance.title = "foo"
+      instance.save
 
       aggregate_failures do
-        article.title = "bar"
-        expect(article.changed?).to eq(true)
+        instance.title = "bar"
+        expect(instance.changed?).to eq(true)
 
-        article.save
+        instance.save
 
-        expect(article.changed?).to eq(false)
-        expect(article.previous_changes).to eq({ "title_en" => ["foo", "bar"]})
+        expect(instance.changed?).to eq(false)
+        expect(instance.previous_changes).to eq({ "title_en" => ["foo", "bar"]})
       end
     end
 
     it "tracks changes in multiple locales" do
-      article = Article.new
-
-      expect(article.title).to eq(nil)
+      expect(instance.title).to eq(nil)
 
       aggregate_failures "change in English locale" do
-        article.title = "English title"
+        instance.title = "English title"
 
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_en"])
-        expect(article.changes).to eq({ "title_en" => [nil, "English title"] })
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to eq(["title_en"])
+        expect(instance.changes).to eq({ "title_en" => [nil, "English title"] })
       end
 
       aggregate_failures "change in French locale" do
         Mobility.locale = :fr
 
-        article.title = "Titre en Francais"
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to match_array(["title_en", "title_fr"])
-        expect(article.changes).to eq({ "title_en" => [nil, "English title"], "title_fr" => [nil, "Titre en Francais"] })
+        instance.title = "Titre en Francais"
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to match_array(["title_en", "title_fr"])
+        expect(instance.changes).to eq({ "title_en" => [nil, "English title"], "title_fr" => [nil, "Titre en Francais"] })
       end
     end
 
     it "tracks previous changes in multiple locales" do
-      article = Article.new
-      article.title_en = "English title 1"
-      article.title_fr = "Titre en Francais 1"
-      article.save
+      instance.title_en = "English title 1"
+      instance.title_fr = "Titre en Francais 1"
+      instance.save
 
-      article.title = "English title 2"
+      instance.title = "English title 2"
       Mobility.locale = :fr
-      article.title = "Titre en Francais 2"
+      instance.title = "Titre en Francais 2"
 
-      article.save
+      instance.save
 
-      expect(article.previous_changes).to eq({"title_en" => ["English title 1", "English title 2"],
+      expect(instance.previous_changes).to eq({"title_en" => ["English title 1", "English title 2"],
                                               "title_fr" => ["Titre en Francais 1", "Titre en Francais 2"]})
     end
 
     it "resets changes when locale is set to original value" do
-      article = Article.new
-
-      expect(article.changed?).to eq(false)
+      expect(instance.changed?).to eq(false)
 
       aggregate_failures "after change" do
-        article.title = "foo"
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_en"])
-        expect(article.changes).to eq({ "title_en" => [nil, "foo"] })
+        instance.title = "foo"
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to eq(["title_en"])
+        expect(instance.changes).to eq({ "title_en" => [nil, "foo"] })
       end
 
       aggregate_failures "after setting attribute back to original value" do
-        article.title = nil
-        expect(article.changed?).to eq(false)
-        expect(article.changed).to eq([])
-        expect(article.changes).to eq({})
+        instance.title = nil
+        expect(instance.changed?).to eq(false)
+        expect(instance.changed).to eq([])
+        expect(instance.changes).to eq({})
       end
 
       aggregate_failures "changing value in different locale" do
-        Mobility.with_locale(:fr) { article.title = "Titre en Francais" }
+        Mobility.with_locale(:fr) { instance.title = "Titre en Francais" }
 
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_fr"])
-        expect(article.changes).to eq({ "title_fr" => [nil, "Titre en Francais"] })
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to eq(["title_fr"])
+        expect(instance.changes).to eq({ "title_fr" => [nil, "Titre en Francais"] })
       end
     end
   end
 
   describe "suffix methods" do
     it "defines suffix methods on translated attribute", rails_version_geq: '5.0' do
-      article = Article.new
-      article.title = "foo"
-      article.save
+      instance.title = "foo"
+      instance.save
 
-      article.title = "bar"
+      instance.title = "bar"
 
       aggregate_failures do
-        expect(article.title_changed?).to eq(true)
-        expect(article.title_change).to eq(["foo", "bar"])
-        expect(article.title_was).to eq("foo")
+        expect(instance.title_changed?).to eq(true)
+        expect(instance.title_change).to eq(["foo", "bar"])
+        expect(instance.title_was).to eq("foo")
 
-        article.save
+        instance.save
         if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
+          expect(instance.title_changed?).to eq(nil)
         else
-          expect(article.title_previously_changed?).to eq(true)
-          expect(article.title_previous_change).to eq(["foo", "bar"])
-          expect(article.title_changed?).to eq(false)
+          expect(instance.title_previously_changed?).to eq(true)
+          expect(instance.title_previous_change).to eq(["foo", "bar"])
+          expect(instance.title_changed?).to eq(false)
         end
 
-        article.title_will_change!
-        expect(article.title_changed?).to eq(true)
+        instance.title_will_change!
+        expect(instance.title_changed?).to eq(true)
       end
     end
 
     it "returns changes on attribute for current locale", rails_version_geq: '5.0' do
-      article = Article.new
-      article.title = "foo"
-      article.save
+      instance.title = "foo"
+      instance.save
 
-      article.title = "bar"
+      instance.title = "bar"
 
       aggregate_failures do
-        expect(article.title_changed?).to eq(true)
-        expect(article.title_change).to eq(["foo", "bar"])
-        expect(article.title_was).to eq("foo")
+        expect(instance.title_changed?).to eq(true)
+        expect(instance.title_change).to eq(["foo", "bar"])
+        expect(instance.title_was).to eq("foo")
 
         Mobility.locale = :fr
         if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
+          expect(instance.title_changed?).to eq(nil)
         else
-          expect(article.title_changed?).to eq(false)
+          expect(instance.title_changed?).to eq(false)
         end
-        expect(article.title_change).to eq(nil)
-        expect(article.title_was).to eq(nil)
+        expect(instance.title_change).to eq(nil)
+        expect(instance.title_was).to eq(nil)
       end
     end
   end
@@ -200,91 +193,88 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   describe "restoring attributes" do
     it "defines restore_<attribute>! for translated attributes" do
       Mobility.locale = :'pt-BR'
-      article = Article.new
-      article.save
+      instance.save
 
-      article.title = "foo"
+      instance.title = "foo"
 
-      article.restore_title!
-      expect(article.title).to eq(nil)
-      expect(article.changes).to eq({})
+      instance.restore_title!
+      expect(instance.title).to eq(nil)
+      expect(instance.changes).to eq({})
     end
 
     it "restores attribute when passed to restore_attribute!" do
-      article = Article.new
-      article.save
+      instance.save
 
-      article.title = "foo"
-      article.send :restore_attribute!, :title
+      instance.title = "foo"
+      instance.send :restore_attribute!, :title
 
-      expect(article.title).to eq(nil)
+      expect(instance.title).to eq(nil)
     end
 
     it "handles translated attributes when passed to restore_attributes" do
-      article = Article.new
-      article.title = "foo"
-      article.save
+      instance.title = "foo"
+      instance.save
 
-      expect(article.title).to eq("foo")
+      expect(instance.title).to eq("foo")
 
-      article.title = "bar"
-      expect(article.title).to eq("bar")
-      article.restore_attributes([:title])
-      expect(article.title).to eq("foo")
+      instance.title = "bar"
+      expect(instance.title).to eq("bar")
+      instance.restore_attributes([:title])
+      expect(instance.title).to eq("foo")
     end
   end
 
   describe "fallbacks compatiblity" do
-    before do
+    plugin_setup dirty: true, fallbacks: { en: 'ja' }
+
+    let(:model_class) do
       stub_const 'ArticleWithFallbacks', Class.new
-      ArticleWithFallbacks.class_eval do
-        include ActiveModel::Dirty
-        extend Mobility
-      end
-      ArticleWithFallbacks.translates :title, backend: backend_class, dirty: true, cache: false, fallbacks: { en: 'ja' }
+      ArticleWithFallbacks.include ActiveModel::Dirty
+      ArticleWithFallbacks.include attributes
+      ArticleWithFallbacks
     end
 
-    it "does not compare with fallback value" do
-      article = ArticleWithFallbacks.new
+    let(:backend_class) { define_backend_class }
 
+    it "does not compare with fallback value" do
       aggregate_failures "before change" do
-        expect(article.title).to eq(nil)
-        expect(article.changed?).to eq(false)
-        expect(article.changed).to eq([])
-        expect(article.changes).to eq({})
+        expect(instance.title).to eq(nil)
+        expect(instance.changed?).to eq(false)
+        expect(instance.changed).to eq([])
+        expect(instance.changes).to eq({})
       end
 
       aggregate_failures "set fallback locale value" do
-        Mobility.with_locale(:ja) { article.title = "あああ" }
-        expect(article.title).to eq("あああ")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_ja"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "あああ"]})
-        Mobility.with_locale(:ja) { expect(article.title).to eq("あああ") }
+        Mobility.with_locale(:ja) { instance.title = "あああ" }
+        expect(instance.title).to eq("あああ")
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to eq(["title_ja"])
+        expect(instance.changes).to eq({ "title_ja" => [nil, "あああ"]})
+        Mobility.with_locale(:ja) { expect(instance.title).to eq("あああ") }
       end
 
       aggregate_failures "set value in current locale to same value" do
-        article.title = nil
-        expect(article.title).to eq("あああ")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_ja"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "あああ"]})
+        instance.title = nil
+        expect(instance.title).to eq("あああ")
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to eq(["title_ja"])
+        expect(instance.changes).to eq({ "title_ja" => [nil, "あああ"]})
       end
 
       aggregate_failures "set value in fallback locale to different value" do
-        Mobility.with_locale(:ja) { article.title = "ばばば" }
-        expect(article.title).to eq("ばばば")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_ja"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "ばばば"]})
+        Mobility.with_locale(:ja) { instance.title = "ばばば" }
+        expect(instance.title).to eq("ばばば")
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to eq(["title_ja"])
+        expect(instance.changes).to eq({ "title_ja" => [nil, "ばばば"]})
       end
 
       aggregate_failures "set value in current locale to different value" do
-        article.title = "Title"
-        expect(article.title).to eq("Title")
-        expect(article.changed?).to eq(true)
-        expect(article.changed).to match_array(["title_ja", "title_en"])
-        expect(article.changes).to eq({ "title_ja" => [nil, "ばばば"], "title_en" => [nil, "Title"]})
+        instance.title = "Title"
+        expect(instance.title).to eq("Title")
+        expect(instance.changed?).to eq(true)
+        expect(instance.changed).to match_array(["title_ja", "title_en"])
+        expect(instance.changes).to eq({ "title_ja" => [nil, "ばばば"], "title_en" => [nil, "Title"]})
       end
     end
   end

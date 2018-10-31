@@ -121,13 +121,16 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       m.drop_table :string_column_posts
     end
 
-    it "raises InvalidColumnType exception" do
-      stub_const 'StringColumnPost', Class.new(ActiveRecord::Base)
-      StringColumnPost.extend Mobility
-      expect {
+    describe ".build_node" do
+      it "raises InvalidColumnType exception when called with column_type" do
+        stub_const 'StringColumnPost', Class.new(ActiveRecord::Base)
+        StringColumnPost.extend Mobility
         StringColumnPost.translates :title, backend: :container, column_name: :foo
-      }.to raise_error(Mobility::Backends::ActiveRecord::Container::InvalidColumnType,
-                       "foo must be a column of type json or jsonb")
+        expect {
+          StringColumnPost.mobility_backend_class(:title).build_node(:title, :en)
+        }.to raise_error(Mobility::Backends::ActiveRecord::Container::InvalidColumnType,
+                         "foo must be a column of type json or jsonb")
+      end
     end
   end
 end if Mobility::Loaded::ActiveRecord

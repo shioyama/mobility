@@ -17,10 +17,6 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       #   @return [Symbol] (:translations) Name of translations column
       option_reader :column_name
 
-      # @!method column_type
-      #   @return [Symbol] Either :json or :jsonb
-      option_reader :column_type
-
       # @!group Backend Accessors
       #
       # @note Translation may be a string, integer, boolean, hash or array
@@ -44,30 +40,42 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       end
       # @!endgroup
 
-      # @!group Backend Configuration
-      # @option options [Symbol] column_name (:translations) Name of column on which to store translations
-      # @raise [InvalidColumnType] if the type of the container column is not json or jsonb
-      def self.configure(options)
-        options[:column_name] ||= :translations
-        options[:column_name] = options[:column_name].to_sym
-        options[:column_type] = options[:model_class].type_for_attribute(options[:column_name].to_s).try(:type)
-        unless %i[json jsonb].include?(options[:column_type])
-          raise InvalidColumnType, "#{options[:column_name]} must be a column of type json or jsonb"
+      class << self
+        # @!group Backend Configuration
+        # @option options [Symbol] column_name (:translations) Name of column on which to store translations
+        # @raise [InvalidColumnType] if the type of the container column is not json or jsonb
+        def configure(options)
+          options[:column_name] ||= :translations
+          options[:column_name] = options[:column_name].to_sym
         end
-      end
-      # @!endgroup
+        # @!endgroup
 
-      # @param [String] attr Attribute name
-      # @param [Symbol] locale Locale
-      # @return [Mobility::Arel::Nodes::Json,Mobility::Arel::Nodes::Jsonb] Arel
-      #   node for attribute on json or jsonb column
-      def self.build_node(attr, locale)
-        column = model_class.arel_table[column_name]
-        case column_type
-        when :json
-          Arel::Nodes::JsonContainer.new(column, build_quoted(locale), build_quoted(attr))
-        when :jsonb
-          Arel::Nodes::JsonbContainer.new(column, build_quoted(locale), build_quoted(attr))
+        # @param [String] attr Attribute name
+        # @param [Symbol] locale Locale
+        # @return [Mobility::Arel::Nodes::Json,Mobility::Arel::Nodes::Jsonb] Arel
+        #   node for attribute on json or jsonb column
+        def build_node(attr, locale)
+          column = model_class.arel_table[column_name]
+          case column_type
+          when :json
+            Arel::Nodes::JsonContainer.new(column, build_quoted(locale), build_quoted(attr))
+          when :jsonb
+            Arel::Nodes::JsonbContainer.new(column, build_quoted(locale), build_quoted(attr))
+          end
+        end
+
+        def column_type
+          @column_type ||= get_column_type
+        end
+
+        private
+
+        def get_column_type
+          options[:model_class].type_for_attribute(options[:column_name].to_s).try(:type).tap do |type|
+            unless %i[json jsonb].include? type
+              raise InvalidColumnType, "#{options[:column_name]} must be a column of type json or jsonb"
+            end
+          end
         end
       end
 

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "mobility/plugins/cache/translation_cacher"
 
 module Mobility
   module Plugins
@@ -37,7 +36,14 @@ Values are added to the cache in two ways:
         # @!macro backend_reader
         # @!method read(locale, value, options = {})
         #   @option options [Boolean] cache *false* to disable cache.
-        include TranslationCacher.new(:read)
+        def read(locale, **options)
+          return super(locale, options) if options.delete(:cache) == false
+          if cache.has_key?(locale)
+            cache[locale]
+          else
+            cache[locale] = super(locale, options)
+          end
+        end
 
         # @!macro backend_writer
         # @option options [Boolean] cache
@@ -47,6 +53,16 @@ Values are added to the cache in two ways:
           cache[locale] = super
         end
         # @!endgroup
+
+        private
+
+        def cache
+          @cache ||= {}
+        end
+
+        def clear_cache
+          @cache = {}
+        end
       end
     end
   end

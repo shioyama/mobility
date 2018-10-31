@@ -127,7 +127,24 @@ each translated model, or set a default option in your configuration.
       end
 
       module Cache
-        include Plugins::Cache::TranslationCacher.new(:translation_for)
+        def translation_for(locale, **options)
+          return super(locale, options) if options.delete(:cache) == false
+          if cache.has_key?(locale)
+            cache[locale]
+          else
+            cache[locale] = super(locale, options)
+          end
+        end
+
+        private
+
+        def cache
+          @cache ||= {}
+        end
+
+        def clear_cache
+          @cache = {}
+        end
       end
     end
   end

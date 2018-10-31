@@ -2,6 +2,10 @@
 
 ## 0.8
 
+### 0.8.5 (November 1, 2018)
+* Load column_type when building node
+  ([#301](https://github.com/shioyama/mobility/pull/301))
+
 ### 0.8.4 (October 19, 2018)
 * Use references to define polymorphic associations in generator migrations
   ([#292](https://github.com/shioyama/mobility/pull/292))

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "mobility/backend_resetter"
 require "mobility/plugins/fallthrough_accessors"
 
 module Mobility

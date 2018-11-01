@@ -28,7 +28,6 @@ module Mobility
   require "mobility/attributes"
   require "mobility/backend"
   require "mobility/backends"
-  require "mobility/backend_resetter"
   require "mobility/configuration"
   require "mobility/fallbacks"
   require "mobility/loaded"

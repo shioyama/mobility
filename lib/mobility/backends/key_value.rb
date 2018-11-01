@@ -136,14 +136,14 @@ each translated model, or set a default option in your configuration.
           end
         end
 
+        def clear_cache
+          @cache = {}
+        end
+
         private
 
         def cache
           @cache ||= {}
-        end
-
-        def clear_cache
-          @cache = {}
         end
       end
     end

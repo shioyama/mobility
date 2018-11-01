@@ -143,6 +143,10 @@ set.
           end
         end
 
+        def clear_cache
+          model_cache && model_cache.clear
+        end
+
         private
 
         def cache
@@ -151,10 +155,6 @@ set.
 
         def model_cache
           model.instance_variable_get(:"@__mobility_#{association_name}_cache")
-        end
-
-        def clear_cache
-          model_cache && model_cache.clear
         end
       end
     end

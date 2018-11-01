@@ -26,7 +26,7 @@ Values are added to the cache in two ways:
       included_hook do |model_class, backend_class|
         if options[:cache]
           backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
-          CacheResetter.reset(model_class, names)
+          CacheResetter.apply(model_class, names)
         end
       end
 
@@ -65,49 +65,27 @@ Values are added to the cache in two ways:
         end
       end
 
-      module CacheResetter
-        def self.reset(klass, names)
+      class CacheResetter < Module
+        def self.apply(klass, names)
+          methods = []
           if Loaded::ActiveRecord && klass < ::ActiveRecord::Base
-            klass.include ActiveRecordResetter.new(names)
+            methods = %i[changes_applied clear_changes_information reload]
           elsif Loaded::ActiveRecord && klass.ancestors.include?(::ActiveModel::Dirty)
-            klass.include ActiveModelResetter.new(names)
+            methods = %i[changes_applied clear_changes_information]
           elsif Loaded::Sequel && klass < ::Sequel::Model
-            klass.include SequelResetter.new(names)
+            methods = %i[refresh]
           end
-        end
-      end
 
-      class ActiveModelResetter < Module
-        # @param [Array<String>] attribute_names Names of attributes whose backends should be reset
-        def initialize(names)
-          %i[changes_applied clear_changes_information].each do |method|
-            define_method method do
-              super()
-              names.each { |name| mobility_backends[name].clear_cache }
+          resetter = new do
+            methods.each do |method|
+              define_method method do |*args|
+                super(*args).tap do
+                  names.each { |name| mobility_backends[name].clear_cache }
+                end
+              end
             end
           end
-        end
-      end
-
-      class ActiveRecordResetter < ActiveModelResetter
-        def initialize(names)
-          super
-
-          define_method :reload do |*args|
-            super(*args).tap do
-              names.each { |name| mobility_backends[name].clear_cache }
-            end
-          end
-        end
-      end
-
-      class SequelResetter < Module
-        def initialize(names)
-          define_method :refresh do
-            super().tap do
-              names.each { |name| mobility_backends[name].clear_cache }
-            end
-          end
+          klass.include resetter
         end
       end
     end

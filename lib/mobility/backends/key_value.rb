@@ -57,12 +57,12 @@ other backends on model (otherwise one will overwrite the other).
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, options = {})
-        translation_for(locale, options).value
+        [locale, translation_for(locale, options).value]
       end
 
       # @!macro backend_writer
       def write(locale, value, options = {})
-        translation_for(locale, options).value = value
+        [locale, translation_for(locale, options).value = value]
       end
       # @!endgroup
 

@@ -145,8 +145,8 @@ the current locale was +nil+.
 
             locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
             locales.each do |fallback_locale|
-              value = super(fallback_locale, options)
-              return value if Util.present?(value)
+              upstream_locale, value = super(fallback_locale, options)
+              return [upstream_locale, value] if Util.present?(value)
             end
 
             super(locale, options)

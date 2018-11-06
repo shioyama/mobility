@@ -26,7 +26,12 @@ backend.
         # @option options [Boolean] presence
         #   *false* to disable presence filter.
         def read(locale, **options)
-          options.delete(:presence) == false ? super : Presence[super]
+          if options.delete(:presence) == false
+            super
+          else
+            locale, value = super
+            [locale, Presence[value]]
+          end
         end
 
         # @!macro backend_writer

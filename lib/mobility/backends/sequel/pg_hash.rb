@@ -19,11 +19,11 @@ jsonb).
         include HashValued
 
         def read(locale, options = {})
-          super(locale.to_s, options)
+          [locale, super(locale.to_s, options)[1]]
         end
 
         def write(locale, value, options = {})
-          super(locale.to_s, value, options)
+          [locale, super(locale.to_s, value, options)[1]]
         end
 
         # @!macro backend_iterator

@@ -33,13 +33,13 @@ describe "Mobility::Backends::Sequel::Column", orm: :sequel do
     describe "#read" do
       it "returns attribute in locale from appropriate column" do
         aggregate_failures do
-          expect(backend.read(:en)).to eq("Good post!")
-          expect(backend.read(:ja)).to eq("なかなか面白い記事")
+          expect(backend.read(:en)).to eq([:en, "Good post!"])
+          expect(backend.read(:ja)).to eq([:ja, "なかなか面白い記事"])
         end
       end
 
       it "handles dashed locales" do
-        expect(backend.read(:"pt-BR")).to eq("Olá")
+        expect(backend.read(:"pt-BR")).to eq([:'pt-BR', "Olá"])
       end
     end
 

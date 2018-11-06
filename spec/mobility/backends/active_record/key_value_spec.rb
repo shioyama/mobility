@@ -38,7 +38,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
         expect(title_backend.send(:translations)).to receive(:find).thrice.and_call_original
         title_backend.write(:en, "foo")
         title_backend.write(:en, "bar")
-        expect(title_backend.read(:en)).to eq("bar")
+        expect(title_backend.read(:en)).to eq([:en, "bar"])
       end
     end
 
@@ -51,9 +51,9 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
         expect(title_backend.send(:translations)).to receive(:find).twice.and_call_original
         title_backend.write(:en, "foo")
         title_backend.write(:en, "bar")
-        expect(title_backend.read(:en)).to eq("bar")
+        expect(title_backend.read(:en)).to eq([:en, "bar"])
         title_backend.write(:fr, "baz")
-        expect(title_backend.read(:fr)).to eq("baz")
+        expect(title_backend.read(:fr)).to eq([:fr, "baz"])
       end
 
       it "resets translations cache when model is saved or reloaded" do
@@ -102,15 +102,15 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
 
         it "returns attribute in locale from translations table" do
           aggregate_failures do
-            expect(title_backend.read(:en)).to eq("New Article")
-            expect(content_backend.read(:en)).to eq("Once upon a time...")
-            expect(title_backend.read(:ja)).to eq("新規記事")
-            expect(content_backend.read(:ja)).to eq("昔々あるところに…")
+            expect(title_backend.read(:en)).to eq([:en, "New Article"])
+            expect(content_backend.read(:en)).to eq([:en, "Once upon a time..."])
+            expect(title_backend.read(:ja)).to eq([:ja, "新規記事"])
+            expect(content_backend.read(:ja)).to eq([:ja, "昔々あるところに…"])
           end
         end
 
         it "returns nil if no translation exists" do
-          expect(title_backend.read(:de)).to eq(nil)
+          expect(title_backend.read(:de)).to eq([:de, nil])
         end
 
         it "builds translation if no translation exists" do
@@ -125,7 +125,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
           end
 
           it "returns changed value" do
-            expect(title_backend.read(:en)).to eq("Changed Article Title")
+            expect(title_backend.read(:en)).to eq([:en, "Changed Article Title"])
           end
         end
       end

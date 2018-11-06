@@ -11,8 +11,8 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
 
     dupped_instance = instance.dup
     dupped_backend = dupped_instance.send("#{attribute}_backend")
-    expect(dupped_backend.read(:en)).to eq("foo")
-    expect(dupped_backend.read(:ja)).to eq("ほげ")
+    expect(dupped_backend.read(:en)).to eq([:en, "foo"])
+    expect(dupped_backend.read(:ja)).to eq([:ja, "ほげ"])
 
     save_or_raise(dupped_instance)
     expect(dupped_instance.send(attribute)).to eq(instance.send(attribute))
@@ -20,14 +20,14 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
     if ENV['ORM'] == 'active_record'
       # Ensure duped instances are pointing to different objects
       instance_backend.write(:en, "bar")
-      expect(dupped_backend.read(:en)).to eq("foo")
+      expect(dupped_backend.read(:en)).to eq([:en, "foo"])
     end
 
     # Ensure we haven't mucked with the original instance
     instance.reload
 
-    expect(instance_backend.read(:en)).to eq("foo")
-    expect(instance_backend.read(:ja)).to eq("ほげ")
+    expect(instance_backend.read(:en)).to eq([:en, "foo"])
+    expect(instance_backend.read(:ja)).to eq([:ja, "ほげ"])
   end
 
   it "dups new record" do

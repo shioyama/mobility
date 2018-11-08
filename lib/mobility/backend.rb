@@ -218,10 +218,12 @@ On top of this, a backend will normally:
     end
 
     Translation = Struct.new(:backend, :locale) do
-      %w[read write].each do |accessor|
-        define_method accessor do |*args|
-          backend.send(accessor, locale, *args)
-        end
+      def read(options = {})
+        backend.read(locale, options)
+      end
+
+      def write(value, options = {})
+        backend.write(locale, value, options)
       end
     end
   end

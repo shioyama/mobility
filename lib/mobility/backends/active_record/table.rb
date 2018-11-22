@@ -299,7 +299,8 @@ columns to that table.
 
         # Destroys translations with all empty values
         def destroy_empty_translations(required_attributes)
-          each { |t| destroy(t) if required_attributes.map(&t.method(:send)).none? }
+          empty_translations = select{ |t| required_attributes.map(&t.method(:send)).none? }
+          destroy(empty_translations) if empty_translations.any?
         end
       end
     end

@@ -87,8 +87,11 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
         Mobility.locale = :ja
         article.title
 
+        Mobility.locale = :fr
+        article.title
+
         aggregate_failures do
-          expect(article.send(association_name).size).to eq(2)
+          expect(article.send(association_name).size).to eq(3)
           article.save
           expect(article.title).to be_nil
           expect(article.reload.send(association_name).size).to eq(1)

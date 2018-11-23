@@ -2,6 +2,11 @@
 
 ## 0.8
 
+### 0.8.6 (November 23, 2018)
+* Fix destroying empty translations in AR table backend
+  ([#307](https://github.com/shioyama/mobility/pull/307)).
+  Thanks [Raúl Rodríguez](https://github.com/raulr)!
+
 ### 0.8.5 (November 1, 2018)
 * Load column_type when building node
   ([#301](https://github.com/shioyama/mobility/pull/301))

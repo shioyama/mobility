@@ -95,5 +95,8 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
 
     include_accessor_examples 'JsonbPost'
     include_serialization_examples 'JsonbPost', column_affix: column_affix
+
+    # regression for https://github.com/shioyama/mobility/issues/308
+    include_querying_examples 'JsonbPost' if ENV['RAILS_VERSION'] == '5.1'
   end
 end if Mobility::Loaded::ActiveRecord

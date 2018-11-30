@@ -23,24 +23,6 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Hash]
     attr_reader :default_options
 
-    # @deprecated The default_options= setter has been deprecated. Set each
-    #   option on the default_options hash instead.
-    def default_options=(options)
-      warn %{
-WARNING: The default_options= setter has been deprecated.
-Set each option on the default_options hash instead, like this:
-
-  config.default_options[:fallbacks] = { ... }
-  config.default_options[:dirty] = true
-}
-      if (keys = options.keys & RESERVED_OPTION_KEYS).present?
-        raise ReservedOptionKey,
-          "Default options may not contain the following reserved keys: #{keys.join(', ')}"
-      else
-        @default_options = options
-      end
-    end
-
     # @param [Symbol] name Plugin name
     def plugin(name)
       attributes_class.plugin(name)
@@ -67,26 +49,6 @@ Set each option on the default_options hash instead, like this:
     # instance of +I18n::Locale::Fallbacks+.
     # @param [Proc] fallbacks generator
     attr_writer :fallbacks_generator
-
-    # @deprecated Use {#new_fallbacks} instead.
-    def default_fallbacks(fallbacks = {})
-      warn %{
-WARNING: The default_fallbacks configuration getter has been renamed
-new_fallbacks to avoid confusion. The original method default_fallbacks will be
-removed in the next major version of Mobility.
-}
-      new_fallbacks(fallbacks)
-    end
-
-    # @deprecated Use {#fallbacks_generator=} instead.
-    def default_fallbacks=(fallbacks)
-      warn %{
-WARNING: The default_fallbacks= configuration setter has been renamed
-fallbacks_generator= to avoid confusion. The original method
-default_fallbacks= will be removed in the next major version of Mobility.
-}
-      self.fallbacks_generator = fallbacks
-    end
 
     # Default backend to use (can be symbol or actual backend class)
     # @return [Symbol,Class]

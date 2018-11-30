@@ -8,12 +8,12 @@ describe "Mobility::Backends::KeyValue", orm: [:active_record, :sequel] do
       klass
     end
 
-    it "issues warning if type is not defined, and class_name and association_name are also not defined" do
+    it "raises ArgumentError if type is not defined, and class_name and association_name are also not defined" do
       stub_const("Foo", Class.new)
-      error_regex = /#{%{WARNING: In previous versions, the Mobility KeyValue backend defaulted to a}}/
-      expect { backend_class.configure({}) }.to output(error_regex).to_stderr
-      expect { backend_class.configure(class_name: "Foo") }.to output(error_regex).to_stderr
-      expect { backend_class.configure(association_name: "foos") }.to output(error_regex).to_stderr
+      error_msg = /KeyValue backend requires an explicit type option/
+      expect { backend_class.configure({}) }.to raise_error(ArgumentError, error_msg)
+      expect { backend_class.configure(class_name: "Foo") }.to raise_error(ArgumentError, error_msg)
+      expect { backend_class.configure(association_name: "foos") }.to raise_error(ArgumentError, error_msg)
     end
   end
 end

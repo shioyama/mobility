@@ -98,14 +98,7 @@ other backends on model (otherwise one will overwrite the other).
           options[:association_name] &&= options[:association_name].to_sym
           options[:class_name]       &&= Util.constantize(options[:class_name])
           if !(options[:type] || (options[:class_name] && options[:association_name]))
-            # TODO: Remove warning and raise ArgumentError in v1.0
-            warn %{
-WARNING: In previous versions, the Mobility KeyValue backend defaulted to a
-text type column, but this behavior is now deprecated and will be removed in
-the next release. Either explicitly specify the type by passing type: :text in
-each translated model, or set a default option in your configuration.
-  }
-            options[:type] = :text
+            raise ArgumentError, "KeyValue backend requires an explicit type option, either text or string."
           end
         end
 

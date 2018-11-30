@@ -85,8 +85,6 @@ module Mobility
 
       model_class.extend Translates
       model_class.extend ClassMethods
-      #TODO: Remove in v1.0
-      model_class.include InstanceMethods
 
       if translates = Mobility.config.accessor_method
         model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
@@ -183,12 +181,6 @@ module Mobility
       end
     end
 
-    # TODO: Remove in v1.0
-    def default_fallbacks(*args)
-      config.public_send(:default_fallbacks, *args)
-    end
-
-    # TODO: Make private in v1.0
     def new_fallbacks(*args)
       config.public_send(:new_fallbacks, *args)
     end
@@ -235,17 +227,7 @@ module Mobility
     # @param [String,Symbol] locale
     # @raise [InvalidLocale] if locale is present but not available
     def enforce_available_locales!(locale)
-      # TODO: Remove conditional in v1.0
-      if I18n.enforce_available_locales
-        raise Mobility::InvalidLocale.new(locale) unless (locale.nil? || available_locales.include?(locale.to_sym))
-      else
-        warn <<-EOL
-WARNING: You called Mobility.enforce_available_locales! in a situation where
-I18n.enforce_available_locales is false. In the past, Mobility would do nothing
-in this case, but as of the next major release Mobility will ignore the I18n
-setting and enforce available locales whenever this method is called.
-EOL
-      end
+      raise Mobility::InvalidLocale.new(locale) unless (locale.nil? || available_locales.include?(locale.to_sym))
     end
 
     # Returns available locales. Defaults to I18n.available_locales, but will
@@ -275,33 +257,6 @@ EOL
       enforce_available_locales!(locale) if I18n.enforce_available_locales
       storage[:mobility_locale] = locale
     end
-  end
-
-  # TODO: Remove entire module in v1.0
-  module InstanceMethods
-    # Fetch backend for an attribute
-    # @deprecated Use mobility_backends[:<attribute>] instead.
-    # @param [String] attribute Attribute
-    def mobility_backend_for(attribute)
-      warn %{
-WARNING: mobility_backend_for is deprecated and will be removed in the next
-version of Mobility. Use <post>.<attribute>_backend instead.}
-      mobility_backends[attribute.to_sym]
-    end
-
-    def mobility
-      warn %{
-WARNING: <post>.mobility is deprecated and will be removed in the next
-version of Mobility. To get backends, use <post>.<attribute>_backend instead.}
-      @mobility ||= Adapter.new(self)
-    end
-
-    class Adapter < Struct.new(:model)
-      def backend_for(attribute)
-        model.mobility_backends[attribute.to_sym]
-      end
-    end
-    private_constant :Adapter
   end
 
   module ClassMethods

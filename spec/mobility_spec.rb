@@ -223,14 +223,4 @@ describe Mobility do
       }.to yield_with_args(described_class.config)
     end
   end
-
-  # TODO: remove default_fallbacks in v1.0
-  %w[accessor_method query_method default_fallbacks new_fallbacks default_accessor_locales].each do |delegated_method|
-    describe ".#{delegated_method}" do
-      it "delegates to config" do
-        expect(described_class.config).to receive(delegated_method).and_return("foo")
-        expect(described_class.send(delegated_method)).to eq("foo")
-      end
-    end
-  end
 end

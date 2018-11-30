@@ -2,6 +2,10 @@
 
 ## 0.8
 
+### 0.8.7 (November 30, 2018)
+* Handle case when attribute name passed to has_attribute is not a string
+  ([#309](https://github.com/shioyama/mobility/pull/309)).
+
 ### 0.8.6 (November 23, 2018)
 * Fix destroying empty translations in AR table backend
   ([#307](https://github.com/shioyama/mobility/pull/307)).

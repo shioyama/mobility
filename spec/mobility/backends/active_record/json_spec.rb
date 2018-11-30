@@ -45,7 +45,7 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
   context "with dirty plugin applied" do
     let(:backend) { post.mobility_backends[:title] }
 
-    before { JsonPost.translates :title, :content, backend: :json, **default_options }
+    before { JsonPost.translates :title, :content, backend: :json, **default_options, dirty: true }
     let(:post) { JsonPost.new }
 
     include_accessor_examples 'JsonPost'

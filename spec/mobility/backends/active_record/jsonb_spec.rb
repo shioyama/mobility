@@ -90,7 +90,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
   context "with dirty plugin applied" do
     let(:backend) { post.mobility_backends[:title] }
 
-    before { JsonbPost.translates :title, :content, backend: :jsonb, **default_options }
+    before { JsonbPost.translates :title, :content, backend: :jsonb, **default_options, dirty: true }
     let(:post) { JsonbPost.new }
 
     include_accessor_examples 'JsonbPost'

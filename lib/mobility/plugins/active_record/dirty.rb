@@ -49,7 +49,7 @@ AR::Dirty plugin adds support for the following persistence-specific methods
               method_name_regex = /\A(#{names.join('|')})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
               has_attribute = Module.new do
                 define_method :has_attribute? do |attr_name|
-                  super(attr_name) || !!method_name_regex.match(attr_name)
+                  super(attr_name) || (String === attr_name && !!method_name_regex.match(attr_name))
                 end
               end
               model_class.extend has_attribute

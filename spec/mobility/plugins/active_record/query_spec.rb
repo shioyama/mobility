@@ -29,7 +29,7 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
   describe "query method" do
     # NOTE: __mobility_query_scope__ is a public method for convenience, but is
     # intended for internal use. For application code, use i18n or whatever you
-    # define in Mobility.query_method instead.
+    # define in options[:query].
     it "creates a __mobility_query_scope__ method" do
       stub_const 'Article', Class.new(ActiveRecord::Base)
       Article.class_eval do

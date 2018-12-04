@@ -16,11 +16,11 @@ enabled for any one attribute on the model.
     module ActiveRecord
       module Query
         class << self
-          def apply(names, model_class, backend_class)
+          def apply(names, model_class, backend_class, query_method)
             model_class.class_eval do
               extend QueryMethod
               extend FindByMethods.new(*names)
-              singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_scope__
+              singleton_class.send :alias_method, query_method, :__mobility_query_scope__
             end
             backend_class.include self
           end

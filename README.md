@@ -95,7 +95,6 @@ with the lines:
 Mobility.configure do |config|
   config.default_backend = :key_value
   config.accessor_method = :translates
-  config.query_method    = :i18n
 end
 ```
 
@@ -115,7 +114,6 @@ unnecessary and will be ignored if you are using a different backend).
  Mobility.configure do |config|
    config.default_backend = :key_value
    config.accessor_method = :translates
-   config.query_method    = :i18n
 +  config.default_options[:dirty] = true
 +  config.default_options[:type]  = :string
 end

@@ -9,11 +9,6 @@ Mobility.configure do |config|
   # translation gem which uses the same method name.
   config.accessor_method = :translates
 
-  # To query on translated attributes, you need to append a scope to your
-  # model. The name of this scope is +i18n+ by default, but this can be changed
-  # to something else.
-  config.query_method    = :i18n
-
   # Uncomment and remove (or add) items to (from) this list to completely
   # disable/enable plugins globally (so they cannot be used and are never even
   # loaded). Note that if you remove an item from the list, you will not be

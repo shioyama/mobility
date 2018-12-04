@@ -13,6 +13,26 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Symbol]
     attr_accessor :accessor_method
 
+    def query_method=(method_name)
+      error_msg = <<-EOL
+query_method is no longer a global configuration option. The value can now be
+set in the value of options[:query_method].
+EOL
+      if method_name == :i18n
+        raise ArgumentError, <<-EOL
+#{error_msg}
+
+You are currently passing :i18n which is the default, so simply removing the line:
+
+   config.query_method = :i18n
+
+from your configuration will fix this exception.
+EOL
+      else
+        raise ArgumentError, error_msg
+      end
+    end
+
     # Default set of options. These will be merged with any backend options
     # when defining translated attributes (with +translates+). Default options
     # may not include the keys 'backend' or 'model_class'.

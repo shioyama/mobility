@@ -36,10 +36,10 @@ and [Sequel](http://sequel.jeremyevans.net/) ORM, with support for other
 platforms planned.
 
 For a detailed introduction to Mobility, see [Translating with
-Mobility](http://dejimata.com/2017/3/3/translating-with-mobility). See also the
-[Roadmap](https://github.com/shioyama/mobility/wiki/Roadmap) for what's in the
-works for future releases, and other pages of the [wiki][wiki] for more detail
-on usage.
+Mobility](http://dejimata.com/2017/3/3/translating-with-mobility). See also my
+talk at RubyConf 2018, [Building Generic
+Software](https://www.youtube.com/watch?v=RZkemV_-__A), where I explain the
+thinking behind Mobility's design.
 
 If you're coming from Globalize, be sure to also read the [Migrating from
 Globalize](https://github.com/shioyama/mobility/wiki/Migrating-from-Globalize)

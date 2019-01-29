@@ -117,23 +117,22 @@ enabled for any one attribute on the model.
             opts == :chain ? WhereChain.new(spawn) : super
           end
 
-          def order(opts, *rest)
-            case opts
+          def order(opts, *rest, locale: Mobility.locale, **options) case opts
             when Symbol, String
-              @klass.mobility_attribute?(opts) ? order({ opts => :asc }, *rest) : super
+              @klass.mobility_attribute?(opts) ? order({ opts => :asc }, *rest, locale: locale, **options) : super
             when ::Hash
               i18n_keys, keys = opts.keys.partition(&@klass.method(:mobility_attribute?))
-              return super if i18n_keys.empty?
+              return super(opts, *rest, **options) if i18n_keys.empty?
 
               base = keys.empty? ? self : super(opts.slice(keys))
 
               i18n_keys.inject(base) do |query, key|
                 backend_class = @klass.mobility_backend_class(key)
-                dir, node = opts[key], backend_node(key)
-                backend_class.apply_scope(query, node).order(node.send(dir.downcase))
+                dir, node = opts[key], backend_node(key, locale)
+                backend_class.apply_scope(query, node, locale).order(node.send(dir.downcase))
               end
             else
-              super
+              super(opts, *rest, **options)
             end
           end
 

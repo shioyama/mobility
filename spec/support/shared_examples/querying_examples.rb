@@ -246,7 +246,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
   end
 
   describe ".order" do
-    let!(:i) do
+    let(:i) do
       [
         model_class.create(a1 => "foo0"),
         model_class.create(a1 => "foo2", a2 => "foo1"),
@@ -284,6 +284,25 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
     it "does not modify original hash" do
       hash = { a1 => :asc }
       expect { query_scope.order(hash) }.not_to change { hash }
+    end
+
+    context "with locale option" do
+      it "orders records correctly" do
+        i1 = model_class.new
+        Mobility.with_locale(:en) { i1.send("#{a1}=", "foo") }
+        Mobility.with_locale(:ja) { i1.send("#{a1}=", "bar") }
+        i1.save
+
+        i2 = model_class.new
+        Mobility.with_locale(:en) { i2.send("#{a1}=", "bar") }
+        Mobility.with_locale(:ja) { i2.send("#{a1}=", "foo") }
+        i2.save
+
+        aggregate_failures do
+          expect(query_scope.order(a1.to_s, locale: :en)).to eq([i2, i1])
+          expect(query_scope.order(a1.to_s, locale: :ja)).to eq([i1, i2])
+        end
+      end
     end
   end
 

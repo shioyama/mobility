@@ -29,7 +29,7 @@ group :development, :test do
   platforms :ruby do
     gem 'guard-rspec'
     gem 'pry-byebug'
-    gem 'sqlite3'
+    gem 'sqlite3', '~> 1.3.6'
     gem 'mysql2', '~> 0.4.9'
     gem 'pg', '< 1.0'
   end

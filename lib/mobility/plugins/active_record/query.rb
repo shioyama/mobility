@@ -213,7 +213,7 @@ enabled for any one attribute on the model.
                 return yield if query_map == IDENTITY
 
                 relation = opts.empty? ? scope : yield(opts)
-                query_map[relation.where(predicates.inject(&:and))]
+                query_map[relation.where(predicates.inject(:and))]
               end
 
               def build_predicate(node, values)

@@ -137,7 +137,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         alias :visit_Array :visit_collection
 
         def visit_Arel_Nodes_Or(object)
-          [object.left, object.right].map(&method(:visit)).compact.inject(&:merge).
+          [object.left, object.right].map(&method(:visit)).compact.inject(:merge).
             transform_values { OUTER_JOIN }
         end
 

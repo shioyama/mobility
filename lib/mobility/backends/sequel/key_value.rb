@@ -104,7 +104,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             ::Hash[hash.keys.map { |key| [key, :inner] }]
           elsif boolean.op == :OR
             hash = boolean.args.map { |op| visit(op, locale) }.
-              compact.inject(&:merge)
+              compact.inject(:merge)
             # TODO: simplify to hash.transform_values { :left_outer } when
             #   support for Ruby 2.3 is deprecated
             ::Hash[hash.keys.map { |key| [key, :left_outer] }]

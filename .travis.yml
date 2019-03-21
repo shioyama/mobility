@@ -31,6 +31,14 @@ env:
   - DB=sqlite3 ORM= I18N_FALLBACKS=true
 matrix:
   fast_finish: true
+  exclude:
+    - rvm: 2.4.5
+      env: DB=postgres ORM=active_record RAILS_VERSION=latest
+    - rvm: 2.4.5
+      env: DB=mysql ORM=active_record RAILS_VERSION=latest
+    - rvm: 2.4.5
+      env: DB=sqlite3 ORM=active_record RAILS_VERSION=latest
+
 before_script:
   - bundle exec rake db:create db:up
 before_install: gem install bundler

@@ -12,7 +12,7 @@ group :development, :test do
     elsif ENV['RAILS_VERSION'] == '5.1'
       gem 'activerecord', '>= 5.1', '< 5.2'
     elsif ENV['RAILS_VERSION'] == 'latest'
-      gem 'activerecord', '>= 6.0.0.beta1'
+      gem 'activerecord', git: 'https://github.com/rails/rails.git'
     else # Default is Rails 5.2
       gem 'activerecord', '>= 5.2.0', '< 5.3'
       gem 'railties', '>= 5.2.0.rc2', '< 5.3'

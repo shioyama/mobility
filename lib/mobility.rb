@@ -69,8 +69,10 @@ module Mobility
     require "sequel"
     raise VersionNotSupportedError, "Mobility is only compatible with Sequel 4.0 and greater" if ::Sequel::MAJOR < 4
     require "sequel/plugins/mobility"
-    #TODO avoid automatically including the inflector extension
-    require "sequel/extensions/inflector"
+    unless defined?(ActiveSupport::Inflector)
+      # TODO: avoid automatically including the inflector extension
+      require "sequel/extensions/inflector"
+    end
     require "sequel/plugins/dirty"
     require "mobility/sequel"
     Loaded::Sequel = true

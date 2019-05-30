@@ -35,7 +35,7 @@ module Mobility
             String      :locale,     allow_null: false
             String      :title
             String      :subtitle
-            String      :content, size: 65535
+            String      :content, text: true
             DateTime    :created_at, allow_null: false
             DateTime    :updated_at, allow_null: false
           end
@@ -95,10 +95,10 @@ module Mobility
 
           DB.create_table? :comments do
             primary_key :id
-            String      :content_en,    size: 65535
-            String      :content_ja,    size: 65535
-            String      :content_pt_br, size: 65535
-            String      :content_ru,    size: 65535
+            String      :content_en,    text: true
+            String      :content_ja,    text: true
+            String      :content_pt_br, text: true
+            String      :content_ru,    text: true
             String      :author_en
             String      :author_ja
             String      :author_pt_br
@@ -111,8 +111,8 @@ module Mobility
 
           DB.create_table? :serialized_posts do
             primary_key :id
-            String      :my_title_i18n,   size: 65535
-            String      :my_content_i18n, size: 65535
+            String      :my_title_i18n,   text: true
+            String      :my_content_i18n, text: true
             TrueClass   :published
             DateTime    :created_at,                   allow_null: false
             DateTime    :updated_at,                   allow_null: false

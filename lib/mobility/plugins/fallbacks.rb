@@ -144,12 +144,12 @@ the current locale was +nil+.
           fallback_locales =
             if fallback == true
               if fallbacks.is_a?(Proc)
-                instance_exec(model, &fallbacks)
+                model.instance_exec(&fallbacks)
               else
                 fallbacks[locale]
               end
             elsif fallback.is_a?(Proc)
-              instance_exec(model, &fallback)
+              model.instance_exec(&fallback)
             else
               fallback
             end

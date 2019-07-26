@@ -141,7 +141,20 @@ the current locale was +nil+.
         define_method :read do |locale, fallback: true, **options|
           return super(locale, options) if !fallback || options[:locale]
 
-          locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
+          fallback_locales =
+            if fallback == true
+              if fallbacks.is_a?(Proc)
+                instance_exec(model, &fallbacks)
+              else
+                fallbacks[locale]
+              end
+            elsif fallback.is_a?(Proc)
+              instance_exec(model, &fallback)
+            else
+              fallback
+            end
+
+          locales = [locale, *fallback_locales]
           locales.each do |fallback_locale|
             value = super(fallback_locale, options)
             return value if Util.present?(value)
@@ -156,6 +169,8 @@ the current locale was +nil+.
           Mobility.new_fallbacks(option)
         elsif option == true
           Mobility.new_fallbacks
+        elsif option.is_a?(Proc)
+          option
         else
           Hash.new { [] }
         end

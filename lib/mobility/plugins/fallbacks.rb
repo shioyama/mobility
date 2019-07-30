@@ -158,8 +158,8 @@ the current locale was +nil+.
             )
 
           fallback_locales.each do |fallback_locale|
-            value = super(fallback_locale.to_sym, options)
-            return value if Util.present?(value)
+            fallback_value = super(fallback_locale.to_sym, options)
+            return fallback_value if Util.present?(fallback_value)
           end
 
           value

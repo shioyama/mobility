@@ -22,7 +22,17 @@ describe Mobility::Plugins::Fallbacks do
       end
       Class.new(backend_subclass).include(described_class.new(fallbacks))
     end
-    let(:object) { (stub_const 'MobilityModel', Class.new).include(Mobility).new }
+    let(:object) do
+      (stub_const 'MobilityModel', Class.new)
+        .include(Mobility)
+        .include(
+          Module.new do
+            def fallback_locale_method
+              'de-DE'
+            end
+          end
+      ).new
+    end
     subject { backend_class.new(object, "title") }
 
     context "fallbacks is a hash" do
@@ -163,6 +173,44 @@ describe Mobility::Plugins::Fallbacks do
       end
 
       it "returns fallback value when value when fallback: true option is passed" do
+        expect(subject.read(:"en-US", fallback: true)).to eq("foo")
+      end
+
+      it "uses locale passed in as value of fallback option when present" do
+        expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
+      end
+
+      it "uses array of locales passed in as value of fallback options when present" do
+        expect(subject.read(:"en-US", fallback: [:pl, :'de-DE'])).to eq("foo")
+      end
+
+      it "passes options to getter in fallback locale" do
+        expect(subject.read(:'en-US', bar: true)).to eq("bar")
+      end
+
+      it "does not modify options passed in" do
+        options = { fallback: false }
+        subject.read(:"en-US", options)
+        expect(options).to eq({ fallback: false })
+      end
+    end
+
+    context "fallbacks is a proc calling a model method" do
+      let(:fallbacks) { proc { fallback_locale_method } }
+
+      it "returns value when value is not nil" do
+        expect(subject.read(:ja)).to eq("フー")
+      end
+
+      it "falls through to fallback locale when value is nil" do
+        expect(subject.read(:"en-US")).to eq("foo")
+      end
+
+      it "falls through to fallback locale when value is blank" do
+        expect(subject.read(:pt)).to eq("foo")
+      end
+
+      it "falls through to fallback locale when fallback: true option is passed" do
         expect(subject.read(:"en-US", fallback: true)).to eq("foo")
       end
 

@@ -109,6 +109,17 @@ Some useful methods on strings, borrowed in parts from Sequel and ActiveSupport.
       object if present?(object)
     end
 
+    # taken from https://github.com/rails/rails/blob/6-0-stable/activesupport/lib/active_support/core_ext/array/wrap.rb
+    def array_wrap(object)
+      if object.nil?
+        []
+      elsif object.respond_to?(:to_ary)
+        object.to_ary || [object]
+      else
+        [object]
+      end
+    end
+
     private
 
     # Calls caller method on object if defined, otherwise yields to block

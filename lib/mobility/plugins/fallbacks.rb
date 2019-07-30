@@ -142,20 +142,21 @@ the current locale was +nil+.
           return super(locale, options) if !fallback || options[:locale]
 
           fallback_locales =
-            if fallback == true
-              if fallbacks.is_a?(Proc)
-                model.instance_exec(&fallbacks)
+            Util.array_wrap(
+              if fallback == true
+                if fallbacks.is_a?(Proc)
+                  model.instance_exec(&fallbacks)
+                else
+                  fallbacks[locale]
+                end
+              elsif fallback.is_a?(Proc)
+                model.instance_exec(&fallback)
               else
-                fallbacks[locale]
+                fallback
               end
-            elsif fallback.is_a?(Proc)
-              model.instance_exec(&fallback)
-            else
-              fallback
-            end
+            )
 
-          locales = [locale, *fallback_locales]
-          locales.each do |fallback_locale|
+          fallback_locales.each do |fallback_locale|
             value = super(fallback_locale, options)
             return value if Util.present?(value)
           end

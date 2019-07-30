@@ -139,7 +139,8 @@ the current locale was +nil+.
 
       def define_read(fallbacks)
         define_method :read do |locale, fallback: true, **options|
-          return super(locale, options) if !fallback || options[:locale]
+          value = super(locale, options)
+          return value if !fallback || options[:locale] || Util.present?(value)
 
           fallback_locales =
             Util.array_wrap(
@@ -157,11 +158,11 @@ the current locale was +nil+.
             )
 
           fallback_locales.each do |fallback_locale|
-            value = super(fallback_locale, options)
+            value = super(fallback_locale.to_sym, options)
             return value if Util.present?(value)
           end
 
-          super(locale, options)
+          value
         end
       end
 

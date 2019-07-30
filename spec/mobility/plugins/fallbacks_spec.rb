@@ -14,7 +14,8 @@ describe Mobility::Plugins::Fallbacks do
             "title" => {
               :'de-DE' => "foo",
               :ja => "フー",
-              :'pt' => ""
+              :'pt' => "",
+              :'cz' => "cz-foo"
             }
           }[attribute][locale]
         end
@@ -48,6 +49,120 @@ describe Mobility::Plugins::Fallbacks do
       end
 
       it "falls through to fallback locale when fallback: true option is passed" do
+        expect(subject.read(:"en-US", fallback: true)).to eq("foo")
+      end
+
+      it "uses locale passed in as value of fallback option when present" do
+        expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
+      end
+
+      it "uses array of locales passed in as value of fallback options when present" do
+        expect(subject.read(:"en-US", fallback: [:pl, :'cz'])).to eq("cz-foo")
+      end
+
+      it "passes options to getter in fallback locale" do
+        expect(subject.read(:'en-US', bar: true)).to eq("bar")
+      end
+
+      it "does not modify options passed in" do
+        options = { fallback: false }
+        subject.read(:"en-US", options)
+        expect(options).to eq({ fallback: false })
+      end
+    end
+
+    context "fallbacks is a proc returning a locale" do
+      let(:fallbacks) { proc { 'de-DE' } }
+
+      it "returns value when value is not nil" do
+        expect(subject.read(:ja)).to eq("フー")
+      end
+
+      it "falls through to fallback locale when value is nil" do
+        expect(subject.read(:"en-US")).to eq("foo")
+      end
+
+      it "falls through to fallback locale when value is blank" do
+        expect(subject.read(:pt)).to eq("foo")
+      end
+
+      it "falls through to fallback locale when fallback: true option is passed" do
+        expect(subject.read(:"en-US", fallback: true)).to eq("foo")
+      end
+
+      it "uses locale passed in as value of fallback option when present" do
+        expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
+      end
+
+      it "uses array of locales passed in as value of fallback options when present" do
+        expect(subject.read(:"en-US", fallback: [:pl, :'de-DE'])).to eq("foo")
+      end
+
+      it "passes options to getter in fallback locale" do
+        expect(subject.read(:'en-US', bar: true)).to eq("bar")
+      end
+
+      it "does not modify options passed in" do
+        options = { fallback: false }
+        subject.read(:"en-US", options)
+        expect(options).to eq({ fallback: false })
+      end
+    end
+
+    context "fallbacks is a proc returning nothing" do
+      let(:fallbacks) { proc {} }
+
+      it "returns value when value is not nil" do
+        expect(subject.read(:ja)).to eq("フー")
+      end
+
+      it "returns original value when value is nil" do
+        expect(subject.read(:"en-US")).to eq(nil)
+      end
+
+      it "returns original value when value is blank" do
+        expect(subject.read(:pt)).to eq("")
+      end
+
+      it "returns original value when value when fallback: true option is passed" do
+        expect(subject.read(:"en-US", fallback: true)).to eq(nil)
+      end
+
+      it "uses locale passed in as value of fallback option when present" do
+        expect(subject.read(:"en-US", fallback: :ja)).to eq("フー")
+      end
+
+      it "uses array of locales passed in as value of fallback options when present" do
+        expect(subject.read(:"en-US", fallback: [:pl, :'de-DE'])).to eq("foo")
+      end
+
+      it "passes options to getter in fallback locale" do
+        expect(subject.read(:'en-US', bar: true)).to eq("bar")
+      end
+
+      it "does not modify options passed in" do
+        options = { fallback: false }
+        subject.read(:"en-US", options)
+        expect(options).to eq({ fallback: false })
+      end
+    end
+
+    context "fallbacks is a proc returning an array" do
+      let(:fallbacks) { proc { [:pl, :'de-DE'] } }
+
+      it "returns value when value is not nil" do
+        expect(subject.read(:ja)).to eq("フー")
+      end
+
+      it "returns fallback value when value is nil" do
+        expect(subject.read(:"en-US")).to eq("foo")
+      end
+
+      it "returns fallback value when value is blank" do
+        expect(subject.read(:pt)).to eq("foo")
+      end
+
+      it "returns fallback value when value when fallback: true option is passed" do
         expect(subject.read(:"en-US", fallback: true)).to eq("foo")
       end
 

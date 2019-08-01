@@ -6,7 +6,7 @@ module Mobility
 
       belongs_to :translatable, polymorphic: true, touch: true
 
-      validates :key, presence: true, uniqueness: { scope: [:translatable_id, :translatable_type, :locale] }
+      validates :key, presence: true, uniqueness: { scope: [:translatable_id, :translatable_type, :locale], case_sensitive: true }
       validates :translatable, presence: true
       validates :locale, presence: true
     end

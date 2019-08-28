@@ -2,8 +2,8 @@ language: ruby
 cache: bundler
 rvm:
   - 2.4.5
-  - 2.5.5
-  - 2.6.1
+  - 2.5.6
+  - 2.6.4
 env:
   - DB=postgres ORM=active_record RAILS_VERSION=4.2
   - DB=mysql ORM=active_record RAILS_VERSION=4.2

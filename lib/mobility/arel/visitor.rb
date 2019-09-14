@@ -14,10 +14,10 @@ module Mobility
 
       private
 
-      def visit(object)
+      def visit(*args)
         super
       rescue TypeError
-        visit_default(object)
+        visit_default(*args)
       end
 
       def visit_collection(_objects)

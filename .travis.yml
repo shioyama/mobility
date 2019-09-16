@@ -31,10 +31,10 @@ env:
   - DB=sqlite3 ORM= I18N_FALLBACKS=true
 matrix:
   fast_finish: true
-    allow_failures:
-      - env: DB=postgres ORM=active_record RAILS_VERSION=latest
-      - env: DB=mysql ORM=active_record RAILS_VERSION=latest
-      - env: DB=sqlite3 ORM=active_record RAILS_VERSION=latest
+  allow_failures:
+    - env: DB=postgres ORM=active_record RAILS_VERSION=latest
+    - env: DB=mysql ORM=active_record RAILS_VERSION=latest
+    - env: DB=sqlite3 ORM=active_record RAILS_VERSION=latest
   exclude:
     - rvm: 2.4.5
       env: DB=postgres ORM=active_record RAILS_VERSION=latest

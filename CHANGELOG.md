@@ -2,6 +2,12 @@
 
 ## 0.8
 
+### 0.8.8 (September 18, 2019)
+* Accept any number of arguments to `Arel::Visitors::Visitor#visit`
+  ([#339](https://github.com/shioyama/mobility/pull/339)). (Thanks to
+  [fauno](https://github.com/fauno) for [uncovering the
+  issue](https://github.com/shioyama/mobility/issues/334#issuecomment-526281737).)
+
 ### 0.8.7 (November 30, 2018)
 * Handle case when attribute name passed to has_attribute is not a string
   ([#309](https://github.com/shioyama/mobility/pull/309)).

@@ -12,17 +12,17 @@ describe Mobility::Plugins::Cache do
 
     describe "#read" do
       it "caches reads" do
-        expect(listener).to receive(:read).once.with(locale, options).and_return("foo")
-        2.times { expect(backend.read(locale, options)).to eq("foo") }
+        expect(listener).to receive(:read).once.with(locale, options).and_return([locale, "foo"])
+        2.times { expect(backend.read(locale, options)).to eq([locale, "foo"]) }
       end
 
       it "does not cache reads with cache: false option" do
-        expect(listener).to receive(:read).twice.with(locale, options).and_return("foo")
-        2.times { expect(backend.read(locale, options.merge(cache: false))).to eq("foo") }
+        expect(listener).to receive(:read).twice.with(locale, options).and_return([locale, "foo"])
+        2.times { expect(backend.read(locale, options.merge(cache: false))).to eq([locale, "foo"]) }
       end
 
       it "does not modify options passed in" do
-        allow(listener).to receive(:read).with(locale, {}).and_return("foo")
+        allow(listener).to receive(:read).with(locale, {}).and_return([locale, "foo"])
         options = { cache: false }
         backend.read(locale, options)
         expect(options).to eq({ cache: false })
@@ -31,22 +31,22 @@ describe Mobility::Plugins::Cache do
 
     describe "#write" do
       it "returns value fetched from backend" do
-        expect(listener).to receive(:write).twice.with(locale, "foo", options).and_return("bar")
-        2.times { expect(backend.write(locale, "foo", options)).to eq("bar") }
+        expect(listener).to receive(:write).twice.with(locale, "foo", options).and_return([locale, "bar"])
+        2.times { expect(backend.write(locale, "foo", options)).to eq([locale, "bar"]) }
       end
 
       it "stores value fetched from backend in cache" do
-        expect(listener).to receive(:write).once.with(locale, "foo", options).and_return("bar")
-        expect(backend.write(locale, "foo", options)).to eq("bar")
+        expect(listener).to receive(:write).once.with(locale, "foo", options).and_return([locale, "bar"])
+        expect(backend.write(locale, "foo", options)).to eq([locale, "bar"])
         expect(listener).not_to receive(:read)
-        expect(backend.read(locale, options)).to eq("bar")
+        expect(backend.read(locale, options)).to eq([locale, "bar"])
       end
 
       it "does not store value in cache with cache: false option" do
-        allow(listener).to receive(:write).once.with(locale, "foo", options).and_return("bar")
-        expect(backend.write(locale, "foo", options.merge(cache: false))).to eq("bar")
-        expect(listener).to receive(:read).with(locale, options).and_return("baz")
-        expect(backend.read(locale, options)).to eq("baz")
+        allow(listener).to receive(:write).once.with(locale, "foo", options).and_return([locale, "bar"])
+        expect(backend.write(locale, "foo", options.merge(cache: false))).to eq([locale, "bar"])
+        expect(listener).to receive(:read).with(locale, options).and_return([locale, "baz"])
+        expect(backend.read(locale, options)).to eq([locale, "baz"])
       end
 
       it "does not modify options passed in" do
@@ -62,15 +62,15 @@ describe Mobility::Plugins::Cache do
     shared_examples_for "cache that resets on model action" do |action, options = nil|
       it "updates backend cache on #{action}" do
         aggregate_failures "reading and writing" do
-          expect(listener).to receive(:write).with(:en, "foo", {}).and_return("foo set")
+          expect(listener).to receive(:write).with(:en, "foo", {}).and_return([:en, "foo set"])
           backend.write(:en, "foo")
-          expect(backend.read(:en)).to eq("foo set")
+          expect(backend.read(:en)).to eq([:en, "foo set"])
         end
 
         aggregate_failures "resetting model" do
           options ? instance.send(action, options) : instance.send(action)
-          expect(listener).to receive(:read).with(:en, {}).and_return("from backend")
-          expect(backend.read(:en)).to eq("from backend")
+          expect(listener).to receive(:read).with(:en, {}).and_return([:en, "from backend"])
+          expect(backend.read(:en)).to eq([:en, "from backend"])
         end
       end
     end
@@ -78,20 +78,20 @@ describe Mobility::Plugins::Cache do
     shared_examples_for "cache that resets on model action with multiple backends" do |action, options = nil|
       it "updates cache on both backends on #{action}" do
         aggregate_failures "reading and writing" do
-          expect(listener).to receive(:write).with(:en, "foo", {}).and_return("foo set")
-          expect(content_listener).to receive(:write).with(:en, "bar", {}).and_return("bar set")
+          expect(listener).to receive(:write).with(:en, "foo", {}).and_return([:en, "foo set"])
+          expect(content_listener).to receive(:write).with(:en, "bar", {}).and_return([:en, "bar set"])
           backend.write(:en, "foo")
           instance.content_backend.write(:en, "bar")
-          expect(backend.read(:en)).to eq("foo set")
-          expect(instance.content_backend.read(:en)).to eq("bar set")
+          expect(backend.read(:en)).to eq([:en, "foo set"])
+          expect(instance.content_backend.read(:en)).to eq([:en, "bar set"])
         end
 
         aggregate_failures "resetting model" do
           options ? instance.send(action, options) : instance.send(action)
-          expect(listener).to receive(:read).with(:en, {}).and_return("from title backend")
-          expect(backend.read(:en)).to eq("from title backend")
-          expect(content_listener).to receive(:read).with(:en, {}).and_return("from content backend")
-          expect(instance.content_backend.read(:en)).to eq("from content backend")
+          expect(listener).to receive(:read).with(:en, {}).and_return([:en, "from title backend"])
+          expect(backend.read(:en)).to eq([:en, "from title backend"])
+          expect(content_listener).to receive(:read).with(:en, {}).and_return([:en, "from content backend"])
+          expect(instance.content_backend.read(:en)).to eq([:en, "from content backend"])
         end
       end
     end

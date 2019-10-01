@@ -85,12 +85,12 @@ set.
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, options = {})
-        translation_for(locale, options).send(attribute)
+        [locale, translation_for(locale, options).send(attribute)]
       end
 
       # @!macro backend_writer
       def write(locale, value, options = {})
-        translation_for(locale, options).send("#{attribute}=", value)
+        [locale, translation_for(locale, options).send("#{attribute}=", value)]
       end
       # @!endgroup
 

@@ -25,7 +25,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       # @param [Hash] options
       # @return [String,Integer,Boolean] Value of translation
       def read(locale, _ = nil)
-        model_translations(locale)[attribute]
+        [locale, model_translations(locale)[attribute]]
       end
 
       # @note Translation may be a string, integer, boolean, hash or array
@@ -36,7 +36,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       # @return [String,Integer,Boolean] Updated value
       def write(locale, value, _ = nil)
         set_attribute_translation(locale, value)
-        model_translations(locale)[attribute]
+        [locale, model_translations(locale)[attribute]]
       end
       # @!endgroup
 

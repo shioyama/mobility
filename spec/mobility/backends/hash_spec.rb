@@ -5,14 +5,14 @@ describe Mobility::Backends::Hash do
   describe "#read/#write" do
     it "returns value for locale key" do
       backend = described_class.new
-      expect(backend.read(:ja)).to eq(nil)
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:ja)).to eq([:ja, nil])
+      expect(backend.read(:en)).to eq([:en, nil])
       backend.write(:ja, "アアア")
-      expect(backend.read(:ja)).to eq("アアア")
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:ja)).to eq([:ja, "アアア"])
+      expect(backend.read(:en)).to eq([:en, nil])
       backend.write(:en, "foo")
-      expect(backend.read(:ja)).to eq("アアア")
-      expect(backend.read(:en)).to eq("foo")
+      expect(backend.read(:ja)).to eq([:ja, "アアア"])
+      expect(backend.read(:en)).to eq([:en, "foo"])
     end
   end
 

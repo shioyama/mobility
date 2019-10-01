@@ -10,11 +10,12 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
     Class.new do
       include Mobility::Backend
       def read(locale, **)
-        values[locale]
+        [locale, values[locale]]
       end
 
       def write(locale, value, **)
         values[locale] = value
+        [locale, value]
       end
 
       private

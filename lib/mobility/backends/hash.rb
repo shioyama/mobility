@@ -12,13 +12,13 @@ Backend which stores translations in an in-memory hash.
       # @!macro backend_reader
       # @return [Object]
       def read(locale, _ = {})
-        translations[locale]
+        [locale, translations[locale]]
       end
 
       # @!macro backend_writer
       # @return [Object]
       def write(locale, value, _ = {})
-        translations[locale] = value
+        [locale, translations[locale] = value]
       end
       # @!endgroup
 

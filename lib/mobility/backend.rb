@@ -102,7 +102,8 @@ On top of this, a backend will normally:
     # @param [Symbol] locale Locale to read
     # @return [TrueClass,FalseClass] Whether translation is present for locale
     def present?(locale, options = {})
-      Util.present?(read(locale, options))
+      _, value = read(locale, options)
+      Util.present?(value)
     end
 
     # @!method model_class

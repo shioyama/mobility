@@ -14,11 +14,11 @@ describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
   let(:backend_class) do
     Class.new(Mobility::Backends::Null) do
       def read(locale, **options)
-        values[locale]
+        [locale, values[locale]]
       end
 
       def write(locale, value, **options)
-        values[locale] = value
+        [locale, values[locale] = value]
       end
 
       private

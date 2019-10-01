@@ -48,9 +48,12 @@ Automatically includes dirty plugin in model class when enabled.
             if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
               super
               [model.changed_columns, model.initial_values].each { |h| h.delete(locale_accessor) }
-            elsif read(locale, options.merge(fallback: false)) != value
-              model.will_change_column(locale_accessor)
-              super
+            else
+              _, backend_value = read(locale, options.merge(fallback: false))
+              if backend_value != value
+                model.will_change_column(locale_accessor)
+                super
+              end
             end
           end
           # @!endgroup

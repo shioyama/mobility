@@ -37,12 +37,12 @@ can be run again to add new attributes or locales.)
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, _ = {})
-        model.read_attribute(column(locale))
+        [locale, model.read_attribute(column(locale))]
       end
 
       # @!macro backend_writer
       def write(locale, value, _ = {})
-        model.send(:write_attribute, column(locale), value)
+        [locale, model.send(:write_attribute, column(locale), value)]
       end
       # @!endgroup
 

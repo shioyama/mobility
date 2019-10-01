@@ -88,10 +88,11 @@ The proc can accept zero to three arguments (see examples below)
         #   *false* to disable presence filter.
         def read(locale, accessor_options = {})
           default = accessor_options.has_key?(:default) ? accessor_options.delete(:default) : options[:default]
-          if (value = super(locale, accessor_options)).nil?
-            Default[default, locale: locale, accessor_options: accessor_options, model: model, attribute: attribute]
+          locale, value = super(locale, accessor_options)
+          if value.nil?
+            [locale, Default[default, locale: locale, accessor_options: accessor_options, model: model, attribute: attribute]]
           else
-            value
+            [locale, value]
           end
         end
         # @!endgroup

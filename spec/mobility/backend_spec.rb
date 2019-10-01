@@ -32,12 +32,12 @@ describe Mobility::Backend do
 
     describe "#present?" do
       it "returns true if backend.read(locale) return non-blank value" do
-        expect(backend_double).to receive(:read).with(:en, {}).and_return("foo")
+        expect(backend_double).to receive(:read).with(:en, {}).and_return([:en, "foo"])
         expect(backend.present?(:en)).to eq(true)
       end
 
       it "returns false if backend.read(locale) returns blank value" do
-        expect(backend_double).to receive(:read).with(:en, {}).and_return("")
+        expect(backend_double).to receive(:read).with(:en, {}).and_return([:en, ""])
         expect(backend.present?(:en)).to eq(false)
       end
     end

@@ -12,8 +12,8 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
     context "with nil serialized column" do
       it "returns nil in any locale" do
-        expect(backend.read(:en)).to eq(nil)
-        expect(backend.read(:ja)).to eq(nil)
+        expect(backend.read(:en)).to eq([:en, nil])
+        expect(backend.read(:ja)).to eq([:ja, nil])
       end
     end
 
@@ -23,8 +23,8 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
         instance.save
         instance.reload
 
-        expect(backend.read(:ja)).to eq("あああ")
-        expect(backend.read(:en)).to eq(nil)
+        expect(backend.read(:ja)).to eq([:ja, "あああ"])
+        expect(backend.read(:en)).to eq([:en, nil])
       end
     end
 
@@ -35,11 +35,11 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
         instance.save
         instance.reload
 
-        expect(backend.read(:ja)).to eq("あああ")
-        expect(backend.read(:en)).to eq(nil)
+        expect(backend.read(:ja)).to eq([:ja, "あああ"])
+        expect(backend.read(:en)).to eq([:en, nil])
         other_backend = instance.mobility_backends[attribute2.to_sym]
-        expect(other_backend.read(:ja)).to eq(nil)
-        expect(other_backend.read(:en)).to eq("aaa")
+        expect(other_backend.read(:ja)).to eq([:ja, nil])
+        expect(other_backend.read(:en)).to eq([:en, "aaa"])
       end
     end
   end
@@ -60,7 +60,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       backend.write(:en, nil)
       expect(instance.read_attribute(column1)).to match_hash({ en: nil })
       instance.save
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:en)).to eq([:en, nil])
       expect(instance.read_attribute(column1)).to match_hash({})
     end
 
@@ -74,11 +74,11 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
       instance.reload if ENV['RAILS_VERSION'] < '5.0' # don't ask me why
       # Note: Sequel backend and Rails < 5.0 return a blank string here.
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:en)).to eq([:en, nil])
 
       expect(instance.send(attribute1)).to eq(nil)
       instance.reload
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:en)).to eq([:en, nil])
       expect(instance.read_attribute(column1)).to eq({})
     end
 
@@ -105,7 +105,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
 
     it "saves empty hash for serialized translations by default" do
       expect(instance.send(attribute1)).to eq(nil)
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:en)).to eq([:en, nil])
       instance.save
       expect(instance.read_attribute(column1)).to eq({})
     end
@@ -162,8 +162,8 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
 
     context "with nil serialized column" do
       it "returns nil in any locale" do
-        expect(backend.read(:en)).to eq(nil)
-        expect(backend.read(:ja)).to eq(nil)
+        expect(backend.read(:en)).to eq([:en, nil])
+        expect(backend.read(:ja)).to eq([:ja, nil])
       end
     end
 
@@ -173,8 +173,8 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
         instance.save
         instance.reload
 
-        expect(backend.read(:ja)).to eq("あああ")
-        expect(backend.read(:en)).to eq(nil)
+        expect(backend.read(:ja)).to eq([:ja, "あああ"])
+        expect(backend.read(:en)).to eq([:en, nil])
       end
     end
 
@@ -185,11 +185,11 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
         instance.save
         instance.reload
 
-        expect(backend.read(:ja)).to eq("あああ")
-        expect(backend.read(:en)).to eq(nil)
+        expect(backend.read(:ja)).to eq([:ja, "あああ"])
+        expect(backend.read(:en)).to eq([:en, nil])
         other_backend = instance.mobility_backends[attribute2.to_sym]
-        expect(other_backend.read(:ja)).to eq(nil)
-        expect(other_backend.read(:en)).to eq("aaa")
+        expect(other_backend.read(:ja)).to eq([:ja, nil])
+        expect(other_backend.read(:en)).to eq([:en, "aaa"])
       end
     end
   end
@@ -210,7 +210,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       backend.write(:en, nil)
       expect(get_translations(instance, column1)).to match_hash({ en: nil })
       instance.save
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:en)).to eq([:en, nil])
       expect(instance[column1]).to eq(serialize({}))
     end
 
@@ -234,15 +234,15 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       # Note that for Jsonb backend (when format is nil) this correctly returns
       # nil.
       if format
-        expect(backend.read(:en)).to eq("")
+        expect(backend.read(:en)).to eq([:en, ""])
         expect(instance.send(attribute1)).to eq("")
       else
-        expect(backend.read(:en)).to eq(nil)
+        expect(backend.read(:en)).to eq([:en, nil])
         expect(instance.send(attribute1)).to eq(nil)
       end
 
       instance.reload
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:en)).to eq([:en, nil])
       expect(instance[column1]).to eq(serialize({}))
     end
 
@@ -269,7 +269,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
 
     it "saves empty hash for serialized translations by default" do
       expect(instance.send(attribute1)).to eq(nil)
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:en)).to eq([:en, nil])
       instance.save
       expect(instance[column1]).to eq(serialize({}))
     end

@@ -37,7 +37,7 @@ enabled for any one attribute on the model.
         def read(locale, **)
           if (model_attributes_defined? &&
               model_attributes.key?(alias_ = Query.attribute_alias(attribute, locale)))
-            model_attributes[alias_].value
+            [locale, model_attributes[alias_].value]
           else
             super
           end

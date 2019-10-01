@@ -39,9 +39,9 @@ Values are added to the cache in two ways:
         def read(locale, **options)
           return super(locale, options) if options.delete(:cache) == false
           if cache.has_key?(locale)
-            cache[locale]
+            [locale, cache[locale]]
           else
-            cache[locale] = super(locale, options)
+            super(locale, options).tap { |_, value| cache[locale] = value }
           end
         end
 
@@ -50,7 +50,7 @@ Values are added to the cache in two ways:
         #   *false* to disable cache.
         def write(locale, value, **options)
           return super if options.delete(:cache) == false
-          cache[locale] = super
+          super.tap { |_, value_| cache[locale] = value_ }
         end
         # @!endgroup
 

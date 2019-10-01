@@ -12,7 +12,7 @@ shared_examples_for "Mobility backend" do |backend_class, model_class, attribute
     it "can be called without options hash" do
       backend.write(Mobility.locale, "foo")
       backend.read(Mobility.locale)
-      expect(backend.read(Mobility.locale)).to eq("foo")
+      expect(backend.read(Mobility.locale)).to eq([Mobility.locale, "foo"])
     end
   end
 

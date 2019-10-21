@@ -405,7 +405,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         expect(article.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil })
 
         article.published = false
-        expect(article.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil, 'published' => false })
+        expect(article.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil, 'published' => nil })
 
         article.save
         article.title_en = 'foo en 2'

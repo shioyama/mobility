@@ -12,7 +12,6 @@ details on usage.
 In addition to methods added by {Mobility::Plugins::ActiveModel::Dirty}, the
 AR::Dirty plugin adds support for the following persistence-specific methods
 (for a model with a translated attribute +title+):
-- +saved_changes+
 - +saved_change_to_title?+
 - +saved_change_to_title+
 - +title_before_last_save+
@@ -20,130 +19,97 @@ AR::Dirty plugin adds support for the following persistence-specific methods
 - +title_change_to_be_saved+
 - +title_in_database+
 
+The following methods are also patched to include translated attribute changes:
+- +saved_changes+
+- +has_changes_to_save?+
+- +changes_to_save+
+- +changed_attribute_names_to_save+
+- +attributes_in_database+
+
 =end
       module Dirty
-        # Builds module which patches a few AR methods to handle changes to
-        # translated attributes just like normal attributes.
         class MethodsBuilder < ActiveModel::Dirty::MethodsBuilder
-          def initialize(*attribute_names)
-            super
-            @attribute_names = attribute_names
-            define_method_overrides if ::ActiveRecord::VERSION::STRING < '5.2'
-            define_attribute_methods if ::ActiveRecord::VERSION::STRING >= '5.1'
-          end
+          if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
+            def initialize(*attribute_names)
+              super
 
-          # Overrides +ActiveRecord::AttributeMethods::ClassMethods#has_attribute+ (in AR 5.1) and
-          # +ActiveModel::AttributeMethods#_read_attribute+ (in AR >= 5.2) to
-          # ensure that fallthrough attribute methods are treated like "real"
-          # attribute methods.
-          #
-          # @note Patching +has_attribute?+ is necessary in AR 5.1 due to this commit[https://github.com/rails/rails/commit/4fed08fa787a316fa51f14baca9eae11913f5050].
+              define_ar_dirty_methods(attribute_names)
+            end
+          end
           # @param [Attributes] attributes
           def included(model_class)
             super
 
-            if ::ActiveRecord::VERSION::MAJOR == 5 && ::ActiveRecord::VERSION::MINOR == 1
-              names = @attribute_names
-              method_name_regex = /\A(#{names.join('|')})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
-              has_attribute = Module.new do
-                define_method :has_attribute? do |attr_name|
-                  super(attr_name) || (String === attr_name && !!method_name_regex.match(attr_name))
-                end
-              end
-              model_class.extend has_attribute
-            elsif ::ActiveRecord::VERSION::STRING >= '5.2'
-              model_class.include ReadAttribute
-            end
+            model_class.include InstanceMethods
           end
 
           private
 
-          # @note These method overrides are needed for AR versions < 5.2,
-          #   since AR::Dirty overrides AM::Dirty, disabling previous_changes
-          #   from being set. Here we "undo" that.
-          def define_method_overrides
-            changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
-            define_method changes_applied_method do
-              @previously_changed = changes
-              super()
-            end
+          def define_ar_dirty_methods(attribute_names)
+            m = self
 
-            define_method :clear_changes_information do
-              @previously_changed = ActiveSupport::HashWithIndifferentAccess.new
-              super()
-            end
+            attribute_names.each do |name|
+              define_method "saved_change_to_#{name}?" do
+                mutations_before_last_save_from_mobility.changed?(m.append_locale(name))
+              end
 
-            define_method :previous_changes do
-              (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super())
+              define_method "saved_change_to_#{name}" do
+                mutations_before_last_save_from_mobility.change_to_attribute(m.append_locale(name))
+              end
+
+              define_method "#{name}_before_last_save" do
+                mutations_before_last_save_from_mobility.original_value(m.append_locale(name))
+              end
+
+              define_method "will_save_change_to_#{name}?" do
+                mutations_from_mobility.changed?(m.append_locale(name))
+              end
+
+              define_method "#{name}_change_to_be_saved" do
+                mutations_from_mobility.change_to_attribute(m.append_locale(name))
+              end
+
+              define_method "#{name}_in_database" do
+                mutations_from_mobility.original_value(m.append_locale(name))
+              end
             end
           end
 
-          # For AR >= 5.1 only
-          def define_attribute_methods
-            define_method :saved_changes do
-              (@previously_changed ||= ActiveSupport::HashWithIndifferentAccess.new).merge(super())
-            end
-
-            @attribute_names.each do |name|
-              define_method :"saved_change_to_#{name}?" do
-                previous_changes.include?(Mobility.normalize_locale_accessor(name))
+          module InstanceMethods
+            if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
+              def saved_changes
+                mutations_before_last_save_from_mobility.changes
               end
 
-              define_method :"saved_change_to_#{name}" do
-                previous_changes[Mobility.normalize_locale_accessor(name)]
+              def changes_to_save
+                super.merge(mutations_from_mobility.changes)
               end
 
-              define_method :"#{name}_before_last_save" do
-                previous_changes[Mobility.normalize_locale_accessor(name)].first
+              def changed_attribute_names_to_save
+                super + mutations_from_mobility.changed_attribute_names
               end
 
-              alias_method :"will_save_change_to_#{name}?", :"#{name}_changed?"
-              alias_method :"#{name}_change_to_be_saved", :"#{name}_change"
-              alias_method :"#{name}_in_database", :"#{name}_was"
-            end
-          end
+              def attributes_in_database
+                super.merge(mutations_from_mobility.changed_values)
+              end
 
-          # Overrides _read_attribute to correctly dispatch reads on translated
-          # attributes to their respective setters, rather than to
-          # +@attributes+, which would otherwise return +nil+.
-          #
-          # For background on why this is necessary, see:
-          # https://github.com/shioyama/mobility/issues/115
-          module ReadAttribute
-            # @note We first check if attributes has the key +attr+ to avoid
-            #   doing any extra work in case this is a "normal"
-            #   (non-translated) attribute.
-            def _read_attribute(attr, *args)
-              if @attributes.key?(attr)
-                super
-              else
-                mobility_changed_attributes.include?(attr) ? __send__(attr) : super
+              if ::ActiveRecord::VERSION::STRING >= '6.0'
+                def has_changes_to_save?
+                  super || mutations_from_mobility.any_changes?
+                end
               end
             end
 
-            # @note This is necessary due to a performance fix in e12607
-            #   which skips setting @previously_changed if @attributes is
-            #   defined. For Mobility models using the Dirty plugin, there will
-            #   be cases where @attributes has been set, but there are *other*
-            #   changes on virtual translated attributes which need to also be
-            #   assigned. In this case, we use the presence of such changed
-            #   virtual attributes as an alternative trigger to set this variable.
-            #
-            #   See:
-            #   - https://github.com/rails/rails/commit/e126078a0e013acfe0a397a8dad33b2c9de78732
-            #   - https://github.com/shioyama/mobility/pull/166
-            def changes_applied
-              if defined?(@attributes) && mobility_changed_attributes.any?
-                @previously_changed = changes
+            def reload(*)
+              super.tap do
+                @mutations_from_mobility = nil
+                @mutations_before_last_save_from_mobility = nil
               end
-              super
             end
           end
         end
 
-        module BackendMethods
-          include ActiveModel::Dirty::BackendMethods
-        end
+        BackendMethods = ActiveModel::Dirty::BackendMethods
       end
     end
   end

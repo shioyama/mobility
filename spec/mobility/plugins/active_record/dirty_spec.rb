@@ -150,11 +150,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       aggregate_failures do
         expect(article.changed?).to eq(true)
         expect(article.title_changed?).to eq(true)
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.content_changed?).to eq(nil)
-        else
-          expect(article.content_changed?).to eq(false)
-        end
+        expect(article.content_changed?).to eq(false)
         expect(article.title_change).to eq(["foo", "foo"])
         expect(article.content_change).to eq(nil)
         expect(article.previous_changes).to include({ "title_en" => [nil, "foo"]})
@@ -206,14 +202,12 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       aggregate_failures "after save" do
         expect(article.changed?).to eq(false)
         expect(article.title_change).to eq(nil)
+        expect(article.title_changed?).to eq(false)
         expect(article.title_was).to eq("foo")
 
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
           expect(article.title_previously_changed?).to eq(true)
           expect(article.title_previous_change).to eq([nil, "foo"])
-          expect(article.title_changed?).to eq(false)
         end
 
         # AR-specific suffix methods, added in AR 5.1
@@ -233,22 +227,23 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         article.save
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
+
+        expect(article.title_changed?).to eq(false)
+
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
           expect(article.title_previously_changed?).to eq(true)
           expect(article.title_previous_change).to eq(["foo", "bar"])
           expect(article.title_changed?).to eq(false)
-        end
 
-        # AR-specific suffix methods
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
-          expect(article.saved_change_to_title?).to eq(true)
-          expect(article.saved_change_to_title).to eq(["foo", "bar"])
-          expect(article.title_before_last_save).to eq("foo")
-          expect(article.will_save_change_to_title?).to eq(false)
-          expect(article.title_change_to_be_saved).to eq(nil)
-          expect(article.title_in_database).to eq("bar")
+          # AR-specific suffix methods, added in 5.1
+          if ENV['RAILS_VERSION'] > '5.0'
+            expect(article.saved_change_to_title?).to eq(true)
+            expect(article.saved_change_to_title).to eq(["foo", "bar"])
+            expect(article.title_before_last_save).to eq("foo")
+            expect(article.will_save_change_to_title?).to eq(false)
+            expect(article.title_change_to_be_saved).to eq(nil)
+            expect(article.title_in_database).to eq("bar")
+          end
         end
       end
 
@@ -272,13 +267,9 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         article.save!
 
         aggregate_failures "after save" do
-          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-            expect(article.title_changed?).to eq(nil)
-          else
-            expect(article.title_changed?).to eq(false)
-          end
+          expect(article.title_changed?).to eq(false)
 
-          # AR-specific suffix methods
+          # AR-specific suffix methods, added in 5.1
           if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
             expect(article.saved_change_to_title?).to eq(true)
             expect(article.saved_change_to_title).to eq(["bar", "bar"])
@@ -302,11 +293,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         Mobility.locale = :fr
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
-          expect(article.title_changed?).to eq(false)
-        end
+        expect(article.title_changed?).to eq(false)
         expect(article.title_change).to eq(nil)
         expect(article.title_was).to eq(nil)
       end
@@ -373,22 +360,62 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     it_behaves_like "resets on model action", :reload
   end
 
-  if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
-    describe "#saved_changes" do
-      it "includes translated attributes" do
+  describe "#saved_changes", rails_version_geq: '5.1' do
+    it "includes translated attributes" do
+      article = Article.create
+
+      article.title = "foo en"
+      Mobility.with_locale(:ja) { article.title = "foo ja" }
+      article.save
+
+      aggregate_failures do
+        saved_changes = article.saved_changes
+        expect(saved_changes).to include("title_en", "title_ja")
+        expect(saved_changes["title_en"]).to eq([nil, "foo en"])
+        expect(saved_changes["title_ja"]).to eq([nil, "foo ja"])
+      end
+    end
+
+    describe '#has_changes_to_save?', rails_version_geq: '6.0' do
+      it 'detects changes to translated attributes' do
         article = Article.create
 
-        article.title = "foo en"
-        Mobility.with_locale(:ja) { article.title = "foo ja" }
-        article.save
+        expect(article.has_changes_to_save?).to eq(false)
 
-        aggregate_failures do
-          saved_changes = article.saved_changes
-          expect(saved_changes).to include("title_en", "title_ja")
-          expect(saved_changes["title_en"]).to eq([nil, "foo en"])
-          expect(saved_changes["title_ja"]).to eq([nil, "foo ja"])
-        end
+        article.title = "foo en"
+        expect(article.has_changes_to_save?).to eq(true)
       end
+    end
+
+    describe '#attributes_in_database', rails_version_geq: '6.0' do
+      it 'includes translated attributes' do
+        article = Article.create
+        expect(article.attributes_in_database).to eq({})
+
+        article.title_en = 'foo en'
+        expect(article.attributes_in_database).to eq({ 'title_en' => nil })
+
+        article.title_ja = 'foo ja'
+        expect(article.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil })
+
+        article.save
+        article.title_en = 'foo en 2'
+        article.title_ja = 'foo ja 2'
+        expect(article.attributes_in_database).to eq({ 'title_en' => 'foo en', 'title_ja' => 'foo ja' })
+      end
+    end
+  end
+
+  describe '#changed_attribute_names_to_save', rails_version_geq: '5.1' do
+    it 'includes translated attributes' do
+      article = Article.new
+      expect(article.changed_attribute_names_to_save).to eq([])
+
+      article.title = 'foo en'
+      expect(article.changed_attribute_names_to_save).to eq(%w[title_en])
+
+      Mobility.with_locale(:ja) { article.title = 'foo ja' }
+      expect(article.changed_attribute_names_to_save).to eq(%w[title_en title_ja])
     end
   end
 

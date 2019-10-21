@@ -41,7 +41,6 @@ unless orm == 'none'
   require "#{orm}/models"
 end
 
-
 RSpec.configure do |config|
   config.include Helpers
   config.include Mobility::Util

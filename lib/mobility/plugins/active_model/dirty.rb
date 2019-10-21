@@ -35,6 +35,7 @@ The following methods are also patched to work with translated attributes:
         class MethodsBuilder < Module
           def initialize(*attribute_names)
             define_dirty_methods(attribute_names)
+            define_attribute_methods(attribute_names)
 
             if ::ActiveModel::VERSION::STRING >= '5.0' # methods added in Rails 5.0
               define_ar_5_0_dirty_methods(attribute_names)
@@ -101,6 +102,35 @@ The following methods are also patched to work with translated attributes:
                 mutations_before_last_save_from_mobility.change_to_attribute(m.append_locale(name))
               end
             end
+          end
+
+          def define_attribute_methods(attribute_names)
+            method_suffixes.each do |suffix|
+              define_method "attribute#{suffix}" do |*args|
+                if attribute_names.include?(args[0].to_s)
+                  attr_name, *rest = args
+                  __send__("#{attr_name}#{suffix}", *rest)
+                else
+                  super(*args)
+                end
+              end
+            end
+          end
+
+          private
+
+          # Get method suffixes. Creating an object just to get the list of
+          # suffixes is not very efficient, but the most reliable way given that
+          # they change from Rails version to version.
+          def method_suffixes
+            @method_suffixes ||=
+              begin
+                klass = Class.new { include ::ActiveModel::Dirty }
+                klass.attribute_method_matchers.map(&:suffix).select do |m|
+                  # only include suffixes for non-private handler methods
+                  m =~ /\A_/ && !klass.private_instance_methods.include?(:"attribute#{m}")
+                end
+              end
           end
 
           module InstanceMethods

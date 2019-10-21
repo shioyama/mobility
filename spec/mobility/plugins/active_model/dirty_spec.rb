@@ -159,12 +159,20 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.title_change).to eq(["foo", "bar"])
         expect(article.title_was).to eq("foo")
 
+        expect(article.attribute_changed?(:title)).to eq(true)
+        expect(article.attribute_was(:title)).to eq("foo")
+
         article.save
         expect(article.title_changed?).to eq(false)
+        expect(article.attribute_changed?(:title)).to eq(false)
+
         if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
           expect(article.title_previously_changed?).to eq(true)
           expect(article.title_previous_change).to eq(["foo", "bar"])
           expect(article.title_changed?).to eq(false)
+
+          expect(article.attribute_previously_changed?(:title)).to eq(true)
+          expect(article.attribute_changed?(:title)).to eq(false)
         end
 
         article.title_will_change!
@@ -184,11 +192,23 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.title_change).to eq(["foo", "bar"])
         expect(article.title_was).to eq("foo")
 
+        expect(article.attribute_changed?(:title)).to eq(true)
+        expect(article.attribute_was(:title)).to eq('foo')
+
         Mobility.locale = :fr
         expect(article.title_changed?).to eq(false)
         expect(article.title_change).to eq(nil)
         expect(article.title_was).to eq(nil)
+
+        expect(article.attribute_changed?(:title)).to eq(false)
+        expect(article.attribute_was(:title)).to eq(nil)
       end
+    end
+
+    it 'does not make private methods public' do
+      article = Article.new
+      expect { article.attribute_change(:title) }.to raise_error(NoMethodError)
+      expect { article.send(:attribute_change, :title) }.not_to raise_error
     end
   end
 

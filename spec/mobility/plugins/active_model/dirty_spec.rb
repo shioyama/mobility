@@ -165,10 +165,6 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
           expect(article.title_previously_changed?).to eq(true)
           expect(article.title_previous_change).to eq(["foo", "bar"])
           expect(article.title_changed?).to eq(false)
-
-          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '6.0'
-            expect(article.title_previously_was).to eq('foo')
-          end
         end
 
         article.title_will_change!

@@ -15,7 +15,6 @@ following methods:
 - +title_will_change!+
 - +title_previously_changed?+
 - +title_previous_change+
-- +title_previous_was+
 - +restore_title!+
 
 The following methods are also patched to work with translated attributes:
@@ -39,9 +38,6 @@ The following methods are also patched to work with translated attributes:
 
             if ::ActiveModel::VERSION::STRING >= '5.0' # methods added in Rails 5.0
               define_ar_5_0_dirty_methods(attribute_names)
-              if ::ActiveModel::VERSION::STRING >= '5.1' # methods added in Rails 5.1
-                define_ar_6_0_dirty_methods(attribute_names)
-              end
             end
           end
 
@@ -103,16 +99,6 @@ The following methods are also patched to work with translated attributes:
 
               define_method "#{name}_previous_change" do
                 mutations_before_last_save_from_mobility.change_to_attribute(m.append_locale(name))
-              end
-            end
-          end
-
-          def define_ar_6_0_dirty_methods(attribute_names)
-            m = self
-
-            attribute_names.each do |name|
-              define_method "#{name}_previously_was" do
-                mutations_before_last_save_from_mobility.original_value(m.append_locale(name))
               end
             end
           end

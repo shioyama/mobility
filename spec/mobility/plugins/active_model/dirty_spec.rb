@@ -156,10 +156,14 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
 
       aggregate_failures do
         expect(article.title_changed?).to eq(true)
+        expect(article.title_changed?(from: 'foo', to: 'bar')).to eq(true)
+        expect(article.title_changed?(from: 'foo', to: 'baz')).to eq(false)
         expect(article.title_change).to eq(["foo", "bar"])
         expect(article.title_was).to eq("foo")
 
         expect(article.attribute_changed?(:title)).to eq(true)
+        expect(article.attribute_changed?(:title, from: 'foo', to: 'bar')).to eq(true)
+        expect(article.attribute_changed?(:title, from: 'foo', to: 'baz')).to eq(false)
         expect(article.attribute_was(:title)).to eq("foo")
 
         article.save

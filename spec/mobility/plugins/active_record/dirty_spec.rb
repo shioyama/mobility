@@ -378,18 +378,23 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
 
     describe '#has_changes_to_save?', rails_version_geq: '6.0' do
-      it 'detects changes to translated attributes' do
+      it 'detects changes to translated attributes and untranslated attributes' do
         article = Article.create
 
         expect(article.has_changes_to_save?).to eq(false)
 
         article.title = "foo en"
         expect(article.has_changes_to_save?).to eq(true)
+
+        article = Article.new
+
+        article.published = false
+        expect(article/has_changes_to_save?).to eq(true)
       end
     end
 
     describe '#attributes_in_database', rails_version_geq: '6.0' do
-      it 'includes translated attributes' do
+      it 'includes translated attributes and untranslated attributes' do
         article = Article.create
         expect(article.attributes_in_database).to eq({})
 
@@ -399,24 +404,31 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         article.title_ja = 'foo ja'
         expect(article.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil })
 
+        article.published = false
+        expect(article.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil, 'published' => false })
+
         article.save
         article.title_en = 'foo en 2'
         article.title_ja = 'foo ja 2'
-        expect(article.attributes_in_database).to eq({ 'title_en' => 'foo en', 'title_ja' => 'foo ja' })
+        article.published = true
+        expect(article.attributes_in_database).to eq({ 'title_en' => 'foo en', 'title_ja' => 'foo ja', 'published' => false })
       end
     end
   end
 
   describe '#changed_attribute_names_to_save', rails_version_geq: '5.1' do
-    it 'includes translated attributes' do
+    it 'includes translated and untranslated attributes' do
       article = Article.new
       expect(article.changed_attribute_names_to_save).to eq([])
 
-      article.title = 'foo en'
+      article.title_en = 'foo en'
       expect(article.changed_attribute_names_to_save).to eq(%w[title_en])
 
-      Mobility.with_locale(:ja) { article.title = 'foo ja' }
-      expect(article.changed_attribute_names_to_save).to eq(%w[title_en title_ja])
+      article.title_ja = 'foo ja'
+      expect(article.changed_attribute_names_to_save).to match_array(%w[title_en title_ja])
+
+      article.published = false
+      expect(article.changed_attribute_names_to_save).to match_array(%w[title_en title_ja published])
     end
   end
 

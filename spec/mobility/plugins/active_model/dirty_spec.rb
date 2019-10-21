@@ -147,7 +147,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   end
 
   describe "suffix methods" do
-    it "defines suffix methods on translated attribute", rails_version_geq: '5.0' do
+    it "defines suffix methods on translated attribute" do
       article = Article.new
       article.title = "foo"
       article.save
@@ -160,12 +160,15 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         article.save
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
+        expect(article.title_changed?).to eq(false)
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
           expect(article.title_previously_changed?).to eq(true)
           expect(article.title_previous_change).to eq(["foo", "bar"])
           expect(article.title_changed?).to eq(false)
+
+          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '6.0'
+            expect(article.title_previously_was).to eq('foo')
+          end
         end
 
         article.title_will_change!
@@ -186,11 +189,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         Mobility.locale = :fr
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
-          expect(article.title_changed?).to eq(false)
-        end
+        expect(article.title_changed?).to eq(false)
         expect(article.title_change).to eq(nil)
         expect(article.title_was).to eq(nil)
       end

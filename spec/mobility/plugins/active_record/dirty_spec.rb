@@ -431,12 +431,4 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       expect(article.changed_attribute_names_to_save).to match_array(%w[title_en title_ja published])
     end
   end
-
-  # Regression test for https://github.com/shioyama/mobility/issues/149
-  describe "#_read_attribute" do
-    it "is public" do
-      article = Article.create
-      expect { article._read_attribute("foo") }.not_to raise_error
-    end
-  end
 end if Mobility::Loaded::ActiveRecord

@@ -4,6 +4,8 @@ checks:
   method-complexity:
     config:
       threshold: 6
+  method-lines:
+    enabled: false
 engines:
   duplication:
     enabled: true

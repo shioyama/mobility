@@ -389,7 +389,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         article = Article.new
 
         article.published = false
-        expect(article/has_changes_to_save?).to eq(true)
+        expect(article.has_changes_to_save?).to eq(true)
       end
     end
 

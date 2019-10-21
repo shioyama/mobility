@@ -361,16 +361,17 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   end
 
   describe "#saved_changes", rails_version_geq: '5.1' do
-    it "includes translated attributes" do
+    it "includes translated attributes and untranslated attributes" do
       article = Article.create
 
-      article.title = "foo en"
-      Mobility.with_locale(:ja) { article.title = "foo ja" }
+      article.title_en = "foo en"
+      article.title_ja = "foo ja"
+      article.published = false
       article.save
 
       aggregate_failures do
         saved_changes = article.saved_changes
-        expect(saved_changes).to include("title_en", "title_ja")
+        expect(saved_changes).to include("title_en", 'title_ja', 'published')
         expect(saved_changes["title_en"]).to eq([nil, "foo en"])
         expect(saved_changes["title_ja"]).to eq([nil, "foo ja"])
       end

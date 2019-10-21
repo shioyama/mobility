@@ -79,7 +79,7 @@ The following methods are also patched to include translated attribute changes:
           module InstanceMethods
             if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
               def saved_changes
-                mutations_before_last_save_from_mobility.changes
+                super.merge(mutations_before_last_save_from_mobility.changes)
               end
 
               def changes_to_save

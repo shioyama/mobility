@@ -29,13 +29,6 @@ The following methods are also patched to include translated attribute changes:
 =end
       module Dirty
         class MethodsBuilder < ActiveModel::Dirty::MethodsBuilder
-          if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
-            def initialize(*attribute_names)
-              super
-
-              define_ar_dirty_methods(attribute_names)
-            end
-          end
           # @param [Attributes] attributes
           def included(model_class)
             super
@@ -43,42 +36,26 @@ The following methods are also patched to include translated attribute changes:
             model_class.include InstanceMethods
           end
 
-          private
+          class << self
+            private
 
-          def define_ar_dirty_methods(attribute_names)
-            m = self
+            def dirty_class
+              @dirty_class ||= (Class.new do
+                # In earlier versions of Rails, these are needed to avoid an
+                # exception when including the AR Dirty module outside of an
+                # AR::Base class. Eventually we should be able to drop them.
+                def self.after_create; end
+                def self.after_update; end
 
-            attribute_names.each do |name|
-              define_method "saved_change_to_#{name}?" do
-                mutations_before_last_save_from_mobility.changed?(m.append_locale(name))
-              end
-
-              define_method "saved_change_to_#{name}" do
-                mutations_before_last_save_from_mobility.change_to_attribute(m.append_locale(name))
-              end
-
-              define_method "#{name}_before_last_save" do
-                mutations_before_last_save_from_mobility.original_value(m.append_locale(name))
-              end
-
-              define_method "will_save_change_to_#{name}?" do
-                mutations_from_mobility.changed?(m.append_locale(name))
-              end
-
-              define_method "#{name}_change_to_be_saved" do
-                mutations_from_mobility.change_to_attribute(m.append_locale(name))
-              end
-
-              define_method "#{name}_in_database" do
-                mutations_from_mobility.original_value(m.append_locale(name))
-              end
+                include ::ActiveRecord::AttributeMethods::Dirty
+              end)
             end
           end
 
           module InstanceMethods
             if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
               def saved_changes
-                mutations_before_last_save_from_mobility.changes
+                super.merge(mutations_from_mobility.previous_changes)
               end
 
               def changes_to_save
@@ -86,16 +63,16 @@ The following methods are also patched to include translated attribute changes:
               end
 
               def changed_attribute_names_to_save
-                super + mutations_from_mobility.changed_attribute_names
+                super + mutations_from_mobility.changed
               end
 
               def attributes_in_database
-                super.merge(mutations_from_mobility.changed_values)
+                super.merge(mutations_from_mobility.changed_attributes)
               end
 
               if ::ActiveRecord::VERSION::STRING >= '6.0'
                 def has_changes_to_save?
-                  super || mutations_from_mobility.any_changes?
+                  super || mutations_from_mobility.changed?
                 end
               end
             end
@@ -103,7 +80,6 @@ The following methods are also patched to include translated attribute changes:
             def reload(*)
               super.tap do
                 @mutations_from_mobility = nil
-                @mutations_before_last_save_from_mobility = nil
               end
             end
           end

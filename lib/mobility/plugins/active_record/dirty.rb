@@ -26,6 +26,18 @@ The following methods are also patched to include translated attribute changes:
 - +changed_attribute_names_to_save+
 - +attributes_in_database+
 
+In addition, the following ActiveModel attribute handler methods are also
+patched to work with translated attributes:
+- +saved_change_to_attribute?+
+- +saved_change_to_attribute+
+- +attribute_before_last_save+
+- +will_save_change_to_attribute?+
+- +attribute_change_to_be_saved+
+- +attribute_in_database+
+
+(When using these methods, you must pass the attribute name along with its
+locale suffix, so +title_en+, +title_pt_br+, etc.)
+
 =end
       module Dirty
         class MethodsBuilder < ActiveModel::Dirty::MethodsBuilder

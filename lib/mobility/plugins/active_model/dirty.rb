@@ -15,7 +15,6 @@ following methods:
 - +title_will_change!+
 - +title_previously_changed?+
 - +title_previous_change+
-- +title_previous_was+
 - +restore_title!+
 
 The following methods are also patched to work with translated attributes:
@@ -26,6 +25,18 @@ The following methods are also patched to work with translated attributes:
 - +previous_changes+
 - +clear_attribute_changes+
 - +restore_attributes+
+
+In addition, the following ActiveModel attribute handler methods are also
+patched to work with translated attributes:
+- +attribute_changed?+
+- +attribute_previously_changed?+
+- +attribute_was+
+
+(When using these methods, you must pass the attribute name along with its
+locale suffix, so +title_en+, +title_pt_br+, etc.)
+
+Other methods are also included for ActiveRecord models, see documentation on
+the ActiveRecord dirty plugin for more information.
 
 @see http://api.rubyonrails.org/classes/ActiveModel/Dirty.html Rails documentation for Active Model Dirty module
 

@@ -122,44 +122,44 @@ The following methods are also patched to work with translated attributes:
               @dirty_class ||= Class.new { include ::ActiveModel::Dirty }
             end
           end
+        end
 
-          module InstanceMethods
-            def changed_attributes
-              super.merge(mutations_from_mobility.changed_attributes)
-            end
+        module InstanceMethods
+          def changed_attributes
+            super.merge(mutations_from_mobility.changed_attributes)
+          end
 
-            def changes_applied
-              super
-              mutations_from_mobility.finalize_changes
-            end
+          def changes_applied
+            super
+            mutations_from_mobility.finalize_changes
+          end
 
-            def changes
-              super.merge(mutations_from_mobility.changes)
-            end
+          def changes
+            super.merge(mutations_from_mobility.changes)
+          end
 
-            def changed
-              # uniq is required for Rails < 6.0
-              (super + mutations_from_mobility.changed).uniq
-            end
+          def changed
+            # uniq is required for Rails < 6.0
+            (super + mutations_from_mobility.changed).uniq
+          end
 
-            def changed?
-              super || mutations_from_mobility.changed?
-            end
+          def changed?
+            super || mutations_from_mobility.changed?
+          end
 
-            def previous_changes
-              super.merge(mutations_from_mobility.previous_changes)
-            end
+          def previous_changes
+            super.merge(mutations_from_mobility.previous_changes)
+          end
 
-            def clear_changes_information
-              @mutations_from_mobility = nil
-              super
-            end
+          def clear_changes_information
+            @mutations_from_mobility = nil
+            super
+          end
 
-            private
+          private
 
-            def mutations_from_mobility
-              @mutations_from_mobility ||= MobilityMutationTracker.new(self)
-            end
+          def mutations_from_mobility
+            @mutations_from_mobility ||= MobilityMutationTracker.new(self)
           end
         end
 

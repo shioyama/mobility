@@ -22,12 +22,26 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   end
 
   before do
+    # define class with both translated and untranslated attributes
     stub_const 'Article', Class.new {
+      include ActiveModel::Dirty
+
+      define_attribute_methods :published
+      attr_reader :published
+
+      def initialize
+        @published = nil
+      end
+
+      def published=(published)
+        published_will_change! unless published == @published
+        @published = published
+      end
+
       def save
         changes_applied
       end
     }
-    Article.include ActiveModel::Dirty
     Article.extend Mobility
     Article.translates :title, backend: backend_class, dirty: true, cache: false
   end
@@ -42,6 +56,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.changed?).to eq(false)
         expect(article.changed).to eq([])
         expect(article.changes).to eq({})
+        expect(article.changed_attributes).to eq({})
       end
 
       aggregate_failures "set same value" do
@@ -50,31 +65,43 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.changed?).to eq(false)
         expect(article.changed).to eq([])
         expect(article.changes).to eq({})
+        expect(article.changed_attributes).to eq({})
       end
 
       article.title = "foo"
+      article.published = false
 
       aggregate_failures "after change" do
         expect(article.title).to eq("foo")
         expect(article.changed?).to eq(true)
-        expect(article.changed).to eq(["title_pt_br"])
-        expect(article.changes).to eq({ "title_pt_br" => [nil, "foo"] })
+        expect(article.changed).to match_array(['title_pt_br', 'published'])
+        expect(article.changes).to eq({ 'title_pt_br' => [nil, 'foo'], 'published' => [nil, false] })
+        expect(article.changed_attributes).to eq({ 'title_pt_br' => nil, 'published' => nil })
       end
     end
 
     it "tracks previous changes in one locale" do
       article = Article.new
       article.title = "foo"
+      article.published = false
       article.save
 
       aggregate_failures do
-        article.title = "bar"
+        article.title = 'bar'
         expect(article.changed?).to eq(true)
 
+        article.title = 'foo'
+        expect(article.changed?).to eq(false)
+
+        # ensure still works with untranslated attributes
+        article.published = true
+        expect(article.changed?).to eq(true)
+
+        article.title = 'bar'
         article.save
 
         expect(article.changed?).to eq(false)
-        expect(article.previous_changes).to eq({ "title_en" => ["foo", "bar"]})
+        expect(article.previous_changes).to eq({ 'title_en' => ['foo', 'bar'], 'published' => [false, true]})
       end
     end
 
@@ -144,6 +171,29 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.changes).to eq({ "title_fr" => [nil, "Titre en Francais"] })
       end
     end
+
+    it 'clears changes information on translated attributes' do
+      article = Article.new
+      expect(article.changed?).to eq(false)
+
+      article.title = 'foo'
+      expect(article.changed?).to eq(true)
+
+      article.clear_changes_information
+      expect(article.changed?).to eq(false)
+    end
+
+    # regression to ensure this works as usual
+    it 'clears changes information on translated attributes' do
+      article = Article.new
+      expect(article.changed?).to eq(false)
+
+      article.published = true
+      expect(article.changed?).to eq(true)
+
+      article.clear_changes_information
+      expect(article.changed?).to eq(false)
+    end
   end
 
   describe "suffix methods" do
@@ -156,21 +206,57 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
 
       aggregate_failures do
         expect(article.title_changed?).to eq(true)
+        #expect(article.title_changed?(from: 'foo', to: 'bar')).to eq(true)
+        #expect(article.title_changed?(from: 'foo', to: 'baz')).to eq(false)
         expect(article.title_change).to eq(["foo", "bar"])
         expect(article.title_was).to eq("foo")
 
+        expect(article.attribute_changed?(:title_en)).to eq(true)
+        expect(article.attribute_changed?('title_en')).to eq(true) # ensure string values are handled
+        expect(article.attribute_changed?(:title)).to eq(false)    # only attribute name + locale is tracked
+        expect(article.attribute_changed?(:title_en, from: 'foo', to: 'bar')).to eq(true)
+        expect(article.attribute_changed?(:title_en, from: 'foo', to: 'baz')).to eq(false)
+        expect(article.attribute_was(:title_en)).to eq('foo')
+
         article.save
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
+        expect(article.title_changed?).to eq(false)
+        expect(article.attribute_changed?(:title_en)).to eq(false)
+
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
           expect(article.title_previously_changed?).to eq(true)
           expect(article.title_previous_change).to eq(["foo", "bar"])
           expect(article.title_changed?).to eq(false)
+
+          expect(article.attribute_previously_changed?(:title_en)).to eq(true)
+          expect(article.attribute_changed?(:title_en)).to eq(false)
+
+          # Uncomment when Rails 6.1 is released
+          # if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '6.1'
+          #   expect(article.title_previously_was).to eq('foo')
+          #   expect(article.attribute_previously_was(:title)).to eq('foo')
+          # end
         end
 
         article.title_will_change!
         expect(article.title_changed?).to eq(true)
+
+        article.changes_applied
+        expect(article.title_changed?).to eq(false)
       end
+    end
+
+    # This is a regression spec to ensure we don't change the scope of
+    # ActiveModel handler methods.
+    it 'does not change private status of attribute handler methods', rails_version_geq: '5.0' do
+      article = Article.new
+      expect(article.respond_to?(:attribute_change)).to eq(false)
+      expect(article.respond_to?(:attribute_change, true)).to eq(true)
+      expect(article.respond_to?(:attribute_previous_change)).to eq(false)
+      expect(article.respond_to?(:attribute_previous_change, true)).to eq(true)
+      expect(article.respond_to?(:attribute_will_change!)).to eq(false)
+      expect(article.respond_to?(:attribute_will_change!, true)).to eq(true)
+      expect(article.respond_to?(:restore_attribute!)).to eq(false)
+      expect(article.respond_to?(:restore_attribute!, true)).to eq(true)
     end
 
     it "returns changes on attribute for current locale", rails_version_geq: '5.0' do
@@ -186,13 +272,14 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         Mobility.locale = :fr
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
-          expect(article.title_changed?).to eq(false)
-        end
+        expect(article.title_changed?).to eq(false)
         expect(article.title_change).to eq(nil)
         expect(article.title_was).to eq(nil)
+
+        expect(article.attribute_changed?(:title_en)).to eq(true)
+        expect(article.attribute_changed?(:title_fr)).to eq(false)
+        expect(article.attribute_was(:title_en)).to eq('foo')
+        expect(article.attribute_was(:title_ja)).to eq(nil)
       end
     end
   end

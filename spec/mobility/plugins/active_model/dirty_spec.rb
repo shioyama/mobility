@@ -171,7 +171,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       instance.title = 'foo'
       expect(instance.changed?).to eq(true)
 
-      instance.clear_changes_information
+      instance.send(:clear_changes_information) # private in earlier versions of Rails
       expect(instance.changed?).to eq(false)
     end
 
@@ -182,7 +182,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       instance.published = true
       expect(instance.changed?).to eq(true)
 
-      instance.clear_changes_information
+      instance.send(:clear_changes_information) # private in earlier versions of Rails
       expect(instance.changed?).to eq(false)
     end
   end
@@ -230,7 +230,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         instance.title_will_change!
         expect(instance.title_changed?).to eq(true)
 
-        instance.changes_applied
+        instance.send(:changes_applied) # private method in earlier versions of Rails
         expect(instance.title_changed?).to eq(false)
       end
     end
@@ -246,6 +246,16 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       expect(instance.respond_to?(:attribute_will_change!, true)).to eq(true)
       expect(instance.respond_to?(:restore_attribute!)).to eq(false)
       expect(instance.respond_to?(:restore_attribute!, true)).to eq(true)
+    end
+
+    %w[changes_applied clear_changes_information].each do |method_name|
+      it "does not change private status of #{method_name}" do
+        klass = Class.new { include ::ActiveModel::Dirty }
+        dirty = klass.new
+
+        expect(instance.respond_to?(method_name)).to eq(dirty.respond_to?(method_name))
+        expect(instance.respond_to?(method_name, true)).to eq(dirty.respond_to?(method_name, true))
+      end
     end
 
     it "returns changes on attribute for current locale", rails_version_geq: '5.0' do

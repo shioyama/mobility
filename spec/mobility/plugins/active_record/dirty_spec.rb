@@ -212,6 +212,12 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           expect(instance.saved_change_to_title).to eq([nil, "foo"])
           expect(instance.title_before_last_save).to eq(nil)
           expect(instance.title_in_database).to eq("foo")
+
+          # attribute handlers
+          expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
+          expect(instance.saved_change_to_attribute(:title_en)).to eq([nil, 'foo'])
+          expect(instance.attribute_before_last_save(:title_en)).to eq(nil)
+          expect(instance.attribute_in_database(:title_en)).to eq('foo')
         end
       end
 
@@ -239,6 +245,14 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
             expect(instance.will_save_change_to_title?).to eq(false)
             expect(instance.title_change_to_be_saved).to eq(nil)
             expect(instance.title_in_database).to eq("bar")
+
+            # attribute handlers
+            expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
+            expect(instance.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
+            expect(instance.attribute_before_last_save(:title_en)).to eq('foo')
+            expect(instance.will_save_change_to_attribute?(:title_en)).to eq(false)
+            expect(instance.attribute_change_to_be_saved(:title_en)).to eq(nil)
+            expect(instance.attribute_in_database(:title_en)).to eq('bar')
           end
         end
       end
@@ -257,6 +271,13 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
             expect(instance.will_save_change_to_title?).to eq(true)
             expect(instance.title_change_to_be_saved).to eq(["bar", "bar"])
             expect(instance.title_in_database).to eq("bar")
+
+            expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
+            expect(instance.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
+            expect(instance.attribute_before_last_save(:title_en)).to eq('foo')
+            expect(instance.will_save_change_to_attribute?(:title_en)).to eq(true)
+            expect(instance.attribute_change_to_be_saved(:title_en)).to eq(['bar', 'bar'])
+            expect(instance.attribute_in_database(:title_en)).to eq('bar')
           end
         end
 
@@ -273,6 +294,13 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
             expect(instance.will_save_change_to_title?).to eq(false)
             expect(instance.title_change_to_be_saved).to eq(nil)
             expect(instance.title_in_database).to eq("bar")
+
+            expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
+            expect(instance.saved_change_to_attribute(:title_en)).to eq(['bar', 'bar'])
+            expect(instance.attribute_before_last_save(:title_en)).to eq('bar')
+            expect(instance.will_save_change_to_attribute?(:title_en)).to eq(false)
+            expect(instance.attribute_change_to_be_saved(:title_en)).to eq(nil)
+            expect(instance.attribute_in_database(:title_en)).to eq('bar')
           end
         end
       end
@@ -357,53 +385,78 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   end
 
   describe "#saved_changes", rails_version_geq: '5.1' do
-    it "includes translated attributes" do
+    it "includes translated and untranslated attributes" do
       instance = model_class.create
 
-      instance.title = "foo en"
-      Mobility.with_locale(:ja) { instance.title = "foo ja" }
+      instance.title_en = "foo en"
+      instance.title_ja = "foo ja"
+      instance.published = false
       instance.save
 
       aggregate_failures do
         saved_changes = instance.saved_changes
-        expect(saved_changes).to include("title_en", "title_ja")
-        expect(saved_changes["title_en"]).to eq([nil, "foo en"])
-        expect(saved_changes["title_ja"]).to eq([nil, "foo ja"])
-      end
-    end
-
-    describe '#has_changes_to_save?', rails_version_geq: '6.0' do
-      it 'detects changes to translated attributes' do
-        instance = model_class.create
-
-        expect(instance.has_changes_to_save?).to eq(false)
-
-        instance.title = "foo en"
-        expect(instance.has_changes_to_save?).to eq(true)
-      end
-    end
-
-    describe '#attributes_in_database', rails_version_geq: '6.0' do
-      it 'includes translated attributes' do
-        instance = model_class.create
-        expect(instance.attributes_in_database).to eq({})
-
-        instance.title_en = 'foo en'
-        expect(instance.attributes_in_database).to eq({ 'title_en' => nil })
-
-        instance.title_ja = 'foo ja'
-        expect(instance.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil })
-
-        instance.save
-        instance.title_en = 'foo en 2'
-        instance.title_ja = 'foo ja 2'
-        expect(instance.attributes_in_database).to eq({ 'title_en' => 'foo en', 'title_ja' => 'foo ja' })
+        expect(saved_changes).to include('title_en', 'title_ja', 'published')
+        expect(saved_changes['title_en']).to eq([nil, "foo en"])
+        expect(saved_changes['title_ja']).to eq([nil, "foo ja"])
+        expect(saved_changes['published']).to eq([nil, false])
       end
     end
   end
 
+  describe '#changes_to_save', rails_version_geq: '5.1' do
+    it "includes translated and untranslated attributes" do
+      instance = model_class.new
+
+      instance.title_en = "foo en"
+      instance.title_ja = "foo ja"
+      instance.published = false
+
+      expect(instance.changes_to_save).to eq({
+        'title_en' => [nil, 'foo en'],
+        'title_ja' => [nil, 'foo ja'],
+        'published' => [nil, false]
+      })
+    end
+  end
+
+  describe '#has_changes_to_save?', rails_version_geq: '6.0' do
+    it 'detects changes to translated and untranslated attributes' do
+      instance = model_class.new
+      expect(instance.has_changes_to_save?).to eq(false)
+
+      instance.title = "foo en"
+      expect(instance.has_changes_to_save?).to eq(true)
+
+      instance = model_class.new
+      instance.published = false
+      expect(instance.has_changes_to_save?).to eq(true)
+    end
+  end
+
+  describe '#attributes_in_database', rails_version_geq: '6.0' do
+    it 'includes translated and untranslated attributes' do
+      instance = model_class.create
+      expect(instance.attributes_in_database).to eq({})
+
+      instance.title_en = 'foo en'
+      expect(instance.attributes_in_database).to eq({ 'title_en' => nil })
+
+      instance.title_ja = 'foo ja'
+      expect(instance.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil })
+
+      instance.published = false
+      expect(instance.attributes_in_database).to eq({ 'title_en' => nil, 'title_ja' => nil, 'published' => nil })
+
+      instance.save
+      instance.title_en = 'foo en 2'
+      instance.title_ja = 'foo ja 2'
+      instance.published = true
+      expect(instance.attributes_in_database).to eq({ 'title_en' => 'foo en', 'title_ja' => 'foo ja', 'published' => false })
+    end
+  end
+
   describe '#changed_attribute_names_to_save', rails_version_geq: '5.1' do
-    it 'includes translated attributes' do
+    it 'includes translated attributes and untranslated attributes' do
       instance = model_class.new
       expect(instance.changed_attribute_names_to_save).to eq([])
 
@@ -411,15 +464,10 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       expect(instance.changed_attribute_names_to_save).to eq(%w[title_en])
 
       Mobility.with_locale(:ja) { instance.title = 'foo ja' }
-      expect(instance.changed_attribute_names_to_save).to eq(%w[title_en title_ja])
-    end
-  end
+      expect(instance.changed_attribute_names_to_save).to match_array(%w[title_en title_ja])
 
-  # Regression test for https://github.com/shioyama/mobility/issues/149
-  describe "#_read_attribute" do
-    it "is public" do
-      instance = model_class.create
-      expect { instance._read_attribute("foo") }.not_to raise_error
+      instance.published = false
+      expect(instance.changed_attribute_names_to_save).to match_array(%w[title_en title_ja published])
     end
   end
 end if Mobility::Loaded::ActiveRecord

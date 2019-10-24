@@ -123,19 +123,28 @@ the ActiveRecord dirty plugin for more information.
               end
             end
 
+            def dirty_class
+              @dirty_class ||= Class.new { include ::ActiveModel::Dirty }
+            end
+
             private
 
             def excluded_method_patterns
               ['%s', 'restore_%s!']
             end
-
-            def dirty_class
-              @dirty_class ||= Class.new { include ::ActiveModel::Dirty }
-            end
           end
         end
 
         module InstanceMethods
+          def self.included(klass)
+            # In earlier versions of Rails, these methods are private
+            %i[clear_changes_information changes_applied].each do |method_name|
+              if MethodsBuilder.dirty_class.private_instance_methods.include?(method_name)
+                klass.class_eval { private method_name }
+              end
+            end
+          end
+
           def changed_attributes
             super.merge(mutations_from_mobility.changed_attributes)
           end

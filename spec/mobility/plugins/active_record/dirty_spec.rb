@@ -221,13 +221,13 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           expect(article.saved_change_to_title?).to eq(true)
           expect(article.saved_change_to_title).to eq([nil, "foo"])
           expect(article.title_before_last_save).to eq(nil)
-          #expect(article.title_in_database).to eq("foo")
+          expect(article.title_in_database).to eq("foo")
 
           # attribute handlers
           expect(article.saved_change_to_attribute?(:title_en)).to eq(true)
-          #expect(article.saved_change_to_attribute(:title_en)).to eq([nil, 'foo'])
-          #expect(article.attribute_before_last_save(:title_en)).to eq(nil)
-          #expect(article.attribute_in_database(:title_en)).to eq('foo')
+          expect(article.saved_change_to_attribute(:title_en)).to eq([nil, 'foo'])
+          expect(article.attribute_before_last_save(:title_en)).to eq(nil)
+          expect(article.attribute_in_database(:title_en)).to eq('foo')
         end
       end
 
@@ -252,17 +252,17 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
             expect(article.saved_change_to_title?).to eq(true)
             expect(article.saved_change_to_title).to eq(["foo", "bar"])
             expect(article.title_before_last_save).to eq("foo")
-            #expect(article.will_save_change_to_title?).to eq(false)
+            expect(article.will_save_change_to_title?).to eq(false)
             expect(article.title_change_to_be_saved).to eq(nil)
             expect(article.title_in_database).to eq("bar")
 
             # attribute handlers
             expect(article.saved_change_to_attribute?(:title_en)).to eq(true)
-            #expect(article.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
-            #expect(article.attribute_before_last_save(:title_en)).to eq('foo')
-            #expect(article.will_save_change_to_attribute?(:title_en)).to eq(false)
-            #expect(article.attribute_change_to_be_saved(:title_en)).to eq(nil)
-            #expect(article.attribute_in_database(:title_en)).to eq('bar')
+            expect(article.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
+            expect(article.attribute_before_last_save(:title_en)).to eq('foo')
+            expect(article.will_save_change_to_attribute?(:title_en)).to eq(false)
+            expect(article.attribute_change_to_be_saved(:title_en)).to eq(nil)
+            expect(article.attribute_in_database(:title_en)).to eq('bar')
           end
         end
       end
@@ -283,11 +283,11 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
             expect(article.title_in_database).to eq("bar")
 
             expect(article.saved_change_to_attribute?(:title_en)).to eq(true)
-            #expect(article.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
-            #expect(article.attribute_before_last_save(:title_en)).to eq('foo')
-            #expect(article.will_save_change_to_attribute?(:title_en)).to eq(true)
-            #expect(article.attribute_change_to_be_saved(:title_en)).to eq(['bar', 'bar'])
-            #expect(article.attribute_in_database(:title_en)).to eq('bar')
+            expect(article.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
+            expect(article.attribute_before_last_save(:title_en)).to eq('foo')
+            expect(article.will_save_change_to_attribute?(:title_en)).to eq(true)
+            expect(article.attribute_change_to_be_saved(:title_en)).to eq(['bar', 'bar'])
+            expect(article.attribute_in_database(:title_en)).to eq('bar')
           end
         end
 
@@ -310,11 +310,11 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
             expect(article.title_in_database).to eq("bar")
 
             expect(article.saved_change_to_attribute?(:title_en)).to eq(true)
-            #expect(article.saved_change_to_attribute(:title_en)).to eq(['bar', 'bar'])
-            #expect(article.attribute_before_last_save(:title_en)).to eq('bar')
-            #expect(article.will_save_change_to_attribute?(:title_en)).to eq(false)
-            #expect(article.attribute_change_to_be_saved(:title_en)).to eq(nil)
-            #expect(article.attribute_in_database(:title_en)).to eq('bar')
+            expect(article.saved_change_to_attribute(:title_en)).to eq(['bar', 'bar'])
+            expect(article.attribute_before_last_save(:title_en)).to eq('bar')
+            expect(article.will_save_change_to_attribute?(:title_en)).to eq(false)
+            expect(article.attribute_change_to_be_saved(:title_en)).to eq(nil)
+            expect(article.attribute_in_database(:title_en)).to eq('bar')
           end
         end
       end
@@ -422,7 +422,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   end
 
   describe '#changes_to_save', rails_version_geq: '5.1' do
-    pending "includes translated and untranslated attributes" do
+    it "includes translated and untranslated attributes" do
       article = Article.new
 
       article.title_en = "foo en"
@@ -474,7 +474,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   end
 
   describe '#changed_attribute_names_to_save', rails_version_geq: '5.1' do
-    pending 'includes translated attributes and untranslated attributes' do
+    it 'includes translated attributes and untranslated attributes' do
       article = Article.new
       expect(article.changed_attribute_names_to_save).to eq([])
 

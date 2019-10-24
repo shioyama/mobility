@@ -17,7 +17,7 @@ describe Mobility::Plugins::Dirty do
           let(:model_class) { Class.new(ActiveRecord::Base) }
 
           it "includes dirty modules into backend class and model class" do
-            expect(backend_class).to receive(:include).with(Mobility::Plugins::ActiveRecord::Dirty)
+            expect(backend_class).to receive(:include).with(Mobility::Plugins::ActiveRecord::Dirty::BackendMethods)
             methods = instance_double(Mobility::Plugins::ActiveRecord::Dirty::MethodsBuilder)
             expect(Mobility::Plugins::ActiveRecord::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
             expect(model_class).to receive(:include).with(methods)
@@ -33,7 +33,7 @@ describe Mobility::Plugins::Dirty do
           end
 
           it "includes dirty modules into backend class and model class" do
-            expect(backend_class).to receive(:include).with(Mobility::Plugins::ActiveModel::Dirty)
+            expect(backend_class).to receive(:include).with(Mobility::Plugins::ActiveModel::Dirty::BackendMethods)
             methods = instance_double(Mobility::Plugins::ActiveModel::Dirty::MethodsBuilder)
             expect(Mobility::Plugins::ActiveModel::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
             expect(model_class).to receive(:include).with(methods)
@@ -46,7 +46,7 @@ describe Mobility::Plugins::Dirty do
         let(:model_class) { Class.new(Sequel::Model) }
 
         it "includes dirty modules into backend class and model class" do
-          expect(backend_class).to receive(:include).with(Mobility::Plugins::Sequel::Dirty)
+          expect(backend_class).to receive(:include).with(Mobility::Plugins::Sequel::Dirty::BackendMethods)
           methods = instance_double(Mobility::Plugins::Sequel::Dirty::MethodsBuilder)
           expect(Mobility::Plugins::Sequel::Dirty::MethodsBuilder).to receive(:new).with("title").and_return(methods)
           expect(model_class).to receive(:include).with(methods)

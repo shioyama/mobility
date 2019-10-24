@@ -50,7 +50,7 @@ details.
             else
               raise ArgumentError, "#{model_class} does not support Dirty module."
             end
-          backend_class.include dirty_module
+          backend_class.include dirty_module.const_get(:BackendMethods)
           model_class.include dirty_module.const_get(:MethodsBuilder).new(*attribute_names)
         end
       end

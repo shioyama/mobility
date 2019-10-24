@@ -138,7 +138,7 @@ the ActiveRecord dirty plugin for more information.
         module InstanceMethods
           def self.included(klass)
             # In earlier versions of Rails, these methods are private
-            %i[clear_changes_information changes_applied].each do |method_name|
+            %i[clear_attribute_changes clear_changes_information changes_applied].each do |method_name|
               if MethodsBuilder.dirty_class.private_instance_methods.include?(method_name)
                 klass.class_eval { private method_name }
               end
@@ -173,6 +173,11 @@ the ActiveRecord dirty plugin for more information.
 
           def clear_changes_information
             @mutations_from_mobility = nil
+            super
+          end
+
+          def clear_attribute_changes(attr_names)
+            attr_names.each { |attr_name| mutations_from_mobility.restore_attribute!(attr_name) }
             super
           end
 

@@ -173,6 +173,12 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
 
       instance.send(:clear_changes_information) # private in earlier versions of Rails
       expect(instance.changed?).to eq(false)
+
+      instance.title = 'bar'
+      expect(instance.changed?).to eq(true)
+
+      instance.send(:clear_attribute_changes, ['title_en'])
+      expect(instance.changed?).to eq(false)
     end
 
     # regression to ensure this works as usual
@@ -248,7 +254,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       expect(instance.respond_to?(:restore_attribute!, true)).to eq(true)
     end
 
-    %w[changes_applied clear_changes_information].each do |method_name|
+    %w[changes_applied clear_attribute_changes clear_changes_information].each do |method_name|
       it "does not change private status of #{method_name}" do
         klass = Class.new { include ::ActiveModel::Dirty }
         dirty = klass.new

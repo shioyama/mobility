@@ -34,15 +34,15 @@ The following methods are also patched to work with translated attributes:
         # Builds module which adds suffix/prefix methods for translated
         # attributes so they act like normal dirty-tracked attributes.
         class MethodsBuilder < Module
-          delegate :method_patterns, :public_method_patterns, to: :class
+          delegate :handler_methods_module, :method_patterns, to: :class
 
           def initialize(*attribute_names)
             define_dirty_methods(attribute_names)
-            define_handler_methods
           end
 
           def included(model_class)
             model_class.include InstanceMethods
+            model_class.include handler_methods_module
           end
 
           def append_locale(attr_name)
@@ -50,23 +50,6 @@ The following methods are also patched to work with translated attributes:
           end
 
           private
-
-          def define_handler_methods
-            public_method_patterns.each do |pattern|
-              method_name = pattern % 'attribute'
-
-              module_eval <<-EOM, __FILE__, __LINE__ + 1
-              def #{method_name}(attr_name, *rest)
-                if (mutations_from_mobility.attribute_changed?(attr_name) ||
-                    mutations_from_mobility.attribute_previously_changed?(attr_name))
-                  mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest)
-                else
-                  super
-                end
-              end
-              EOM
-            end
-          end
 
           def define_dirty_methods(attribute_names)
             m = self
@@ -97,6 +80,25 @@ The following methods are also patched to work with translated attributes:
           end
 
           class << self
+            def handler_methods_module
+              @handler_methods_module ||= (AttributeHandlerMethods.new.tap do |mod|
+                public_method_patterns.each do |pattern|
+                  method_name = pattern % 'attribute'
+
+                  mod.module_eval <<-EOM, __FILE__, __LINE__ + 1
+                  def #{method_name}(attr_name, *rest)
+                    if (mutations_from_mobility.attribute_changed?(attr_name) ||
+                        mutations_from_mobility.attribute_previously_changed?(attr_name))
+                      mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest)
+                    else
+                      super
+                    end
+                  end
+                  EOM
+                end
+              end)
+            end
+
             # Get method suffixes. Creating an object just to get the list of
             # suffixes is simplest given they change from Rails version to version.
             def method_patterns
@@ -160,6 +162,9 @@ The following methods are also patched to work with translated attributes:
             end
           end
         end
+
+        # Give the module builder a name so it's easier to see in the model's ancestors
+        class AttributeHandlerMethods < Module; end
 
         class MobilityMutationTracker
           OPTION_NOT_GIVEN = Object.new

@@ -51,36 +51,36 @@ The following methods are also patched to include translated attribute changes:
               end)
             end
           end
+        end
 
-          module InstanceMethods
-            if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
-              def saved_changes
-                super.merge(mutations_from_mobility.previous_changes)
-              end
-
-              def changes_to_save
-                super.merge(mutations_from_mobility.changes)
-              end
-
-              def changed_attribute_names_to_save
-                super + mutations_from_mobility.changed
-              end
-
-              def attributes_in_database
-                super.merge(mutations_from_mobility.changed_attributes)
-              end
-
-              if ::ActiveRecord::VERSION::STRING >= '6.0'
-                def has_changes_to_save?
-                  super || mutations_from_mobility.changed?
-                end
-              end
+        module InstanceMethods
+          if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
+            def saved_changes
+              super.merge(mutations_from_mobility.previous_changes)
             end
 
-            def reload(*)
-              super.tap do
-                @mutations_from_mobility = nil
+            def changes_to_save
+              super.merge(mutations_from_mobility.changes)
+            end
+
+            def changed_attribute_names_to_save
+              super + mutations_from_mobility.changed
+            end
+
+            def attributes_in_database
+              super.merge(mutations_from_mobility.changed_attributes)
+            end
+
+            if ::ActiveRecord::VERSION::STRING >= '6.0'
+              def has_changes_to_save?
+                super || mutations_from_mobility.changed?
               end
+            end
+          end
+
+          def reload(*)
+            super.tap do
+              @mutations_from_mobility = nil
             end
           end
         end

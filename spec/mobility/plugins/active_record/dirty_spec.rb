@@ -324,6 +324,24 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
   end
 
+  %w[changes_applied clear_attribute_changes clear_changes_information].each do |method_name|
+    it "does not change private status of #{method_name}" do
+      # Create a dummy AR model so we can inspect its dirty methods. This way
+      # test works for all versions of Rails (private/public status of these
+      # methods has changed between versions.)
+      klass = Class.new do
+        def self.after_create; end
+        def self.after_update; end
+
+        include ::ActiveRecord::AttributeMethods::Dirty
+      end
+      dirty = klass.new
+
+      expect(instance.respond_to?(method_name)).to eq(dirty.respond_to?(method_name))
+      expect(instance.respond_to?(method_name, true)).to eq(dirty.respond_to?(method_name, true))
+    end
+  end
+
   describe "restoring attributes" do
     it "defines restore_<attribute>! for translated attributes" do
       Mobility.locale = :'pt-BR'

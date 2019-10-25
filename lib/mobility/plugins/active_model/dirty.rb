@@ -45,7 +45,7 @@ the ActiveRecord dirty plugin for more information.
         # Builds module which adds suffix/prefix methods for translated
         # attributes so they act like normal dirty-tracked attributes.
         class MethodsBuilder < Module
-          delegate :handler_methods_module, :method_patterns, to: :class
+          delegate :dirty_class, :handler_methods_module, :method_patterns, to: :class
 
           def initialize(*attribute_names)
             define_dirty_methods(attribute_names)
@@ -54,6 +54,13 @@ the ActiveRecord dirty plugin for more information.
           def included(model_class)
             model_class.include InstanceMethods
             model_class.include handler_methods_module
+
+            # In earlier versions of Rails, these methods are private
+            %i[clear_attribute_changes clear_changes_information changes_applied].each do |method_name|
+              if dirty_class.private_instance_methods.include?(method_name)
+                model_class.class_eval { private method_name }
+              end
+            end
           end
 
           def append_locale(attr_name)
@@ -136,15 +143,6 @@ the ActiveRecord dirty plugin for more information.
         end
 
         module InstanceMethods
-          def self.included(klass)
-            # In earlier versions of Rails, these methods are private
-            %i[clear_attribute_changes clear_changes_information changes_applied].each do |method_name|
-              if MethodsBuilder.dirty_class.private_instance_methods.include?(method_name)
-                klass.class_eval { private method_name }
-              end
-            end
-          end
-
           def changed_attributes
             super.merge(mutations_from_mobility.changed_attributes)
           end

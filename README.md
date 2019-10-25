@@ -51,7 +51,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.8.8'
+gem 'mobility', '~> 0.8.9'
 ```
 
 Mobility is cryptographically signed. To be sure the gem you install hasn't
@@ -68,7 +68,7 @@ installation of unsigned dependencies.
 ### ActiveRecord (Rails)
 
 Requirements:
-- ActiveRecord >= 5.0
+- ActiveRecord >= 5.0 (including 6.0)
 
 (Support for most backends and features is also supported with
 ActiveRecord/Rails 4.2, but there are some tests still failing. To see exactly

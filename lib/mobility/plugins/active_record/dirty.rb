@@ -49,8 +49,6 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
           end
 
           class << self
-            private
-
             def dirty_class
               @dirty_class ||= (Class.new do
                 # In earlier versions of Rails, these are needed to avoid an

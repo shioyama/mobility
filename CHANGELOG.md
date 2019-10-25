@@ -2,6 +2,15 @@
 
 ## 0.8
 
+### 0.8.9 (October 25, 2019)
+* Fix Dirty plugin to work with Rails 6
+  ([#343](https://github.com/shioyama/mobility/pull/343),
+  [#348](https://github.com/shioyama/mobility/pull/348),
+  [#352](https://github.com/shioyama/mobility/pull/352) on master branch, plus
+  [#351](https://github.com/shioyama/mobility/pull/351) to sync to 0-8-stable
+  branch). Summary of changes
+  [here](https://github.com/shioyama/mobility/pull/347#issuecomment-544742401).
+
 ### 0.8.8 (September 18, 2019)
 * Accept any number of arguments to `Arel::Visitors::Visitor#visit`
   ([#339](https://github.com/shioyama/mobility/pull/339)). (Thanks to

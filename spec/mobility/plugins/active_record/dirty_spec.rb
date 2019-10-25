@@ -150,11 +150,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       aggregate_failures do
         expect(article.changed?).to eq(true)
         expect(article.title_changed?).to eq(true)
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.content_changed?).to eq(nil)
-        else
-          expect(article.content_changed?).to eq(false)
-        end
+        expect(article.content_changed?).to eq(false)
         expect(article.title_change).to eq(["foo", "foo"])
         expect(article.content_change).to eq(nil)
         expect(article.previous_changes).to include({ "title_en" => [nil, "foo"]})
@@ -208,12 +204,10 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         expect(article.title_change).to eq(nil)
         expect(article.title_was).to eq("foo")
 
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
+        expect(article.title_changed?).to eq(false)
+        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
           expect(article.title_previously_changed?).to eq(true)
           expect(article.title_previous_change).to eq([nil, "foo"])
-          expect(article.title_changed?).to eq(false)
         end
 
         # AR-specific suffix methods, added in AR 5.1
@@ -294,11 +288,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         article.save!
 
         aggregate_failures "after save" do
-          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-            expect(article.title_changed?).to eq(nil)
-          else
-            expect(article.title_changed?).to eq(false)
-          end
+          expect(article.title_changed?).to eq(false)
 
           # AR-specific suffix methods
           if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
@@ -331,11 +321,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         expect(article.title_was).to eq("foo")
 
         Mobility.locale = :fr
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] < '5.0'
-          expect(article.title_changed?).to eq(nil)
-        else
-          expect(article.title_changed?).to eq(false)
-        end
+        expect(article.title_changed?).to eq(false)
         expect(article.title_change).to eq(nil)
         expect(article.title_was).to eq(nil)
       end

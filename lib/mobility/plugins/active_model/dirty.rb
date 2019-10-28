@@ -52,15 +52,11 @@ the ActiveRecord dirty plugin for more information.
           end
 
           def included(model_class)
+            private_methods = InstanceMethods.instance_methods & model_class.private_instance_methods
             model_class.include InstanceMethods
-            model_class.include handler_methods_module
+            model_class.class_eval { private(*private_methods) }
 
-            # In earlier versions of Rails, these methods are private
-            %i[clear_attribute_changes clear_changes_information changes_applied].each do |method_name|
-              if dirty_class.private_instance_methods.include?(method_name)
-                model_class.class_eval { private method_name }
-              end
-            end
+            model_class.include handler_methods_module
           end
 
           def append_locale(attr_name)

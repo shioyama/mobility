@@ -26,7 +26,7 @@ Values are added to the cache in two ways:
       included_hook do |model_class, backend_class|
         if options[:cache]
           backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
-          CacheResetter.apply(model_class, names)
+          model_class.include CacheResetter.new(*names)
         end
       end
 
@@ -66,26 +66,48 @@ Values are added to the cache in two ways:
       end
 
       class CacheResetter < Module
-        def self.apply(klass, names)
-          methods = []
-          if Loaded::ActiveRecord && klass < ::ActiveRecord::Base
-            methods = %i[changes_applied clear_changes_information reload]
-          elsif Loaded::ActiveRecord && klass.ancestors.include?(::ActiveModel::Dirty)
-            methods = %i[changes_applied clear_changes_information]
-          elsif Loaded::Sequel && klass < ::Sequel::Model
-            methods = %i[refresh]
-          end
+        def initialize(*names)
+          @names = names
+        end
 
-          resetter = new do
-            methods.each do |method|
-              define_method method do |*args|
-                super(*args).tap do
-                  names.each { |name| mobility_backends[name].clear_cache }
-                end
+        def included(klass)
+          names = @names
+
+          method_names(klass).each do |method_name|
+            priv = klass.private_instance_methods.include?(method_name)
+            define_method method_name do |*args|
+              super(*args).tap do
+                names.each { |name| mobility_backends[name].clear_cache }
               end
             end
+            private method_name if priv
           end
-          klass.include resetter
+        end
+
+        private
+
+        def method_names(klass)
+          if Loaded::ActiveRecord && klass < ::ActiveRecord::Base
+            active_record_methods
+          elsif Loaded::ActiveRecord && klass.ancestors.include?(::ActiveModel::Dirty)
+            active_model_methods
+          elsif Loaded::Sequel && klass < ::Sequel::Model
+            sequel_methods
+          else
+            []
+          end
+        end
+
+        def active_record_methods
+          %i[changes_applied clear_changes_information reload]
+        end
+
+        def active_model_methods
+          %i[changes_applied clear_changes_information]
+        end
+
+        def sequel_methods
+          %i[refresh]
         end
       end
     end

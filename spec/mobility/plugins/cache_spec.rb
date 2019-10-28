@@ -109,6 +109,24 @@ describe Mobility::Plugins::Cache do
         it_behaves_like "cache that resets on model action", :reload
         it_behaves_like "cache that resets on model action", :reload, { readonly: true, lock: true }
         it_behaves_like "cache that resets on model action", :save
+
+        # borrowed from dirty plugin specs
+        %w[changes_applied clear_changes_information].each do |method_name|
+          it "does not change private status of #{method_name}" do
+            # Create a dummy vanilla AR model so we can inspect its methods and
+            # ensure we haven't made anything that was private, public. By
+            # doing it like this, we ensure that the test works for all
+            # versions of Rails (private/public status of various methods has
+            # changed between versions.)
+            klass = Class.new(ActiveRecord::Base) do
+              self.table_name = 'articles'
+            end
+            ar = klass.new
+
+            expect(instance.respond_to?(method_name)).to eq(ar.respond_to?(method_name))
+            expect(instance.respond_to?(method_name, true)).to eq(ar.respond_to?(method_name, true))
+          end
+        end
       end
 
       context "with multiple backends" do

@@ -4,7 +4,7 @@ module Mobility
 =begin
 
 Defines convenience methods on plugin module to hook into initialize/included
-method calls on +Mobility::Attriubtes+ instance.
+method calls on +Mobility::Attributes+ instance.
 
 - #initialize_hook: called after {{Mobility::Attributes#initialize}, with
   attribute names and options hash.

@@ -122,7 +122,7 @@ the ActiveRecord dirty plugin for more information.
 
             def public_method_patterns
               @public_method_patterns ||= method_patterns.select do |p|
-                !dirty_class.private_instance_methods.include?(:"#{p % 'attribute'}")
+                dirty_class.public_method_defined?(p % 'attribute')
               end
             end
 

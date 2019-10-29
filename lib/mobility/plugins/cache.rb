@@ -74,7 +74,7 @@ Values are added to the cache in two ways:
           names = @names
 
           method_names(klass).each do |method_name|
-            priv = klass.private_instance_methods.include?(method_name)
+            priv = klass.private_method_defined?(method_name)
             define_method method_name do |*args|
               super(*args).tap do
                 names.each { |name| mobility_backends[name].clear_cache }

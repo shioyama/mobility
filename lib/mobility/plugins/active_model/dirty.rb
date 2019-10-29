@@ -45,7 +45,7 @@ the ActiveRecord dirty plugin for more information.
         # Builds module which adds suffix/prefix methods for translated
         # attributes so they act like normal dirty-tracked attributes.
         class MethodsBuilder < Module
-          delegate :dirty_class, :handler_methods_module, :method_patterns, to: :class
+          delegate :handler_methods_module, :method_patterns, to: :class
 
           def initialize(*attribute_names)
             define_dirty_methods(attribute_names)

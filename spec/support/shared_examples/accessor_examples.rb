@@ -36,10 +36,10 @@ shared_examples_for "model with translated attribute accessors" do |model_class_
       Mobility.with_locale(:ja) do
         expect(instance.public_send(attribute1)).to eq("あああ")
         expect(instance.public_send(attribute2)).to eq(nil)
-        expect(instance.public_send(attribute1, { locale: :en })).to eq("foo")
-        expect(instance.public_send(attribute2, { locale: :en })).to eq("bar")
+        expect(instance.public_send(attribute1, **{ locale: :en })).to eq("foo")
+        expect(instance.public_send(attribute2, **{ locale: :en })).to eq("bar")
       end
-      expect(instance.public_send(attribute1, { locale: :ja })).to eq("あああ")
+      expect(instance.public_send(attribute1, **{ locale: :ja })).to eq("あああ")
     end
 
     instance.save

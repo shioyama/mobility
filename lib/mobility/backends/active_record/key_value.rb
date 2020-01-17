@@ -51,7 +51,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         #   translation table value column
         def build_node(attr, locale)
           aliased_table = class_name.arel_table.alias(table_alias(attr, locale))
-          Arel::Attribute.new(aliased_table, :value, locale, self, attribute_name: attr.to_sym)
+          Arel::Attribute.new(aliased_table, :value, locale, self, attr.to_sym)
         end
 
         # Joins translations using either INNER/OUTER join appropriate to the query.

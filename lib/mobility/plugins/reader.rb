@@ -19,13 +19,13 @@ Defines attribute reader that delegates to +Mobility::Backend#read+.
             class_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{name}(locale: nil, **options)
                 #{Reader.setup_source}
-                mobility_backends[:#{name}].read(locale, options)
+                mobility_backends[:#{name}].read(locale, **options)
               end
             EOM
             class_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{name}?(locale: nil, **options)
                 #{Reader.setup_source}
-                mobility_backends[:#{name}].present?(locale, options)
+                mobility_backends[:#{name}].present?(locale, **options)
               end
             EOM
           end

@@ -19,7 +19,7 @@ Defines attribute writer that delegates to +Mobility::Backend#write+.
             class_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{name}=(value, locale: nil, **options)
                 #{Writer.setup_source}
-                mobility_backends[:#{name}].write(locale, value, options)
+                mobility_backends[:#{name}].write(locale, value, **options)
               end
             EOM
           end

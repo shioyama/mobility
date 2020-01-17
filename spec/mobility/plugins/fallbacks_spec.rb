@@ -69,7 +69,7 @@ describe Mobility::Plugins::Fallbacks, type: :plugin do
     it "does not modify options passed in" do
       options = { fallback: false }
       allow(listener).to receive(:read).once
-      backend.read(:'en-US', options)
+      backend.read(:'en-US', **options)
       expect(options).to eq({ fallback: false })
     end
   end

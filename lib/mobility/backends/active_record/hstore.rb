@@ -18,7 +18,7 @@ Implements the {Mobility::Backends::Hstore} backend for ActiveRecord models.
 
         # @!macro backend_writer
         def write(locale, value, options = {})
-          super(locale, value && value.to_s, options)
+          super(locale, value && value.to_s, **options)
         end
         # @!endgroup
 

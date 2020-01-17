@@ -39,7 +39,7 @@ backend.
           if options.delete(:presence) == false
             super
           else
-            super(locale, Presence[value], options)
+            super(locale, Presence[value], **options)
           end
         end
         # @!endgroup

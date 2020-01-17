@@ -393,7 +393,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
 
   describe "Arel queries" do
     # Shortcut for passing block to e.g. Post.i18n
-    def query(*args, &block); model_class.i18n(*args, &block); end
+    def query(*args, **kwargs, &block); model_class.i18n(*args, **kwargs, &block); end
 
     context "single-block querying" do
       let!(:i) { [

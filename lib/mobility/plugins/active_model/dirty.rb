@@ -79,8 +79,8 @@ the ActiveRecord dirty plugin for more information.
         def define_dirty_methods(attribute_names)
           attribute_names.each do |name|
             dirty_handler_methods.each_pattern(name) do |method_name, attribute_method|
-              define_method(method_name) do |*args|
-                mutations_from_mobility.send(attribute_method, Dirty.append_locale(name), *args)
+              define_method(method_name) do |*args, **kwargs|
+                mutations_from_mobility.send(attribute_method, Dirty.append_locale(name), *args, **kwargs)
               end
             end
 
@@ -131,10 +131,10 @@ the ActiveRecord dirty plugin for more information.
               method_name = pattern % 'attribute'
 
               module_eval <<-EOM, __FILE__, __LINE__ + 1
-              def #{method_name}(attr_name, *rest)
+              def #{method_name}(attr_name, *rest, **kwargs)
                 if (mutations_from_mobility.attribute_changed?(attr_name) ||
                     mutations_from_mobility.attribute_previously_changed?(attr_name))
-                  mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest)
+                  mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest, **kwargs)
                 else
                   super
                 end
@@ -330,11 +330,11 @@ the ActiveRecord dirty plugin for more information.
           # @!group Backend Accessors
           # @!macro backend_writer
           # @param [Hash] options
-          def write(locale, value, options = {})
+          def write(locale, value, **options)
             locale_accessor = Mobility.normalize_locale_accessor(attribute, locale)
             if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
               mutations_from_mobility.restore_attribute!(locale_accessor)
-            elsif read(locale, options.merge(locale: true)) != value
+            elsif read(locale, **options.merge(locale: true)) != value
               mutations_from_mobility.attribute_will_change!(locale_accessor)
             end
             super

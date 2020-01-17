@@ -283,7 +283,7 @@ columns to that table.
 
       # Returns translation for a given locale, or builds one if none is present.
       # @param [Symbol] locale
-      def translation_for(locale, _)
+      def translation_for(locale, **)
         translation = translations.in_locale(locale)
         translation ||= translations.build(locale: locale)
         translation

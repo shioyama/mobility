@@ -52,12 +52,12 @@ module Helpers
       Class.new.tap do |klass|
         klass.class_eval do
           include Mobility::Backend
-          define_method :read do |*args, **opts|
-            listener.read(*args, **opts)
+          define_method :read do |locale, **options|
+            listener.read(locale, options)
           end
 
-          define_method :write do |*args, **opts|
-            listener.write(*args, **opts)
+          define_method :write do |locale, value, **options|
+            listener.write(locale, value, options)
           end
         end
       end

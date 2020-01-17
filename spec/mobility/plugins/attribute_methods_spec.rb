@@ -21,14 +21,14 @@ describe Mobility::Plugins::AttributeMethods, orm: :active_record do
 
   describe "#translated_attributes" do
     it "returns hash of translated attribute names/values" do
-      expect(backend).to receive(:read).once.with(Mobility.locale, {}).and_return('foo')
+      expect(backend).to receive(:read).once.with(Mobility.locale, any_args).and_return('foo')
       expect(instance.translated_attributes).to eq('title' => 'foo')
     end
   end
 
   describe "#attributes" do
     it "adds translated attributes to normal attributes" do
-      expect(backend).to receive(:read).once.with(Mobility.locale, {}).and_return('foo')
+      expect(backend).to receive(:read).once.with(Mobility.locale, any_args).and_return('foo')
       expect(instance.attributes).to eq(untranslated_attributes.merge('title' => 'foo'))
     end
   end

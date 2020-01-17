@@ -57,12 +57,12 @@ other backends on model (otherwise one will overwrite the other).
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, options = {})
-        translation_for(locale, options).value
+        translation_for(locale, **options).value
       end
 
       # @!macro backend_writer
       def write(locale, value, options = {})
-        translation_for(locale, options).value = value
+        translation_for(locale, **options).value = value
       end
       # @!endgroup
 
@@ -125,7 +125,7 @@ other backends on model (otherwise one will overwrite the other).
           if cache.has_key?(locale)
             cache[locale]
           else
-            cache[locale] = super(locale, options)
+            cache[locale] = super(locale, **options)
           end
         end
 

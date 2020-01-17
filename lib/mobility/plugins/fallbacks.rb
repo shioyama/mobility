@@ -48,7 +48,7 @@ the current locale was +nil+.
   Mobility.locale = :ja
   post.title
   #=> "foo"
- 
+
   post.title = "bar"
   post.title
   #=> "bar"
@@ -141,15 +141,15 @@ the current locale was +nil+.
 
         def define_read(fallbacks)
           define_method :read do |locale, fallback: true, **options|
-            return super(locale, options) if !fallback || options[:locale]
+            return super(locale, **options) if !fallback || options[:locale]
 
             locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
             locales.each do |fallback_locale|
-              value = super(fallback_locale, options)
+              value = super(fallback_locale, **options)
               return value if Util.present?(value)
             end
 
-            super(locale, options)
+            super(locale, **options)
           end
         end
 

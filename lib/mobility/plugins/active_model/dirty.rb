@@ -297,7 +297,7 @@ the ActiveRecord dirty plugin for more information.
             locale_accessor = Mobility.normalize_locale_accessor(attribute, locale)
             if model.changed_attributes.has_key?(locale_accessor) && model.changed_attributes[locale_accessor] == value
               mutations_from_mobility.restore_attribute!(locale_accessor)
-            elsif read(locale, options.merge(locale: true)) != value
+            elsif read(locale, **options.merge(locale: true)) != value
               mutations_from_mobility.attribute_will_change!(locale_accessor)
             end
             super

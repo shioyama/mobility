@@ -37,11 +37,11 @@ Values are added to the cache in two ways:
         # @!method read(locale, value, options = {})
         #   @option options [Boolean] cache *false* to disable cache.
         def read(locale, **options)
-          return super(locale, options) if options.delete(:cache) == false
+          return super(locale, **options) if options.delete(:cache) == false
           if cache.has_key?(locale)
             cache[locale]
           else
-            cache[locale] = super(locale, options)
+            cache[locale] = super(locale, **options)
           end
         end
 

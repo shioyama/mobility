@@ -191,13 +191,13 @@ with other backends.
         def #{attribute}(**options)
           return super() if options.delete(:super)
           #{set_locale_from_options_inline}
-          mobility_backends[:#{attribute}].read(locale, options)
+          mobility_backends[:#{attribute}].read(locale, **options)
         end
 
         def #{attribute}?(**options)
           return super() if options.delete(:super)
           #{set_locale_from_options_inline}
-          mobility_backends[:#{attribute}].present?(locale, options)
+          mobility_backends[:#{attribute}].present?(locale, **options)
         end
       EOM
     end
@@ -207,7 +207,7 @@ with other backends.
         def #{attribute}=(value, **options)
           return super(value) if options.delete(:super)
           #{set_locale_from_options_inline}
-          mobility_backends[:#{attribute}].write(locale, value, options)
+          mobility_backends[:#{attribute}].write(locale, value, **options)
         end
       EOM
     end

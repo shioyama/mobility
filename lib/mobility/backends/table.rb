@@ -90,7 +90,7 @@ set.
 
       # @!macro backend_writer
       def write(locale, value, options = {})
-        translation_for(locale, options).send("#{attribute}=", value)
+        translation_for(locale, **options).send("#{attribute}=", value)
       end
       # @!endgroup
 
@@ -139,7 +139,7 @@ set.
           if cache.has_key?(locale)
             cache[locale]
           else
-            cache[locale] = super(locale, options)
+            cache[locale] = super(locale, **options)
           end
         end
 

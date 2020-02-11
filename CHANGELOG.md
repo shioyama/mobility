@@ -2,6 +2,10 @@
 
 ## 0.8
 
+### 0.8.10 (February 11, 2020)
+* Enforce case_sensitive comparison for Rails 6.1
+  ([#333](https://github.com/shioyama/mobility/pull/333), thanks [morozRed](https://github.com/morozRed)!)
+
 ### 0.8.9 (October 25, 2019)
 * Fix Dirty plugin to work with Rails 6
   ([#343](https://github.com/shioyama/mobility/pull/343),

@@ -176,7 +176,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
 
     it "returns correct message" do
       out = capture(:stderr) { run_generator ["Foo", "--backend=#{backend_name}"] }
-      expect(out.chomp).to eq("The #{backend_name} backend does not have a translations generator.")
+      expect(out.chomp).to include("The #{backend_name} backend does not have a translations generator.")
     end
   end
 

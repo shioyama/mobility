@@ -38,6 +38,12 @@ matrix:
       env: DB=mysql ORM=active_record RAILS_VERSION=6.0
     - rvm: 2.4
       env: DB=sqlite3 ORM=active_record RAILS_VERSION=6.0
+    - rvm: 2.7
+      env: DB=postgres ORM=active_record RAILS_VERSION=4.2
+    - rvm: 2.7
+      env: DB=mysql ORM=active_record RAILS_VERSION=4.2
+    - rvm: 2.7
+      env: DB=sqlite3 ORM=active_record RAILS_VERSION=4.2
 
 before_script:
   - bundle exec rake db:create db:up

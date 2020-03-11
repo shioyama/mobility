@@ -53,7 +53,7 @@ model class is generated.
             locale = "#{locale}-#{suffix.upcase}" if suffix
             public_send("#{attribute}#{$4}", *arguments, **options, locale: locale.to_sym)
           else
-            super(method_name, *arguments, &block)
+            super(method_name, *arguments, **options, &block)
           end
         end
 

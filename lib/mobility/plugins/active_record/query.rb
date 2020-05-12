@@ -140,7 +140,7 @@ enabled for any one attribute on the model.
           if ::ActiveRecord::VERSION::STRING >= '5.0'
             %w[pluck group select].each do |method_name|
               define_method method_name do |*attrs, &block|
-                return super(&block) if (method_name == 'select' && block.present?)
+                return super(*attrs, &block) if (method_name == 'select' && block.present?)
 
                 return super(*attrs) unless attrs.any?(&@klass.method(:mobility_attribute?))
 

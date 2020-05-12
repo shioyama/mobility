@@ -352,12 +352,6 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
       end
     end
 
-    describe "passing a block to .select" do
-      it "won't throw any error" do
-        expect { ordered_results.select {} }.not_to raise_error
-      end
-    end
-
     describe "selecting translated attributes" do
       it "returns value from attribute methods on results" do
         selected = ordered_results.select(a1)
@@ -383,6 +377,16 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
       it "works with count and group on two attributes" do
         selected = query_scope.select(a1).group(a1, a2)
         expect(selected.count).to eq({ ["foo", "baz"] => 2, ["bar", "baz"] => 1, ["bar", "foo"] => 2 })
+      end
+    end
+
+    describe "ActiveRecord compatibility" do
+      it ".select does not throw any exception when passed a block" do
+        expect { ordered_results.select {} }.not_to raise_error
+      end
+
+      it ".select does throw exception when passed a block with arguments" do
+        expect { ordered_results.select(:foo) {} }.to raise_error(ArgumentError)
       end
     end
   end

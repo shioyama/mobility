@@ -142,7 +142,7 @@ enabled for any one attribute on the model.
               define_method method_name do |*attrs, &block|
                 return super(*attrs, &block) if (method_name == 'select' && block.present?)
 
-                return super(*attrs) unless attrs.any?(&@klass.method(:mobility_attribute?))
+                return super(*attrs, &block) unless attrs.any?(&@klass.method(:mobility_attribute?))
 
                 keys = attrs.dup
 
@@ -156,7 +156,7 @@ enabled for any one attribute on the model.
                   @klass.mobility_backend_class(key).apply_scope(query, backend_node(key))
                 end
 
-                base.public_send(method_name, *keys)
+                base.public_send(method_name, *keys, &block)
               end
             end
           end

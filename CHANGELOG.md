@@ -2,6 +2,9 @@
 
 ## 0.8
 
+### 0.8.11 (May 14, 2020)
+* Handle select with block ([#359](https://github.com/shioyama/mobility/pull/359))
+
 ### 0.8.10 (February 11, 2020)
 * Enforce case_sensitive comparison for Rails 6.1
   ([#333](https://github.com/shioyama/mobility/pull/333), thanks [morozRed](https://github.com/morozRed)!)

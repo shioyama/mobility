@@ -10,6 +10,22 @@ describe Mobility::Plugins::FallthroughAccessors do
     it_behaves_like "locale accessor", :title, :de
     it_behaves_like "locale accessor", :title, :'pt-BR'
     it_behaves_like "locale accessor", :title, :'ru'
+
+    it 'passes arguments and options to super when method does not match' do
+      mod = Module.new do
+        def method_missing(method_name, *_args, **options, &block)
+          (method_name == :foo) ? options : super
+        end
+      end
+
+      model_class.include mod
+      model_class.include attributes
+
+      instance = model_class.new
+
+      options = { some: 'params' }
+      expect(instance.foo(**options)).to eq(options)
+    end
   end
 
   context "option value is false" do

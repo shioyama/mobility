@@ -16,6 +16,23 @@ describe Mobility::Plugins::FallthroughAccessors do
     it_behaves_like "locale accessor", :title, :en
     it_behaves_like "locale accessor", :title, :de
     it_behaves_like "locale accessor", :title, :'pt-BR'
+
+    it 'passes arguments and options to super when method does not match' do
+      mod = Module.new do
+        def method_missing(method_name, *_args, **options, &block)
+          (method_name == :foo) ? options : super
+        end
+      end
+
+      klass = Class.new
+      klass.include mod
+      klass.include described_class.new
+
+      instance = klass.new
+
+      options = { some: 'params' }
+      expect(instance.foo(**options)).to eq(options)
+    end
   end
 
   describe ".apply" do

@@ -2,8 +2,15 @@
 
 ## 0.8
 
+### 0.8.12 (May 15, 2020)
+* Fix fallthrough accessor method_missing not passing all options to super
+  ([#364](https://github.com/shioyama/mobility/pull/364), thanks
+  [doits](https://github.com/doits)!)
+
 ### 0.8.11 (May 14, 2020)
-* Handle select with block ([#359](https://github.com/shioyama/mobility/pull/359))
+* Handle select with block
+  ([#359](https://github.com/shioyama/mobility/pull/359), thanks
+  [dlcmh](https://github.com/dlcmh)!)
 
 ### 0.8.10 (February 11, 2020)
 * Enforce case_sensitive comparison for Rails 6.1

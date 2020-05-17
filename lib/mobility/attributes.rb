@@ -137,13 +137,15 @@ with other backends.
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
       @options = Mobility.default_options.to_h.merge(backend_options)
       @names = attribute_names.map(&:to_s).freeze
-      raise BackendRequired, "Backend option required if Mobility.config.default_backend is not set." if backend.nil?
+
       @backend_name = backend
 
-      attribute_names.each do |name|
-        define_backend(name)
-        define_reader(name) if %i[accessor reader].include?(method)
-        define_writer(name) if %i[accessor writer].include?(method)
+      unless backend.nil?
+        attribute_names.each do |name|
+          define_backend(name)
+          define_reader(name) if %i[accessor reader].include?(method)
+          define_writer(name) if %i[accessor writer].include?(method)
+        end
       end
     end
 
@@ -152,16 +154,18 @@ with other backends.
     # {Mobility::Backend::Setup#setup_model}).
     # @param klass [Class] Class of model
     def included(klass)
-      @backend_class = Backends.load_backend(backend_name)
-        .for(klass)
-        .with_options(options.merge(model_class: klass))
+      if backend_name
+        @backend_class = Backends.load_backend(backend_name)
+          .for(klass)
+          .with_options(options.merge(model_class: klass))
 
-      klass.include InstanceMethods
-      klass.extend ClassMethods
+        klass.include InstanceMethods
+        klass.extend ClassMethods
 
-      backend_class.setup_model(klass, names)
+        backend_class.setup_model(klass, names)
 
-      backend_class
+        backend_class
+      end
     end
 
     # Yield each attribute name to block

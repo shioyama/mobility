@@ -21,17 +21,6 @@ describe Mobility::Attributes do
     it "raises ArgumentError if method is not reader, writer or accessor" do
       expect { described_class.new(method: :foo) }.to raise_error(ArgumentError)
     end
-
-    it "raises BackendRequired error if backend is nil and no default is set" do
-      expect { described_class.new("title") }.to raise_error(Mobility::BackendRequired)
-    end
-
-    it "does not raise error if backend is nil but default_backend is set" do
-      original_default_backend = Mobility.config.default_backend
-      Mobility.config.default_backend = :null
-      expect { described_class.new("title") }.not_to raise_error
-      Mobility.config.default_backend = original_default_backend
-    end
   end
 
   describe "including Attributes in a model" do

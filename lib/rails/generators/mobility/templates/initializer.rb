@@ -32,11 +32,6 @@ Mobility.configure do |config|
   #   locale_accessors
   # ]
 
-  # The translation cache is on by default, but you can turn it off by
-  # uncommenting this line. (This may be helpful in debugging.)
-  #
-  # config.default_options[:cache] = false
-
   # Dirty tracking is disabled by default. Uncomment this line to enable it.
   # If you enable this, you should also enable +locale_accessors+ by default
   # (see below).

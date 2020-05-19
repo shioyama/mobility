@@ -29,16 +29,4 @@ describe Mobility::Configuration do
       expect(subject.default_accessor_locales).to eq([:en, :de])
     end
   end
-
-  describe "#default_options" do
-    it "raises exception when reserved option keys are set" do
-      aggregate_failures do
-        %i[backend model_class].each do |reserved_key|
-          expect {
-            subject.default_options[reserved_key] = "value"
-          }.to raise_error(Mobility::Configuration::ReservedOptionKey)
-        end
-      end
-    end
-  end
 end

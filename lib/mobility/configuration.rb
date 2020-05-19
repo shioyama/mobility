@@ -71,14 +71,6 @@ Stores shared Mobility configuration referenced by all backends.
       @query_method = :i18n
       @fallbacks_generator = lambda { |fallbacks| Mobility::Fallbacks.build(fallbacks) }
       @default_accessor_locales = lambda { Mobility.available_locales }
-      @default_options = Options[{
-        cache:     true,
-        presence:  true,
-        query:     true,
-        # A nil key here includes the plugin so it can be optionally turned on
-        # when reading an attribute using accessor options.
-        fallbacks: nil
-      }]
     end
 
     def attributes_class
@@ -95,5 +87,14 @@ Stores shared Mobility configuration referenced by all backends.
         super
       end
     end
+
+    DEFAULT_OPTIONS = Options[{
+      cache:     true,
+      presence:  true,
+      query:     true,
+      # A nil key here includes the plugin so it can be optionally turned on
+      # when reading an attribute using accessor options.
+      fallbacks: nil
+    }]
   end
 end

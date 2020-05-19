@@ -108,8 +108,23 @@ with other backends.
 
 =end
   class Attributes < Module
-    def self.plugin(name)
-      include Plugins.load_plugin(name)
+    class << self
+      def plugin(plugin_name)
+        include Plugins.load_plugin(plugin_name)
+      end
+
+      def backend(backend_name)
+        @default_backend = backend_name
+      end
+      attr_reader :default_backend
+
+      def options(options)
+        @default_options = options
+      end
+
+      def default_options
+        @default_options ||= Configuration::DEFAULT_OPTIONS
+      end
     end
 
     # Attribute names for which accessors will be defined
@@ -133,9 +148,9 @@ with other backends.
     # @param [Symbol,Class] backend Backend to use
     # @param [Hash] backend_options Backend options hash
     # @raise [ArgumentError] if method is not reader, writer or accessor
-    def initialize(*attribute_names, method: :accessor, backend: Mobility.default_backend, **backend_options)
+    def initialize(*attribute_names, method: :accessor, backend: self.class.default_backend, **backend_options)
       raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
-      @options = Mobility.default_options.to_h.merge(backend_options)
+      @options = self.class.default_options.merge(backend_options)
       @names = attribute_names.map(&:to_s).freeze
 
       @backend_name = backend

@@ -24,7 +24,7 @@ describe Mobility::Attributes do
   end
 
   describe "including Attributes in a model" do
-    let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: model_class } }
+    let(:expected_options) { { foo: "bar", **Mobility::Attributes.default_options, model_class: model_class } }
 
     it "calls with_options on backend class with options merged with default options" do
       expect(backend_class).to receive(:with_options).with(expected_options).and_return(Class.new(backend_class))
@@ -36,7 +36,7 @@ describe Mobility::Attributes do
       attributes = described_class.new("title", backend: backend_class, foo: "bar")
       model_class.include attributes
       expect(attributes.options.merge(model_class: model_class)).to eq(attributes.backend_class.options)
-      expect(attributes.backend_class.options).to eq(Mobility.default_options.merge(model_class: model_class, foo: "bar"))
+      expect(attributes.backend_class.options).to eq(Mobility::Attributes.default_options.merge(model_class: model_class, foo: "bar"))
     end
 
     it "freezes backend options after inclusion into model class" do
@@ -187,7 +187,7 @@ describe Mobility::Attributes do
         model_class.include described_class.new("title", backend: backend_class, foo: "bar")
       end
       let(:article) { model_class.new }
-      let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: model_class } }
+      let(:expected_options) { { foo: "bar", **Mobility::Attributes.default_options, model_class: model_class } }
 
       it "defines <attribute_name>_backend method which returns backend instance" do
         expect(backend_class).to receive(:new).once.with(article, "title").and_call_original

@@ -299,6 +299,4 @@ EOL
       private_constant :BackendsCache
     end
   end
-
-  class BackendRequired < ArgumentError; end
 end

@@ -23,8 +23,8 @@ Values are added to the cache in two ways:
       extend Plugin
 
       # Applies cache plugin to attributes.
-      included_hook do |model_class, backend_class|
-        if options[:cache]
+      included_hook do |model_class, backend_class, cache: true|
+        if cache
           backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
           model_class.include CacheResetter.new(*names)
         end

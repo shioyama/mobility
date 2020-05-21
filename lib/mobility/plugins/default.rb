@@ -65,7 +65,7 @@ The proc can accept zero to three arguments (see examples below)
       extend Plugin
 
       # Applies default plugin to attributes.
-      included_hook do |_, backend_class|
+      included_hook do |_klass, backend_class|
         backend_class.include(BackendMethods)
       end
 

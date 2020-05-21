@@ -15,8 +15,8 @@ attributes only.
       extend Plugin
 
       # Applies attribute_methods plugin for a given option value.
-      included_hook do |model_class|
-        if options[:attribute_methods]
+      included_hook do |model_class, attribute_methods: nil|
+        if attribute_methods
           include_attribute_methods_module(model_class, *names)
         end
       end

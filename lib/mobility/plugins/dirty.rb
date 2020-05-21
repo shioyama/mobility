@@ -25,12 +25,12 @@ details.
         attributes_class.plugin :fallthrough_accessors
       end
 
-      initialize_hook do
-        options[:fallthrough_accessors] = true if options[:dirty] == true
+      initialize_hook do |dirty: nil|
+        options[:fallthrough_accessors] = true if dirty == true
       end
 
-      included_hook do |model_class, backend_class|
-        if options[:dirty]
+      included_hook do |model_class, backend_class, dirty: nil|
+        if dirty
           include_dirty_modules(backend_class, model_class, *names)
         end
       end

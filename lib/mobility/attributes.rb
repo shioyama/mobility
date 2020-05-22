@@ -116,10 +116,6 @@ with other backends.
     # @return [Array<String>] Array of names
     attr_reader :names
 
-    # Backend options
-    # @return [Hash] Backend options
-    attr_reader :options
-
     # Backend class
     # @return [Class] Backend class
     attr_reader :backend_class
@@ -157,7 +153,7 @@ with other backends.
       if backend_name
         @backend_class = Backends.load_backend(backend_name)
           .for(klass)
-          .with_options(options.merge(model_class: klass))
+          .with_options(@options.merge(model_class: klass))
 
         klass.include InstanceMethods
         klass.extend ClassMethods

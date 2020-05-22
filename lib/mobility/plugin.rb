@@ -34,9 +34,9 @@ method calls on +Mobility::Attributes+ instance.
   module Plugin
     def initialize_hook(&block)
       key = plugin_key
-      define_method :initialize do |*names, **options_|
-        super(*names, **options_)
-        class_exec(*names, **options.slice(key), &block)
+      define_method :initialize do |*names, **options|
+        super(*names, **options)
+        class_exec(*names, **@options.slice(key), &block)
       end
     end
 
@@ -44,7 +44,7 @@ method calls on +Mobility::Attributes+ instance.
       key = plugin_key
       define_method :included do |klass|
         super(klass).tap do |backend_class|
-          class_exec(klass, backend_class, **options.slice(key), &block)
+          class_exec(klass, backend_class, **@options.slice(key), &block)
         end
       end
     end

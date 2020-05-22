@@ -26,7 +26,7 @@ details.
       end
 
       initialize_hook do |dirty: nil|
-        options[:fallthrough_accessors] = true if dirty == true
+        @options[:fallthrough_accessors] = true if dirty == true
       end
 
       included_hook do |model_class, backend_class, dirty: nil|

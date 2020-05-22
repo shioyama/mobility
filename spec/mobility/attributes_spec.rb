@@ -35,7 +35,6 @@ describe Mobility::Attributes do
     it "assigns options to backend class" do
       attributes = described_class.new("title", backend: backend_class, foo: "bar")
       model_class.include attributes
-      expect(attributes.options.merge(model_class: model_class)).to eq(attributes.backend_class.options)
       expect(attributes.backend_class.options).to eq(Mobility.default_options.merge(model_class: model_class, foo: "bar"))
     end
 

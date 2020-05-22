@@ -55,9 +55,9 @@ describe Mobility::Plugins::Dirty do
   context "option value is falsey" do
     plugin_setup dirty: false
 
-    it "does not include Mobility::Plugins::FallthroughAccessors" do
-      expect(attributes.options[:fallthrough_accessors]).not_to be_truthy
+    it "does not define method_missing override" do
       model_class.include attributes
+      expect(attributes.instance_methods(false)).not_to include(:method_missing)
     end
 
     it "does not include any dirty modules into backend class" do

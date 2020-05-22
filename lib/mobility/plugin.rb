@@ -52,7 +52,7 @@ method calls on +Mobility::Attributes+ instance.
     private
 
     def plugin_key
-      to_s.split('::').last.underscore.to_sym
+      Util.underscore(to_s.split('::').last).to_sym
     end
   end
 end

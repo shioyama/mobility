@@ -19,9 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
+          - '2.7'
           - '2.6'
           - '2.5'
-          - '2.4'
         database:
           - 'sqlite3'
           - 'mysql'
@@ -44,40 +44,35 @@ jobs:
         experimental: [false]
         feature: ['unit']
         include:
-          - ruby: '2.6'
+          - ruby: '2.7'
             database: 'sqlite3'
             feature: 'performance'
             experimental: false
-          - ruby: '2.6'
+          - ruby: '2.7'
             database: 'sqlite3'
             feature: 'i18n_fallbacks'
             experimental: false
-          - ruby: '2.6'
+          - ruby: '2.7'
             database: 'sqlite3'
             feature: 'unit'
             orm:
               name: 'active_record'
               version: '6.1'
             experimental: true
-          - ruby: '2.6'
+          - ruby: '2.7'
             database: 'mysql'
             feature: 'unit'
             orm:
               name: 'active_record'
               version: '6.1'
             experimental: true
-          - ruby: '2.6'
+          - ruby: '2.7'
             database: 'postgres'
             feature: 'unit'
             orm:
               name: 'active_record'
               version: '6.1'
             experimental: true
-        exclude:
-          - ruby: '2.4'
-            orm:
-              name: 'active_record'
-              version: '6.0'
     env:
       DB: ${{ matrix.database }}
       BUNDLE_JOBS: 4

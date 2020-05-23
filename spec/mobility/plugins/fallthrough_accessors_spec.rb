@@ -18,6 +18,7 @@ describe Mobility::Plugins::FallthroughAccessors do
         end
       end
 
+      model_class = Class.new
       model_class.include mod
       model_class.include attributes
 

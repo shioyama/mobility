@@ -49,14 +49,18 @@ model class is generated.
       def define_fallthrough_accessors(*names)
         method_name_regex = /\A(#{names.join('|')})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
 
-        define_method :method_missing do |method_name, *arguments, **options, &block|
+        define_method :method_missing do |method_name, *args, &block|
           if method_name =~ method_name_regex
-            attribute = $1.to_sym
+            attribute_method = "#{$1}#{$4}"
             locale, suffix = $2.split('_')
             locale = "#{locale}-#{suffix.upcase}" if suffix
-            public_send("#{attribute}#{$4}", *arguments, **options, locale: locale.to_sym)
+            if $4 == '=' # writer
+              public_send(attribute_method, args[0], **(args[1] || {}), locale: locale.to_sym)
+            else         # reader
+              public_send(attribute_method, **(args[0] || {}), locale: locale.to_sym)
+            end
           else
-            super(method_name, *arguments, **options, &block)
+            super(method_name, *args, &block)
           end
         end
 

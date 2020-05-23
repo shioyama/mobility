@@ -224,13 +224,13 @@ describe Mobility::Attributes do
       shared_examples_for "reader" do
         it "correctly maps getter method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(listener).to receive(:read).with(:de, {}).and_return("foo")
+          expect(listener).to receive(:read).with(:de, any_args).and_return("foo")
           expect(article.title).to eq("foo")
         end
 
         it "correctly maps presence method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(listener).to receive(:read).with(:de, {}).and_return("foo")
+          expect(listener).to receive(:read).with(:de, any_args).and_return("foo")
           expect(article.title?).to eq(true)
         end
 
@@ -263,7 +263,7 @@ describe Mobility::Attributes do
       shared_examples_for "writer" do
         it "correctly maps setter method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(listener).to receive(:write).with(:de, "foo", {})
+          expect(listener).to receive(:write).with(:de, "foo", any_args)
           article.title = "foo"
         end
 

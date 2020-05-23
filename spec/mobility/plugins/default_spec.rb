@@ -9,32 +9,32 @@ describe Mobility::Plugins::Default do
 
     describe "#read" do
       it "returns value if not nil" do
-        expect(listener).to receive(:read).once.with(:fr, {}).and_return("foo")
+        expect(listener).to receive(:read).once.with(:fr, any_args).and_return("foo")
         expect(backend.read(:fr)).to eq("foo")
       end
 
       it "returns value if value is false" do
-        expect(listener).to receive(:read).once.with(:fr, {}).and_return(false)
+        expect(listener).to receive(:read).once.with(:fr, any_args).and_return(false)
         expect(backend.read(:fr)).to eq(false)
       end
 
       it "returns default if backend return value is nil" do
-        expect(listener).to receive(:read).once.with(:fr, {}).and_return(nil)
+        expect(listener).to receive(:read).once.with(:fr, any_args).and_return(nil)
         expect(backend.read(:fr)).to eq("default foo")
       end
 
       it "returns value of default override if passed as option to reader" do
-        expect(listener).to receive(:read).once.with(:fr, {}).and_return(nil)
+        expect(listener).to receive(:read).once.with(:fr, any_args).and_return(nil)
         expect(backend.read(:fr, default: "default bar")).to eq("default bar")
       end
 
       it "returns nil if passed default: nil as option to reader" do
-        expect(listener).to receive(:read).once.with(:fr, {}).and_return(nil)
+        expect(listener).to receive(:read).once.with(:fr, any_args).and_return(nil)
         expect(backend.read(:fr, default: nil)).to eq(nil)
       end
 
       it "returns false if passed default: false as option to reader" do
-        expect(listener).to receive(:read).once.with(:fr, {}).and_return(nil)
+        expect(listener).to receive(:read).once.with(:fr, any_args).and_return(nil)
         expect(backend.read(:fr, default: false)).to eq(false)
       end
     end

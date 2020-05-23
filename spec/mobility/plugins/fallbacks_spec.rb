@@ -8,7 +8,7 @@ describe Mobility::Plugins::Fallbacks do
     plugin_setup fallbacks: { :'en-US' => 'de-DE', :pt => 'de-DE' }
 
     it "returns value when value is not nil" do
-      allow(listener).to receive(:read).once.with(:ja, {}).and_return("ja val")
+      allow(listener).to receive(:read).once.with(:ja, any_args).and_return("ja val")
       expect(backend.read(:ja)).to eq("ja val")
     end
 
@@ -34,7 +34,7 @@ describe Mobility::Plugins::Fallbacks do
     end
 
     it "returns backend value when fallback: false option is passed" do
-      expect(listener).to receive(:read).once.with(:'en-US', {}).and_return('')
+      expect(listener).to receive(:read).once.with(:'en-US', any_args).and_return('')
       expect(backend.read(:'en-US', fallback: false)).to eq('')
     end
 
@@ -93,9 +93,9 @@ describe Mobility::Plugins::Fallbacks do
     plugin_setup fallbacks: nil
 
     it "does not use fallbacks when accessor fallback option is false or nil" do
-      expect(listener).to receive(:read).with(:'en-US', {}).once.and_return('')
+      expect(listener).to receive(:read).with(:'en-US', any_args).once.and_return('')
       expect(backend.read(:'en-US')).to eq('')
-      expect(listener).to receive(:read).with(:'en-US', {}).once.and_return('')
+      expect(listener).to receive(:read).with(:'en-US', any_args).once.and_return('')
       expect(backend.read(:'en-US', fallback: false)).to eq('')
     end
 
@@ -115,7 +115,7 @@ describe Mobility::Plugins::Fallbacks do
     end
 
     it "does not use fallbacks when fallback: true option is passed" do
-      expect(listener).to receive(:read).once.with(:'en-US', {}).and_return(nil)
+      expect(listener).to receive(:read).once.with(:'en-US', any_args).and_return(nil)
       expect(backend.read(:'en-US', fallback: true)).to eq(nil)
     end
   end

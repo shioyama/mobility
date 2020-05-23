@@ -22,7 +22,7 @@ describe Mobility::Plugins::Cache do
       end
 
       it "does not modify options passed in" do
-        allow(listener).to receive(:read).with(locale, {}).and_return("foo")
+        allow(listener).to receive(:read).with(locale, any_args).and_return("foo")
         options = { cache: false }
         backend.read(locale, options)
         expect(options).to eq({ cache: false })
@@ -50,7 +50,7 @@ describe Mobility::Plugins::Cache do
       end
 
       it "does not modify options passed in" do
-        allow(listener).to receive(:write).with(locale, "foo", {})
+        allow(listener).to receive(:write).with(locale, "foo", any_args)
         options = { cache: false }
         backend.write(locale, "foo", options)
         expect(options).to eq({ cache: false })
@@ -62,14 +62,14 @@ describe Mobility::Plugins::Cache do
     shared_examples_for "cache that resets on model action" do |action, options = nil|
       it "updates backend cache on #{action}" do
         aggregate_failures "reading and writing" do
-          expect(listener).to receive(:write).with(:en, "foo", {}).and_return("foo set")
+          expect(listener).to receive(:write).with(:en, "foo", any_args).and_return("foo set")
           backend.write(:en, "foo")
           expect(backend.read(:en)).to eq("foo set")
         end
 
         aggregate_failures "resetting model" do
           options ? instance.send(action, options) : instance.send(action)
-          expect(listener).to receive(:read).with(:en, {}).and_return("from backend")
+          expect(listener).to receive(:read).with(:en, any_args).and_return("from backend")
           expect(backend.read(:en)).to eq("from backend")
         end
       end
@@ -78,8 +78,8 @@ describe Mobility::Plugins::Cache do
     shared_examples_for "cache that resets on model action with multiple backends" do |action, options = nil|
       it "updates cache on both backends on #{action}" do
         aggregate_failures "reading and writing" do
-          expect(listener).to receive(:write).with(:en, "foo", {}).and_return("foo set")
-          expect(content_listener).to receive(:write).with(:en, "bar", {}).and_return("bar set")
+          expect(listener).to receive(:write).with(:en, "foo", any_args).and_return("foo set")
+          expect(content_listener).to receive(:write).with(:en, "bar", any_args).and_return("bar set")
           backend.write(:en, "foo")
           instance.content_backend.write(:en, "bar")
           expect(backend.read(:en)).to eq("foo set")
@@ -88,9 +88,9 @@ describe Mobility::Plugins::Cache do
 
         aggregate_failures "resetting model" do
           options ? instance.send(action, options) : instance.send(action)
-          expect(listener).to receive(:read).with(:en, {}).and_return("from title backend")
+          expect(listener).to receive(:read).with(:en, any_args).and_return("from title backend")
           expect(backend.read(:en)).to eq("from title backend")
-          expect(content_listener).to receive(:read).with(:en, {}).and_return("from content backend")
+          expect(content_listener).to receive(:read).with(:en, any_args).and_return("from content backend")
           expect(instance.content_backend.read(:en)).to eq("from content backend")
         end
       end

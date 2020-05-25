@@ -72,7 +72,7 @@ describe Mobility::Plugins::Fallbacks do
     end
   end
 
-  if ENV['I18N_FALLBACKS']
+  if ENV['FEATURE'] == 'i18n_fallbacks'
     context "fallbacks is true" do
       plugin_setup fallbacks: true
 

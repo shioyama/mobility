@@ -118,6 +118,11 @@ jobs:
       - name: Install MySQL
         run: sudo apt-get install libmysqlclient-dev mysql-client -y
         if: matrix.database == 'mysql'
+      - id: cache-bundler
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ matrix.ruby }}-${{ matrix.orm.name }}-${{ matrix.orm.version }}-${{ matrix.feature }}-${{ hashFiles('mobility.gemspec') }}-${{ hashFiles('Gemfile') }}
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:

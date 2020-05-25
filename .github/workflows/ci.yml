@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push:
+    branches: [ master 0-8-stable ]
+  pull_request:
+    branches: [ master 0-8-stable ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        ruby:
+          - '2.6'
+          - '2.5'
+          - '2.4'
+        db:
+          - 'sqlite3'
+          - 'mysql'
+          - 'postgres'
+        orm:
+          - 'active_record-4.2'
+          - 'active_record-5.0'
+          - 'active_record-5.1'
+          - 'active_record-5.2'
+          - 'active_record-6.0'
+          - 'active_record-6.1'
+          - 'sequel-4'
+          - 'sequel-5'
+        include:
+          - ruby: '2.6'
+            db: 'sqlite3'
+            performance: true
+          - ruby: '2.6'
+            db: 'sqlite3'
+            i18n_fallbacks: true
+        exclude:
+          - ruby: '2.4'
+            orm: 'active_record-6.0'
+          - ruby: '2.4'
+            orm: 'active_record-6.1'
+    env:
+      DB: $${matrix.db}}
+      ORM: $${{matrix.orm}
+      TEST_PERFORMANCE: $${matrix.performance}
+      I18N_FALLBACKS: $${matrix.i18n_fallbacks}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{matrix.ruby}}
+      - name: Install latest bundler
+        run: gem install bundler --no-document
+      - name: Install dependencies
+        run: bundle install
+      - name: Setup test db
+        run: bundle exec rake db:create db:up
+      - name: Run tests
+        run: bundle exec rake

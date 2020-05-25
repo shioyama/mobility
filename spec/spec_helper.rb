@@ -1,14 +1,24 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-ENV['RAILS_VERSION']  ||= "6.0"
-ENV['SEQUEL_VERSION'] ||= "4"
+if ENV['ORM'] && (ENV['ORM'] != '')
+  orm, orm_version = ENV['ORM'].split('-', 2)
 
-if !ENV['ORM'].nil? && !ENV['ORM'].empty?
-  orm = ENV['ORM']
+  case orm
+  when 'active_record'
+    orm_version ||= '6.0' # default is 6.1
+    ENV['RAILS_VERSION'] = orm_version
+  when 'sequel'
+    orm_version ||= '5'   # default is 5
+    ENV['SEQUEL_VERSION'] = orm_version
+  else
+    raise ArgumentError, 'Invalid ORM'
+  end
+
   require orm
 else
   orm = 'none'
 end
+
 db = ENV['DB'] || 'none'
 require 'pry-byebug'
 require 'i18n'

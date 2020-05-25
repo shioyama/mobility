@@ -1,20 +1,28 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-ENV['RAILS_VERSION']  ||= "6.0"
-ENV['SEQUEL_VERSION'] ||= "4"
+if !ENV['ORM'].nil? && (ENV['ORM'] != '')
+  orm, orm_version = ENV['ORM'], ENV['ORM_VERSION']
 
-if !ENV['ORM'].nil? && !ENV['ORM'].empty?
-  orm = ENV['ORM']
+  case orm
+  when 'active_record'
+    ENV['RAILS_VERSION'] = orm_version || '6.0'
+  when 'sequel'
+    ENV['SEQUEL_VERSION'] = orm_version || '5'
+  else
+    raise ArgumentError, 'Invalid ORM'
+  end
+
   require orm
 else
   orm = 'none'
 end
+
 db = ENV['DB'] || 'none'
 require 'pry-byebug'
 require 'i18n'
-require 'i18n/backend/fallbacks' if ENV['I18N_FALLBACKS']
+require 'i18n/backend/fallbacks' if ENV['FEATURE'] == 'i18n_fallbacks'
 require 'rspec'
-require 'allocation_stats' if ENV['TEST_PERFORMANCE']
+require 'allocation_stats' if ENV['FEATURE'] == 'performance'
 require 'json'
 
 require 'mobility'

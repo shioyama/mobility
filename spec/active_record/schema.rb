@@ -1,6 +1,6 @@
 module Mobility
   module Test
-    if ENV['RAILS_VERSION'] == '4.2'
+    if ::ActiveRecord::VERSION::MAJOR < 5
       parent_class = ::ActiveRecord::Migration
     else
       parent_class = ::ActiveRecord::Migration[[::ActiveRecord::VERSION::MAJOR, ::ActiveRecord::VERSION::MINOR].join(".")]

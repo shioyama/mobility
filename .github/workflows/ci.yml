@@ -1,18 +1,20 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
-
-name: ci
 
 on:
   push:
-    branches: [ master 0-8-stable ]
+    branches:
+      - master
+      - 0-8-stable
   pull_request:
-    branches: [ master 0-8-stable ]
+    branches:
+      - master
+      - 0-8-stable
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    name: ${{ matrix.feature }} ruby-${{ matrix.ruby }} ${{ matrix.orm.name }}-${{ matrix.orm.version}} ${{ matrix.database }}
     strategy:
       fail-fast: true
       matrix:
@@ -20,45 +22,107 @@ jobs:
           - '2.6'
           - '2.5'
           - '2.4'
-        db:
+        database:
           - 'sqlite3'
           - 'mysql'
           - 'postgres'
         orm:
-          - 'active_record-4.2'
-          - 'active_record-5.0'
-          - 'active_record-5.1'
-          - 'active_record-5.2'
-          - 'active_record-6.0'
-          - 'active_record-6.1'
-          - 'sequel-4'
-          - 'sequel-5'
+          - name: 'active_record'
+            version: '4.2'
+          - name: 'active_record'
+            version: '5.0'
+          - name: 'active_record'
+            version: '5.1'
+          - name: 'active_record'
+            version: '5.2'
+          - name: 'active_record'
+            version: '6.0'
+          - name: 'sequel'
+            version: '4'
+          - name: 'sequel'
+            version: '5'
+        experimental: [false]
+        feature: ['unit']
         include:
           - ruby: '2.6'
-            db: 'sqlite3'
-            performance: true
+            database: 'sqlite3'
+            feature: 'performance'
+            experimental: false
           - ruby: '2.6'
-            db: 'sqlite3'
-            i18n_fallbacks: true
+            database: 'sqlite3'
+            feature: 'i18n_fallbacks'
+            experimental: false
+          - ruby: '2.6'
+            database: 'sqlite3'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: '6.1'
+            experimental: true
+          - ruby: '2.6'
+            database: 'mysql'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: '6.1'
+            experimental: true
+          - ruby: '2.6'
+            database: 'postgres'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: '6.1'
+            experimental: true
         exclude:
           - ruby: '2.4'
-            orm: 'active_record-6.0'
-          - ruby: '2.4'
-            orm: 'active_record-6.1'
+            orm:
+              name: 'active_record'
+              version: '6.0'
     env:
-      DB: $${matrix.db}}
-      ORM: $${{matrix.orm}
-      TEST_PERFORMANCE: $${matrix.performance}
-      I18N_FALLBACKS: $${matrix.i18n_fallbacks}
+      DB: ${{ matrix.database }}
+      BUNDLE_JOBS: 4
+      BUNDLE_PATH: vendor/bundle
+      ORM: ${{ matrix.orm.name }}
+      ORM_VERSION: ${{ matrix.orm.version }}
+      MYSQL_PASSWORD: root
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      RAILS_ENV: test
+      FEATURE: ${{ matrix.feature }}
+
+    services:
+      postgres:
+        image: postgres:11.5
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      mysql:
+        image: mysql:5.7
+        ports: ["3306:3306"]
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 5
+        env:
+          MYSQL_ROOT_PASSWORD: root
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Update packages
+        run: sudo apt-get update
+      - name: Install Sqlite
+        run: sudo apt-get install libsqlite3-dev -y
+        if: matrix.database == 'sqlite3'
+      - name: Install Postgres
+        run: sudo apt-get install libpq-dev postgresql-client -y
+        if: matrix.database == 'postgres'
+      - name: Install MySQL
+        run: sudo apt-get install libmysqlclient-dev mysql-client -y
+        if: matrix.database == 'mysql'
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{matrix.ruby}}
-      - name: Install latest bundler
+          ruby-version: ${{ matrix.ruby }}
+      - name: Install latest Bundler
         run: gem install bundler --no-document
       - name: Install dependencies
         run: bundle install

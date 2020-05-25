@@ -2,12 +2,13 @@ Mobility
 ========
 
 [![Gem Version](https://badge.fury.io/rb/mobility.svg)][gem]
-[![Build Status](https://travis-ci.com/shioyama/mobility.svg?branch=master)][travis]
+[![Build Status](https://github.com/shioyama/mobility/workflows/CI/badge.svg)][actions]
 [![Code Climate](https://api.codeclimate.com/v1/badges/72200f2b00c339ec4537/maintainability.svg)][codeclimate]
 [![Gitter Chat](https://badges.gitter.im/mobility-ruby/mobility.svg)](https://gitter.im/mobility-ruby/mobility)
 
+
 [gem]: https://rubygems.org/gems/mobility
-[travis]: https://travis-ci.com/shioyama/mobility
+[actions]: https://github.com/shioyama/mobility/actions
 [codeclimate]: https://codeclimate.com/github/shioyama/mobility
 [docs]: http://www.rubydoc.info/gems/mobility
 [wiki]: https://github.com/shioyama/mobility/wiki

@@ -16,7 +16,7 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     name: ${{ matrix.feature }} ruby-${{ matrix.ruby }} ${{ matrix.orm.name }}-${{ matrix.orm.version}} ${{ matrix.database }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         ruby:
           - '2.6'

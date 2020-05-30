@@ -13,6 +13,12 @@ Mobility
 [docs]: http://www.rubydoc.info/gems/mobility
 [wiki]: https://github.com/shioyama/mobility/wiki
 
+**This is the readme for the [`master`](https://github.com/shioyama/mobility)
+branch, which will eventually become version 1.0 and has changes not included
+in the latest 0.8.x releases. Unless you are actually pointing your Gemfile at
+`master`, you probably want the readme on the [0-8-stable
+branch](https://github.com/shioyama/mobility/tree/0-8-stable).**
+
 Mobility is a gem for storing and retrieving translations as attributes on a
 class. These translations could be the content of blog posts, captions on
 images, tags on bookmarks, or anything else you might want to store in

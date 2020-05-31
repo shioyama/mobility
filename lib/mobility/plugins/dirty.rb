@@ -21,9 +21,7 @@ details.
     module Dirty
       extend Plugin
 
-      def self.included(attributes_class)
-        attributes_class.plugin :fallthrough_accessors
-      end
+      depends_on :fallthrough_accessors
 
       initialize_hook do |dirty: nil|
         @options[:fallthrough_accessors] = true if dirty == true

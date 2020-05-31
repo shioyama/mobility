@@ -49,6 +49,20 @@ method calls on +Mobility::Attributes+ instance.
       end
     end
 
+    def dependencies
+      @dependencies ||= Set.new
+    end
+
+    def depends_on(plugin)
+      dependencies << plugin
+    end
+
+    def included(attributes_class)
+      dependencies.each do |dependency|
+        attributes_class.plugin dependency
+      end
+    end
+
     private
 
     def plugin_key

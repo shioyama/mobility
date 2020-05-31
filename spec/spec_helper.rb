@@ -31,6 +31,9 @@ require "mobility/backends/null"
 # Enable default plugins
 Mobility.configure do |config|
   config.plugins *%i[
+    backend
+    reader
+    writer
     query
     cache
     dirty

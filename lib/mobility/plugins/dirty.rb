@@ -20,6 +20,7 @@ details.
     module Dirty
       extend Plugin
 
+      depends_on :backend, include: :before
       depends_on :fallthrough_accessors, include: :after
 
       initialize_hook do |dirty: nil|

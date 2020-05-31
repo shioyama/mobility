@@ -4,7 +4,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   require "mobility/plugins/active_record/dirty"
 
   include Helpers::Plugins
-  plugin_setup "title", dirty: true
+  plugin_setup "title", dirty: true, reader: true, writer: true
 
   let(:model_class) do
     stub_const 'Article', Class.new(ActiveRecord::Base)
@@ -48,27 +48,27 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
   describe "tracking changes" do
     it "tracks changes in one locale" do
-      Mobility.locale = :'pt-BR'
+      Mobility.locale = locale = :'pt-BR'
 
       aggregate_failures "before change" do
-        expect(instance.title).to eq(nil)
+        expect(backend.read(locale)).to eq(nil)
         expect(instance.changed?).to eq(false)
         expect(instance.changed).to eq([])
         expect(instance.changes).to eq({})
       end
 
       aggregate_failures "set same value" do
-        instance.title = nil
-        expect(instance.title).to eq(nil)
+        backend.write(locale, nil)
+        expect(backend.read(locale)).to eq(nil)
         expect(instance.changed?).to eq(false)
         expect(instance.changed).to eq([])
         expect(instance.changes).to eq({})
       end
 
-      instance.title = "foo"
+      backend.write(locale, 'foo')
 
       aggregate_failures "after change" do
-        expect(instance.title).to eq("foo")
+        expect(backend.read(locale)).to eq("foo")
         expect(instance.changed?).to eq(true)
         expect(instance.changed).to eq(["title_pt_br"])
         expect(instance.changes).to eq({ "title_pt_br" => [nil, "foo"] })
@@ -76,10 +76,11 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
 
     it "tracks previous changes in one locale" do
+      Mobility.locale = locale = :en
       instance = model_class.create(title: "foo")
 
       aggregate_failures do
-        instance.title = "bar"
+        instance.title_backend.write(:en, "bar")
         expect(instance.changed?).to eq(true)
 
         instance.save
@@ -90,9 +91,10 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
 
     it "tracks previous changes in one locale in before_save hook" do
+      Mobility.locale = locale = :en
       instance = model_class.create(title: "foo")
 
-      instance.title = "bar"
+      instance.title_backend.write(locale, 'bar')
       instance.save
 
       instance.singleton_class.class_eval do
@@ -107,10 +109,11 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
 
     it "tracks changes in multiple locales" do
-      expect(instance.title).to eq(nil)
+      Mobility.locale = locale = :en
+      expect(backend.read(locale)).to eq(nil)
 
       aggregate_failures "change in English locale" do
-        instance.title = "English title"
+        backend.write(locale, "English title")
 
         expect(instance.changed?).to eq(true)
         expect(instance.changed).to eq(["title_en"])
@@ -118,9 +121,9 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       end
 
       aggregate_failures "change in French locale" do
-        Mobility.locale = :fr
+        Mobility.locale = locale = :fr
 
-        instance.title = "Titre en Francais"
+        backend.write(locale, "Titre en Francais")
         expect(instance.changed?).to eq(true)
         expect(instance.changed).to match_array(["title_en", "title_fr"])
         expect(instance.changes).to eq({ "title_en" => [nil, "English title"], "title_fr" => [nil, "Titre en Francais"] })
@@ -128,11 +131,13 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
 
     it "tracks previous changes in multiple locales" do
+      Mobility.locale = :en
       instance = model_class.create(title_en: "English title 1", title_fr: "Titre en Francais 1")
 
-      instance.title = "English title 2"
-      Mobility.locale = :fr
-      instance.title = "Titre en Francais 2"
+      backend = instance.title_backend
+
+      backend.write(:en, "English title 2")
+      backend.write(:fr, "Titre en Francais 2")
 
       instance.save
 
@@ -164,24 +169,25 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
 
     it "resets changes when locale is set to original value" do
+      Mobility.locale = locale = :en
       expect(instance.changed?).to eq(false)
 
       aggregate_failures "after change" do
-        instance.title = "foo"
+        backend.write(locale, "foo")
         expect(instance.changed?).to eq(true)
         expect(instance.changed).to eq(["title_en"])
         expect(instance.changes).to eq({ "title_en" => [nil, "foo"] })
       end
 
       aggregate_failures "after setting attribute back to original value" do
-        instance.title = nil
+        backend.write(locale, nil)
         expect(instance.changed?).to eq(false)
         expect(instance.changed).to eq([])
         expect(instance.changes).to eq({})
       end
 
       aggregate_failures "changing value in different locale" do
-        Mobility.with_locale(:fr) { instance.title = "Titre en Francais" }
+        backend.write(:fr, "Titre en Francais")
 
         expect(instance.changed?).to eq(true)
         expect(instance.changed).to eq(["title_fr"])
@@ -192,7 +198,8 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
   describe "suffix methods" do
     it "defines suffix methods on translated attribute" do
-      instance.title = "foo"
+      Mobility.locale = :en
+      backend.write(:en, 'foo')
 
       instance.save
       aggregate_failures "after save" do
@@ -221,7 +228,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         end
       end
 
-      instance.title = "bar"
+      backend.write(:en, 'bar')
 
       aggregate_failures "changed after save" do
         expect(instance.title_changed?).to eq(true)
@@ -309,7 +316,8 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     it "returns changes on attribute for current locale" do
       instance = model_class.create(title: "foo")
 
-      instance.title = "bar"
+      backend = instance.title_backend
+      backend.write(:en, "bar")
 
       aggregate_failures do
         expect(instance.title_changed?).to eq(true)
@@ -344,10 +352,10 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
   describe "restoring attributes" do
     it "defines restore_<attribute>! for translated attributes" do
-      Mobility.locale = :'pt-BR'
+      Mobility.locale = locale = :'pt-BR'
       instance = model_class.create
 
-      instance.title = "foo"
+      backend.write(locale, 'foo')
 
       instance.restore_title!
       expect(instance.title).to eq(nil)
@@ -357,7 +365,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     it "restores attribute when passed to restore_attribute!" do
       instance = model_class.create
 
-      instance.title = "foo"
+      backend.write(:en, "foo")
       instance.send :restore_attribute!, :title
 
       expect(instance.title).to eq(nil)
@@ -365,13 +373,14 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
     it "handles translated attributes when passed to restore_attributes" do
       instance = model_class.create(title: "foo")
+      backend = instance.title_backend
 
-      expect(instance.title).to eq("foo")
+      expect(backend.read(:en)).to eq("foo")
 
-      instance.title = "bar"
-      expect(instance.title).to eq("bar")
+      backend.write(:en, 'bar')
+      expect(backend.read(:en)).to eq("bar")
       instance.restore_attributes([:title])
-      expect(instance.title).to eq("foo")
+      expect(backend.read(:en)).to eq("foo")
     end
   end
 
@@ -379,9 +388,10 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     shared_examples_for "resets on model action" do |action|
       it "resets changes when model on #{action}" do
         instance = model_class.create
+        backend = instance.title_backend
 
         aggregate_failures do
-          instance.title = "foo"
+          backend.write(:en, 'foo')
           expect(instance.changes).to eq({ "title_en" => [nil, "foo"] })
 
           instance.send(action)
@@ -389,10 +399,10 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           # bypass the dirty module and set the variable directly
           instance.mobility_backends[:title].instance_variable_set(:@values, { :en => "bar" })
 
-          expect(instance.title).to eq("bar")
+          expect(backend.read(:en)).to eq("bar")
           expect(instance.changes).to eq({})
 
-          instance.title = nil
+          backend.write(:en, nil)
           expect(instance.changes).to eq({ "title_en" => ["bar", nil]})
         end
       end
@@ -440,9 +450,11 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   describe '#has_changes_to_save?', rails_version_geq: '6.0' do
     it 'detects changes to translated and untranslated attributes' do
       instance = model_class.new
+      backend = instance.title_backend
+
       expect(instance.has_changes_to_save?).to eq(false)
 
-      instance.title = "foo en"
+      backend.write(:en, 'foo en')
       expect(instance.has_changes_to_save?).to eq(true)
 
       instance = model_class.new
@@ -476,12 +488,13 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   describe '#changed_attribute_names_to_save', rails_version_geq: '5.1' do
     it 'includes translated attributes and untranslated attributes' do
       instance = model_class.new
+      backend = instance.title_backend
       expect(instance.changed_attribute_names_to_save).to eq([])
 
-      instance.title = 'foo en'
+      backend.write(:en, 'foo en')
       expect(instance.changed_attribute_names_to_save).to eq(%w[title_en])
 
-      Mobility.with_locale(:ja) { instance.title = 'foo ja' }
+      backend.write(:ja, 'foo ja')
       expect(instance.changed_attribute_names_to_save).to match_array(%w[title_en title_ja])
 
       instance.published = false

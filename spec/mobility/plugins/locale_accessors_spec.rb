@@ -5,7 +5,7 @@ describe Mobility::Plugins::LocaleAccessors do
   include Helpers::Plugins
 
   context "with option = [locales]" do
-    plugin_setup locale_accessors: [:cz, :de, :'pt-BR']
+    plugin_setup locale_accessors: [:cz, :de, :'pt-BR'], reader: true, writer: true
 
     it_behaves_like "locale accessor", :title, :cz
     it_behaves_like "locale accessor", :title, :de

@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
   include Helpers::Plugins
-  plugin_setup "title", dirty:true
+  plugin_setup "title", dirty: true, reader: true, writer: true
 
   let(:model_class) do
     stub_const 'Article', Class.new(Sequel::Model)

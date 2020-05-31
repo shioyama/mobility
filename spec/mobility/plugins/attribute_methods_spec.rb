@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mobility::Plugins::AttributeMethods, orm: :active_record do
   include Helpers::Plugins
-  plugin_setup attribute_methods: true
+  plugin_setup attribute_methods: true, reader: true
 
   let(:untranslated_attributes) do
     {

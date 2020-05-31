@@ -64,6 +64,8 @@ The proc can accept zero to three arguments (see examples below)
     module Default
       extend Plugin
 
+      depends_on :backend, include: :before
+
       # Applies default plugin to attributes.
       included_hook do |_klass, backend_class|
         backend_class.include(BackendMethods)

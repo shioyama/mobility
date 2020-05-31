@@ -15,6 +15,8 @@ backend.
     module Presence
       extend Plugin
 
+      depends_on :backend, include: :before
+
       # Applies presence plugin to attributes.
       included_hook do |_, backend_class, presence: true|
         backend_class.include(BackendMethods) if presence

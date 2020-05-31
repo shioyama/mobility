@@ -123,52 +123,16 @@ with other backends.
     # @return [Array<String>] Array of names
     attr_reader :names
 
-    # Backend class
-    # @return [Class] Backend class
-    attr_reader :backend_class
-
-    # Name of backend
-    # @return [Symbol,Class] Name of backend, or backend class
-    attr_reader :backend_name
-
     # @param [Array<String>] attribute_names Names of attributes to define backend for
-    # @param [Symbol] method One of: [reader, writer, accessor]
-    # @param [Symbol,Class] backend Backend to use
     # @param [Hash] backend_options Backend options hash
-    # @raise [ArgumentError] if method is not reader, writer or accessor
-    def initialize(*attribute_names, method: :accessor, backend: Mobility.default_backend, **backend_options)
-      raise ArgumentError, "method must be one of: reader, writer, accessor" unless %i[reader writer accessor].include?(method)
+    def initialize(*attribute_names, **backend_options)
       @options = Mobility.default_options.to_h.merge(backend_options)
       @names = attribute_names.map(&:to_s).freeze
-
-      @backend_name = backend
-
-      unless backend.nil?
-        attribute_names.each do |name|
-          define_backend(name)
-          define_reader(name) if %i[accessor reader].include?(method)
-          define_writer(name) if %i[accessor writer].include?(method)
-        end
-      end
     end
 
-    # Setup backend class, include modules into model class, include/extend
-    # shared modules and setup model with backend setup block (see
-    # {Mobility::Backend::Setup#setup_model}).
-    # @param klass [Class] Class of model
     def included(klass)
-      if backend_name
-        @backend_class = Backends.load_backend(backend_name)
-          .for(klass)
-          .with_options(@options.merge(model_class: klass))
-
-        klass.include InstanceMethods
-        klass.extend ClassMethods
-
-        backend_class.setup_model(klass, names)
-
-        backend_class
-      end
+      klass.extend ClassMethods
+      nil
     end
 
     # Yield each attribute name to block
@@ -180,74 +144,7 @@ with other backends.
     # Show useful information about this module.
     # @return [String]
     def inspect
-      "#<Attributes (#{backend_name}) @names=#{names.join(", ")}>"
-    end
-
-    private
-
-    def define_backend(attribute)
-      module_eval <<-EOM, __FILE__, __LINE__ + 1
-      def #{Backend.method_name(attribute)}
-        mobility_backends[:#{attribute}]
-      end
-      EOM
-    end
-
-    def define_reader(attribute)
-      class_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{attribute}(**options)
-          return super() if options.delete(:super)
-          #{set_locale_from_options_inline}
-          mobility_backends[:#{attribute}].read(locale, options)
-        end
-
-        def #{attribute}?(**options)
-          return super() if options.delete(:super)
-          #{set_locale_from_options_inline}
-          mobility_backends[:#{attribute}].present?(locale, options)
-        end
-      EOM
-    end
-
-    def define_writer(attribute)
-      class_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{attribute}=(value, **options)
-          return super(value) if options.delete(:super)
-          #{set_locale_from_options_inline}
-          mobility_backends[:#{attribute}].write(locale, value, options)
-        end
-      EOM
-    end
-
-    # This string is evaluated inline in order to optimize performance of
-    # getters and setters, avoiding extra steps where they are unneeded.
-    def set_locale_from_options_inline
-      <<-EOL
-if options[:locale]
-  #{"Mobility.enforce_available_locales!(options[:locale])" if I18n.enforce_available_locales}
-  locale = options[:locale].to_sym
-  options[:locale] &&= !!locale
-else
-  locale = Mobility.locale
-end
-EOL
-    end
-
-    module InstanceMethods
-      # Return a new backend for an attribute name.
-      # @return [Hash] Hash of attribute names and backend instances
-      # @api private
-      def mobility_backends
-        @mobility_backends ||= ::Hash.new do |hash, name|
-          next hash[name.to_sym] if String === name
-          hash[name] = self.class.mobility_backend_class(name).new(self, name.to_s)
-        end
-      end
-
-      def initialize_dup(other)
-        @mobility_backends = nil
-        super
-      end
+      "#<Attributes @names=#{names.join(", ")}>"
     end
 
     module ClassMethods
@@ -274,32 +171,6 @@ EOL
       # @!method translated_attribute_names
       # @return (see #mobility_attributes)
       alias translated_attribute_names mobility_attributes
-
-      # Return backend class for a given attribute name.
-      # @param [Symbol,String] Name of attribute
-      # @return [Class] Backend class
-      def mobility_backend_class(name)
-        @backends ||= BackendsCache.new(self)
-        @backends[name.to_sym]
-      end
-
-      class BackendsCache < ::Hash
-        def initialize(klass)
-          # Preload backend mapping
-          klass.mobility_modules.each do |mod|
-            mod.names.each { |name| self[name.to_sym] = mod.backend_class }
-          end
-
-          super() do |hash, name|
-            if mod = klass.mobility_modules.find { |m| m.names.include? name.to_s }
-              hash[name] = mod.backend_class
-            else
-              raise KeyError, "No backend for: #{name}."
-            end
-          end
-        end
-      end
-      private_constant :BackendsCache
     end
   end
 end

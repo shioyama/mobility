@@ -125,6 +125,8 @@ the current locale was +nil+.
     module Fallbacks
       extend Plugin
 
+      depends_on :backend, include: :before
+
       # Applies fallbacks plugin to attributes. Completely disables fallbacks
       # on model if option is +false+.
       included_hook do |_, backend_class, fallbacks: nil|

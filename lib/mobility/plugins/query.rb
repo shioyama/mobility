@@ -9,6 +9,8 @@ module Mobility
     module Query
       extend Plugin
 
+      depends_on :backend, include: :before
+
       # Applies query plugin to attributes.
       included_hook do |model_class, backend_class, query: true|
         if query

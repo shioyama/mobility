@@ -119,15 +119,17 @@ module Helpers
       # Sets up attributes module with a listener to listen on reads/writes to the
       # backend. Pass two separate arrays to create separate attributes modules.
       def plugin_setup(attribute_name = "title", *other_names, **options)
-        plugin_names = options.keys & %i[query cache dirty fallbacks presence default attribute_methods fallthrough_accessors locale_accessors]
+        plugin_names = options.keys & Dir['./lib/mobility/plugins/*.rb'].map { |f| File.basename(f, '.rb').to_sym }
+
+        # Handle special case of backend plugin. If we pass plugin: true, we
+        # want to enable the backend plugin but use the backend listener.
+        options.delete(:backend) if options[:backend] == true
 
         attribute_names = [attribute_name, *other_names]
         let(:attribute_name) { attribute_name }
         let(:attributes_class) do
-          Class.new(TestAttributes) do
-            plugins do
-              plugin_names.each { |p| __send__ p }
-            end
+          Class.new(TestAttributes).tap do |attrs|
+            plugin_names.each { |plugin| attrs.plugin plugin }
           end
         end
         let(:model_class) do
@@ -140,7 +142,7 @@ module Helpers
         let(:attributes) { attributes_class.new(*attribute_names, backend: backend_class, **options) }
         let(:listener) { double(:backend) }
         let(:backend_class) { backend_listener(listener) }
-        let(:backend) { instance.send("#{attribute_name}_backend") }
+        let(:backend) { instance.mobility_backends[attribute_name] }
         attribute_names.each { |name| let(:"#{name}_backend") { instance.send("#{name}_backend") } }
       end
     end

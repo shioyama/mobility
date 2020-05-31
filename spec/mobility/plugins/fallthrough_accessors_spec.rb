@@ -5,7 +5,7 @@ describe Mobility::Plugins::FallthroughAccessors do
   include Helpers::Plugins
 
   context "option value is truthy" do
-    plugin_setup fallthrough_accessors: true
+    plugin_setup fallthrough_accessors: true, reader: true, writer: true
     it_behaves_like "locale accessor", :title, :en
     it_behaves_like "locale accessor", :title, :de
     it_behaves_like "locale accessor", :title, :'pt-BR'

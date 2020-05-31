@@ -37,7 +37,7 @@ describe Mobility::Attributes do
       specify {
         instance = klass.new
         title = "foo"
-        expect { 3.times { instance.title = title } }.to allocate_under(14).objects
+        expect { 3.times { instance.title = title } }.to allocate_under(20).objects
       }
     end
   end

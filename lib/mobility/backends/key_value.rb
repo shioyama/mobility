@@ -87,7 +87,7 @@ other backends on model (otherwise one will overwrite the other).
       module ClassMethods
         # @!group Backend Configuration
         # @option options [Symbol,String] type Column type to use
-        # @option options [Symbol] associaiton_name (:<type>_translations) Name
+        # @option options [Symbol] association_name (:<type>_translations) Name
         #   of association method, defaults to +<type>_translations+
         # @option options [Symbol] class_name Translation class, defaults to
         #   +Mobility::<ORM>::<type>Translation+

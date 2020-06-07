@@ -54,6 +54,7 @@ method calls on +Mobility::Attributes+ instance.
     end
 
     def depends_on(plugin)
+      require "mobility/plugins/#{plugin}"
       dependencies << plugin
     end
 

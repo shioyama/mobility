@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "mobility/plugins/fallthrough_accessors"
 
 module Mobility
   module Plugins
@@ -21,7 +20,7 @@ details.
     module Dirty
       extend Plugin
 
-      depends_on :fallthrough_accessors
+      depends_on :fallthrough_accessors, include: :after
 
       initialize_hook do |dirty: nil|
         @options[:fallthrough_accessors] = true if dirty == true

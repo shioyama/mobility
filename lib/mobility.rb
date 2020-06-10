@@ -25,6 +25,10 @@ in backends to define gem-dependent behavior.
 
 =end
 module Mobility
+  # A generic exception used by Mobility.
+  class Error < StandardError
+  end
+
   require "mobility/attributes"
   require "mobility/backend"
   require "mobility/backends"
@@ -34,10 +38,6 @@ module Mobility
   require "mobility/plugin"
   require "mobility/plugins"
   require "mobility/translates"
-
-  # A generic exception used by Mobility.
-  class Error < StandardError
-  end
 
   # General error for version compatibility conflicts
   class VersionNotSupportedError < ArgumentError; end

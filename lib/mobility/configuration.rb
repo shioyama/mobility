@@ -30,7 +30,7 @@ Stores shared Mobility configuration referenced by all backends.
 
     # @param [Symbol] name Plugin name
     def plugins(*names)
-      names.each(&method(:plugin))
+      names.each { |name| attributes_class.plugin name }
     end
 
     # Generate new fallbacks instance

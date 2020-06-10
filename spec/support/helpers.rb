@@ -119,13 +119,15 @@ module Helpers
       # Sets up attributes module with a listener to listen on reads/writes to the
       # backend. Pass two separate arrays to create separate attributes modules.
       def plugin_setup(attribute_name = "title", *other_names, **options)
-        plugins = options.keys & %i[query cache dirty fallbacks presence default attribute_methods fallthrough_accessors locale_accessors]
+        plugin_names = options.keys & %i[query cache dirty fallbacks presence default attribute_methods fallthrough_accessors locale_accessors]
 
         attribute_names = [attribute_name, *other_names]
         let(:attribute_name) { attribute_name }
         let(:attributes_class) do
-          Class.new(TestAttributes).tap do |attrs|
-            plugins.each { |plugin| attrs.plugin plugin }
+          Class.new(TestAttributes) do
+            plugins do
+              plugin_names.each { |p| __send__ p }
+            end
           end
         end
         let(:model_class) do

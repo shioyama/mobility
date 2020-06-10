@@ -12,7 +12,10 @@ method calls on +Mobility::Attributes+ instance.
   class (model class) and backend class. (Use this hook to include any
   module(s) into backend class.)
 
-@example
+Also includes a +configure+ class method to apply plugins to a pluggable
+instance (+Mobility::Attributes+), with a block.
+
+@example Defining a plugin
   module MyPlugin
     extend Mobility::Plugin
 
@@ -30,8 +33,36 @@ method calls on +Mobility::Attributes+ instance.
     end
   end
 
+@example Configure a pluggable class with plugins
+  class TranslatedAttributes < Mobility::Attributes
+  end
+
+  Mobility::Plugin.configure(TranslatedAttributes) do
+    cache
+    fallbacks
+  end
+
+  TranslatedAttributes.included_modules
+  #=> [Mobility::Plugins::Fallbacks, Mobility::Plugins::Cache, ...]
 =end
   module Plugin
+    class << self
+      # Configure a pluggable {Mobility::Attributes} with a block. Yields to a
+      # clean room where plugin names define plugins on the module. Plugin
+      # dependencies are resolved before applying them.
+      #
+      # @param [Class, Module] pluggable
+      # @raise [Mobility::Plugin::CyclicDependency] if dependencies cannot be met
+      # @example
+      #   Mobility::Plugin.configure(TranslatedAttributes) do
+      #     cache
+      #     fallbacks
+      #   end
+      def configure(pluggable, &block)
+        DependencyResolver.new(pluggable).call(&block)
+      end
+    end
+
     def initialize_hook(&block)
       key = plugin_key
       define_method :initialize do |*names, **options|
@@ -50,18 +81,14 @@ method calls on +Mobility::Attributes+ instance.
     end
 
     def dependencies
-      @dependencies ||= Set.new
+      @dependencies ||= {}
     end
 
-    def depends_on(plugin)
-      require "mobility/plugins/#{plugin}"
-      dependencies << plugin
-    end
-
-    def included(attributes_class)
-      dependencies.each do |dependency|
-        attributes_class.plugin dependency
+    def depends_on(plugin, include: nil)
+      unless [nil, :before, :after].include?(include)
+        raise ArgumentError, "depends_on 'include' keyword argument must be nil, :before or :after"
       end
+      dependencies[plugin] = include
     end
 
     private
@@ -69,5 +96,92 @@ method calls on +Mobility::Attributes+ instance.
     def plugin_key
       Util.underscore(to_s.split('::').last).to_sym
     end
+
+    DependencyResolver = Struct.new(:pluggable) do
+      NO_DEPENDENCIES = Set.new.freeze
+
+      def call(&block)
+        plugin_names = DSL.call(&block)
+        tree = create_tree(plugin_names)
+
+        # Add any previously included plugins as dependencies of new plugins,
+        # ensuring any dependencies between them are met.
+        tree.each_key { |plugin| tree[plugin] += included_plugins }
+
+        pluggable.include(*tree.tsort.reverse) unless tree.empty?
+      rescue TSort::Cyclic => e
+        components = e.message.scan(/(?<=\[).*(?=\])/).first
+        raise CyclicDependency, "Dependencies cannot be resolved between: #{components}"
+      end
+
+      private
+
+      def create_tree(plugin_names)
+        DependencyTree.new.tap do |tree|
+          visited = []
+          plugin_names.each do |name|
+            plugin = Plugins.load_plugin(name)
+            next if pluggable.included_modules.include?(plugin)
+            add_dependency(tree, plugin, visited)
+          end
+        end
+      end
+
+      attr_reader :tree
+
+      def included_plugins
+        pluggable.included_modules.grep(Plugin)
+      end
+
+      # Recursively add dependencies and their dependencies to tree
+      def add_dependency(tree, plugin, visited)
+        return if visited.include?(plugin)
+
+        tree[plugin] ||= NO_DEPENDENCIES
+
+        plugin.dependencies.each do |dep, load_order|
+          dep = Plugins.load_plugin(dep)
+          tree[dep] ||= NO_DEPENDENCIES
+
+          case load_order
+          when :before
+            tree[plugin] += [dep]
+          when :after
+            tree[dep] += [plugin]
+          end
+
+          add_dependency(tree, dep, visited << plugin)
+        end
+      end
+
+      class DependencyTree < Hash
+        include ::TSort
+
+        alias tsort_each_node each_key
+
+        def tsort_each_child(dep, &block)
+          self.fetch(dep, []).each(&block)
+        end
+      end
+
+      class DSL < BasicObject
+        def self.call(&block)
+          ::Set.new.tap do |plugins|
+            new(plugins).instance_eval(&block)
+          end
+        end
+
+        def initialize(plugins)
+          @plugins = plugins
+        end
+
+        def method_missing(m, *)
+          @plugins << m
+        end
+      end
+    end
+    private_constant :DependencyResolver
+
+    class CyclicDependency < Mobility::Error; end
   end
 end

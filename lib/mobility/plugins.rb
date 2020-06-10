@@ -42,10 +42,10 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
         end
         plugin
       end
-    end
 
-    def self.register_plugin(name, mod)
-      @plugins[name] = mod
+      def register_plugin(name, mod)
+        @plugins[name] = mod
+      end
     end
   end
 end

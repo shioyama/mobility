@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "mobility/util"
+require "tsort"
 
 module Mobility
 =begin
@@ -108,8 +109,14 @@ with other backends.
 
 =end
   class Attributes < Module
-    def self.plugin(name)
-      include Plugins.load_plugin(name)
+    class << self
+      def plugin(name)
+        Plugin.configure(self) { __send__ name }
+      end
+
+      def plugins(&block)
+        Plugin.configure(self, &block)
+      end
     end
 
     # Attribute names for which accessors will be defined

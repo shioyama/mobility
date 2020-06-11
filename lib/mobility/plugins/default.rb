@@ -97,5 +97,7 @@ The proc can accept zero to three arguments (see examples below)
         # @!endgroup
       end
     end
+
+    register_plugin(:default, Default)
   end
 end

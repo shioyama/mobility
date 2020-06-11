@@ -34,5 +34,7 @@ attributes only.
         model_class.include module_builder.new(*attribute_names)
       end
     end
+
+    register_plugin(:attribute_methods, AttributeMethods)
   end
 end

@@ -46,5 +46,7 @@ backend.
         (value == "") ? nil : value
       end
     end
+
+    register_plugin(:presence, Presence)
   end
 end

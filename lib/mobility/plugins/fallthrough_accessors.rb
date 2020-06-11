@@ -69,5 +69,7 @@ model class is generated.
         end
       end
     end
+
+    register_plugin :fallthrough_accessors, FallthroughAccessors
   end
 end

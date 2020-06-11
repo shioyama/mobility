@@ -35,6 +35,10 @@ module Mobility
   require "mobility/plugins"
   require "mobility/translates"
 
+  # A generic exception used by Mobility.
+  class Error < StandardError
+  end
+
   # General error for version compatibility conflicts
   class VersionNotSupportedError < ArgumentError; end
   CALL_COMPILABLE_REGEXP = /\A[a-zA-Z_]\w*[!?]?\z/

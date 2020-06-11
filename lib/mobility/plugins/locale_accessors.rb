@@ -81,5 +81,7 @@ available locales for a Rails application) will be used by default.
         EOM
       end
     end
+
+    register_plugin(:locale_accessors, LocaleAccessors)
   end
 end

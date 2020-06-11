@@ -163,5 +163,7 @@ the current locale was +nil+.
         end
       end
     end
+
+    register_plugin(:fallbacks, Fallbacks)
   end
 end

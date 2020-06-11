@@ -28,5 +28,7 @@ module Mobility
         end
       end
     end
+
+    register_plugin(:query, Query)
   end
 end

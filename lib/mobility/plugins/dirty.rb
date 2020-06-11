@@ -55,5 +55,7 @@ details.
         model_class.include dirty_module.const_get(:MethodsBuilder).new(*attribute_names)
       end
     end
+
+    register_plugin(:dirty, Dirty)
   end
 end

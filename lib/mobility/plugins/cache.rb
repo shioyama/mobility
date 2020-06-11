@@ -111,5 +111,7 @@ Values are added to the cache in two ways:
         end
       end
     end
+
+    register_plugin(:cache, Cache)
   end
 end

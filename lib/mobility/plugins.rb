@@ -31,12 +31,21 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
 
 =end
   module Plugins
+    @plugins = {}
+
     class << self
-      # @param [Symbol] backend Name of plugin to load.
-      def load_plugin(plugin)
-        require "mobility/plugins/#{plugin}"
-        Mobility.get_class_from_key(self, plugin)
+      # @param [Symbol] name Name of plugin to load.
+      def load_plugin(name)
+        unless (plugin = @plugins[name])
+          require "mobility/plugins/#{name}"
+          raise Error, "plugin #{name} did not register itself correctly in Mobility::Plugins" unless (plugin = @plugins[name])
+        end
+        plugin
       end
+    end
+
+    def self.register_plugin(name, mod)
+      @plugins[name] = mod
     end
   end
 end

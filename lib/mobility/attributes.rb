@@ -244,7 +244,7 @@ EOL
     end
 
     module ClassMethods
-      # Return all {Mobility::Attribute} module instances from among ancestors
+      # Return all {Mobility::Attributes} module instances from among ancestors
       # of this model.
       # @return [Array<Mobility::Attributes>] Attribute modules
       def mobility_modules

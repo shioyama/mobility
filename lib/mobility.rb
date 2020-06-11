@@ -152,15 +152,6 @@ module Mobility
       @configuration ||= Configuration.new
     end
 
-    # @param [Class] parent_class Parent class in namespace
-    # @param [Symbol] key Name of class to find in namespace
-    # @return [Class] Class in namespace matching key
-    # @api private
-    def get_class_from_key(parent_class, key)
-      klass_name = key.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
-      parent_class.const_get(klass_name)
-    end
-
     # (see Mobility::Configuration#accessor_method)
     # @!method accessor_method
     #

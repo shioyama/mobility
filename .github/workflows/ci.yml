@@ -38,8 +38,6 @@ jobs:
           - name: 'active_record'
             version: '6.0'
           - name: 'sequel'
-            version: '4'
-          - name: 'sequel'
             version: '5'
         experimental: [false]
         feature: ['unit']
@@ -78,10 +76,6 @@ jobs:
             orm:
               name: 'active_record'
               version: '4.2'
-          - ruby: '2.7'
-            orm:
-              name: 'sequel'
-              version: '4'
     env:
       DB: ${{ matrix.database }}
       BUNDLE_JOBS: 4

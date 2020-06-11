@@ -18,5 +18,7 @@ Prefix and suffix to add to attribute name to generate json column name.
     module Json
       extend Backend::OrmDelegator
     end
+
+    register_backend(:json, Json)
   end
 end

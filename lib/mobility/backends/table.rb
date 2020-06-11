@@ -158,5 +158,7 @@ set.
         end
       end
     end
+
+    register_backend(:table, Table)
   end
 end

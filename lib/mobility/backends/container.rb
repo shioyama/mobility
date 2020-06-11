@@ -21,5 +21,7 @@ stored).
     module Container
       extend Backend::OrmDelegator
     end
+
+    register_backend(:container, Container)
   end
 end

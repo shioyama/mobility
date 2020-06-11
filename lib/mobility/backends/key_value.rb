@@ -140,5 +140,7 @@ other backends on model (otherwise one will overwrite the other).
         end
       end
     end
+
+    register_backend(:key_value, KeyValue)
   end
 end

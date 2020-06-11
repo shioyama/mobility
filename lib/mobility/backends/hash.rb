@@ -33,5 +33,7 @@ Backend which stores translations in an in-memory hash.
         @translations ||= {}
       end
     end
+
+    register_backend(:hash, Hash)
   end
 end

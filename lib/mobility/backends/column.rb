@@ -49,5 +49,7 @@ be ignored if set, since it would cause a conflict with column accessors.
         base.extend Backend::OrmDelegator
       end
     end
+
+    register_backend(:column, Column)
   end
 end

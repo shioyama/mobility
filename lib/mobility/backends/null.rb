@@ -20,5 +20,7 @@ Backend which does absolutely nothing. Mostly for testing purposes.
       def self.configure(_); end
       # @!endgroup
     end
+
+    register_backend(:null, Null)
   end
 end

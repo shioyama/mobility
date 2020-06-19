@@ -9,6 +9,7 @@ describe Mobility::Plugin do
         Module.new.tap do |mod|
           mod.extend Mobility::Plugin
           Mobility::Plugins.register_plugin(name, mod)
+          stub_const(name.to_s.capitalize, mod)
         end
       end
     end

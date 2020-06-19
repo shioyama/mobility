@@ -18,12 +18,14 @@ describe Mobility::Plugin do
     define_plugin(:foo)
     define_plugin(:bar)
     define_plugin(:baz)
+    define_plugin(:qux)
 
     after do
       plugins = Mobility::Plugins.instance_variable_get(:@plugins)
       plugins.delete(:foo)
       plugins.delete(:bar)
       plugins.delete(:baz)
+      plugins.delete(:qux)
     end
 
     describe '.configure' do
@@ -148,6 +150,22 @@ describe Mobility::Plugin do
         last_included, *others = included_plugins
         expect(last_included).to eq(bar)
         expect(others).to match_array([foo, baz])
+      end
+
+      it 'handles multiple dependency levels' do
+        foo.depends_on :bar
+        bar.depends_on :baz, include: :after
+        baz.depends_on :qux, include: :before
+
+        expect {
+          described_class.configure(pluggable) do
+            __send__ :foo
+          end
+        }.not_to raise_error
+
+        expect(included_plugins).to match_array([foo, bar, baz, qux])
+        expect(included_plugins & [baz, bar]).to eq([baz, bar])
+        expect(included_plugins & [baz, qux]).to eq([baz, qux])
       end
     end
   end

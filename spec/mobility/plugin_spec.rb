@@ -110,6 +110,44 @@ describe Mobility::Plugin do
           end
         }.to raise_error(Mobility::Plugin::CyclicDependency)
       end
+
+      it 'skips mutual before dependencies which have already been included' do
+        foo.depends_on :baz, include: :before
+        bar.depends_on :foo, include: :before
+        bar.depends_on :baz, include: :before
+
+        described_class.configure(pluggable) do
+          __send__ :foo
+        end
+
+        expect {
+          described_class.configure(pluggable) do
+            __send__ :bar
+          end
+        }.not_to raise_error
+
+        expect(pluggable.included_modules.grep(Mobility::Plugin)).to eq([bar, foo, baz])
+      end
+
+      it 'handles non-conflicting cyclic dependencies which have already been included' do
+        foo.depends_on :baz
+        bar.depends_on :foo, include: :before
+        bar.depends_on :baz, include: :before
+
+        described_class.configure(pluggable) do
+          __send__ :foo
+        end
+
+        expect {
+          described_class.configure(pluggable) do
+            __send__ :bar
+          end
+        }.not_to raise_error
+
+        last_included, *others = pluggable.included_modules.grep(Mobility::Plugin)
+        expect(last_included).to eq(bar)
+        expect(others).to match_array([foo, baz])
+      end
     end
   end
 end

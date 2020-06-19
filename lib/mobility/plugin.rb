@@ -98,15 +98,14 @@ instance (+Mobility::Attributes+), with a block.
     end
 
     DependencyResolver = Struct.new(:pluggable) do
-      NO_DEPENDENCIES = Set.new.freeze
-
       def call(&block)
         plugin_names = DSL.call(&block)
         tree = create_tree(plugin_names)
 
         # Add any previously included plugins as dependencies of new plugins,
         # ensuring any dependencies between them are met.
-        tree.each_key { |plugin| tree[plugin] += included_plugins }
+        plugins = included_plugins
+        tree.each_key { |plugin| tree[plugin] += plugins }
 
         pluggable.include(*tree.tsort.reverse) unless tree.empty?
       rescue TSort::Cyclic => e
@@ -118,10 +117,9 @@ instance (+Mobility::Attributes+), with a block.
 
       def create_tree(plugin_names)
         DependencyTree.new.tap do |tree|
-          visited = []
+          visited = included_plugins
           plugin_names.each do |name|
             plugin = Plugins.load_plugin(name)
-            next if pluggable.included_modules.include?(plugin)
             add_dependency(tree, plugin, visited)
           end
         end
@@ -137,16 +135,16 @@ instance (+Mobility::Attributes+), with a block.
       def add_dependency(tree, plugin, visited)
         return if visited.include?(plugin)
 
-        tree[plugin] ||= NO_DEPENDENCIES
+        tree.add(plugin)
 
         plugin.dependencies.each do |dep, load_order|
           dep = Plugins.load_plugin(dep)
-          tree[dep] ||= NO_DEPENDENCIES
 
           case load_order
           when :before
             tree[plugin] += [dep]
           when :after
+            tree.add(dep)
             tree[dep] += [plugin]
           end
 
@@ -156,6 +154,11 @@ instance (+Mobility::Attributes+), with a block.
 
       class DependencyTree < Hash
         include ::TSort
+        NO_DEPENDENCIES = Set.new.freeze
+
+        def add(key)
+          self[key] ||= NO_DEPENDENCIES
+        end
 
         alias tsort_each_node each_key
 

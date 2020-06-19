@@ -104,8 +104,8 @@ instance (+Mobility::Attributes+), with a block.
 
         # Add any previously included plugins as dependencies of new plugins,
         # ensuring any dependencies between them are met.
-        plugins = included_plugins
-        tree.each_key { |plugin| tree[plugin] += plugins }
+        before_dependencies = included_plugins
+        tree.each_key { |plugin| tree[plugin] += before_dependencies }
 
         pluggable.include(*tree.tsort.reverse) unless tree.empty?
       rescue TSort::Cyclic => e

@@ -57,13 +57,13 @@ available locales for a Rails application) will be used by default.
         def #{name}_#{normalized_locale}(options = {})
           return super() if options.delete(:super)
           warn "#{warning_message}" if options[:locale]
-          #{name}(**options, locale: :'#{locale}')
+          #{name}(**options, locale: #{locale.inspect})
         end
 
         def #{name}_#{normalized_locale}?(options = {})
           return super() if options.delete(:super)
           warn "#{warning_message}" if options[:locale]
-          #{name}?(**options, locale: :'#{locale}')
+          #{name}?(**options, locale: #{locale.inspect})
         end
         EOM
       end
@@ -76,7 +76,7 @@ available locales for a Rails application) will be used by default.
         def #{name}_#{normalized_locale}=(value, options = {})
           return super(value) if options.delete(:super)
           warn "#{warning_message}" if options[:locale]
-          public_send(:#{name}=, value, **options, locale: :'#{locale}')
+          public_send(:#{name}=, value, **options, locale: #{locale.inspect})
         end
         EOM
       end

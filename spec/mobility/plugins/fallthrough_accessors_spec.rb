@@ -6,10 +6,10 @@ describe Mobility::Plugins::FallthroughAccessors do
 
   context "option value is truthy" do
     plugin_setup fallthrough_accessors: true, reader: true, writer: true
-    it_behaves_like "locale accessor", :title, :en
-    it_behaves_like "locale accessor", :title, :de
-    it_behaves_like "locale accessor", :title, :'pt-BR'
-    it_behaves_like "locale accessor", :title, :'ru'
+    it_behaves_like "locale accessor", :title, 'en'
+    it_behaves_like "locale accessor", :title, 'de'
+    it_behaves_like "locale accessor", :title, 'pt-BR'
+    it_behaves_like "locale accessor", :title, 'ru'
 
     it 'passes arguments and options to super when method does not match' do
       mod = Module.new do

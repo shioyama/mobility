@@ -55,9 +55,9 @@ model class is generated.
             locale, suffix = $2.split('_')
             locale = "#{locale}-#{suffix.upcase}" if suffix
             if $4 == '=' # writer
-              public_send(attribute_method, args[0], **(args[1] || {}), locale: locale.to_sym)
+              public_send(attribute_method, args[0], **(args[1] || {}), locale: locale)
             else         # reader
-              public_send(attribute_method, **(args[0] || {}), locale: locale.to_sym)
+              public_send(attribute_method, **(args[0] || {}), locale: locale)
             end
           else
             super(method_name, *args, &block)

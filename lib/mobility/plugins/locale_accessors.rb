@@ -59,7 +59,9 @@ available locales for a Rails application) will be used by default.
           warn "#{warning_message}" if options[:locale]
           #{name}(**options, locale: #{locale.inspect})
         end
+        EOM
 
+        module_eval <<-EOM, __FILE__, __LINE__ + 1
         def #{name}_#{normalized_locale}?(options = {})
           return super() if options.delete(:super)
           warn "#{warning_message}" if options[:locale]

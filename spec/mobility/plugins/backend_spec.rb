@@ -20,7 +20,7 @@ describe Mobility::Plugins::Backend do
     it "assigns options to backend class" do
       attributes = attributes_class.new("title", backend: backend_class, foo: "bar")
       model_class.include attributes
-      expect(attributes.backend_class.options).to eq(Mobility.default_options.merge(backend: backend_class, model_class: model_class, foo: "bar"))
+      expect(attributes.backend_class.options).to eq(backend: backend_class, model_class: model_class, foo: "bar")
     end
 
     it "freezes backend options after inclusion into model class" do

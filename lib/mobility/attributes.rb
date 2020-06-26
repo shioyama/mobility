@@ -110,12 +110,16 @@ with other backends.
 =end
   class Attributes < Module
     class << self
-      def plugin(name)
-        Plugin.configure(self) { __send__ name }
+      def plugin(name, **options)
+        Plugin.configure(self, defaults) { __send__ name, **options }
       end
 
       def plugins(&block)
-        Plugin.configure(self, &block)
+        Plugin.configure(self, defaults, &block)
+      end
+
+      def defaults
+        @defaults ||= {}
       end
     end
 
@@ -124,9 +128,9 @@ with other backends.
     attr_reader :names
 
     # @param [Array<String>] attribute_names Names of attributes to define backend for
-    # @param [Hash] backend_options Backend options hash
-    def initialize(*attribute_names, **backend_options)
-      @options = Mobility.default_options.to_h.merge(backend_options)
+    # @param [Hash] options Backend options hash
+    def initialize(*attribute_names, **options)
+      @options = self.class.defaults.merge(options)
       @names = attribute_names.map(&:to_s).freeze
     end
 

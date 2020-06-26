@@ -18,7 +18,7 @@ plugins must depend on this.
       # @return [Symbol,Class] Name of backend, or backend class
       attr_reader :backend_name
 
-      initialize_hook do |*names, backend: Mobility.default_backend|
+      initialize_hook do |*names, backend:|
         @backend_name = backend
 
         names.each do |name|

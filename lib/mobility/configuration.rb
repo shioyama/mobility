@@ -7,8 +7,6 @@ Stores shared Mobility configuration referenced by all backends.
 
 =end
   class Configuration
-    RESERVED_OPTION_KEYS = %i[backend model_class].freeze
-
     # Alias for mobility_accessor (defaults to +translates+)
     # @return [Symbol]
     attr_accessor :accessor_method
@@ -16,12 +14,6 @@ Stores shared Mobility configuration referenced by all backends.
     # Name of query scope/dataset method (defaults to +i18n+)
     # @return [Symbol]
     attr_accessor :query_method
-
-    # Default set of options. These will be merged with any backend options
-    # when defining translated attributes (with +translates+). Default options
-    # may not include the keys 'backend' or 'model_class'.
-    # @return [Hash]
-    attr_reader :default_options
 
     # @param [Symbol] name Plugin name
     def plugin(name)
@@ -52,7 +44,9 @@ Stores shared Mobility configuration referenced by all backends.
 
     # Default backend to use (can be symbol or actual backend class)
     # @return [Symbol,Class]
-    attr_accessor :default_backend
+    def default_backend
+      attributes_class.defaults[:backend]
+    end
 
     # Returns set of default accessor locales to use (defaults to
     # +I18n.available_locales+)
@@ -71,23 +65,10 @@ Stores shared Mobility configuration referenced by all backends.
       @query_method = :i18n
       @fallbacks_generator = lambda { |fallbacks| Mobility::Fallbacks.build(fallbacks) }
       @default_accessor_locales = lambda { Mobility.available_locales }
-      @default_options = Options[{
-      }]
     end
 
     def attributes_class
       @attributes_class ||= Class.new(Attributes)
-    end
-
-    class ReservedOptionKey < Exception; end
-
-    class Options < ::Hash
-      def []=(key, _)
-        if RESERVED_OPTION_KEYS.include?(key)
-          raise Configuration::ReservedOptionKey, "Default options may not contain the following reserved key: #{key}"
-        end
-        super
-      end
     end
   end
 end

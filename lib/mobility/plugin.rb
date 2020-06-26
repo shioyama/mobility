@@ -52,14 +52,16 @@ instance (+Mobility::Attributes+), with a block.
       # dependencies are resolved before applying them.
       #
       # @param [Class, Module] pluggable
+      # @param [Hash] defaults Plugin defaults hash to update
+      # @return [Hash] Updated plugin defaults
       # @raise [Mobility::Plugin::CyclicDependency] if dependencies cannot be met
       # @example
       #   Mobility::Plugin.configure(TranslatedAttributes) do
       #     cache
-      #     fallbacks
+      #     fallbacks default: [:en, :de]
       #   end
-      def configure(pluggable, &block)
-        DependencyResolver.new(pluggable).call(&block)
+      def configure(pluggable, defaults = {}, &block)
+        DependencyResolver.new(pluggable, defaults).call(&block)
       end
     end
 
@@ -97,10 +99,10 @@ instance (+Mobility::Attributes+), with a block.
       Util.underscore(to_s.split('::').last).to_sym
     end
 
-    DependencyResolver = Struct.new(:pluggable) do
+    DependencyResolver = Struct.new(:pluggable, :defaults) do
       def call(&block)
-        plugin_names = DSL.call(&block)
-        tree = create_tree(plugin_names)
+        plugins = DSL.call(defaults, &block)
+        tree = create_tree(plugins)
 
         # Add any previously included plugins as dependencies of new plugins,
         # ensuring any dependencies between them are met.
@@ -108,6 +110,7 @@ instance (+Mobility::Attributes+), with a block.
         tree.each_key { |plugin| tree[plugin] += before_dependencies }
 
         pluggable.include(*tree.tsort.reverse) unless tree.empty?
+        defaults
       rescue TSort::Cyclic => e
         components = e.message.scan(/(?<=\[).*(?=\])/).first
         raise CyclicDependency, "Dependencies cannot be resolved between: #{components}"
@@ -168,18 +171,19 @@ instance (+Mobility::Attributes+), with a block.
       end
 
       class DSL < BasicObject
-        def self.call(&block)
-          ::Set.new.tap do |plugins|
-            new(plugins).instance_eval(&block)
-          end
+        def self.call(defaults, &block)
+          new(plugins = ::Set.new, defaults).instance_eval(&block)
+          plugins
         end
 
-        def initialize(plugins)
+        def initialize(plugins, defaults)
           @plugins = plugins
+          @defaults = defaults
         end
 
-        def method_missing(m, *)
+        def method_missing(m, *_args, **options)
           @plugins << m
+          @defaults[m] = options[:default] if options.has_key?(:default)
         end
       end
     end

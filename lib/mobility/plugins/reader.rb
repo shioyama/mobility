@@ -24,7 +24,8 @@ Defines attribute reader that delegates to +Mobility::Backend#read+.
             #{Reader.setup_source}
             mobility_backends[:#{attribute}].read(locale, options)
           end
-
+        EOM
+        class_eval <<-EOM, __FILE__, __LINE__ + 1
           def #{attribute}?(locale: nil, **options)
             #{Reader.setup_source}
             mobility_backends[:#{attribute}].present?(locale, options)

@@ -48,26 +48,32 @@ passed to accessors to configure backend (see example below).
     #   @param [Array<String>] attributes
     #   @param [Hash] options
     #   @yield Yields to block with backend as context
+    def mobility_accessor(*args, **options, &block)
+      attributes = Mobility.config.attributes_class.new(*args, reader: true, writer: true, **options)
+      attributes.backend.instance_eval(&block) if block_given?
+      include attributes
+    end
 
     # Defines mobility reader and presence method on model class.
     # @!method mobility_reader(*attributes, **options)
     #   @param [Array<String>] attributes
     #   @param [Hash] options
     #   @yield Yields to block with backend as context
+    def mobility_reader(*args, **options, &block)
+      attributes = Mobility.config.attributes_class.new(*args, reader: true, writer: false, **options)
+      attributes.backend.instance_eval(&block) if block_given?
+      include attributes
+    end
 
     # Defines mobility writer on model class.
     # @!method mobility_writer(*attributes, **options)
     #   @param [Array<String>] attributes
     #   @param [Hash] options
     #   @yield Yields to block with backend as context
-    %w[accessor reader writer].each do |method|
-      class_eval <<-EOM, __FILE__, __LINE__ + 1
-        def mobility_#{method}(*args, **options, &block)
-          attributes = Mobility.config.attributes_class.new(*args, method: :#{method}, **options)
-          attributes.backend.instance_eval(&block) if block_given?
-          include attributes
-        end
-      EOM
+    def mobility_writer(*args, **options, &block)
+      attributes = Mobility.config.attributes_class.new(*args, reader: false, writer: true, **options)
+      attributes.backend.instance_eval(&block) if block_given?
+      include attributes
     end
   end
 end

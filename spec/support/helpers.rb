@@ -62,7 +62,6 @@ module Helpers
         end
       end
     end
-
   end
 
   module ActiveRecord

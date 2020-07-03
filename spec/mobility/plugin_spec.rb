@@ -48,6 +48,20 @@ describe Mobility::Plugin do
                          "Dependencies cannot be resolved between: bar, foo")
       end
 
+      it 'includes pluggable name in cyclic dependency conflict message' do
+        foo.depends_on :bar, include: :before
+        bar.depends_on :foo, include: :before
+
+        stub_const('Pluggable', pluggable)
+        expect {
+          described_class.configure(pluggable) do
+            __send__ :foo
+            __send__ :bar
+          end
+        }.to raise_error(Mobility::Plugin::CyclicDependency,
+                         "Dependencies cannot be resolved between: bar, foo in Pluggable")
+      end
+
       it 'detects after dependency conflict between two plugins' do
         foo.depends_on :bar, include: :after
         bar.depends_on :foo, include: :after
@@ -117,6 +131,24 @@ describe Mobility::Plugin do
           end
         }.to raise_error(Mobility::Plugin::DependencyConflict,
                          "'foo' plugin must come after 'bar' plugin")
+      end
+
+      it 'includes pluggable name in after dependency conflict error message' do
+        bar.depends_on :foo, include: :after
+
+        described_class.configure(pluggable) do
+          __send__ :foo
+        end
+
+        # Check that error message shows the pluggable name if defined
+        stub_const('Pluggable', pluggable)
+
+        expect {
+          described_class.configure(pluggable) do
+            __send__ :bar
+          end
+        }.to raise_error(Mobility::Plugin::DependencyConflict,
+                         "'foo' plugin must come after 'bar' plugin in Pluggable")
       end
 
       it 'skips mutual before dependencies which have already been included' do

@@ -152,7 +152,8 @@ instance (+Mobility::Attributes+), with a block.
 
       def check_after_dependency!(dep, dep_name, plugin_name)
         if included_plugins.include?(dep)
-          raise DependencyConflict, "'#{dep_name}' plugin must come after '#{plugin_name}' plugin"
+          message = "'#{dep_name}' plugin must come after '#{plugin_name}' plugin"
+          raise DependencyConflict, append_pluggable_name(message)
         end
       end
 
@@ -161,7 +162,12 @@ instance (+Mobility::Attributes+), with a block.
         names = components.split(', ').map! do |plugin|
           Plugins.lookup_name(Object.const_get(plugin)).to_s
         end
-        raise CyclicDependency, "Dependencies cannot be resolved between: #{names.sort.join(', ')}"
+        message = "Dependencies cannot be resolved between: #{names.sort.join(', ')}"
+        raise CyclicDependency, append_pluggable_name(message)
+      end
+
+      def append_pluggable_name(message)
+        pluggable.name ? "#{message} in #{pluggable}" : message
       end
 
       class DependencyTree < Hash

@@ -56,7 +56,7 @@ plugins must depend on this.
 
       def define_backend(attribute)
         module_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{Mobility::Backend.method_name(attribute)}
+        def #{attribute}_backend
           mobility_backends[:#{attribute}]
         end
         EOM

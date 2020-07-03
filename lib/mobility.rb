@@ -29,7 +29,6 @@ module Mobility
   class Error < StandardError
   end
 
-  require "mobility/attributes"
   require "mobility/backend"
   require "mobility/backends"
   require "mobility/configuration"
@@ -37,6 +36,7 @@ module Mobility
   require "mobility/loaded"
   require "mobility/plugin"
   require "mobility/plugins"
+  require "mobility/attributes"
   require "mobility/translates"
 
   # General error for version compatibility conflicts

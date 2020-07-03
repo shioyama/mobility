@@ -16,6 +16,8 @@ Defines:
     module Backend
       extend Plugin
 
+      depends_on :attributes, include: :before
+
       # Backend class
       # @return [Class] Backend class
       attr_reader :backend_class

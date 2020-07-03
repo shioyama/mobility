@@ -108,32 +108,11 @@ with other backends.
 
 =end
   class Attributes < Pluggable
-    # Attribute names for which accessors will be defined
-    # @return [Array<String>] Array of names
-    attr_reader :names
-
-    # @param [Array<String>] attribute_names Names of attributes to define backend for
-    # @param [Hash] options Backend options hash
-    def initialize(*attribute_names, **options)
-      super
-      @names = attribute_names.map(&:to_s).freeze
-    end
+    include ::Mobility::Plugins.load_plugin(:attributes)
 
     def included(klass)
       klass.extend ClassMethods
       nil
-    end
-
-    # Yield each attribute name to block
-    # @yieldparam [String] Attribute
-    def each &block
-      names.each(&block)
-    end
-
-    # Show useful information about this module.
-    # @return [String]
-    def inspect
-      "#<Attributes @names=#{names.join(", ")}>"
     end
 
     module ClassMethods

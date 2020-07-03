@@ -109,32 +109,5 @@ with other backends.
 =end
   class Attributes < Pluggable
     include ::Mobility::Plugins.load_plugin(:attributes)
-
-    def included(klass)
-      klass.extend ClassMethods
-      nil
-    end
-
-    module ClassMethods
-      # Return all {Mobility::Attributes} module instances from among ancestors
-      # of this model.
-      # @return [Array<Mobility::Attributes>] Attribute modules
-      def mobility_modules
-        ancestors.grep(Attributes)
-      end
-
-      # Return translated attribute names on this model.
-      # @return [Array<String>] Attribute names
-      def mobility_attributes
-        mobility_modules.map(&:names).flatten.uniq
-      end
-
-      # Return true if attribute name is translated on this model.
-      # @param [String, Symbol] Attribute name
-      # @return [Boolean]
-      def mobility_attribute?(name)
-        mobility_attributes.include?(name.to_s)
-      end
-    end
   end
 end

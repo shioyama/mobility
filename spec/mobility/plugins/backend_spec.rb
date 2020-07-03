@@ -90,7 +90,7 @@ describe Mobility::Plugins::Backend do
 
         expect {
           model_class.mobility_backend_class("content")
-        }.to raise_error(KeyError)
+        }.to raise_error(KeyError, "No backend for: content")
         content_backend_class = model_subclass.mobility_backend_class("content")
         expect(content_backend_class).to be <(backend_class_2)
       end

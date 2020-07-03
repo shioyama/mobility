@@ -44,6 +44,10 @@ Defines:
 
           backend_class.setup_model(klass, names)
 
+          @names.each do |name|
+            klass.register_mobility_backend_class(name, @backend_class)
+          end
+
           backend_class
         end
       end
@@ -76,28 +80,26 @@ Defines:
         # @param [Symbol,String] Name of attribute
         # @return [Class] Backend class
         def mobility_backend_class(name)
-          @backends ||= BackendsCache.new(self)
-          @backends[name.to_sym]
+          mobility_backend_classes.fetch(name.to_sym)
+        rescue KeyError
+          raise KeyError, "No backend for: #{name}"
+        end
+
+        def register_mobility_backend_class(name, backend_class)
+          mobility_backend_classes[name.to_sym] = backend_class
+        end
+
+        def inherited(klass)
+          klass.mobility_backend_classes.merge!(@mobility_backend_classes)
+          super
+        end
+
+        protected
+
+        def mobility_backend_classes
+          @mobility_backend_classes ||= {}
         end
       end
-
-      class BackendsCache < ::Hash
-        def initialize(klass)
-          # Preload backend mapping
-          klass.mobility_modules.each do |mod|
-            mod.names.each { |name| self[name.to_sym] = mod.backend_class }
-          end
-
-          super() do |hash, name|
-            if (mod = klass.mobility_modules.find { |m| m.names.include? name.to_s })
-              hash[name] = mod.backend_class
-            else
-              raise KeyError, "No backend for: #{name}."
-            end
-          end
-        end
-      end
-      private_constant :BackendsCache
     end
 
     register_plugin(:backend, Backend)

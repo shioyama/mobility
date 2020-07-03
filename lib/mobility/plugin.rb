@@ -1,19 +1,21 @@
 # frozen-string-literal: true
+require "tsort"
+require "mobility/util"
 
 module Mobility
 =begin
 
 Defines convenience methods on plugin module to hook into initialize/included
-method calls on +Mobility::Attributes+ instance.
+method calls on +Mobility::Pluggable+ instance.
 
-- #initialize_hook: called after {{Mobility::Attributes#initialize}, with
+- #initialize_hook: called after {Mobility::Pluggable#initialize}, with
   attribute names and options hash.
-- #included_hook: called after {{Mobility::Attributes#included}, with included
-  class (model class) and backend class. (Use this hook to include any
-  module(s) into backend class.)
+- #included_hook: called after {Mobility::Pluggable#included}. (This can be
+  used to include any module(s) into the backend class, see
+  {Mobility::Plugins::Backend}.)
 
 Also includes a +configure+ class method to apply plugins to a pluggable
-instance (+Mobility::Attributes+), with a block.
+({Mobility::Pluggable} instance), with a block.
 
 @example Defining a plugin
   module MyPlugin
@@ -33,7 +35,7 @@ instance (+Mobility::Attributes+), with a block.
     end
   end
 
-@example Configure a pluggable class with plugins
+@example Configure an attributes class with plugins
   class TranslatedAttributes < Mobility::Attributes
   end
 
@@ -47,7 +49,7 @@ instance (+Mobility::Attributes+), with a block.
 =end
   module Plugin
     class << self
-      # Configure a pluggable {Mobility::Attributes} with a block. Yields to a
+      # Configure a pluggable {Mobility::Pluggable} with a block. Yields to a
       # clean room where plugin names define plugins on the module. Plugin
       # dependencies are resolved before applying them.
       #

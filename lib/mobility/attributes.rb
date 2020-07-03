@@ -1,6 +1,5 @@
 # frozen_string_literal: true
-require "mobility/util"
-require "tsort"
+require "mobility/pluggable"
 
 module Mobility
 =begin
@@ -108,21 +107,7 @@ necessary, ensure that names are defined in such a way as to avoid conflicts
 with other backends.
 
 =end
-  class Attributes < Module
-    class << self
-      def plugin(name, **options)
-        Plugin.configure(self, defaults) { __send__ name, **options }
-      end
-
-      def plugins(&block)
-        Plugin.configure(self, defaults, &block)
-      end
-
-      def defaults
-        @defaults ||= {}
-      end
-    end
-
+  class Attributes < Pluggable
     # Attribute names for which accessors will be defined
     # @return [Array<String>] Array of names
     attr_reader :names
@@ -130,7 +115,7 @@ with other backends.
     # @param [Array<String>] attribute_names Names of attributes to define backend for
     # @param [Hash] options Backend options hash
     def initialize(*attribute_names, **options)
-      @options = self.class.defaults.merge(options)
+      super
       @names = attribute_names.map(&:to_s).freeze
     end
 

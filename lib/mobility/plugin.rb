@@ -107,7 +107,6 @@ Also includes a +configure+ class method to apply plugins to a pluggable
         tree = create_tree(plugins)
 
         pluggable.include(*tree.tsort.reverse) unless tree.empty?
-        defaults
       rescue TSort::Cyclic => e
         raise_cyclic_dependency!(e.message)
       end

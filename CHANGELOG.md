@@ -5,6 +5,8 @@
   ([#400](https://github.com/shioyama/mobility/pull/400))
 - Remove `translated_attribute_names` as alias for `mobility_attributes`
   ([#402](https://github.com/shioyama/mobility/pull/402))
+- Move `_backend` methods into `backend_reader` plugin
+  ([#403](https://github.com/shioyama/mobility/pull/403))
 
 ## 0.8
 

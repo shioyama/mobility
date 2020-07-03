@@ -43,6 +43,11 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
         plugin
       end
 
+      # @param [Module] plugin Plugin module to lookup. Plugin must already be loaded.
+      def lookup_name(plugin)
+        @plugins.invert[plugin]
+      end
+
       def register_plugin(name, mod)
         @plugins[name] = mod
       end

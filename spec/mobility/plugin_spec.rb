@@ -44,7 +44,8 @@ describe Mobility::Plugin do
             __send__ :foo
             __send__ :bar
           end
-        }.to raise_error(Mobility::Plugin::CyclicDependency)
+        }.to raise_error(Mobility::Plugin::CyclicDependency,
+                         "Dependencies cannot be resolved between: bar, foo")
       end
 
       it 'detects after dependency conflict between two plugins' do
@@ -55,7 +56,8 @@ describe Mobility::Plugin do
             __send__ :foo
             __send__ :bar
           end
-        }.to raise_error(Mobility::Plugin::CyclicDependency)
+        }.to raise_error(Mobility::Plugin::CyclicDependency,
+                         "Dependencies cannot be resolved between: bar, foo")
       end
 
       it 'detects before dependency conflict between three plugins' do
@@ -68,7 +70,8 @@ describe Mobility::Plugin do
             __send__ :bar
             __send__ :baz
           end
-        }.to raise_error(Mobility::Plugin::CyclicDependency)
+        }.to raise_error(Mobility::Plugin::CyclicDependency,
+                         "Dependencies cannot be resolved between: bar, baz, foo")
       end
 
       it 'detects after dependency conflict between three plugins' do
@@ -81,7 +84,8 @@ describe Mobility::Plugin do
             __send__ :bar
             __send__ :baz
           end
-        }.to raise_error(Mobility::Plugin::CyclicDependency)
+        }.to raise_error(Mobility::Plugin::CyclicDependency,
+                         "Dependencies cannot be resolved between: bar, baz, foo")
       end
 
       it 'correctly includes plugins with no dependency conflicts' do
@@ -100,7 +104,7 @@ describe Mobility::Plugin do
         expect(included_plugins).to eq([baz, foo, bar])
       end
 
-      it 'raises CyclicDependency error if plugin has after dependency on previously included plugin' do
+      it 'raises DependencyConflict error if plugin has after dependency on previously included plugin' do
         bar.depends_on :foo, include: :after
 
         described_class.configure(pluggable) do
@@ -111,7 +115,8 @@ describe Mobility::Plugin do
           described_class.configure(pluggable) do
             __send__ :bar
           end
-        }.to raise_error(Mobility::Plugin::CyclicDependency)
+        }.to raise_error(Mobility::Plugin::DependencyConflict,
+                         "'foo' plugin must come after 'bar' plugin")
       end
 
       it 'skips mutual before dependencies which have already been included' do

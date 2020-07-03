@@ -104,55 +104,64 @@ instance (+Mobility::Attributes+), with a block.
         plugins = DSL.call(defaults, &block)
         tree = create_tree(plugins)
 
-        # Add any previously included plugins as dependencies of new plugins,
-        # ensuring any dependencies between them are met.
-        before_dependencies = included_plugins
-        tree.each_key { |plugin| tree[plugin] += before_dependencies }
-
         pluggable.include(*tree.tsort.reverse) unless tree.empty?
         defaults
       rescue TSort::Cyclic => e
-        components = e.message.scan(/(?<=\[).*(?=\])/).first
-        raise CyclicDependency, "Dependencies cannot be resolved between: #{components}"
+        raise_cyclic_dependency!(e.message)
       end
 
       private
 
+      attr_reader :tree
+
       def create_tree(plugin_names)
         DependencyTree.new.tap do |tree|
           visited = included_plugins
-          plugin_names.each do |name|
-            plugin = Plugins.load_plugin(name)
-            add_dependency(tree, plugin, visited)
+          plugin_names.each do |plugin_name|
+            plugin = Plugins.load_plugin(plugin_name)
+            add_dependency(tree, plugin, plugin_name, visited)
           end
         end
       end
-
-      attr_reader :tree
 
       def included_plugins
         pluggable.included_modules.grep(Plugin)
       end
 
       # Recursively add dependencies and their dependencies to tree
-      def add_dependency(tree, plugin, visited)
+      def add_dependency(tree, plugin, plugin_name, visited)
         return if visited.include?(plugin)
 
         tree.add(plugin)
 
-        plugin.dependencies.each do |dep, load_order|
-          dep = Plugins.load_plugin(dep)
+        plugin.dependencies.each do |dep_name, load_order|
+          dep = Plugins.load_plugin(dep_name)
 
           case load_order
           when :before
             tree[plugin] += [dep]
           when :after
+            check_after_dependency!(dep, dep_name, plugin_name)
             tree.add(dep)
             tree[dep] += [plugin]
           end
 
-          add_dependency(tree, dep, visited << plugin)
+          add_dependency(tree, dep, dep_name, visited << plugin)
         end
+      end
+
+      def check_after_dependency!(dep, dep_name, plugin_name)
+        if included_plugins.include?(dep)
+          raise DependencyConflict, "'#{dep_name}' plugin must come after '#{plugin_name}' plugin"
+        end
+      end
+
+      def raise_cyclic_dependency!(error_message)
+        components = error_message.scan(/(?<=\[).*(?=\])/).first
+        names = components.split(', ').map! do |plugin|
+          Plugins.lookup_name(Object.const_get(plugin)).to_s
+        end
+        raise CyclicDependency, "Dependencies cannot be resolved between: #{names.sort.join(', ')}"
       end
 
       class DependencyTree < Hash
@@ -189,6 +198,7 @@ instance (+Mobility::Attributes+), with a block.
     end
     private_constant :DependencyResolver
 
-    class CyclicDependency < Mobility::Error; end
+    class DependencyConflict < Mobility::Error; end
+    class CyclicDependency < DependencyConflict; end
   end
 end

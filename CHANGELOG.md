@@ -1,7 +1,10 @@
 # Mobility Changelog
 
 ## 1.0.0.alpha (unreleased)
-- Remove `Mobility::Backend.method_name` ([#400](https://github.com/shioyama/mobility/pull/400))
+- Remove `Mobility::Backend.method_name`
+  ([#400](https://github.com/shioyama/mobility/pull/400))
+- Remove `translated_attribute_names` as alias for `mobility_attributes`
+  ([#402](https://github.com/shioyama/mobility/pull/402))
 
 ## 0.8
 

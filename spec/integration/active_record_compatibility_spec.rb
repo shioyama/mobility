@@ -119,13 +119,6 @@ describe "ActiveRecord compatibility", orm: :active_record do
     end
   end
 
-  describe "#translated_attribute_names" do
-    it "delegates to class method" do
-      post = Post.new
-      expect(post.translated_attribute_names).to match_array(%w[title content])
-    end
-  end
-
   describe "uniqueness validation" do
     it "works without any translated attributes" do
       stub_const 'Article', Class.new(ActiveRecord::Base)

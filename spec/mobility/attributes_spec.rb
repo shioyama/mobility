@@ -21,21 +21,19 @@ describe Mobility::Attributes do
     let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: model_class } }
 
     describe "model class methods" do
-      %w[mobility_attributes translated_attribute_names].each do |method_name|
-        describe ".#{method_name}" do
-          it "returns attribute names" do
-            model_class.include described_class.new("title", "content", backend: backend_class)
-            model_class.include described_class.new("foo", backend: backend_class)
+      describe ".mobility_attributes" do
+        it "returns attribute names" do
+          model_class.include described_class.new("title", "content", backend: backend_class)
+          model_class.include described_class.new("foo", backend: backend_class)
 
-            expect(model_class.public_send(method_name)).to match_array(["title", "content", "foo"])
-          end
+          expect(model_class.mobility_attributes).to match_array(["title", "content", "foo"])
+        end
 
-          it "only returns unique attributes" do
-            model_class.include described_class.new("title", backend: :null)
-            model_class.include described_class.new("title", backend: :null)
+        it "only returns unique attributes" do
+          model_class.include described_class.new("title", backend: :null)
+          model_class.include described_class.new("title", backend: :null)
 
-            expect(model_class.public_send(method_name)).to eq(["title"])
-          end
+          expect(model_class.mobility_attributes).to eq(["title"])
         end
       end
 

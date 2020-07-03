@@ -39,31 +39,6 @@ describe Mobility do
         model.extend described_class
         model.translates :title, backend: :null, foo: :bar
       end
-
-      it "defines translated_attribute_names" do
-        model.extend described_class
-        model.translates :title, backend: :null
-        expect(MyModel.translated_attribute_names).to eq(["title"])
-      end
-
-      context "model subclass" do
-        it "inherits translated_attribute_names" do
-          model.extend described_class
-          model.translates :title, backend: :null
-          subclass = Class.new(model)
-          expect(subclass.translated_attribute_names).to eq(["title"])
-        end
-
-        it "defines new translated attributes independently of superclass" do
-          model.extend described_class
-          model.translates :title, backend: :null
-          subclass = Class.new(model)
-          subclass.translates :content, backend: :null
-
-          expect(model.translated_attribute_names).to eq(["title"])
-          expect(subclass.translated_attribute_names).to match_array(["title", "content"])
-        end
-      end
     end
   end
 

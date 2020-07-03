@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Mobility do
   it 'has a version number' do
-    expect(described_class::VERSION).not_to be nil
+    expect(described_class.gem_version).not_to be nil
   end
 
   describe "including Mobility in class" do

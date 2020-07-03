@@ -1,5 +1,8 @@
 # Mobility Changelog
 
+## 1.0.0.alpha (unreleased)
+- Remove `Mobility::Backend.method_name` ([#400](https://github.com/shioyama/mobility/pull/400))
+
 ## 0.8
 
 ### 0.8.13 (May 27, 2020)

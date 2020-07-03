@@ -16,6 +16,11 @@ module Helpers
     I18n.class_variable_set(:@@fallbacks, nil)
   end
 
+  # Define as helper to make it easy in the future to update if this changes.
+  def backend_for(object, name)
+    object.mobility_backends[name]
+  end
+
   module LazyDescribedClass
     # lazy-load described_class if it's a string
     def described_class

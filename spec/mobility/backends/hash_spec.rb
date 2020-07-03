@@ -40,7 +40,7 @@ describe Mobility::Backends::Hash do
       expect(instance.name(locale: :en)).to eq("foo")
       expect(instance.name(locale: :ja)).to eq("アアア")
 
-      expect(instance.name_backend.locales).to match_array([:en, :ja])
+      expect(backend_for(instance, :name).locales).to match_array([:en, :ja])
     end
   end
 end

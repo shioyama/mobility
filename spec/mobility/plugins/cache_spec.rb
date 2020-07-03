@@ -81,9 +81,9 @@ describe Mobility::Plugins::Cache do
           expect(listener).to receive(:write).with(:en, "foo", any_args).and_return("foo set")
           expect(content_listener).to receive(:write).with(:en, "bar", any_args).and_return("bar set")
           backend.write(:en, "foo")
-          instance.content_backend.write(:en, "bar")
+          backend_for(instance, :content).write(:en, "bar")
           expect(backend.read(:en)).to eq("foo set")
-          expect(instance.content_backend.read(:en)).to eq("bar set")
+          expect(backend_for(instance, :content).read(:en)).to eq("bar set")
         end
 
         aggregate_failures "resetting model" do
@@ -91,7 +91,7 @@ describe Mobility::Plugins::Cache do
           expect(listener).to receive(:read).with(:en, any_args).and_return("from title backend")
           expect(backend.read(:en)).to eq("from title backend")
           expect(content_listener).to receive(:read).with(:en, any_args).and_return("from content backend")
-          expect(instance.content_backend.read(:en)).to eq("from content backend")
+          expect(backend_for(instance, :content).read(:en)).to eq("from content backend")
         end
       end
     end

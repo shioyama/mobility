@@ -118,7 +118,7 @@ describe Mobility::Plugins::Backend do
         article.mobility_backends[:title] # trigger memoization
         other = article.dup
 
-        expect(other.title_backend).not_to eq(article.title_backend)
+        expect(other.mobility_backends[:title]).not_to eq(article.mobility_backends[:title])
       end
     end
   end

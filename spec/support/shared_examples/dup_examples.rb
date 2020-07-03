@@ -4,13 +4,13 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
   it "dups persisted model" do
     skip_if_duping_not_implemented
     instance = model_class.new
-    instance_backend = instance.send("#{attribute}_backend")
+    instance_backend = backend_for(instance, attribute)
     instance_backend.write(:en, "foo")
     instance_backend.write(:ja, "ほげ")
     save_or_raise(instance)
 
     dupped_instance = instance.dup
-    dupped_backend = dupped_instance.send("#{attribute}_backend")
+    dupped_backend = backend_for(dupped_instance, attribute)
     expect(dupped_backend.read(:en)).to eq("foo")
     expect(dupped_backend.read(:ja)).to eq("ほげ")
 

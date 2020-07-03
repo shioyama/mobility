@@ -5,7 +5,7 @@ module Mobility
 
 Defines convenience methods for accessing backends, of the form
 "<name>_backend". The format for this method can be customized by passing a
-different interpolation string as the plugin option.
+different format string as the plugin option.
 
 =end
     module BackendReader

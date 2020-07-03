@@ -80,7 +80,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       instance = model_class.create(title: "foo")
 
       aggregate_failures do
-        instance.title_backend.write(:en, "bar")
+        backend_for(instance, :title).write(:en, "bar")
         expect(instance.changed?).to eq(true)
 
         instance.save
@@ -94,7 +94,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       Mobility.locale = locale = :en
       instance = model_class.create(title: "foo")
 
-      instance.title_backend.write(locale, 'bar')
+      backend_for(instance, :title).write(locale, 'bar')
       instance.save
 
       instance.singleton_class.class_eval do
@@ -134,7 +134,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       Mobility.locale = :en
       instance = model_class.create(title_en: "English title 1", title_fr: "Titre en Francais 1")
 
-      backend = instance.title_backend
+      backend = backend_for(instance, :title)
 
       backend.write(:en, "English title 2")
       backend.write(:fr, "Titre en Francais 2")
@@ -316,7 +316,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     it "returns changes on attribute for current locale" do
       instance = model_class.create(title: "foo")
 
-      backend = instance.title_backend
+      backend = backend_for(instance, :title)
       backend.write(:en, "bar")
 
       aggregate_failures do
@@ -373,7 +373,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
     it "handles translated attributes when passed to restore_attributes" do
       instance = model_class.create(title: "foo")
-      backend = instance.title_backend
+      backend = backend_for(instance, :title)
 
       expect(backend.read(:en)).to eq("foo")
 
@@ -388,7 +388,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     shared_examples_for "resets on model action" do |action|
       it "resets changes when model on #{action}" do
         instance = model_class.create
-        backend = instance.title_backend
+        backend = backend_for(instance, :title)
 
         aggregate_failures do
           backend.write(:en, 'foo')
@@ -450,7 +450,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   describe '#has_changes_to_save?', rails_version_geq: '6.0' do
     it 'detects changes to translated and untranslated attributes' do
       instance = model_class.new
-      backend = instance.title_backend
+      backend = backend_for(instance, :title)
 
       expect(instance.has_changes_to_save?).to eq(false)
 
@@ -488,7 +488,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   describe '#changed_attribute_names_to_save', rails_version_geq: '5.1' do
     it 'includes translated attributes and untranslated attributes' do
       instance = model_class.new
-      backend = instance.title_backend
+      backend = backend_for(instance, :title)
       expect(instance.changed_attribute_names_to_save).to eq([])
 
       backend.write(:en, 'foo en')

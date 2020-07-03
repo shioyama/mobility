@@ -21,7 +21,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
 
     it "finds translation on every read/write" do
       article = Article.new
-      title_backend = article.mobility_backends[:title]
+      title_backend = backend_for(article, :title)
       expect(title_backend.model.send(title_backend.association_name)).to receive(:find).thrice.and_call_original
       title_backend.write(:en, "foo")
       title_backend.write(:en, "bar")
@@ -35,7 +35,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
 
     it "only fetches translation once per locale" do
       article = Article.new
-      title_backend = article.mobility_backends[:title]
+      title_backend = backend_for(article, :title)
 
       aggregate_failures do
         expect(title_backend.model.send(title_backend.association_name)).to receive(:find).twice.and_call_original
@@ -49,8 +49,8 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
 
     it "resets model translations cache when model is saved or reloaded" do
       article = Article.new
-      title_backend = article.mobility_backends[:title]
-      content_backend = article.mobility_backends[:content]
+      title_backend = backend_for(article, :title)
+      content_backend = backend_for(article, :content)
 
       aggregate_failures "cacheing reads" do
         title_backend.read(:en)
@@ -77,7 +77,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
     before { Article.translates :title, :content, backend: :table, cache: true }
 
     describe "cleaning up blank translations" do
-      let(:title_backend) { article.mobility_backends[:title] }
+      let(:title_backend) { backend_for(article, :title) }
 
       it "builds nil translations when reading but does not save them" do
         Mobility.locale = :en
@@ -137,8 +137,8 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
       %w[foo bar baz].each { |slug| Article.create!(slug: slug) }
     end
     let(:article) { Article.find_by(slug: "baz") }
-    let(:title_backend) { article.mobility_backends[:title] }
-    let(:content_backend) { article.mobility_backends[:content] }
+    let(:title_backend) { backend_for(article, :title) }
+    let(:content_backend) { backend_for(article, :content) }
 
     subject { article }
 

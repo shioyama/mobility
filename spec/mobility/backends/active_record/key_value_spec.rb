@@ -14,8 +14,8 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
   end
 
   context "with standard plugins applied" do
-    let(:title_backend)   { article.mobility_backends[:title] }
-    let(:content_backend) { article.mobility_backends[:content] }
+    let(:title_backend)   { backend_for(article, :title) }
+    let(:content_backend) { backend_for(article, :content) }
     let(:cache) { false }
 
     before do

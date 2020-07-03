@@ -66,6 +66,34 @@ describe Mobility::Plugins::Backend do
 
         expect(model_class.mobility_backend_class("content")).to eq(other_mod.backend_class)
       end
+
+      it "works with subclasses" do
+        backend_class_1 = Class.new
+        backend_class_1.include Mobility::Backend
+
+        mod1 = attributes_class.new("title", backend: backend_class_1)
+        model_class.include mod1
+
+        backend_class_2 = Class.new
+        backend_class_2.include Mobility::Backend
+
+        model_subclass = Class.new(model_class)
+        mod2 = attributes_class.new("content", backend: backend_class_2)
+
+        model_subclass.include mod2
+
+        title_backend_class_1 = model_class.mobility_backend_class("title")
+        title_backend_class_2 = model_subclass.mobility_backend_class("title")
+
+        expect(title_backend_class_1).to be <(backend_class_1)
+        expect(title_backend_class_2).to be <(backend_class_1)
+
+        expect {
+          model_class.mobility_backend_class("content")
+        }.to raise_error(KeyError)
+        content_backend_class = model_subclass.mobility_backend_class("content")
+        expect(content_backend_class).to be <(backend_class_2)
+      end
     end
 
     describe "#mobility_backends" do

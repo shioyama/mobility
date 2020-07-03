@@ -6,6 +6,12 @@ module Mobility
 Plugin for setting up a backend for a set of model attributes. All backend
 plugins must depend on this.
 
+Defines:
+- instance method +mobility_backends+ which returns a hash whose keys are
+  attribute names and values a backend for each attribute.
+- class method +mobility_backend_class+ which takes an attribute name and
+  returns the backend class for that name.
+
 =end
     module Backend
       extend Plugin
@@ -18,12 +24,8 @@ plugins must depend on this.
       # @return [Symbol,Class] Name of backend, or backend class
       attr_reader :backend_name
 
-      initialize_hook do |*names, backend:|
+      initialize_hook do |*, backend:|
         @backend_name = backend
-
-        names.each do |name|
-          define_backend(name)
-        end
       end
 
       # Setup backend class, include modules into model class, include/extend
@@ -50,16 +52,6 @@ plugins must depend on this.
       # @return [String]
       def inspect
         "#<Attributes (#{backend_name}) @names=#{names.join(", ")}>"
-      end
-
-      private
-
-      def define_backend(attribute)
-        module_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{attribute}_backend
-          mobility_backends[:#{attribute}]
-        end
-        EOM
       end
 
       module InstanceMethods

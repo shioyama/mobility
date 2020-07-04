@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mobility::Attributes do
   describe "initializing" do
     specify {
-      expect { described_class.new(backend: :null) }.to allocate_under(15).objects
+      expect { described_class.new(backend: :null) }.to allocate_under(25).objects
     }
   end
 

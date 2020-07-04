@@ -22,7 +22,7 @@ To use the validator, you must +extend Mobility+ before calling +validates+
       def validate_each(record, attribute, value)
         klass = record.class
 
-        if (([*options[:scope]] + [attribute]).map(&:to_s) & klass.mobility_attributes).present?
+        if ([*options[:scope]] + [attribute]).any? { |name| klass.mobility_attribute?(name) }
           return unless value.present?
           relation = klass.unscoped.__mobility_query_scope__ do |m|
             node = m.__send__(attribute)

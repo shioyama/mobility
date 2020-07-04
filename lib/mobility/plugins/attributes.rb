@@ -33,27 +33,34 @@ for aggregating attributes.
 
       included_hook do |klass, *, **|
         klass.extend ClassMethods
+        @names.each { |name| klass.register_mobility_attribute(name) }
       end
 
       module ClassMethods
-        # Return all {Mobility::Attributes} module instances from among ancestors
-        # of this model.
-        # @return [Array<Mobility::Attributes>] Attribute modules
-        def mobility_modules
-          ancestors.grep(Attributes)
-        end
-
-        # Return translated attribute names on this model.
-        # @return [Array<String>] Attribute names
-        def mobility_attributes
-          mobility_modules.map(&:names).flatten.uniq
-        end
-
         # Return true if attribute name is translated on this model.
         # @param [String, Symbol] Attribute name
         # @return [Boolean]
         def mobility_attribute?(name)
           mobility_attributes.include?(name.to_s)
+        end
+
+        # Register a new attribute name. Public, but treat as internal.
+        # @param [String, Symbol] Attribute name
+        def register_mobility_attribute(name)
+          (self.mobility_attributes << name.to_s).uniq!
+        end
+
+        def inherited(klass)
+          super
+          mobility_attributes.each { |name| klass.register_mobility_attribute(name) }
+        end
+
+        protected
+
+        # Return translated attribute names on this model.
+        # @return [Array<String>] Attribute names
+        def mobility_attributes
+          @mobility_attributes ||= []
         end
       end
     end

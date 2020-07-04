@@ -195,11 +195,11 @@ enabled for any one attribute on the model.
               # Builds a translated relation for a given opts hash and optional
               # invert boolean.
               def _build(scope, opts, locale, invert)
-                return yield unless scope.respond_to?(:mobility_modules)
+                return yield if (mods = attribute_modules(scope)).empty?
 
                 keys, predicates = opts.keys.map(&:to_s), []
 
-                query_map = scope.mobility_modules.inject(IDENTITY) do |qm, mod|
+                query_map = mods.inject(IDENTITY) do |qm, mod|
                   i18n_keys = mod.names & keys
                   next qm if i18n_keys.empty?
 
@@ -216,6 +216,10 @@ enabled for any one attribute on the model.
 
                 relation = opts.empty? ? scope : yield(opts)
                 query_map[relation.where(predicates.inject(:and))]
+              end
+
+              def attribute_modules(scope)
+                scope.model.ancestors.grep(::Mobility::Attributes)
               end
 
               def build_predicate(node, values)

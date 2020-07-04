@@ -26,14 +26,14 @@ describe Mobility::Attributes do
           model_class.include described_class.new("title", "content", backend: backend_class)
           model_class.include described_class.new("foo", backend: backend_class)
 
-          expect(model_class.mobility_attributes).to match_array(["title", "content", "foo"])
+          expect(model_class.send(:mobility_attributes)).to match_array(["title", "content", "foo"])
         end
 
         it "only returns unique attributes" do
           model_class.include described_class.new("title", backend: :null)
           model_class.include described_class.new("title", backend: :null)
 
-          expect(model_class.mobility_attributes).to eq(["title"])
+          expect(model_class.send(:mobility_attributes)).to eq(["title"])
         end
       end
 
@@ -46,16 +46,6 @@ describe Mobility::Attributes do
             expect(model_class.mobility_attribute?(name.to_sym)).to eq(true)
           end
           expect(model_class.mobility_attribute?("foo")).to eq(false)
-        end
-      end
-
-      describe ".mobility_modules" do
-        it "returns attribute modules on class" do
-          modules = [
-            described_class.new("title", "content", backend: :null),
-            described_class.new("foo", backend: :null)]
-          modules.each { |mod| model_class.include mod }
-          expect(model_class.mobility_modules).to match_array(modules)
         end
       end
     end

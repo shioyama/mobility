@@ -256,8 +256,8 @@ module Mobility
   module ClassMethods
     # Return translated attribute names on this model.
     # @return [Array<String>] Attribute names
-    def mobility_attributes
-      []
+    def mobility_attribute?(_)
+      false
     end
   end
 

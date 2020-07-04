@@ -109,7 +109,7 @@ See ActiveRecord::Query plugin.
               keys, predicates = cond.keys, []
               model = dataset.model
 
-              query_map = model.mobility_modules.inject(IDENTITY) do |qm, mod|
+              query_map = attribute_modules(model).inject(IDENTITY) do |qm, mod|
                 i18n_keys = mod.names.map(&:to_sym) & keys
                 next qm if i18n_keys.empty?
 
@@ -125,6 +125,10 @@ See ActiveRecord::Query plugin.
 
               predicates = ::Sequel.&(*predicates, cond) unless cond.empty?
               query_map[dataset.public_send(query_method, ::Sequel.&(*predicates))]
+            end
+
+            def attribute_modules(model)
+              model.ancestors.grep(::Mobility::Attributes)
             end
 
             def build_predicate(op, values)

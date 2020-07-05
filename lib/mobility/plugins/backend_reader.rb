@@ -15,17 +15,15 @@ different format string as the plugin option.
 
       initialize_hook do |*names, backend_reader: true|
         backend_reader = "%s_backend" if backend_reader == true
-        names.each { |name| define_backend(name, backend_reader) } if backend_reader
-      end
-
-      private
-
-      def define_backend(attribute, format_string)
-        module_eval <<-EOM, __FILE__, __LINE__ + 1
-        def #{format_string % attribute}
-          mobility_backends[:#{attribute}]
+        if backend_reader
+          names.each do |name|
+            module_eval <<-EOM, __FILE__, __LINE__ + 1
+            def #{backend_reader % name}
+              mobility_backends[:#{name}]
+            end
+            EOM
+          end
         end
-        EOM
       end
     end
 

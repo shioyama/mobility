@@ -272,7 +272,5 @@ enabled for any one attribute on the model.
         private_constant :QueryExtension, :FindByMethods
       end
     end
-
-    register_plugin(:query, Query)
   end
 end

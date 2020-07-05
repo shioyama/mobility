@@ -12,18 +12,16 @@ Defines attribute writer that delegates to +Mobility::Backend#write+.
       depends_on :backend
 
       initialize_hook do |*names, writer: true|
-        names.each { |name| define_writer(name) } if writer
-      end
-
-      private
-
-      def define_writer(attribute)
-        class_eval <<-EOM, __FILE__, __LINE__ + 1
-          def #{attribute}=(value, locale: nil, **options)
-            #{Writer.setup_source}
-            mobility_backends[:#{attribute}].write(locale, value, options)
+        if writer
+          names.each do |name|
+            class_eval <<-EOM, __FILE__, __LINE__ + 1
+              def #{name}=(value, locale: nil, **options)
+                #{Writer.setup_source}
+                mobility_backends[:#{name}].write(locale, value, options)
+              end
+            EOM
           end
-        EOM
+        end
       end
 
       def self.setup_source

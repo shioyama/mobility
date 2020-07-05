@@ -13,24 +13,22 @@ Defines attribute reader that delegates to +Mobility::Backend#read+.
       depends_on :backend
 
       initialize_hook do |*names, reader: true|
-        names.each { |name| define_reader(name) } if reader
-      end
-
-      private
-
-      def define_reader(attribute)
-        class_eval <<-EOM, __FILE__, __LINE__ + 1
-          def #{attribute}(locale: nil, **options)
-            #{Reader.setup_source}
-            mobility_backends[:#{attribute}].read(locale, options)
+        if reader
+          names.each do |name|
+            class_eval <<-EOM, __FILE__, __LINE__ + 1
+              def #{name}(locale: nil, **options)
+                #{Reader.setup_source}
+                mobility_backends[:#{name}].read(locale, options)
+              end
+            EOM
+            class_eval <<-EOM, __FILE__, __LINE__ + 1
+              def #{name}?(locale: nil, **options)
+                #{Reader.setup_source}
+                mobility_backends[:#{name}].present?(locale, options)
+              end
+            EOM
           end
-        EOM
-        class_eval <<-EOM, __FILE__, __LINE__ + 1
-          def #{attribute}?(locale: nil, **options)
-            #{Reader.setup_source}
-            mobility_backends[:#{attribute}].present?(locale, options)
-          end
-        EOM
+        end
       end
 
       def self.setup_source

@@ -15,7 +15,7 @@ for aggregating attributes.
       # @return [Array<String>] Array of names
       attr_reader :names
 
-      initialize_hook do |*names, **|
+      initialize_hook do |*names|
         @names = names.map(&:to_s).freeze
       end
 
@@ -31,7 +31,7 @@ for aggregating attributes.
         "#<Attributes @names=#{names.join(", ")}>"
       end
 
-      included_hook do |klass, *, **|
+      included_hook do |klass|
         klass.extend ClassMethods
         @names.each { |name| klass.register_mobility_attribute(name) }
       end

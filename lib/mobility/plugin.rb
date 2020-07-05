@@ -69,17 +69,25 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
     def initialize_hook(&block)
       key = plugin_key
+      call_with_kwargs = call_with_kwargs?(block)
+
       define_method :initialize do |*names, **options|
         super(*names, **options)
-        class_exec(*names, **@options.slice(key), &block)
+        call_with_kwargs ?
+          class_exec(*names, **@options.slice(key), &block) :
+          class_exec(*names, &block)
       end
     end
 
     def included_hook(&block)
       key = plugin_key
+      call_with_kwargs = call_with_kwargs?(block)
+
       define_method :included do |klass|
         super(klass).tap do |backend_class|
-          class_exec(klass, backend_class, **@options.slice(key), &block)
+          call_with_kwargs ?
+            class_exec(klass, backend_class, **@options.slice(key), &block) :
+            class_exec(klass, backend_class, &block)
         end
       end
     end
@@ -99,6 +107,10 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
     def plugin_key
       Util.underscore(to_s.split('::').last).to_sym
+    end
+
+    def call_with_kwargs?(block)
+      [:keyrest, :keyreq, :key].include?(block.parameters.last.first)
     end
 
     DependencyResolver = Struct.new(:pluggable, :defaults) do

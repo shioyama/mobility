@@ -125,8 +125,6 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
       private
 
-      attr_reader :tree
-
       def create_tree(plugin_names)
         DependencyTree.new.tap do |tree|
           visited = included_plugins

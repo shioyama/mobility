@@ -13,7 +13,8 @@ different format string as the plugin option.
 
       depends_on :backend
 
-      initialize_hook do |*names, backend_reader: "%s_backend"|
+      initialize_hook do |*names, backend_reader: true|
+        backend_reader = "%s_backend" if backend_reader == true
         names.each { |name| define_backend(name, backend_reader) } if backend_reader
       end
 

@@ -32,6 +32,7 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
 =end
   module Plugins
     @plugins = {}
+    @names = {}
 
     class << self
       # @param [Symbol] name Name of plugin to load.
@@ -45,11 +46,12 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
 
       # @param [Module] plugin Plugin module to lookup. Plugin must already be loaded.
       def lookup_name(plugin)
-        @plugins.invert[plugin]
+        @names.fetch(plugin)
       end
 
-      def register_plugin(name, mod)
-        @plugins[name] = mod
+      def register_plugin(name, plugin)
+        @plugins[name] = plugin
+        @names[plugin] = name
       end
     end
   end

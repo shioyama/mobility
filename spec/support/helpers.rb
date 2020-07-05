@@ -121,19 +121,21 @@ module Helpers
 
     module ClassMethods
       # Sets up attributes module with a listener to listen on reads/writes to the
-      # backend. Pass two separate arrays to create separate attributes modules.
-      def plugin_setup(attribute_name = "title", *other_names, **options)
-        plugin_names = options.keys & Dir['./lib/mobility/plugins/*.rb'].map { |f| File.basename(f, '.rb').to_sym }
-
-        # Handle special case of backend plugin. If we pass plugin: true, we
-        # want to enable the backend plugin but use the backend listener.
-        options.delete(:backend) if options[:backend] == true
+      # backend.
+      # Pass block to define plugins in block.
+      def plugin_setup(attribute_name = "title", *other_names, **options, &block)
+        if block_given?
+          plugin_definer = block
+        else
+          plugin_names = options.keys & Dir['./lib/mobility/plugins/*.rb'].map { |f| File.basename(f, '.rb').to_sym }
+          plugin_definer = proc { plugin_names.each { |plugin| __send__(plugin) } }
+        end
 
         attribute_names = [attribute_name, *other_names]
         let(:attribute_name) { attribute_name }
         let(:attributes_class) do
           Class.new(TestAttributes).tap do |attrs|
-            plugin_names.each { |plugin| attrs.plugin plugin }
+            attrs.plugins(&plugin_definer)
           end
         end
         let(:model_class) do

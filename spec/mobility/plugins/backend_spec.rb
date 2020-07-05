@@ -4,7 +4,9 @@ require "mobility/plugins/writer"
 describe Mobility::Plugins::Backend do
   include Helpers::Plugins
 
-  plugin_setup backend: true
+  plugin_setup do
+    backend
+  end
 
   # Override default helper-defined model_class which has attributes module
   # pre-included, so we can explicitly include it in specs.

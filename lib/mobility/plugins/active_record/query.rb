@@ -14,43 +14,48 @@ enabled for any one attribute on the model.
 
 =end
     module ActiveRecord
-      module Query
-        class << self
-          def apply(names, model_class, backend_class)
-            model_class.class_eval do
-              extend QueryMethod
-              extend FindByMethods.new(*names)
-              singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_scope__
+      class Query
+        def initialize(pluggable)
+          @attribute_names = pluggable.names
+        end
+
+        def call(klass, backend_class)
+          backend_class.include BackendMethods
+          names = @attribute_names
+          klass.class_eval do
+            extend QueryMethod
+            extend FindByMethods.new(*names)
+            singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_scope__
+          end
+        end
+
+        def self.attribute_alias(attribute, locale = Mobility.locale)
+          "__mobility_%s_%s__"  % [attribute, ::Mobility.normalize_locale(locale)]
+        end
+
+        module BackendMethods
+          # @note We use +instance_variable_get+ here to get the +AttributeSet+
+          #   rather than the hash of attributes. Getting the full hash of
+          #   attributes is a performance hit and better to avoid if unnecessary.
+          # TODO: Improve this.
+          def read(locale, **)
+            if (model_attributes_defined? &&
+                model_attributes.key?(alias_ = Query.attribute_alias(attribute, locale)))
+              model_attributes[alias_].value
+            else
+              super
             end
-            backend_class.include self
           end
 
-          def attribute_alias(attribute, locale = Mobility.locale)
-            "__mobility_%s_%s__"  % [attribute, ::Mobility.normalize_locale(locale)]
+          private
+
+          def model_attributes_defined?
+            model.instance_variable_defined?(:@attributes)
           end
-        end
 
-        # @note We use +instance_variable_get+ here to get the +AttributeSet+
-        #   rather than the hash of attributes. Getting the full hash of
-        #   attributes is a performance hit and better to avoid if unnecessary.
-        # TODO: Improve this.
-        def read(locale, **)
-          if (model_attributes_defined? &&
-              model_attributes.key?(alias_ = Query.attribute_alias(attribute, locale)))
-            model_attributes[alias_].value
-          else
-            super
+          def model_attributes
+            model.instance_variable_get(:@attributes)
           end
-        end
-
-        private
-
-        def model_attributes_defined?
-          model.instance_variable_defined?(:@attributes)
-        end
-
-        def model_attributes
-          model.instance_variable_get(:@attributes)
         end
 
         module QueryMethod

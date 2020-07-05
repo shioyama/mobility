@@ -39,7 +39,16 @@ patched to work with translated attributes:
 locale suffix, so +title_en+, +title_pt_br+, etc.)
 
 =end
-      module Dirty
+      class Dirty
+        def initialize(pluggable)
+          @attribute_names = pluggable.names
+        end
+
+        def call(klass, backend_class)
+          backend_class.include BackendMethods
+          klass.include MethodsBuilder.new(*@attribute_names)
+        end
+
         class MethodsBuilder < ActiveModel::Dirty::MethodsBuilder
           # @param [Attributes] attributes
           def included(model_class)

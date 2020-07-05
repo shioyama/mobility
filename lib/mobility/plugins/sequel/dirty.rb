@@ -12,7 +12,16 @@ Automatically includes dirty plugin in model class when enabled.
 
 =end
     module Sequel
-      module Dirty
+      class Dirty
+        def initialize(pluggable)
+          @attribute_names = pluggable.names
+        end
+
+        def call(klass, backend_class)
+          backend_class.include BackendMethods
+          model_class.include MethodsBuilder.new(*@attribute_names)
+        end
+
         # Builds module which overrides dirty methods to handle translated as
         # well as normal (untranslated) attributes.
         class MethodsBuilder < Module

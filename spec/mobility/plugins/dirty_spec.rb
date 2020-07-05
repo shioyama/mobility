@@ -25,6 +25,8 @@ describe Mobility::Plugins::Dirty do
     end
 
     context "model_class includes ActiveModel::Dirty", orm: :active_record do
+      plugin_setup dirty: true, active_record: true
+
       context "including class is an ActiveRecord::Base" do
         it_behaves_like "dirty module" do
           let(:parent_module) { Mobility::Plugins::ActiveRecord::Dirty }
@@ -45,6 +47,8 @@ describe Mobility::Plugins::Dirty do
     end
 
     context "options[:model_class] is a Sequel::Model", orm: :sequel do
+      plugin_setup dirty: true, sequel: true
+
       it_behaves_like "dirty module" do
         let(:parent_module) { Mobility::Plugins::Sequel::Dirty }
         let(:model_class) { Class.new(Sequel::Model) }

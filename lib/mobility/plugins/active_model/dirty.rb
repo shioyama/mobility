@@ -41,7 +41,16 @@ the ActiveRecord dirty plugin for more information.
 @see http://api.rubyonrails.org/classes/ActiveModel/Dirty.html Rails documentation for Active Model Dirty module
 
 =end
-      module Dirty
+      class Dirty
+        def initialize(pluggable)
+          @attribute_names = pluggable.names
+        end
+
+        def call(klass, backend_class)
+          backend_class.include BackendMethods
+          klass.include MethodsBuilder.new(*@attribute_names)
+        end
+
         # Builds module which adds suffix/prefix methods for translated
         # attributes so they act like normal dirty-tracked attributes.
         class MethodsBuilder < Module

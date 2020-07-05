@@ -30,7 +30,7 @@ require "mobility/backends/null"
 
 # Enable default plugins
 Mobility.configure do |config|
-  config.plugins *%i[
+  plugins = %i[
     backend
     reader
     writer
@@ -44,6 +44,9 @@ Mobility.configure do |config|
     fallthrough_accessors
     locale_accessors
   ]
+  plugins << :active_record if orm == 'active_record'
+  plugins << :sequel if orm == 'sequel'
+  config.plugins *plugins
 end
 
 I18n.enforce_available_locales = true

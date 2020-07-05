@@ -4,7 +4,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   require "mobility/plugins/active_record/dirty"
 
   include Helpers::Plugins
-  plugin_setup "title", dirty: true, reader: true, writer: true
+  plugin_setup "title", dirty: true, reader: true, writer: true, active_record: true
 
   let(:model_class) do
     stub_const 'Article', Class.new(ActiveRecord::Base)

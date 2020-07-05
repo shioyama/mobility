@@ -22,37 +22,14 @@ details.
 
       depends_on :backend, include: :before
       depends_on :fallthrough_accessors, include: :after
+      depends_on :delegator
 
       initialize_hook do |dirty: nil|
         @options[:fallthrough_accessors] = true if dirty == true
       end
 
       included_hook do |model_class, backend_class, dirty: nil|
-        if dirty
-          include_dirty_modules(backend_class, model_class, *names)
-        end
-      end
-
-      private
-
-      def include_dirty_modules(backend_class, model_class, *attribute_names)
-        dirty_module =
-          if Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveModel::Dirty)
-            if (model_class < ::ActiveRecord::Base)
-              require "mobility/plugins/active_record/dirty"
-              Plugins::ActiveRecord::Dirty
-            else
-              require "mobility/plugins/active_model/dirty"
-              Plugins::ActiveModel::Dirty
-            end
-          elsif Loaded::Sequel && model_class < ::Sequel::Model
-            require "mobility/plugins/sequel/dirty"
-            Plugins::Sequel::Dirty
-          else
-            raise ArgumentError, "#{model_class} does not support Dirty module."
-          end
-        backend_class.include dirty_module.const_get(:BackendMethods)
-        model_class.include dirty_module.const_get(:MethodsBuilder).new(*attribute_names)
+        delegate_included(:dirty, model_class, backend_class) if dirty
       end
     end
 

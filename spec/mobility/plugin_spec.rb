@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Mobility::Plugin do
-  let(:pluggable) { Class.new(Module) }
+  let(:pluggable) { Class.new(Mobility::Pluggable) }
   let(:included_plugins) { pluggable.included_modules.grep(described_class) }
 
   describe 'dependencies' do
@@ -203,6 +203,66 @@ describe Mobility::Plugin do
         expect(included_plugins).to match_array([foo, bar, baz, qux])
         expect(included_plugins & [baz, bar]).to eq([baz, bar])
         expect(included_plugins & [baz, qux]).to eq([baz, qux])
+      end
+
+      it 'does not include dependency for include: false' do
+        foo.depends_on :foo
+        bar.depends_on :bar, include: false
+
+        expect {
+          described_class.configure(pluggable) do
+            __send__ :foo
+          end
+        }.not_to raise_error
+
+        expect(included_plugins).to eq([foo])
+      end
+
+      it 'does not run hooks if dependency is not included for include: false' do
+        foo.depends_on :bar, include: false
+        listener = double
+
+        bar.initialize_hook do |*|
+          listener.initialize
+        end
+
+        bar.included_hook do
+          listener.included
+        end
+
+        described_class.configure(pluggable) do
+          __send__ :foo
+        end
+
+        expect(listener).not_to receive(:initialize)
+        mod = pluggable.new
+
+        expect(listener).not_to receive(:included)
+        Class.new.include mod
+      end
+
+      it 'does run hooks if dependency is included for include: false' do
+        foo.depends_on :bar, include: false
+        listener = double
+
+        bar.initialize_hook do |*|
+          listener.initialize
+        end
+
+        bar.included_hook do
+          listener.included
+        end
+
+        described_class.configure(pluggable) do
+          __send__ :foo
+          __send__ :bar
+        end
+
+        expect(listener).to receive(:initialize)
+        mod = pluggable.new
+
+        expect(listener).to receive(:included)
+        Class.new.include mod
       end
     end
   end

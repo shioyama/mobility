@@ -73,6 +73,8 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
       define_method :initialize do |*names, **options|
         super(*names, **options)
+        return unless self.class.included_modules.include?(plugin)
+
         call_with_kwargs ?
           class_exec(*names, **@options.slice(Plugins.lookup_name(plugin)), &block) :
           class_exec(*names, &block)
@@ -85,9 +87,11 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
       define_method :included do |klass|
         super(klass).tap do |backend_class|
-          call_with_kwargs ?
-            class_exec(klass, backend_class, **@options.slice(Plugins.lookup_name(plugin)), &block) :
-            class_exec(klass, backend_class, &block)
+          if self.class.included_modules.include?(plugin)
+            call_with_kwargs ?
+              class_exec(klass, backend_class, **@options.slice(Plugins.lookup_name(plugin)), &block) :
+              class_exec(klass, backend_class, &block)
+          end
         end
       end
     end
@@ -96,9 +100,9 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       @dependencies ||= {}
     end
 
-    def depends_on(plugin, include: nil)
-      unless [nil, :before, :after].include?(include)
-        raise ArgumentError, "depends_on 'include' keyword argument must be nil, :before or :after"
+    def depends_on(plugin, include: true)
+      unless [true, false, :before, :after].include?(include)
+        raise ArgumentError, "depends_on 'include' keyword argument must be one of: true, false, :before or :after"
       end
       dependencies[plugin] = include
     end
@@ -106,7 +110,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
     private
 
     def call_with_kwargs?(block)
-      [:keyrest, :keyreq, :key].include?(block.parameters.last.first)
+      [:keyrest, :keyreq, :key].include?(block.parameters.last&.first)
     end
 
     DependencyResolver = Struct.new(:pluggable, :defaults) do
@@ -126,7 +130,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
           visited = included_plugins
           plugin_names.each do |plugin_name|
             plugin = Plugins.load_plugin(plugin_name)
-            add_dependency(tree, plugin, plugin_name, visited)
+            traverse(tree, plugin, visited)
           end
         end
       end
@@ -135,31 +139,35 @@ Also includes a +configure+ class method to apply plugins to a pluggable
         pluggable.included_modules.grep(Plugin)
       end
 
-      # Recursively add dependencies and their dependencies to tree
-      def add_dependency(tree, plugin, plugin_name, visited)
+      # Recursively traverse dependencies and add their dependencies to tree
+      def traverse(tree, plugin, visited)
         return if visited.include?(plugin)
 
         tree.add(plugin)
 
-        plugin.dependencies.each do |dep_name, load_order|
+        plugin.dependencies.each do |dep_name, include_order|
+          next unless include_order
           dep = Plugins.load_plugin(dep_name)
+          add_dependency(plugin, dep, tree, include_order)
 
-          case load_order
-          when :before
-            tree[plugin] += [dep]
-          when :after
-            check_after_dependency!(dep, dep_name, plugin_name)
-            tree.add(dep)
-            tree[dep] += [plugin]
-          end
-
-          add_dependency(tree, dep, dep_name, visited << plugin)
+          traverse(tree, dep, visited << plugin)
         end
       end
 
-      def check_after_dependency!(dep, dep_name, plugin_name)
+      def add_dependency(plugin, dep, tree, include_order)
+        case include_order
+        when :before
+          tree[plugin] += [dep]
+        when :after
+          check_after_dependency!(plugin, dep)
+          tree.add(dep)
+          tree[dep] += [plugin]
+        end
+      end
+
+      def check_after_dependency!(plugin, dep)
         if included_plugins.include?(dep)
-          message = "'#{dep_name}' plugin must come after '#{plugin_name}' plugin"
+          message = "'#{name(dep)}' plugin must come after '#{name(plugin)}' plugin"
           raise DependencyConflict, append_pluggable_name(message)
         end
       end
@@ -167,7 +175,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       def raise_cyclic_dependency!(error_message)
         components = error_message.scan(/(?<=\[).*(?=\])/).first
         names = components.split(', ').map! do |plugin|
-          Plugins.lookup_name(Object.const_get(plugin)).to_s
+          name(Object.const_get(plugin)).to_s
         end
         message = "Dependencies cannot be resolved between: #{names.sort.join(', ')}"
         raise CyclicDependency, append_pluggable_name(message)
@@ -175,6 +183,10 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
       def append_pluggable_name(message)
         pluggable.name ? "#{message} in #{pluggable}" : message
+      end
+
+      def name(plugin)
+        Plugins.lookup_name(plugin)
       end
 
       class DependencyTree < Hash

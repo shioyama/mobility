@@ -3,7 +3,7 @@ version: "2"
 checks:
   method-complexity:
     config:
-      threshold: 6
+      threshold: 8
   method-lines:
     enabled: false
 engines:

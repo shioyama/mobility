@@ -62,7 +62,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       #     cache
       #     fallbacks default: [:en, :de]
       #   end
-      def configure(pluggable, defaults = {}, &block)
+      def configure(pluggable, defaults = pluggable.defaults, &block)
         DependencyResolver.new(pluggable, defaults).call(&block)
       end
     end

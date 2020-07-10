@@ -5,27 +5,24 @@ describe Mobility::Plugin do
   let(:included_plugins) { pluggable.included_modules.grep(described_class) }
 
   describe 'dependencies' do
-    def self.define_plugin(name)
-      let!(name) do
-        Module.new.tap do |mod|
-          mod.extend Mobility::Plugin
-          Mobility::Plugins.register_plugin(name, mod)
-          stub_const(name.to_s.capitalize, mod)
+    def self.define_plugins(*names)
+      names.each do |name|
+        let!(name) do
+          Module.new.tap do |mod|
+            mod.extend Mobility::Plugin
+            Mobility::Plugins.register_plugin(name, mod)
+            stub_const(name.to_s.capitalize, mod)
+          end
         end
       end
     end
 
-    define_plugin(:foo)
-    define_plugin(:bar)
-    define_plugin(:baz)
-    define_plugin(:qux)
+    plugin_names = [:foo, :bar, :baz, :qux]
+    define_plugins(*plugin_names)
 
     after do
       plugins = Mobility::Plugins.instance_variable_get(:@plugins)
-      plugins.delete(:foo)
-      plugins.delete(:bar)
-      plugins.delete(:baz)
-      plugins.delete(:qux)
+      plugin_names.each { |name| plugins.delete(name) }
     end
 
     describe '.configure' do
@@ -34,6 +31,14 @@ describe Mobility::Plugin do
           __send__ :foo
         end
         expect(included_plugins).to include(foo)
+      end
+
+      it 'updates defaults for plugin' do
+        defaults = {}
+        described_class.configure(pluggable, defaults) do
+          __send__ :foo, default: 'somedefault'
+        end
+        expect(defaults).to eq(foo: 'somedefault')
       end
 
       it 'detects before dependency conflict between two plugins' do

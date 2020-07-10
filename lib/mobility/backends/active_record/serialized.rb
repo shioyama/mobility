@@ -72,5 +72,7 @@ Implements {Mobility::Backends::Serialized} backend for ActiveRecord models.
         EOM
       end
     end
+
+    register_backend(:active_record_serialized, ActiveRecord::Serialized)
   end
 end

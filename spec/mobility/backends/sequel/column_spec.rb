@@ -116,4 +116,4 @@ describe "Mobility::Backends::Sequel::Column", orm: :sequel do
       include_dup_examples 'Comment', :content
     end
   end
-end if Mobility::Loaded::Sequel
+end if defined?(Sequel)

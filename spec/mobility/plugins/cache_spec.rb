@@ -100,7 +100,7 @@ describe Mobility::Plugins::Cache do
 
     context "ActiveRecord model", orm: :active_record do
       context "with one backend" do
-        plugin_setup cache: true
+        plugin_setup cache: true, active_record: true
 
         let(:model_class) do
           stub_const 'Article', Class.new(ActiveRecord::Base)
@@ -132,14 +132,14 @@ describe Mobility::Plugins::Cache do
       end
 
       context "with multiple backends" do
-        plugin_setup "title", cache: true
+        plugin_setup "title", cache: true, active_record: true
 
         let(:instance) { model_class.create }
         let(:content_listener) { double(:backend) }
         let(:model_class) do
           stub_const 'Article', Class.new(ActiveRecord::Base)
           Article.include attributes
-          Article.include attributes_class.new("content", backend: backend_listener(content_listener), cache: true)
+          Article.include attributes_class.new("content", backend: backend_listener(content_listener), cache: true, active_record: true)
           Article
         end
         it_behaves_like "cache that resets on model action with multiple backends", :reload
@@ -150,7 +150,7 @@ describe Mobility::Plugins::Cache do
 
     context "Sequel model", orm: :sequel do
       context "with one backend" do
-        plugin_setup "title", cache: true
+        plugin_setup "title", cache: true, sequel: true
         let(:instance) { model_class.create }
         let(:model_class) do
           stub_const 'Article', Class.new(Sequel::Model)
@@ -163,7 +163,7 @@ describe Mobility::Plugins::Cache do
       end
 
       context "with multiple backends" do
-        plugin_setup "title", cache: true
+        plugin_setup "title", cache: true, sequel: true
 
         let(:instance) { model_class.create }
         let(:content_listener) { double(:backend) }

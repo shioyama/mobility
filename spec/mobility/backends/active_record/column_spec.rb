@@ -115,4 +115,4 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
       include_validation_examples 'Comment', :content, :author
     end
   end
-end if Mobility::Loaded::ActiveRecord
+end if defined?(ActiveRecord)

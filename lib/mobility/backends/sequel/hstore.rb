@@ -35,5 +35,7 @@ Implements the {Mobility::Backends::Hstore} backend for Sequel models.
         class HStoreOp < ::Sequel::Postgres::HStoreOp; end
       end
     end
+
+    register_backend(:sequel_hstore, Sequel::Hstore)
   end
 end

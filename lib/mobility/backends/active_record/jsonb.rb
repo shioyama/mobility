@@ -40,5 +40,7 @@ Implements the {Mobility::Backends::Jsonb} backend for ActiveRecord models.
         end
       end
     end
+
+    register_backend(:active_record_jsonb, ActiveRecord::Jsonb)
   end
 end

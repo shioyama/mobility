@@ -8,9 +8,13 @@ See ActiveRecord::Query plugin.
 =end
     module Sequel
       module Query
-        class << self
-          def apply(model_class)
-            model_class.class_eval do
+        extend Plugin
+
+        depends_on :query, include: false
+
+        included_hook do |klass, _|
+          if options[:query]
+            klass.class_eval do
               extend QueryMethod
               singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_dataset__
             end
@@ -140,5 +144,7 @@ See ActiveRecord::Query plugin.
         end
       end
     end
+
+    register_plugin(:sequel_query, Sequel::Query)
   end
 end

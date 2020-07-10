@@ -73,5 +73,7 @@ can be run again to add new attributes or locales.)
         end.compact
       end
     end
+
+    register_backend(:active_record_column, ActiveRecord::Column)
   end
 end

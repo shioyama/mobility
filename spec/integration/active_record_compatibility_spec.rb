@@ -107,7 +107,8 @@ describe "ActiveRecord compatibility", orm: :active_record do
       post = Post.new
       post.title = "foo"
       post.content = "bar"
-      expect(post.translated_attributes).to eq({ "title" => "foo", "content" => "bar" }) end
+      expect(post.translated_attributes).to eq({ "title" => "foo", "content" => "bar" })
+    end
   end
 
   describe "#untranslated_attributes" do

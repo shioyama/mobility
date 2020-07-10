@@ -32,5 +32,7 @@ Implements the {Mobility::Backends::Hstore} backend for ActiveRecord models.
         end
       end
     end
+
+    register_backend(:active_record_hstore, ActiveRecord::Hstore)
   end
 end

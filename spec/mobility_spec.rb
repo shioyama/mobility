@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Mobility do
+describe Mobility, orm: 'none' do
   it 'has a version number' do
     expect(described_class.gem_version).not_to be nil
   end
@@ -142,7 +142,7 @@ describe Mobility do
       allow(Rails).to receive_message_chain(:application, :config, :i18n, :available_locales).
         and_return([:ru, :cn])
       expect(described_class.available_locales).to eq([:ru, :cn])
-    end if Mobility::Loaded::Rails
+    end if defined?(Rails)
   end
 
   describe '.normalize_locale' do

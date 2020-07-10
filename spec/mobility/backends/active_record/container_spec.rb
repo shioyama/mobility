@@ -133,4 +133,4 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       end
     end
   end
-end if Mobility::Loaded::ActiveRecord
+end if defined?(ActiveRecord)

@@ -189,4 +189,4 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
   def connection
     ActiveRecord::Base.connection
   end
-end if Mobility::Loaded::Rails
+end if defined?(Rails)

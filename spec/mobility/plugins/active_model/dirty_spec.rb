@@ -4,7 +4,16 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   require "mobility/plugins/active_model/dirty"
 
   include Helpers::Plugins
-  plugin_setup dirty: true, reader: true, writer: true
+  plugin_setup active_model: true, dirty: true, reader: true, writer: true
+
+  it "raises TypeError unless class is a subclass of ActiveModel::Dirty" do
+    klass = Class.new
+    am_class = Class.new
+    am_class.include ::ActiveModel::Dirty
+
+    expect { klass.include attributes }.to raise_error(TypeError, /should include ActiveModel\:\:Dirty/)
+    expect { am_class.include attributes }.not_to raise_error
+  end
 
   def define_backend_class
     Class.new do
@@ -333,7 +342,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   end
 
   describe "fallbacks compatiblity" do
-    plugin_setup dirty: true, fallbacks: { en: 'ja' }, reader: true, writer: true
+    plugin_setup active_model: true, dirty: true, fallbacks: { en: 'ja' }, reader: true, writer: true
 
     let(:model_class) do
       stub_const 'ArticleWithFallbacks', Class.new
@@ -386,4 +395,4 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       end
     end
   end
-end if Mobility::Loaded::ActiveRecord
+end if defined?(ActiveRecord)

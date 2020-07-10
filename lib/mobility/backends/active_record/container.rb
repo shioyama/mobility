@@ -141,5 +141,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
 
       class InvalidColumnType < StandardError; end
     end
+
+    register_backend(:active_record_container, ActiveRecord::Container)
   end
 end

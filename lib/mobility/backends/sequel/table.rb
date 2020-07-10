@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "mobility/util"
 require "mobility/backends/sequel"
-require "mobility/backends/key_value"
+require "mobility/backends/table"
 require "mobility/sequel/model_translation"
 require "mobility/sequel/sql"
 
@@ -175,5 +175,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
 
       class CacheRequired < ::StandardError; end
     end
+
+    register_backend(:sequel_table, Sequel::Table)
   end
 end

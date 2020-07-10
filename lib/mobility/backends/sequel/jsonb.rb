@@ -66,5 +66,7 @@ Implements the {Mobility::Backends::Jsonb} backend for Sequel models.
         end
       end
     end
+
+    register_backend(:sequel_jsonb, Sequel::Jsonb)
   end
 end

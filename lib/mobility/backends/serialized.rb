@@ -23,8 +23,6 @@ Format for serialization. Either +:yaml+ (default) or +:json+.
 
 =end
     module Serialized
-      extend Backend::OrmDelegator
-
       class << self
 
         # @!group Backend Configuration

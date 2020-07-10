@@ -42,5 +42,7 @@ Implements the {Mobility::Backends::Json} backend for Sequel models.
         class JSONOp < ::Sequel::Postgres::JSONOp; end
       end
     end
+
+    register_backend(:sequel_json, Sequel::Json)
   end
 end

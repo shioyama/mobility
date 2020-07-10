@@ -52,4 +52,4 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
     include_accessor_examples 'HstorePost'
     include_serialization_examples 'HstorePost', column_affix: column_affix
   end
-end if Mobility::Loaded::ActiveRecord
+end if defined?(ActiveRecord)

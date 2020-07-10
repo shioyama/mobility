@@ -65,7 +65,6 @@ set.
 @see Mobility::Backends::Sequel::Table
 =end
     module Table
-      extend Backend::OrmDelegator
       # @!method association_name
       #   Returns the name of the translations association.
       #   @return [Symbol] Name of the association

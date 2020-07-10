@@ -27,8 +27,6 @@ be ignored if set, since it would cause a conflict with column accessors.
 
 =end
     module Column
-      extend Backend::OrmDelegator
-
       # Returns name of column where translated attribute is stored
       # @param [Symbol] locale
       # @return [String]
@@ -43,10 +41,6 @@ be ignored if set, since it would cause a conflict with column accessors.
       def self.column_name_for(attribute, locale = Mobility.locale)
         normalized_locale = Mobility.normalize_locale(locale)
         "#{attribute}_#{normalized_locale}".to_sym
-      end
-
-      def self.included(base)
-        base.extend Backend::OrmDelegator
       end
     end
 

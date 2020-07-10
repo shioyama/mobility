@@ -42,101 +42,131 @@ the ActiveRecord dirty plugin for more information.
 
 =end
       module Dirty
-        # Builds module which adds suffix/prefix methods for translated
-        # attributes so they act like normal dirty-tracked attributes.
-        class MethodsBuilder < Module
-          delegate :handler_methods_module, :method_patterns, to: :class
+        extend Plugin
 
-          def initialize(*attribute_names)
-            define_dirty_methods(attribute_names)
+        depends_on :dirty, include: false
+
+        initialize_hook do
+          if options[:dirty]
+            define_dirty_methods(names)
+            include dirty_handler_methods
+          end
+        end
+
+        included_hook do |klass, backend_class|
+          raise TypeError, "#{name} should include ActiveModel::Dirty to use the active_model plugin" unless active_model_dirty_class?(klass)
+
+          if options[:dirty]
+            private_methods = InstanceMethods.instance_methods & klass.private_instance_methods
+            klass.include InstanceMethods
+            klass.class_eval { private(*private_methods) }
+
+            backend_class.include BackendMethods
+          end
+        end
+
+        private
+
+        # Overridden in AR::Dirty plugin to define a different HandlerMethods module
+        def dirty_handler_methods
+          HandlerMethods
+        end
+
+        def active_model_dirty_class?(klass)
+          klass.ancestors.include?(::ActiveModel::Dirty)
+        end
+
+        def define_dirty_methods(attribute_names)
+          attribute_names.each do |name|
+            dirty_handler_methods.each_pattern(name) do |method_name, attribute_method|
+              define_method(method_name) do |*args|
+                mutations_from_mobility.send(attribute_method, Dirty.append_locale(name), *args)
+              end
+            end
+
+            define_method "restore_#{name}!" do
+              locale_accessor = Dirty.append_locale(name)
+              if mutations_from_mobility.attribute_changed?(locale_accessor)
+                __send__("#{name}=", mutations_from_mobility.attribute_was(locale_accessor))
+                mutations_from_mobility.restore_attribute!(locale_accessor)
+              end
+            end
           end
 
-          def included(model_class)
-            private_methods = InstanceMethods.instance_methods & model_class.private_instance_methods
-            model_class.include InstanceMethods
-            model_class.class_eval { private(*private_methods) }
+          # This private method override is necessary to make
+          # +restore_attributes+ (which is public) work with translated
+          # attributes.
+          define_method :restore_attribute! do |attr|
+            attribute_names.include?(attr.to_s) ? send("restore_#{attr}!") : super(attr)
+          end
+          private :restore_attribute!
+        end
 
-            model_class.include handler_methods_module
+        def self.append_locale(attr_name)
+          Mobility.normalize_locale_accessor(attr_name)
+        end
+
+        # Module builder which mimics dirty method handlers on a given dirty class.
+        # Used to mimic ActiveModel::Dirty and ActiveRecord::Dirty, which have
+        # similar but slightly different sets of handler methods. Doing it this
+        # way with introspection allows us to support basically all AR/AM
+        # versions without changes here.
+        class HandlerMethodsBuilder < Module
+          attr_reader :klass
+
+          # @param [Class] klass Dirty class to mimic
+          def initialize(klass)
+            @klass = klass
+            define_handler_methods
           end
 
-          def append_locale(attr_name)
-            Mobility.normalize_locale_accessor(attr_name)
+          def each_pattern(attr_name)
+            patterns.each do |pattern|
+              yield pattern % attr_name, pattern % 'attribute'
+            end
+          end
+
+          def define_handler_methods
+            public_patterns.each do |pattern|
+              method_name = pattern % 'attribute'
+
+              module_eval <<-EOM, __FILE__, __LINE__ + 1
+              def #{method_name}(attr_name, *rest)
+                if (mutations_from_mobility.attribute_changed?(attr_name) ||
+                    mutations_from_mobility.attribute_previously_changed?(attr_name))
+                  mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest)
+                else
+                  super
+                end
+              end
+              EOM
+            end
+          end
+
+          # Get method suffixes. Creating an object just to get the list of
+          # suffixes is simplest given they change from Rails version to version.
+          def patterns
+            @patterns ||=
+              (klass.attribute_method_matchers.map { |p| "#{p.prefix}%s#{p.suffix}" } - excluded_patterns)
           end
 
           private
 
-          def define_dirty_methods(attribute_names)
-            m = self
-
-            attribute_names.each do |name|
-              method_patterns.each do |pattern|
-                define_method(pattern % name) do |*args|
-                  mutations_from_mobility.send(pattern % 'attribute', m.append_locale(name), *args)
-                end
-              end
-
-              define_method "restore_#{name}!" do
-                locale_accessor = m.append_locale(name)
-                if mutations_from_mobility.attribute_changed?(locale_accessor)
-                  __send__("#{name}=", mutations_from_mobility.attribute_was(locale_accessor))
-                  mutations_from_mobility.restore_attribute!(locale_accessor)
-                end
-              end
+          def public_patterns
+            @public_patterns ||= patterns.select do |p|
+              klass.public_method_defined?(p % 'attribute')
             end
-
-            # This private method override is necessary to make
-            # +restore_attributes+ (which is public) work with translated
-            # attributes.
-            define_method :restore_attribute! do |attr|
-              attribute_names.include?(attr.to_s) ? send("restore_#{attr}!") : super(attr)
-            end
-            private :restore_attribute!
           end
 
-          class << self
-            def handler_methods_module
-              @handler_methods_module ||= (AttributeHandlerMethods.new.tap do |mod|
-                public_method_patterns.each do |pattern|
-                  method_name = pattern % 'attribute'
-
-                  mod.module_eval <<-EOM, __FILE__, __LINE__ + 1
-                  def #{method_name}(attr_name, *rest)
-                    if (mutations_from_mobility.attribute_changed?(attr_name) ||
-                        mutations_from_mobility.attribute_previously_changed?(attr_name))
-                      mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest)
-                    else
-                      super
-                    end
-                  end
-                  EOM
-                end
-              end)
-            end
-
-            # Get method suffixes. Creating an object just to get the list of
-            # suffixes is simplest given they change from Rails version to version.
-            def method_patterns
-              @method_patterns ||=
-                (dirty_class.attribute_method_matchers.map { |p| "#{p.prefix}%s#{p.suffix}" } - excluded_method_patterns)
-            end
-
-            def public_method_patterns
-              @public_method_patterns ||= method_patterns.select do |p|
-                dirty_class.public_method_defined?(p % 'attribute')
-              end
-            end
-
-            def dirty_class
-              @dirty_class ||= Class.new { include ::ActiveModel::Dirty }
-            end
-
-            private
-
-            def excluded_method_patterns
-              ['%s', 'restore_%s!']
-            end
+          def excluded_patterns
+            ['%s', 'restore_%s!']
           end
         end
+
+        # Module which defines generic handler methods like
+        # +attribute_changed?+ that are patched to work with translated
+        # attributes.
+        HandlerMethods = HandlerMethodsBuilder.new(Class.new { include ::ActiveModel::Dirty })
 
         module InstanceMethods
           def changed_attributes
@@ -182,9 +212,16 @@ the ActiveRecord dirty plugin for more information.
           end
         end
 
-        # Give the module builder a name so it's easier to see in the model's ancestors
-        class AttributeHandlerMethods < Module; end
-
+        # @note Seriously, I really don't want to reproduce all of
+        #   ActiveModel::Dirty here, but having fought with upstream changes
+        #   many many times I finally decided it's more future-proof to just
+        #   re-implement the stuff we need here, to avoid weird breakage.
+        #
+        #   Although this is somewhat ugly, at least it's explicit and since
+        #   it's self-defined (rather than hooking into fickle private methods
+        #   in Rails), it won't break all of a sudden. We just need to ensure
+        #   that specs are up-to-date with the latest weird dirty method
+        #   pattern Rails has decided to support.
         class MobilityMutationTracker
           OPTION_NOT_GIVEN = Object.new
 
@@ -312,5 +349,7 @@ the ActiveRecord dirty plugin for more information.
         end
       end
     end
+
+    register_plugin(:active_model_dirty, ActiveModel::Dirty)
   end
 end

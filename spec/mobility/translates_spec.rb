@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Translates do
+describe Mobility::Translates, orm: 'none' do
   include Helpers::Backend
   before { stub_const('MyClass', Class.new).extend(Mobility::Translates) }
 

@@ -212,5 +212,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
       end
     end
+
+    register_backend(:active_record_key_value, ActiveRecord::KeyValue)
   end
 end

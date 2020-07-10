@@ -51,4 +51,4 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
     include_accessor_examples 'JsonPost'
     include_serialization_examples 'JsonPost', column_affix: column_affix
   end
-end if Mobility::Loaded::ActiveRecord
+end if defined?(ActiveRecord)

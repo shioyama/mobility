@@ -103,4 +103,4 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
                        "foo must be a column of type json or jsonb")
     end
   end
-end if Mobility::Loaded::Sequel && ENV['DB'] == 'postgres'
+end if defined?(Sequel) && ENV['DB'] == 'postgres'

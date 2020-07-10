@@ -40,28 +40,43 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
 
 =end
       module Dirty
-        class MethodsBuilder < ActiveModel::Dirty::MethodsBuilder
-          # @param [Attributes] attributes
-          def included(model_class)
-            super
+        extend Plugin
 
-            model_class.include InstanceMethods
-          end
+        depends_on :dirty, include: false
+        depends_on :active_model_dirty, include: :before
 
-          class << self
-            def dirty_class
-              @dirty_class ||= (Class.new do
-                # In earlier versions of Rails, these are needed to avoid an
-                # exception when including the AR Dirty module outside of an
-                # AR::Base class. Eventually we should be able to drop them.
-                def self.after_create; end
-                def self.after_update; end
-
-                include ::ActiveRecord::AttributeMethods::Dirty
-              end)
-            end
+        initialize_hook do
+          if options[:dirty]
+            include InstanceMethods
           end
         end
+
+        included_hook do |_, backend_class|
+          if options[:dirty]
+            backend_class.include BackendMethods
+          end
+        end
+
+        private
+
+        def dirty_handler_methods
+          HandlerMethods
+        end
+
+        # Module which defines generic ActiveRecord::Dirty handler methods like
+        # +attribute_before_last_save+ that are patched to work with translated
+        # attributes.
+        HandlerMethods = ActiveModel::Dirty::HandlerMethodsBuilder.new(
+          Class.new do
+            # In earlier versions of Rails, these are needed to avoid an
+            # exception when including the AR Dirty module outside of an
+            # AR::Base class. Eventually we should be able to drop them.
+            def self.after_create; end
+            def self.after_update; end
+
+            include ::ActiveRecord::AttributeMethods::Dirty
+          end
+        )
 
         module InstanceMethods
           if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
@@ -98,5 +113,7 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
         BackendMethods = ActiveModel::Dirty::BackendMethods
       end
     end
+
+    register_plugin(:active_record_dirty, ActiveRecord::Dirty)
   end
 end

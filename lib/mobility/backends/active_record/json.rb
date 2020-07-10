@@ -40,5 +40,7 @@ Implements the {Mobility::Backends::Json} backend for ActiveRecord models.
         end
       end
     end
+
+    register_backend(:active_record_json, ActiveRecord::Json)
   end
 end

@@ -18,11 +18,6 @@ value of {Mobility.accessor_method}, which defaults to +translates+).
     translates :title, backend: :key_value
   end
 
-When defining this module, Mobility attempts to +require+ various gems (for
-example, +active_record+ and +sequel+) to evaluate which are loaded. Loaded
-gems are tracked with dynamic subclasses of the {Loaded} module and referenced
-in backends to define gem-dependent behavior.
-
 =end
 module Mobility
   # A generic exception used by Mobility.
@@ -33,7 +28,6 @@ module Mobility
   require "mobility/backends"
   require "mobility/configuration"
   require "mobility/fallbacks"
-  require "mobility/loaded"
   require "mobility/plugin"
   require "mobility/plugins"
   require "mobility/attributes"
@@ -44,46 +38,7 @@ module Mobility
   CALL_COMPILABLE_REGEXP = /\A[a-zA-Z_]\w*[!?]?\z/
   private_constant :CALL_COMPILABLE_REGEXP
 
-  begin
-    require "rails"
-    Loaded::Rails = true
-  rescue LoadError => e
-    raise unless e.message =~ /rails/
-    Loaded::Rails = false
-  end
-
-  begin
-    require "active_record"
-    raise VersionNotSupportedError, "Mobility is only compatible with ActiveRecord 4.2 and greater" if ::ActiveRecord::VERSION::STRING < "4.2"
-    Loaded::ActiveRecord = true
-  rescue LoadError => e
-    raise unless e.message =~ /active_record/
-    Loaded::ActiveRecord = false
-  end
-
-  if Loaded::ActiveRecord
-    require "mobility/active_model"
-    require "mobility/active_record"
-    if Loaded::Rails
-      require "rails/generators/mobility/generators"
-    end
-  end
-
-  begin
-    require "sequel"
-    raise VersionNotSupportedError, "Mobility is only compatible with Sequel 4.0 and greater" if ::Sequel::MAJOR < 4
-    require "sequel/plugins/mobility"
-    unless defined?(ActiveSupport::Inflector)
-      # TODO: avoid automatically including the inflector extension
-      require "sequel/extensions/inflector"
-    end
-    require "sequel/plugins/dirty"
-    require "mobility/sequel"
-    Loaded::Sequel = true
-  rescue LoadError => e
-    raise unless e.message =~ /sequel/
-    Loaded::Sequel = false
-  end
+  require "rails/generators/mobility/generators" if defined?(Rails)
 
   class << self
     def extended(model_class)
@@ -94,14 +49,6 @@ module Mobility
 
       if translates = Mobility.config.accessor_method
         model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
-      end
-
-      if Loaded::ActiveRecord && model_class < ::ActiveRecord::Base
-        model_class.include(ActiveRecord)
-      end
-
-      if Loaded::Sequel && model_class < ::Sequel::Model
-        model_class.include(Sequel)
       end
     end
 
@@ -233,7 +180,7 @@ module Mobility
     #   simply default to +I18n.available_locales+, we may define many more
     #   methods (in LocaleAccessors) than is really necessary.
     def available_locales
-      if Loaded::Rails && Rails.application
+      if defined?(Rails) && Rails.application
         Rails.application.config.i18n.available_locales || I18n.available_locales
       else
         I18n.available_locales

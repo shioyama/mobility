@@ -2,9 +2,9 @@ shared_examples_for "AR Model validation" do |model_class_name, attribute1=:titl
   describe "Uniqueness validation" do
     context "without scope" do
       let(:model_class) do
-        model_class_name.constantize.tap do |klass|
-          klass.class_eval { validates attribute1, uniqueness: true }
-        end
+        model_class = model_class_name.constantize
+        model_class.validates attribute1, uniqueness: true
+        model_class
       end
 
       it "is valid if no other record has same attribute value in this locale" do

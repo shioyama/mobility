@@ -110,5 +110,7 @@ Sequel serialization plugin.
         super.to_sym
       end
     end
+
+    register_backend(:sequel_serialized, Sequel::Serialized)
   end
 end

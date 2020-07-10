@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Attributes do
+describe Mobility::Attributes, orm: 'none' do
   include Helpers::Backend
   before { stub_const 'Article', Class.new }
 

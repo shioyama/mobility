@@ -92,4 +92,4 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
       expect((Pathname.new(destination_root) + "db" + "migrate").exist?).to eq(false)
     end
   end
-end if Mobility::Loaded::Rails
+end if defined?(Rails)

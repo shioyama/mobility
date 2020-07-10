@@ -114,5 +114,7 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
         end
       end
     end
+
+    register_backend(:sequel_container, Sequel::Container)
   end
 end

@@ -1,10 +1,8 @@
 require "spec_helper"
 
 describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
-  require "mobility/plugins/active_record/dirty"
-
   include Helpers::Plugins
-  plugin_setup "title", dirty: true, reader: true, writer: true
+  plugin_setup "title", dirty: true, active_record: true, reader: true, writer: true
 
   let(:model_class) do
     stub_const 'Article', Class.new(ActiveRecord::Base)
@@ -333,7 +331,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   end
 
   %w[changes_applied clear_attribute_changes clear_changes_information].each do |method_name|
-    it "does not change private status of #{method_name}" do
+    it "does not change visibility of #{method_name}" do
       # Create a dummy AR model so we can inspect its dirty methods. This way
       # test works for all versions of Rails (private/public status of these
       # methods has changed between versions.)
@@ -501,4 +499,4 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
       expect(instance.changed_attribute_names_to_save).to match_array(%w[title_en title_ja published])
     end
   end
-end if Mobility::Loaded::ActiveRecord
+end

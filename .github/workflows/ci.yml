@@ -43,11 +43,21 @@ jobs:
         feature: ['unit']
         include:
           - ruby: '2.7'
-            database: 'sqlite3'
+            feature: 'unit'
+            orm:
+            experimental: false
+          - ruby: '2.6'
+            feature: 'unit'
+            orm:
+            experimental: false
+          - ruby: '2.5'
+            feature: 'unit'
+            orm:
+            experimental: false
+          - ruby: '2.7'
             feature: 'performance'
             experimental: false
           - ruby: '2.7'
-            database: 'sqlite3'
             feature: 'i18n_fallbacks'
             experimental: false
           - ruby: '2.7'
@@ -131,5 +141,6 @@ jobs:
         run: bundle install
       - name: Setup test db
         run: bundle exec rake db:create db:up
+        if: matrix.database
       - name: Run tests
         run: bundle exec rake

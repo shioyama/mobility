@@ -202,5 +202,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
       end
     end
+
+    register_backend(:sequel_key_value, Sequel::KeyValue)
   end
 end

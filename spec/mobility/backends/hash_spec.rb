@@ -1,7 +1,7 @@
 require "spec_helper"
 require "mobility/backends/hash"
 
-describe Mobility::Backends::Hash do
+describe Mobility::Backends::Hash, orm: 'none' do
   describe "#read/#write" do
     it "returns value for locale key" do
       backend = described_class.new

@@ -404,4 +404,4 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
       end
     end
   end
-end if Mobility::Loaded::ActiveRecord
+end if defined?(ActiveRecord)

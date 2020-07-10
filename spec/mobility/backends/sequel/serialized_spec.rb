@@ -116,4 +116,4 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
       end
     end
   end
-end if Mobility::Loaded::Sequel
+end if defined?(Sequel)

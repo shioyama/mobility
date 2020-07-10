@@ -1,6 +1,4 @@
 # frozen-string-literal: true
-require "mobility/backend/orm_delegator"
-
 module Mobility
 =begin
 
@@ -180,18 +178,6 @@ On top of this, a backend will normally:
           self.class.options[:#{name}]
         end
         EOM
-      end
-
-      # {Attributes} uses this method to get a backend class specific to the
-      # model using the backend. Backend classes can override this method to
-      # return a class specific to the model class using the backend (e.g.
-      # either an ActiveRecord or Sequel backend class depending on whether the
-      # model is an ActiveRecord model or a Sequel model.)
-      # @see OrmDelegator
-      # @see Attributes
-      # @return [self] returns itself
-      def for(_)
-        self
       end
 
       # Called from plugins to apply custom processing for this backend.

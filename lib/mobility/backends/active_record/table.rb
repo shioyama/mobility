@@ -304,5 +304,7 @@ columns to that table.
         end
       end
     end
+
+    register_backend(:active_record_table, ActiveRecord::Table)
   end
 end

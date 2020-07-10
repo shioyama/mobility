@@ -99,4 +99,4 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
     # regression for https://github.com/shioyama/mobility/issues/308
     include_querying_examples 'JsonbPost' if ENV['RAILS_VERSION'] == '5.1'
   end
-end if Mobility::Loaded::ActiveRecord
+end if defined?(ActiveRecord)

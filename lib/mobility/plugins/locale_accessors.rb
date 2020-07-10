@@ -35,7 +35,7 @@ available locales for a Rails application) will be used by default.
       # Apply locale accessors plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
-      initialize_hook do
+      initialize_hook do |*names|
         if locales = options[:locale_accessors]
           locales = Mobility.config.default_accessor_locales if locales == true
           names.each do |name|

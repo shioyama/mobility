@@ -13,29 +13,37 @@ Automatically includes dirty plugin in model class when enabled.
 =end
     module Sequel
       module Dirty
-        # Builds module which overrides dirty methods to handle translated as
-        # well as normal (untranslated) attributes.
-        class MethodsBuilder < Module
-          def initialize(*attribute_names)
-            # Although we load the plugin in the included callback method, we
-            # need to include this module here in advance to ensure that its
-            # instance methods are included *before* the ones defined here.
-            include ::Sequel::Plugins::Dirty::InstanceMethods
+        extend Plugin
 
-            %w[initial_value column_change column_changed? reset_column].each do |method_name|
-              define_method method_name do |column|
-                if attribute_names.map(&:to_sym).include?(column)
-                  super(Mobility.normalize_locale_accessor(column).to_sym)
-                else
-                  super(column)
-                end
+        depends_on :dirty, include: false
+
+        initialize_hook do
+          # Although we load the plugin in the included callback method, we
+          # need to include this module here in advance to ensure that its
+          # instance methods are included *before* the ones defined here.
+          include ::Sequel::Plugins::Dirty::InstanceMethods
+        end
+
+        included_hook do |klass, backend_class|
+          if options[:dirty]
+            # this just adds Sequel::Plugins::Dirty to @plugins
+            klass.plugin :dirty
+            define_dirty_methods(names)
+            backend_class.include BackendMethods
+          end
+        end
+
+        private
+
+        def define_dirty_methods(names)
+          %w[initial_value column_change column_changed? reset_column].each do |method_name|
+            define_method method_name do |column|
+              if names.map(&:to_sym).include?(column)
+                super(Mobility.normalize_locale_accessor(column).to_sym)
+              else
+                super(column)
               end
             end
-          end
-
-          def included(model_class)
-            # this just adds Sequel::Plugins::Dirty to @plugins
-            model_class.plugin :dirty
           end
         end
 
@@ -58,5 +66,7 @@ Automatically includes dirty plugin in model class when enabled.
 
       end
     end
+
+    register_plugin(:sequel_dirty, Sequel::Dirty)
   end
 end

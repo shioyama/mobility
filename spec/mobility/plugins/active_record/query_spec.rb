@@ -87,4 +87,4 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
       end
     end
   end
-end if Mobility::Loaded::ActiveRecord
+end if defined?(ActiveRecord)

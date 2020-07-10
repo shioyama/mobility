@@ -50,5 +50,7 @@ Implements the {Mobility::Backends::Column} backend for Sequel models.
         end.compact
       end
     end
+
+    register_backend(:sequel_column, Sequel::Column)
   end
 end

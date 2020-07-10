@@ -14,7 +14,7 @@ if !ENV['ORM'].nil? && (ENV['ORM'] != '')
 
   require orm
 else
-  orm = 'none'
+  orm = nil
 end
 
 db = ENV['DB'] || 'none'
@@ -30,7 +30,7 @@ require "mobility/backends/null"
 
 # Enable default plugins
 Mobility.configure do |config|
-  config.plugins *%i[
+  config.plugins *(%i[
     backend
     reader
     writer
@@ -40,10 +40,10 @@ Mobility.configure do |config|
     fallbacks
     presence
     default
-    attribute_methods
     fallthrough_accessors
     locale_accessors
-  ]
+  ] + [orm]).compact
+  config.plugin :attribute_methods if orm == 'active_record'
 end
 
 I18n.enforce_available_locales = true
@@ -52,7 +52,7 @@ I18n.default_locale = :en
 
 Dir[File.expand_path("./spec/support/**/*.rb")].each { |f| require f }
 
-unless orm == 'none'
+if orm
   require "database"
   require "#{orm}/schema"
 
@@ -90,7 +90,7 @@ RSpec.configure do |config|
     Mobility.locale = :en
   end
 
-  unless orm == 'none'
+  if orm
     config.before :each do
       DatabaseCleaner.start
     end
@@ -100,7 +100,7 @@ RSpec.configure do |config|
   end
 
   config.order = "random"
-  config.filter_run_excluding orm: lambda { |v| ![*v].include?(orm.to_sym) }, db: lambda { |v| ![*v].include?(db.to_sym) }
+  config.filter_run_excluding orm: lambda { |v| ![*v].include?(orm&.to_sym) || (orm && (v == 'none')) }, db: lambda { |v| ![*v].include?(db.to_sym) }
 end
 
 class TestAttributes < Mobility::Attributes

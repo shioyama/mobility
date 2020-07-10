@@ -44,8 +44,6 @@ other backends on model (otherwise one will overwrite the other).
 
 =end
     module KeyValue
-      extend Backend::OrmDelegator
-
       # @!method association_name
       #   Returns the name of the polymorphic association.
       #   @return [Symbol] Name of the association

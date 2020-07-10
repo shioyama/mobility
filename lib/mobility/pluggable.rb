@@ -20,6 +20,11 @@ Works with {Mobility::Plugin}. (Subclassed by {Mobility::Attributes}.)
       def defaults
         @defaults ||= {}
       end
+
+      def inherited(klass)
+        super
+        klass.defaults.merge!(defaults)
+      end
     end
 
     def initialize(*, **options)

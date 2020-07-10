@@ -193,8 +193,7 @@ describe Mobility::Plugin do
       end
 
       it 'does not include dependency for include: false' do
-        foo.depends_on :foo
-        bar.depends_on :bar, include: false
+        foo.depends_on :bar, include: false
 
         expect {
           described_class.configure(pluggable) do

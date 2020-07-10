@@ -120,6 +120,24 @@ module Helpers
     end
 
     module ClassMethods
+      # Define new plugin, register it, then remove after spec is done
+      def define_plugins(*names)
+        names.each do |name|
+          let!(name) do
+            Module.new.tap do |mod|
+              mod.extend Mobility::Plugin
+              Mobility::Plugins.register_plugin(name, mod)
+              stub_const(name.to_s.capitalize, mod)
+            end
+          end
+        end
+
+        after do
+          plugins = Mobility::Plugins.instance_variable_get(:@plugins)
+          names.each { |name| plugins.delete(name) }
+        end
+      end
+      alias_method :define_plugin, :define_plugins
       # Sets up attributes module with a listener to listen on reads/writes to the
       # backend.
       # Pass block to define plugins in block.

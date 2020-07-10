@@ -1,29 +1,12 @@
 require "spec_helper"
 
 describe Mobility::Plugin do
+  include Helpers::Plugins
   let(:pluggable) { Class.new(Mobility::Pluggable) }
   let(:included_plugins) { pluggable.included_modules.grep(described_class) }
 
   describe 'dependencies' do
-    def self.define_plugins(*names)
-      names.each do |name|
-        let!(name) do
-          Module.new.tap do |mod|
-            mod.extend Mobility::Plugin
-            Mobility::Plugins.register_plugin(name, mod)
-            stub_const(name.to_s.capitalize, mod)
-          end
-        end
-      end
-    end
-
-    plugin_names = [:foo, :bar, :baz, :qux]
-    define_plugins(*plugin_names)
-
-    after do
-      plugins = Mobility::Plugins.instance_variable_get(:@plugins)
-      plugin_names.each { |name| plugins.delete(name) }
-    end
+    define_plugins(:foo, :bar, :baz, :qux)
 
     describe '.configure' do
       it 'includes plugin' do

@@ -204,26 +204,31 @@ describe Mobility::Plugin do
         expect(included_plugins).to eq([foo])
       end
 
-      it 'does not run hooks if dependency is not included for include: false' do
-        foo.depends_on :bar, include: false
-        listener = double
+      it 'does not run hooks if direct dependency is not included for include: false' do
+        # Note that foo hooks *are* run, although bar dependencies are not met.
+        # So include: false is not applied recursively to dependents.
+        foo.depends_on :bar
+        bar.depends_on :baz, include: false
 
-        bar.initialize_hook do |*|
-          listener.initialize
-        end
+        foo_listener = double
+        bar_listener = double
 
-        bar.included_hook do
-          listener.included
-        end
+        foo.initialize_hook() { |*| foo_listener.initialize }
+        bar.initialize_hook() { |*| bar_listener.initialize }
+
+        foo.included_hook() { foo_listener.included }
+        bar.included_hook() { bar_listener.included }
 
         described_class.configure(pluggable) do
           __send__ :foo
         end
 
-        expect(listener).not_to receive(:initialize)
+        expect(foo_listener).to receive(:initialize)
+        expect(bar_listener).not_to receive(:initialize)
         mod = pluggable.new
 
-        expect(listener).not_to receive(:included)
+        expect(foo_listener).to receive(:included)
+        expect(bar_listener).not_to receive(:included)
         Class.new.include mod
       end
 

@@ -73,7 +73,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
       define_method :initialize do |*names, **options|
         super(*names, **options)
-        return unless self.class.included_modules.include?(plugin)
+        return unless plugin.dependencies_satisfied?(self.class)
 
         call_with_kwargs ?
           class_exec(*names, **@options.slice(Plugins.lookup_name(plugin)), &block) :
@@ -87,7 +87,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
       define_method :included do |klass|
         super(klass).tap do |backend_class|
-          if self.class.included_modules.include?(plugin)
+          if plugin.dependencies_satisfied?(self.class)
             call_with_kwargs ?
               class_exec(klass, backend_class, **@options.slice(Plugins.lookup_name(plugin)), &block) :
               class_exec(klass, backend_class, &block)
@@ -100,6 +100,27 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       @dependencies ||= {}
     end
 
+    # Does this class include all plugins this plugin depends (directly) on?
+    # @param [Class] klass Pluggable class
+    def dependencies_satisfied?(klass)
+      required_plugins = dependencies.keys.map { |name| Plugins.load_plugin(name) }
+      (required_plugins - klass.included_modules).none?
+    end
+
+    # Specifies a dependency of this plugin.
+    #
+    # By default, the dependency is included (include: true). Passing +:before+
+    # or +:after+ will ensure the dependency is included before or after this
+    # plugin.
+    #
+    # Passing +false+ does not include the dependency, but checks that it has
+    # been included when running include and initialize hooks (so hooks iwill
+    # not run for this plugin if it has not been included). In other words:
+    # disable this plugin unless this dependency has been included elsewhere.
+    # (Note that this check is not applied recursively.)
+    #
+    # @param [Symbol] plugin Name of plugin dependency
+    # @option [TrueClass, FalseClass, Symbol] include
     def depends_on(plugin, include: true)
       unless [true, false, :before, :after].include?(include)
         raise ArgumentError, "depends_on 'include' keyword argument must be one of: true, false, :before or :after"

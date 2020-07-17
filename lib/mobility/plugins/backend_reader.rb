@@ -11,9 +11,11 @@ different format string as the plugin option.
     module BackendReader
       extend Plugin
 
+      default true
       depends_on :backend
 
-      initialize_hook do |*names, backend_reader: true|
+      initialize_hook do |*names|
+        backend_reader = options[:backend_reader]
         backend_reader = "%s_backend" if backend_reader == true
         if backend_reader
           names.each do |name|

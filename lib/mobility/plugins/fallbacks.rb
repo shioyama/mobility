@@ -129,7 +129,8 @@ the current locale was +nil+.
 
       # Applies fallbacks plugin to attributes. Completely disables fallbacks
       # on model if option is +false+.
-      included_hook do |_, backend_class, fallbacks: nil|
+      included_hook do |_, backend_class|
+        fallbacks = options[:fallbacks]
         backend_class.include(Methods.new(fallbacks)) unless fallbacks == false
       end
 

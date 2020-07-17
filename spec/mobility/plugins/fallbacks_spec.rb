@@ -89,8 +89,10 @@ describe Mobility::Plugins::Fallbacks do
     end
   end
 
-  context "fallbacks is nil" do
-    plugin_setup fallbacks: nil
+  context "fallbacks is default" do
+    plugin_setup do
+      fallbacks
+    end
 
     it "does not use fallbacks when accessor fallback option is false or nil" do
       expect(listener).to receive(:read).with(:'en-US', any_args).once.and_return('')

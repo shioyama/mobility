@@ -23,12 +23,12 @@ details.
       depends_on :backend, include: :before
       depends_on :fallthrough_accessors, include: :after
 
-      initialize_hook do |dirty: nil|
-        @options[:fallthrough_accessors] = true if dirty == true
+      initialize_hook do
+        @options[:fallthrough_accessors] = true if options[:dirty]
       end
 
-      included_hook do |model_class, backend_class, dirty: nil|
-        if dirty
+      included_hook do |model_class, backend_class|
+        if options[:dirty]
           include_dirty_modules(backend_class, model_class, *names)
         end
       end

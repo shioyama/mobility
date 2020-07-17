@@ -4,8 +4,10 @@ require "mobility/plugins/presence"
 describe Mobility::Plugins::Presence do
   include Helpers::Plugins
 
-  context "option = true" do
-    plugin_setup presence: true
+  context "default option value" do
+    plugin_setup do
+      presence
+    end
 
     describe "#read" do
       it "passes through present values unchanged" do

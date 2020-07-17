@@ -5,7 +5,9 @@ describe Mobility::Plugins::BackendReader do
   include Helpers::Plugins
 
   context "with default format string" do
-    plugin_setup() { backend_reader }
+    plugin_setup do
+      backend_reader
+    end
 
     it "defines <attr>_backend methods mapping to backend instance for <attr>" do
       expect(instance.respond_to?(:title_backend)).to eq(true)
@@ -14,7 +16,9 @@ describe Mobility::Plugins::BackendReader do
   end
 
   context "with custom format string" do
-    plugin_setup() { backend_reader default: "%s_translations" }
+    plugin_setup do
+      backend_reader default: "%s_translations"
+    end
 
     it "defines backend reader methods with custom format string" do
       expect(instance.respond_to?(:title_translations)).to eq(true)
@@ -24,7 +28,9 @@ describe Mobility::Plugins::BackendReader do
   end
 
   context "with true as format string" do
-    plugin_setup() { backend_reader default: true }
+    plugin_setup do
+      backend_reader default: true
+    end
 
     it "defines backend reader methods with default format string" do
       expect(instance.respond_to?(:title_backend)).to eq(true)
@@ -33,7 +39,9 @@ describe Mobility::Plugins::BackendReader do
   end
 
   context "with falsey format string" do
-    plugin_setup() { backend_reader default: false }
+    plugin_setup do
+      backend_reader default: false
+    end
 
     it "does not define backend reader methods" do
       expect(instance.respond_to?(:title_backend)).to eq(false)

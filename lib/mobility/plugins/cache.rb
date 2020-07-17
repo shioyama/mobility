@@ -22,11 +22,12 @@ Values are added to the cache in two ways:
     module Cache
       extend Plugin
 
+      default true
       depends_on :backend, include: :before
 
       # Applies cache plugin to attributes.
-      included_hook do |model_class, backend_class, cache: true|
-        if cache
+      included_hook do |model_class, backend_class|
+        if options[:cache]
           backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
           model_class.include CacheResetter.new(*names)
         end

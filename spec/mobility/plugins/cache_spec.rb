@@ -5,7 +5,9 @@ describe Mobility::Plugins::Cache do
   include Helpers::Plugins
 
   describe "backend methods" do
-    plugin_setup cache: true, these: "options"
+    plugin_setup do
+      cache
+    end
 
     let(:locale) { :cz }
     let(:options) { { these: "options" } }

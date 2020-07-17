@@ -30,5 +30,7 @@ Works with {Mobility::Plugin}. (Subclassed by {Mobility::Attributes}.)
     def initialize(*, **options)
       @options = self.class.defaults.merge(options)
     end
+
+    attr_reader :options
   end
 end

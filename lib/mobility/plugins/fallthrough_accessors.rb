@@ -40,8 +40,8 @@ model class is generated.
       # Apply fallthrough accessors plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
-      initialize_hook do |fallthrough_accessors: nil|
-        define_fallthrough_accessors(names) if fallthrough_accessors
+      initialize_hook do
+        define_fallthrough_accessors(names) if options[:fallthrough_accessors]
       end
 
       private

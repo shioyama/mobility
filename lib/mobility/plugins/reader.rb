@@ -10,10 +10,11 @@ Defines attribute reader that delegates to +Mobility::Backend#read+.
 =end
       extend Plugin
 
+      default true
       depends_on :backend
 
-      initialize_hook do |*names, reader: true|
-        if reader
+      initialize_hook do |*names, **|
+        if options[:reader]
           names.each do |name|
             class_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{name}(locale: nil, **options)

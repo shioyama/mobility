@@ -26,8 +26,8 @@ Defines:
       # @return [Symbol,Class] Name of backend, or backend class
       attr_reader :backend_name
 
-      initialize_hook do |*, backend:|
-        @backend_name = backend
+      initialize_hook do
+        @backend_name = options[:backend]
       end
 
       # Setup backend class, include modules into model class, include/extend

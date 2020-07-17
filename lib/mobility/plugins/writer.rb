@@ -9,10 +9,12 @@ Defines attribute writer that delegates to +Mobility::Backend#write+.
 
 =end
       extend Plugin
+
+      default true
       depends_on :backend
 
-      initialize_hook do |*names, writer: true|
-        if writer
+      initialize_hook do |*names|
+        if options[:writer]
           names.each do |name|
             class_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{name}=(value, locale: nil, **options)

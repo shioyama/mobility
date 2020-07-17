@@ -9,7 +9,7 @@ Defines convenience methods on plugin module to hook into initialize/included
 method calls on +Mobility::Pluggable+ instance.
 
 - #initialize_hook: called after {Mobility::Pluggable#initialize}, with
-  attribute names and options hash.
+  attribute names.
 - #included_hook: called after {Mobility::Pluggable#included}. (This can be
   used to include any module(s) into the backend class, see
   {Mobility::Plugins::Backend}.)
@@ -21,7 +21,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
   module MyPlugin
     extend Mobility::Plugin
 
-    initialize_hook do |*names, **options|
+    initialize_hook do |*names|
       names.each do |name|
         define_method "#{name}_foo" do
           # method body
@@ -69,35 +69,40 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
     def initialize_hook(&block)
       plugin = self
-      call_with_kwargs = call_with_kwargs?(block)
 
       define_method :initialize do |*names, **options|
         super(*names, **options)
         return unless plugin.dependencies_satisfied?(self.class)
 
-        call_with_kwargs ?
-          class_exec(*names, **@options.slice(Plugins.lookup_name(plugin)), &block) :
-          class_exec(*names, &block)
+        class_exec(*names, &block)
       end
     end
 
     def included_hook(&block)
       plugin = self
-      call_with_kwargs = call_with_kwargs?(block)
 
       define_method :included do |klass|
         super(klass).tap do |backend_class|
           if plugin.dependencies_satisfied?(self.class)
-            call_with_kwargs ?
-              class_exec(klass, backend_class, **@options.slice(Plugins.lookup_name(plugin)), &block) :
-              class_exec(klass, backend_class, &block)
+            class_exec(klass, backend_class, &block)
           end
         end
       end
     end
 
+    def included(pluggable)
+      if defined?(@default) && !pluggable.defaults.has_key?(name = Plugins.lookup_name(self))
+        pluggable.defaults[name] = @default
+      end
+      super
+    end
+
     def dependencies
       @dependencies ||= {}
+    end
+
+    def default(value)
+      @default = value
     end
 
     # Does this class include all plugins this plugin depends (directly) on?
@@ -126,12 +131,6 @@ Also includes a +configure+ class method to apply plugins to a pluggable
         raise ArgumentError, "depends_on 'include' keyword argument must be one of: true, false, :before or :after"
       end
       dependencies[plugin] = include
-    end
-
-    private
-
-    def call_with_kwargs?(block)
-      [:keyrest, :keyreq, :key].include?(block.parameters.last&.first)
     end
 
     DependencyResolver = Struct.new(:pluggable, :defaults) do

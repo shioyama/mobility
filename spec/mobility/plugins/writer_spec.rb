@@ -4,7 +4,7 @@ require "mobility/plugins/writer"
 describe Mobility::Plugins::Writer do
   include Helpers::Plugins
 
-  plugin_setup writer: true
+  plugin_setup { writer }
 
   describe "getters" do
     let(:instance) { model_class.new }

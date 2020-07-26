@@ -11,13 +11,7 @@ Module loading ActiveRecord-specific classes for Mobility models.
     require "mobility/active_record/uniqueness_validator"
 
     def self.included(model_class)
-      model_class.class_eval do
-        unless const_defined?(:UniquenessValidator)
-          const_set(:UniquenessValidator,
-                    Class.new(::Mobility::ActiveRecord::UniquenessValidator))
-        end
-        delegate :translated_attribute_names, to: :class
-      end
+      model_class.delegate :translated_attribute_names, to: :class
     end
   end
 end

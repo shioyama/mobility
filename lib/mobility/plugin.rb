@@ -119,7 +119,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
     # plugin.
     #
     # Passing +false+ does not include the dependency, but checks that it has
-    # been included when running include and initialize hooks (so hooks iwill
+    # been included when running include and initialize hooks (so hooks will
     # not run for this plugin if it has not been included). In other words:
     # disable this plugin unless this dependency has been included elsewhere.
     # (Note that this check is not applied recursively.)

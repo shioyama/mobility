@@ -16,8 +16,8 @@ Stores shared Mobility configuration referenced by all backends.
     attr_accessor :query_method
 
     # @param [Symbol] name Plugin name
-    def plugin(name)
-      attributes_class.plugin(name)
+    def plugin(name, **options)
+      attributes_class.plugin(name, **options)
     end
 
     # @param [Symbol] name Plugin name

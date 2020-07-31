@@ -29,4 +29,11 @@ describe Mobility::Configuration do
       expect(subject.default_accessor_locales).to eq([:en, :de])
     end
   end
+
+  describe "#plugin" do
+    it "delegates to attributes_class#plugin" do
+      expect(subject.attributes_class).to receive(:plugin).with(:foo, these: 'params')
+      subject.plugin :foo, these: 'params'
+    end
+  end
 end

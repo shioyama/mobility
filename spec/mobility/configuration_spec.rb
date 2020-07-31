@@ -36,4 +36,11 @@ describe Mobility::Configuration do
       subject.plugin :foo, these: 'params'
     end
   end
+
+  describe "#default" do
+    it "delegates to attributes_class#default" do
+      expect(subject.attributes_class).to receive(:default).with(:foo, 'bar')
+      subject.default :foo, 'bar'
+    end
+  end
 end

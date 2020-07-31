@@ -20,6 +20,10 @@ Stores shared Mobility configuration referenced by all backends.
       attributes_class.plugin(name, **options)
     end
 
+    def default(name, value)
+      attributes_class.default(name, value)
+    end
+
     # @param [Symbol] name Plugin name
     def plugins(*names)
       names.each { |name| attributes_class.plugin name }

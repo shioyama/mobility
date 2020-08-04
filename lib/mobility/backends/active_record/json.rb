@@ -1,5 +1,6 @@
 require 'mobility/backends/active_record/pg_hash'
-require 'mobility/arel/nodes/pg_ops'
+#require 'mobility/arel/nodes/pg_ops'
+require 'mobility/arel/nodes/mysql_ops'
 
 module Mobility
   module Backends
@@ -36,7 +37,7 @@ Implements the {Mobility::Backends::Json} backend for ActiveRecord models.
         #   attribute key on jsonb column
         def self.build_node(attr, locale)
           column_name = column_affix % attr
-          Arel::Nodes::Json.new(model_class.arel_table[column_name], build_quoted(locale))
+          Arel::Nodes::Json.new(model_class.arel_table[column_name], build_quoted("$.\"#{locale}\""))
         end
       end
     end

@@ -160,7 +160,7 @@ module Helpers
           Class.new.tap do |klass|
             klass.include attributes
           end
-        end
+        end unless method_defined?(:model_class)
         let(:instance) { model_class.new }
 
         let(:attributes) { attributes_class.new(*attribute_names, backend: backend_class, **options) }

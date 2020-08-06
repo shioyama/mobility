@@ -15,11 +15,11 @@ Plugin for ActiveRecord models.
     module ActiveRecord
       extend Plugin
 
-      depends_on :active_record_backend, include: :after
-      depends_on :active_record_dirty
-      depends_on :active_record_cache
-      depends_on :active_record_query
-      depends_on :active_record_uniqueness_validation
+      requires :active_record_backend, include: :after
+      requires :active_record_dirty
+      requires :active_record_cache
+      requires :active_record_query
+      requires :active_record_uniqueness_validation
 
       included_hook do |klass|
         unless active_record_class?(klass)

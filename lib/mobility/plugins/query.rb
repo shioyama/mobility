@@ -10,7 +10,7 @@ module Mobility
       extend Plugin
 
       default :i18n
-      depends_on :backend, include: :before
+      requires :backend, include: :before
 
       def query_method
         (options[:query] == true) ? self.class.defaults[:query] : options[:query]

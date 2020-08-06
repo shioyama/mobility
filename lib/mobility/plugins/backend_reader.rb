@@ -12,7 +12,7 @@ different format string as the plugin option.
       extend Plugin
 
       default true
-      depends_on :backend
+      requires :backend
 
       initialize_hook do |*names|
         backend_reader = options[:backend_reader]

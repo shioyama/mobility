@@ -19,7 +19,7 @@ enabled for any one attribute on the model.
       module Query
         extend Plugin
 
-        depends_on :query, include: false
+        requires :query, include: false
 
         included_hook do |klass, backend_class|
           plugin = self

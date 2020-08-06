@@ -126,9 +126,9 @@ Also includes a +configure+ class method to apply plugins to a pluggable
     #
     # @param [Symbol] plugin Name of plugin dependency
     # @option [TrueClass, FalseClass, Symbol] include
-    def depends_on(plugin, include: true)
+    def requires(plugin, include: true)
       unless [true, false, :before, :after].include?(include)
-        raise ArgumentError, "depends_on 'include' keyword argument must be one of: true, false, :before or :after"
+        raise ArgumentError, "requires 'include' keyword argument must be one of: true, false, :before or :after"
       end
       dependencies[plugin] = include
     end

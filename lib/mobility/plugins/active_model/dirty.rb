@@ -44,7 +44,7 @@ the ActiveRecord dirty plugin for more information.
       module Dirty
         extend Plugin
 
-        depends_on :dirty, include: false
+        requires :dirty, include: false
 
         initialize_hook do
           if options[:dirty]

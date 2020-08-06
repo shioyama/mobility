@@ -125,7 +125,7 @@ the current locale was +nil+.
     module Fallbacks
       extend Plugin
 
-      depends_on :backend, include: :before
+      requires :backend, include: :before
 
       # Applies fallbacks plugin to attributes. Completely disables fallbacks
       # on model if option is +false+.

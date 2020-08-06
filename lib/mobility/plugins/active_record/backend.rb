@@ -4,7 +4,7 @@ module Mobility
       module Backend
         extend Plugin
 
-        depends_on :backend, include: :before
+        requires :backend, include: :before
 
         def load_backend(backend)
           if Symbol === backend

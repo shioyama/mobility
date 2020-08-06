@@ -11,7 +11,7 @@ Defines attribute reader that delegates to +Mobility::Backend#read+.
       extend Plugin
 
       default true
-      depends_on :backend
+      requires :backend
 
       initialize_hook do |*names, **|
         if options[:reader]

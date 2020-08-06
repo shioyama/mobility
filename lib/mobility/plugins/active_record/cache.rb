@@ -13,7 +13,7 @@ methods.
       module Cache
         extend Plugin
 
-        depends_on :cache, include: false
+        requires :cache, include: false
 
         included_hook do |klass, _|
           if options[:cache]

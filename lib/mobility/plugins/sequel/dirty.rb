@@ -15,7 +15,7 @@ Automatically includes dirty plugin in model class when enabled.
       module Dirty
         extend Plugin
 
-        depends_on :dirty, include: false
+        requires :dirty, include: false
 
         initialize_hook do
           # Although we load the plugin in the included callback method, we

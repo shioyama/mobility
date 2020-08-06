@@ -42,8 +42,8 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
       module Dirty
         extend Plugin
 
-        depends_on :dirty, include: false
-        depends_on :active_model_dirty, include: :before
+        requires :dirty, include: false
+        requires :active_model_dirty, include: :before
 
         initialize_hook do
           if options[:dirty]

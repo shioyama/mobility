@@ -16,7 +16,7 @@ Defines:
     module Backend
       extend Plugin
 
-      depends_on :attributes, include: :before
+      requires :attributes, include: :before
 
       # Backend class
       # @return [Class] Backend class

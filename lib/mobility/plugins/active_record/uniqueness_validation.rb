@@ -4,7 +4,7 @@ module Mobility
       module UniquenessValidation
         extend Plugin
 
-        depends_on :query, include: false
+        requires :query, include: false
 
         included_hook do |klass|
           klass.class_eval do

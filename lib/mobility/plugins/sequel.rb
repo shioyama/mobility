@@ -16,10 +16,10 @@ module Mobility
     module Sequel
       extend Plugin
 
-      depends_on :sequel_backend, include: :after
-      depends_on :sequel_dirty
-      depends_on :sequel_cache
-      depends_on :sequel_query
+      requires :sequel_backend, include: :after
+      requires :sequel_dirty
+      requires :sequel_cache
+      requires :sequel_query
 
       included_hook do |klass|
         unless sequel_class?(klass)

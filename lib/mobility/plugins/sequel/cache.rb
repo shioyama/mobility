@@ -11,7 +11,7 @@ Adds hook to clear Mobility cache when +refresh+ is called on Sequel model.
       module Cache
         extend Plugin
 
-        depends_on :cache, include: false
+        requires :cache, include: false
 
         included_hook do |klass|
           define_cache_hooks(klass, :refresh) if options[:cache]

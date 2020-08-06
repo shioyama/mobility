@@ -23,7 +23,7 @@ Values are added to the cache in two ways:
       extend Plugin
 
       default true
-      depends_on :backend, include: :before
+      requires :backend, include: :before
 
       # Applies cache plugin to attributes.
       included_hook do |_, backend_class|

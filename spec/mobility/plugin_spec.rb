@@ -24,8 +24,8 @@ describe Mobility::Plugin do
       end
 
       it 'detects before dependency conflict between two plugins' do
-        foo.depends_on :bar, include: :before
-        bar.depends_on :foo, include: :before
+        foo.requires :bar, include: :before
+        bar.requires :foo, include: :before
         expect {
           described_class.configure(pluggable) do
             __send__ :foo
@@ -36,8 +36,8 @@ describe Mobility::Plugin do
       end
 
       it 'includes pluggable name in cyclic dependency conflict message' do
-        foo.depends_on :bar, include: :before
-        bar.depends_on :foo, include: :before
+        foo.requires :bar, include: :before
+        bar.requires :foo, include: :before
 
         stub_const('Pluggable', pluggable)
         expect {
@@ -50,8 +50,8 @@ describe Mobility::Plugin do
       end
 
       it 'detects after dependency conflict between two plugins' do
-        foo.depends_on :bar, include: :after
-        bar.depends_on :foo, include: :after
+        foo.requires :bar, include: :after
+        bar.requires :foo, include: :after
         expect {
           described_class.configure(pluggable) do
             __send__ :foo
@@ -62,9 +62,9 @@ describe Mobility::Plugin do
       end
 
       it 'detects before dependency conflict between three plugins' do
-        foo.depends_on :baz, include: :before
-        bar.depends_on :foo, include: :before
-        baz.depends_on :bar, include: :before
+        foo.requires :baz, include: :before
+        bar.requires :foo, include: :before
+        baz.requires :bar, include: :before
         expect {
           described_class.configure(pluggable) do
             __send__ :foo
@@ -76,9 +76,9 @@ describe Mobility::Plugin do
       end
 
       it 'detects after dependency conflict between three plugins' do
-        foo.depends_on :baz, include: :after
-        bar.depends_on :foo, include: :after
-        baz.depends_on :bar, include: :after
+        foo.requires :baz, include: :after
+        bar.requires :foo, include: :after
+        baz.requires :bar, include: :after
         expect {
           described_class.configure(pluggable) do
             __send__ :foo
@@ -90,9 +90,9 @@ describe Mobility::Plugin do
       end
 
       it 'correctly includes plugins with no dependency conflicts' do
-        foo.depends_on :bar, include: :before
-        baz.depends_on :foo, include: :before
-        bar.depends_on :baz, include: :after
+        foo.requires :bar, include: :before
+        baz.requires :foo, include: :before
+        bar.requires :baz, include: :after
 
         expect {
           described_class.configure(pluggable) do
@@ -106,7 +106,7 @@ describe Mobility::Plugin do
       end
 
       it 'raises DependencyConflict error if plugin has after dependency on previously included plugin' do
-        bar.depends_on :foo, include: :after
+        bar.requires :foo, include: :after
 
         described_class.configure(pluggable) do
           __send__ :foo
@@ -121,7 +121,7 @@ describe Mobility::Plugin do
       end
 
       it 'includes pluggable name in after dependency conflict error message' do
-        bar.depends_on :foo, include: :after
+        bar.requires :foo, include: :after
 
         described_class.configure(pluggable) do
           __send__ :foo
@@ -139,9 +139,9 @@ describe Mobility::Plugin do
       end
 
       it 'skips mutual before dependencies which have already been included' do
-        foo.depends_on :baz, include: :before
-        bar.depends_on :foo, include: :before
-        bar.depends_on :baz, include: :before
+        foo.requires :baz, include: :before
+        bar.requires :foo, include: :before
+        bar.requires :baz, include: :before
 
         described_class.configure(pluggable) do
           __send__ :foo
@@ -157,9 +157,9 @@ describe Mobility::Plugin do
       end
 
       it 'handles non-conflicting cyclic dependencies which have already been included' do
-        foo.depends_on :baz
-        bar.depends_on :foo, include: :before
-        bar.depends_on :baz, include: :before
+        foo.requires :baz
+        bar.requires :foo, include: :before
+        bar.requires :baz, include: :before
 
         described_class.configure(pluggable) do
           __send__ :foo
@@ -177,9 +177,9 @@ describe Mobility::Plugin do
       end
 
       it 'handles multiple dependency levels' do
-        foo.depends_on :bar
-        bar.depends_on :baz, include: :after
-        baz.depends_on :qux, include: :before
+        foo.requires :bar
+        bar.requires :baz, include: :after
+        baz.requires :qux, include: :before
 
         expect {
           described_class.configure(pluggable) do
@@ -193,7 +193,7 @@ describe Mobility::Plugin do
       end
 
       it 'does not include dependency for include: false' do
-        foo.depends_on :bar, include: false
+        foo.requires :bar, include: false
 
         expect {
           described_class.configure(pluggable) do
@@ -207,8 +207,8 @@ describe Mobility::Plugin do
       it 'does not run hooks if direct dependency is not included for include: false' do
         # Note that foo hooks *are* run, although bar dependencies are not met.
         # So include: false is not applied recursively to dependents.
-        foo.depends_on :bar
-        bar.depends_on :baz, include: false
+        foo.requires :bar
+        bar.requires :baz, include: false
 
         foo_listener = double
         bar_listener = double
@@ -233,7 +233,7 @@ describe Mobility::Plugin do
       end
 
       it 'does run hooks if dependency is included for include: false' do
-        foo.depends_on :bar, include: false
+        foo.requires :bar, include: false
         listener = double
 
         bar.initialize_hook do |*|

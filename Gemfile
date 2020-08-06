@@ -47,6 +47,7 @@ group :development, :test do
   end
 
   gem 'allocation_stats' if ENV['FEATURE'] == 'performance'
+  gem 'rails' if ENV['FEATURE'] == 'rails'
 
   platforms :ruby do
     gem 'guard-rspec'

@@ -17,6 +17,8 @@ else
   orm = nil
 end
 
+require 'rails' if ENV['FEATURE'] == 'rails'
+
 db = ENV['DB'] || 'none'
 require 'pry-byebug'
 require 'i18n'

@@ -1,84 +1,100 @@
 Mobility.configure do |config|
-  # Sets the default backend to use in models. This can be overridden in models
-  # by passing +backend: ...+ to +translates+.
-  config.default_backend = :key_value
 
-  # By default, Mobility uses the +translates+ class method in models to
-  # describe translated attributes, but you can configure this method to be
-  # whatever you like. This may be useful if using Mobility alongside another
-  # translation gem which uses the same method name.
-  config.accessor_method = :translates
+  # PLUGINS
+  config.plugins do
+    # Backend
+    #
+    # Sets the default backend to use in models. This can be overridden in models
+    # by passing +backend: ...+ to +translates+.
+    #
+    # To default to a different backend globally, replace +:key_value+ by another
+    # backend name.
+    #
+    backend default: :key_value
 
-  # To query on translated attributes, you need to append a scope to your
-  # model. The name of this scope is +i18n+ by default, but this can be changed
-  # to something else.
-  config.query_method    = :i18n
+    # ActiveRecord
+    #
+    # Defines ActiveRecord as ORM, and enables ActiveRecord-specific plugins.
+    active_record
 
-  # Uncomment and remove (or add) items to (from) this list to completely
-  # disable/enable plugins globally (so they cannot be used and are never even
-  # loaded). Note that if you remove an item from the list, you will not be
-  # able to use the plugin at all, and any options for the plugin will be
-  # ignored by models. (In most cases, you probably don't want to change this.)
-  #
-  # config.plugins = %i[
-  #   query
-  #   cache
-  #   dirty
-  #   fallbacks
-  #   presence
-  #   default
-  #   attribute_methods
-  #   fallthrough_accessors
-  #   locale_accessors
-  # ]
+    # Accessors
+    #
+    # Define reader and writer methods for translated attributes. Remove either
+    # to disable globally, or pass +reader: false+ or +writer: false+ to
+    # +translates+ in any translated model.
+    #
+    reader
+    writer
 
-  # The translation cache is on by default, but you can turn it off by
-  # uncommenting this line. (This may be helpful in debugging.)
-  #
-  # config.default_options[:cache] = false
+    # Query
+    #
+    # Defines a scope on the model class which allows querying on
+    # translated attributes. The default scope is named +i18n+, pass a different
+    # name as default to change the global default, or to +translates+ in any
+    # model to change it for that model alone.
+    #
+    query
 
-  # Dirty tracking is disabled by default. Uncomment this line to enable it.
-  # If you enable this, you should also enable +locale_accessors+ by default
-  # (see below).
-  #
-  # config.default_options[:dirty] = true
+    # Cache
+    #
+    # Comment out to disable caching reads and writes.
+    #
+    cache
 
-  # No fallbacks are used by default. To define default fallbacks, uncomment
-  # and set the default fallback option value here. A "true" value will use
-  # whatever is defined by +I18n.fallbacks+ (if defined), or alternatively will
-  # fallback according to +I18n::Locale++Fallbacks+.
-  #
-  # config.default_options[:fallbacks] = true
+    # Dirty
+    #
+    # Uncomment this line to include and enable globally:
+    # dirty
+    #
+    # Or uncomment this line to include but disable by default, and only enable
+    # per model by passing +dirty: true+ to +translates+.
+    # dirty default: false
 
-  # The Presence plugin converts empty strings to nil when fetching and setting
-  # translations. By default it is on, uncomment this line to turn it off.
-  #
-  # config.default_options[:presence] = false
+    # Fallbacks
+    #
+    # Uncomment line below to enable fallbacks, using +I18n.fallbacks+.
+    # fallbacks
+    #
+    # Or uncomment this line to enable fallbacks with a global default.
+    # fallbacks default: { :pt => :en }
 
-  # Set a default value to use if the translation is nil. By default this is
-  # off, uncomment and set a default to use it across all models (you probably
-  # don't want to do that).
-  #
-  # config.default_options[:default] = ...
+    # Presence
+    #
+    # Converts blank strings to nil on reads and writes. Comment out to
+    # disable.
+    #
+    presence
 
-  # Uncomment to enable locale_accessors by default on models. A true value
-  # will use the locales defined either in
-  # Rails.application.config.i18n.available_locales or I18n.available_locales.
-  # If you want something else, pass an array of locales instead.
-  #
-  # config.default_options[:locale_accessors] = true
+    # Default
+    #
+    # Set a default translation per attributes. When enabled, passing +default:
+    # 'foo'+ sets a default translation string to show in case no translation is
+    # present. Can also be passed a proc.
+    #
+    # default
 
-  # Uncomment to enable fallthrough accessors by default on models. This will
-  # allow you to call any method with a suffix like _en or _pt_br, and Mobility
-  # will catch the suffix and convert it into a locale in +method_missing+. If
-  # you don't need this kind of open-ended fallthrough behavior, it's better
-  # to use locale_accessors instead (which define methods) since method_missing
-  # is very slow. (You can use both fallthrough and locale accessor plugins
-  # together without conflict.)
-  #
-  # Note: The dirty plugin enables fallthrough_accessors by default.
-  #
-  # config.default_options[:fallthrough_accessors] = true
+    # Fallthrough Accessors
+    #
+    # Uses method_missing to define locale-specific accessor methods like
+    # +title_en+, +title_en=+, +title_fr+, +title_fr=+ for each translated
+    # attribute. If you know what set of locales you want to support, it's
+    # generally better to use Locale Accessors (or both together) since
+    # +method_missing+ is very slow.  (You can use both fallthrough and locale
+    # accessor plugins together without conflict.)
+    #
+    # fallthrough_accessors
+
+    # Locale Accessors
+    #
+    # Uses +def+ to define accessor methods for a set of locales. By default uses
+    # +I18n.available_locales+, but you can pass the set of locales with
+    # +translates+ and/or set a global default here.
+    #
+    # locale_accessors
+    #
+    # Or define specific defaults by uncommenting line below
+    # locale_accessors default: [:en, :ja]
+  end
 
   # You can also include backend-specific default options. For example, if you
   # want to default to using the text-type translation table with the KeyValue
@@ -86,5 +102,13 @@ Mobility.configure do |config|
   # it to :string to default to the string-type translation table instead. (For
   # other backends, this option is ignored.)
   #
-  # config.default_options[:type] = :text
+  # default :type, :text
+
+  # OTHER CONFIGURATION
+
+  # By default, Mobility uses the +translates+ class method in models to
+  # describe translated attributes, but you can configure this method to be
+  # whatever you like. This may be useful if using Mobility alongside another
+  # translation gem which uses the same method name.
+  config.accessor_method = :translates
 end

@@ -8,10 +8,7 @@ checks:
     enabled: false
 engines:
   duplication:
-    enabled: true
-    config:
-      languages:
-      - ruby
+    enabled: false
   fixme:
     enabled: true
     checks:

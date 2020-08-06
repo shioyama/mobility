@@ -21,9 +21,9 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
           directory "initializers" do
             file "mobility.rb" do
               contains "Mobility.configure do |config|"
-              contains "config.default_backend = :key_value"
+              contains "plugin :backend, default: :key_value"
+              contains "plugin :query"
               contains "config.accessor_method = :translates"
-              contains "config.query_method    = :i18n"
             end
           end
         end

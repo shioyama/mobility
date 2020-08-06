@@ -7,7 +7,33 @@ require "spec_helper"
 #   be sufficient at this stage.
 #
 describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
+  include Helpers::Plugins
   require "mobility/plugins/active_record/query"
+
+  describe "query scope" do
+    let(:model_class) do
+      stub_const 'Article', Class.new(ActiveRecord::Base)
+      Article.include attributes
+      Article
+    end
+
+    context "default query scope" do
+      plugin_setup query: true, active_record: true
+
+      it "defines query scope" do
+        expect(model_class.i18n).to eq(model_class.__mobility_query_scope__)
+      end
+    end
+
+    context "custom query scope" do
+      plugin_setup query: :foo, active_record: true
+
+      it "defines query scope" do
+        expect(model_class.foo).to eq(model_class.__mobility_query_scope__)
+        expect { model_class.i18n }.to raise_error(NoMethodError)
+      end
+    end
+  end
 
   describe "query methods" do
     before do
@@ -28,8 +54,7 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
 
   describe "query method" do
     # NOTE: __mobility_query_scope__ is a public method for convenience, but is
-    # intended for internal use. For application code, use i18n or whatever you
-    # define in Mobility.query_method instead.
+    # intended for internal use.
     it "creates a __mobility_query_scope__ method" do
       stub_const 'Article', Class.new(ActiveRecord::Base)
       Article.class_eval do

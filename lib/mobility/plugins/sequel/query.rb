@@ -13,10 +13,11 @@ See ActiveRecord::Query plugin.
         depends_on :query, include: false
 
         included_hook do |klass, _|
+          plugin = self
           if options[:query]
             klass.class_eval do
               extend QueryMethod
-              singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_dataset__
+              singleton_class.send :alias_method, plugin.query_method, :__mobility_query_dataset__
             end
           end
         end

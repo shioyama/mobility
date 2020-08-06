@@ -11,10 +11,6 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Symbol]
     attr_accessor :accessor_method
 
-    # Name of query scope/dataset method (defaults to +i18n+)
-    # @return [Symbol]
-    attr_accessor :query_method
-
     # @param [Symbol] name Plugin name
     def plugin(name, **options)
       attributes_class.plugin(name, **options)
@@ -66,7 +62,6 @@ Stores shared Mobility configuration referenced by all backends.
 
     def initialize
       @accessor_method = :translates
-      @query_method = :i18n
       @fallbacks_generator = lambda { |fallbacks| Mobility::Fallbacks.build(fallbacks) }
       @default_accessor_locales = lambda { Mobility.available_locales }
     end

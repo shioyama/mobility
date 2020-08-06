@@ -7,6 +7,7 @@
   ([#402](https://github.com/shioyama/mobility/pull/402))
 - Move `_backend` methods into `backend_reader` plugin
   ([#403](https://github.com/shioyama/mobility/pull/403))
+- Replace `Configuration#query_method` configuration with Query plugin option
 
 ## 0.8
 

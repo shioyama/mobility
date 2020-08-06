@@ -27,7 +27,7 @@ enabled for any one attribute on the model.
             klass.class_eval do
               extend QueryMethod
               extend FindByMethods.new(*plugin.names)
-              singleton_class.send :alias_method, Mobility.query_method, :__mobility_query_scope__
+              singleton_class.send :alias_method, plugin.query_method, :__mobility_query_scope__
             end
             backend_class.include BackendMethods
           end
@@ -55,6 +55,7 @@ enabled for any one attribute on the model.
         end
 
         module QueryMethod
+          # This is required for UniquenessValidator.
           def __mobility_query_scope__(locale: Mobility.locale, &block)
             if block_given?
               VirtualRow.build_query(self, locale, &block)

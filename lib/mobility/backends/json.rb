@@ -17,7 +17,5 @@ Prefix and suffix to add to attribute name to generate json column name.
 =end
     module Json
     end
-
-    register_backend(:json, Json)
   end
 end

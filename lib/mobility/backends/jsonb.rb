@@ -17,7 +17,5 @@ Prefix and suffix to add to attribute name to generate jsonb column name.
 =end
     module Jsonb
     end
-
-    register_backend(:jsonb, Jsonb)
   end
 end

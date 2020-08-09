@@ -68,7 +68,5 @@ Format for serialization. Either +:yaml+ (default) or +:json+.
         end
       end
     end
-
-    register_backend(:serialized, Serialized)
   end
 end

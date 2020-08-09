@@ -43,7 +43,5 @@ be ignored if set, since it would cause a conflict with column accessors.
         "#{attribute}_#{normalized_locale}".to_sym
       end
     end
-
-    register_backend(:column, Column)
   end
 end

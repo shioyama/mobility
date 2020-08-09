@@ -18,7 +18,5 @@ Prefix and suffix to add to attribute name to generate hstore column name.
 =end
     module Hstore
     end
-
-    register_backend(:hstore, Hstore)
   end
 end

@@ -61,6 +61,8 @@ Defines:
 
       def load_backend(backend)
         Backends.load_backend(backend)
+      rescue Backends::LoadError => e
+        raise e, "could not find a #{backend} backend. Did you forget to include an ORM plugin like active_record or sequel?"
       end
 
       module InstanceMethods

@@ -39,7 +39,7 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
       def load_plugin(name)
         unless (plugin = @plugins[name])
           require "mobility/plugins/#{name}"
-          raise Error, "plugin #{name} did not register itself correctly in Mobility::Plugins" unless (plugin = @plugins[name])
+          raise LoadError, "plugin #{name} did not register itself correctly in Mobility::Plugins" unless (plugin = @plugins[name])
         end
         plugin
       end
@@ -53,6 +53,8 @@ option value. For examples, see classes under the {Mobility::Plugins} namespace.
         @plugins[name] = plugin
         @names[plugin] = name
       end
+
+      class LoadError < Error; end
     end
   end
 end

@@ -9,7 +9,7 @@ module Mobility
 
         unless (backend = @backends[name])
           require "mobility/backends/#{name}"
-          raise Error, "backend #{name} did not register itself correctly in Mobility::Backends" unless (backend = @backends[name])
+          raise LoadError, "backend #{name} did not register itself correctly in Mobility::Backends" unless (backend = @backends[name])
         end
         backend
       end
@@ -18,5 +18,7 @@ module Mobility
     def self.register_backend(name, mod)
       @backends[name] = mod
     end
+
+    class LoadError < Error; end
   end
 end

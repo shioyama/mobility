@@ -32,54 +32,69 @@ describe Mobility::Plugins::LocaleAccessors do
     end
   end
 
-   context "with option = true" do
-     plugin_setup locale_accessors: true
+  context "with default option" do
+    plugin_setup do
+      locale_accessors
+    end
 
-     it "defines locale accessors for all locales in I18n.available_locales" do
-       methods = model_class.instance_methods
-       I18n.available_locales.each do |locale|
-         expect(methods).to include(:"title_#{Mobility.normalize_locale(locale)}")
-         expect(methods).to include(:"title_#{Mobility.normalize_locale(locale)}?")
-         expect(methods).to include(:"title_#{Mobility.normalize_locale(locale)}=")
-       end
-     end
+    it "defines locale accessors for all locales in I18n.available_locales" do
+      methods = model_class.instance_methods
+      I18n.available_locales.each do |locale|
+        expect(methods).to include(:"title_#{Mobility.normalize_locale(locale)}")
+        expect(methods).to include(:"title_#{Mobility.normalize_locale(locale)}?")
+        expect(methods).to include(:"title_#{Mobility.normalize_locale(locale)}=")
+      end
+    end
 
-     describe "super: true" do
-       let(:option) { [:en] }
-       let(:spy) { double("model") }
-       let(:model_class) do
-         spy_ = spy
-         Class.new.tap do |klass|
-           mod = Module.new do
-             define_method :title_en do
-               spy_.title_en
-             end
-             define_method :title_en? do
-               spy_.title_en?
-             end
-             define_method :title_en= do |value|
-               spy_.title_en = value
-             end
-           end
-           klass.include mod
-           klass.include attributes
-         end
-       end
+    describe "super: true" do
+      let(:option) { [:en] }
+      let(:spy) { double("model") }
+      let(:model_class) do
+        spy_ = spy
+        Class.new.tap do |klass|
+          mod = Module.new do
+            define_method :title_en do
+              spy_.title_en
+            end
+            define_method :title_en? do
+              spy_.title_en?
+            end
+            define_method :title_en= do |value|
+              spy_.title_en = value
+            end
+          end
+          klass.include mod
+          klass.include attributes
+        end
+      end
 
-       it "calls super of locale accessor method" do
-         instance = model_class.new
+      it "calls super of locale accessor method" do
+        instance = model_class.new
 
-         aggregate_failures do
-           expect(spy).to receive(:title_en).and_return("model foo")
-           expect(instance.title_en(super: true)).to eq("model foo")
+        aggregate_failures do
+          expect(spy).to receive(:title_en).and_return("model foo")
+          expect(instance.title_en(super: true)).to eq("model foo")
 
-           expect(spy).to receive(:title_en?).and_return(true)
-           expect(instance.title_en?(super: true)).to eq(true)
+          expect(spy).to receive(:title_en?).and_return(true)
+          expect(instance.title_en?(super: true)).to eq(true)
 
-           expect(spy).to receive(:title_en=).with("model foo")
-           instance.send(:title_en=, "model foo", super: true)
-         end
-       end
-     end
+          expect(spy).to receive(:title_en=).with("model foo")
+          instance.send(:title_en=, "model foo", super: true)
+        end
+      end
+    end
+  end
+
+  context "with falsey option" do
+    plugin_setup locale_accesors: false
+
+    it "does not locale accessors for any locales" do
+      methods = model_class.instance_methods
+      I18n.available_locales.each do |locale|
+        expect(methods).not_to include(:"title_#{Mobility.normalize_locale(locale)}")
+        expect(methods).not_to include(:"title_#{Mobility.normalize_locale(locale)}?")
+        expect(methods).not_to include(:"title_#{Mobility.normalize_locale(locale)}=")
+      end
+    end
   end
 end

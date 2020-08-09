@@ -37,6 +37,8 @@ model class is generated.
     module FallthroughAccessors
       extend Plugin
 
+      default true
+
       # Apply fallthrough accessors plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option

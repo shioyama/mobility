@@ -4,8 +4,13 @@ require "mobility/plugins/fallthrough_accessors"
 describe Mobility::Plugins::FallthroughAccessors do
   include Helpers::Plugins
 
-  context "option value is truthy" do
-    plugin_setup fallthrough_accessors: true, reader: true, writer: true
+  context "option value is default" do
+    plugin_setup do
+      fallthrough_accessors
+      reader
+      writer
+    end
+
     it_behaves_like "locale accessor", :title, 'en'
     it_behaves_like "locale accessor", :title, 'de'
     it_behaves_like "locale accessor", :title, 'pt-BR'
@@ -46,7 +51,10 @@ describe Mobility::Plugins::FallthroughAccessors do
   end
 
   context "option value is false" do
-    plugin_setup fallthrough_accessors: false
+    plugin_setup do
+      fallthrough_accessors default: false
+    end
+
     it "does not include instance of FallthroughAccessors into attributes class" do
       instance = model_class.new
       expect { instance.title_en }.to raise_error(NoMethodError)

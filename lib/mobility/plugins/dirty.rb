@@ -21,11 +21,7 @@ details.
       extend Plugin
 
       requires :backend, include: :before
-      requires :fallthrough_accessors, include: :after
-
-      initialize_hook do
-        @options[:fallthrough_accessors] = true if options[:dirty]
-      end
+      requires :fallthrough_accessors
     end
 
     register_plugin(:dirty, Dirty)

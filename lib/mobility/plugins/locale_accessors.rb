@@ -32,6 +32,8 @@ available locales for a Rails application) will be used by default.
     module LocaleAccessors
       extend Plugin
 
+      default true
+
       # Apply locale accessors plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option

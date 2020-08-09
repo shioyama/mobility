@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
+describe Mobility::InstallGenerator, type: :generator do
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase
   include Helpers::Generators
@@ -21,8 +21,8 @@ describe Mobility::InstallGenerator, type: :generator, orm: :active_record do
           directory "initializers" do
             file "mobility.rb" do
               contains "Mobility.configure do |config|"
-              contains "plugin :backend, default: :key_value"
-              contains "plugin :query"
+              contains "backend default: :key_value"
+              contains "query"
               contains "config.accessor_method = :translates"
             end
           end

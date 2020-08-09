@@ -17,7 +17,10 @@ else
   orm = nil
 end
 
-require 'rails' if ENV['FEATURE'] == 'rails'
+if ENV['FEATURE'] == 'rails'
+  ENV['RAILS_VERSION'] = '6.0'
+  require 'rails'
+end
 
 db = ENV['DB'] || 'none'
 require 'pry-byebug'

@@ -57,8 +57,6 @@ jobs:
           - ruby: '2.7'
             feature: 'rails'
             orm:
-              name: 'active_record'
-              version: '6.0'
             database: 'sqlite3'
             experimental: false
           - ruby: '2.7'

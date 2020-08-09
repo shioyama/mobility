@@ -29,8 +29,6 @@ group :development, :test do
     else
       raise ArgumentError, 'Invalid ActiveRecord version'
     end
-
-    gem "generator_spec", '~> 0.9.4'
   when 'sequel'
     orm_version ||= '5'
     case orm_version
@@ -47,7 +45,12 @@ group :development, :test do
   end
 
   gem 'allocation_stats' if ENV['FEATURE'] == 'performance'
-  gem 'rails' if ENV['FEATURE'] == 'rails'
+
+  if ENV['FEATURE'] == 'rails'
+    gem 'rails', '>= 6.0.0', '< 6.1'
+    gem 'generator_spec', '~> 0.9.4'
+    gem 'sqlite3', '~> 1.4.1'
+  end
 
   platforms :ruby do
     gem 'guard-rspec'

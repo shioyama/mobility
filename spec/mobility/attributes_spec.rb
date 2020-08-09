@@ -18,8 +18,6 @@ describe Mobility::Attributes, orm: 'none' do
   let(:clean_options) { { cache: false, fallbacks: false, presence: false } }
 
   describe "including Attributes in a model" do
-    let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: model_class } }
-
     describe "model class methods" do
       describe ".mobility_attributes" do
         it "returns attribute names" do

@@ -23,8 +23,8 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
       cache_ = cache
       Article.class_eval do
         extend Mobility
-        translates :title, :content, backend: :key_value, type: :text, cache: cache_
-        translates :subtitle, backend: :key_value, type: :text
+        translates :title, :content, backend: :key_value, type: :text, cache: cache_, dirty: false
+        translates :subtitle, backend: :key_value, type: :text, dirty: false
       end
     end
 

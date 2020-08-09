@@ -6,7 +6,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
 
   column_options = { column_prefix: 'my_', column_suffix: '_i18n' }
   column_affix = "#{column_options[:column_prefix]}%s#{column_options[:column_suffix]}"
-  let(:default_options) { { presence: false, **column_options } }
+  let(:default_options) { { presence: false, dirty: false, **column_options } }
 
   context "with no options applied" do
     include_backend_examples described_class, (Class.new(Sequel::Model(:serialized_posts)) do

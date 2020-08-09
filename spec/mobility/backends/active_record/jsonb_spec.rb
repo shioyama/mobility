@@ -10,7 +10,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
 
   column_options = { column_prefix: 'my_', column_suffix: '_i18n' }
   column_affix = "#{column_options[:column_prefix]}%s#{column_options[:column_suffix]}"
-  let(:default_options) { { presence: false, cache: false, **column_options } }
+  let(:default_options) { { presence: false, cache: false, dirty: false, **column_options } }
 
   context "with no plugins applied" do
     include_backend_examples described_class, (Class.new(ActiveRecord::Base) do

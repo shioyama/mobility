@@ -18,7 +18,7 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
   context "with standard plugins applied" do
     let(:backend) { post.mobility_backends[:title] }
 
-    before { ContainerPost.translates :title, :content, backend: :container, presence: false, cache: false }
+    before { ContainerPost.translates :title, :content, backend: :container, presence: false, cache: false, dirty: false }
     let(:post) { ContainerPost.new }
 
     include_accessor_examples 'ContainerPost'
@@ -94,7 +94,7 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
     before(:each) do
       stub_const 'JsonContainerPost', Class.new(ActiveRecord::Base)
       JsonContainerPost.extend Mobility
-      JsonContainerPost.translates :title, :content, backend: :container, presence: false, cache: false, column_name: :json_translations
+      JsonContainerPost.translates :title, :content, backend: :container, presence: false, cache: false, dirty: false, column_name: :json_translations
     end
     after(:all) do
       m = ActiveRecord::Migration.new

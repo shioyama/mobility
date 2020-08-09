@@ -14,7 +14,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   end
 
   context "without cache" do
-    before { Article.translates :title, :content, backend: :table, cache: false }
+    before { Article.translates :title, :content, backend: :table, cache: false, dirty: false }
     include_accessor_examples "Article"
     include_dup_examples "Article"
     include_cache_key_examples "Article"
@@ -74,7 +74,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   end
 
   describe "translations association" do
-    before { Article.translates :title, :content, backend: :table, cache: true }
+    before { Article.translates :title, :content, backend: :table, cache: true, dirty: false }
 
     describe "cleaning up blank translations" do
       let(:title_backend) { backend_for(article, :title) }

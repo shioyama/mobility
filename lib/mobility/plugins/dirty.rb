@@ -20,6 +20,8 @@ details.
     module Dirty
       extend Plugin
 
+      default true
+
       requires :backend, include: :before
       requires :fallthrough_accessors
 

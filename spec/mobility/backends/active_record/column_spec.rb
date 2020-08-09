@@ -27,7 +27,7 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
     before do
       stub_const 'Comment', Class.new(ActiveRecord::Base)
       Comment.extend Mobility
-      Comment.translates *attributes, backend: :column, cache: false
+      Comment.translates *attributes, backend: :column, cache: false, dirty: false
     end
 
     subject { comment }

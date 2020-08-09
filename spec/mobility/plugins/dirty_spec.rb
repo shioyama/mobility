@@ -4,8 +4,10 @@ require "mobility/plugins/dirty"
 describe Mobility::Plugins::Dirty do
   include Helpers::Plugins
 
-  context "dirty enabled" do
-    plugin_setup dirty: true
+  context "dirty default option" do
+    plugin_setup do
+      dirty
+    end
 
     it "requires fallthrough_accessors" do
       expect(attributes).to have_plugin(:fallthrough_accessors)

@@ -32,7 +32,7 @@ require "mobility/backends/null"
 
 # Enable default plugins
 Mobility.configure do |config|
-  config.plugins *(%i[
+  config.plugins do
     backend
     reader
     writer
@@ -44,7 +44,8 @@ Mobility.configure do |config|
     default
     fallthrough_accessors
     locale_accessors
-  ] + [orm]).compact
+  end
+  config.plugin orm if orm
   config.plugin :attribute_methods if orm == 'active_record'
 end
 

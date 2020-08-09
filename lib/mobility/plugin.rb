@@ -55,6 +55,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       #
       # @param [Class, Module] pluggable
       # @param [Hash] defaults Plugin defaults hash to update
+      # @yield Block to define plugins
       # @return [Hash] Updated plugin defaults
       # @raise [Mobility::Plugin::CyclicDependency] if dependencies cannot be met
       # @example

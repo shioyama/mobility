@@ -16,13 +16,15 @@ Stores shared Mobility configuration referenced by all backends.
       attributes_class.plugin(name, **options)
     end
 
-    def default(name, value)
-      attributes_class.default(name, value)
+    # @param [Symbol] name Plugin name
+    # @yield Block to define plugins
+    def plugins(*args, &block)
+      raise ArgumentError, "Pass a block to Configuration#plugins to define plugins." if args.any?
+      attributes_class.plugins(&block)
     end
 
-    # @param [Symbol] name Plugin name
-    def plugins(*names)
-      names.each { |name| attributes_class.plugin name }
+    def default(name, value)
+      attributes_class.default(name, value)
     end
 
     # Generate new fallbacks instance

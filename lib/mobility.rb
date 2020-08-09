@@ -102,9 +102,6 @@ module Mobility
     # (see Mobility::Configuration#accessor_method)
     # @!method accessor_method
     #
-    # (see Mobility::Configuration#new_fallbacks)
-    # @!method new_fallbacks
-
     # (see Mobility::Configuration#default_backend)
     # @!method default_backend
 
@@ -116,6 +113,7 @@ module Mobility
       end
     end
 
+    # (see Mobility::Configuration#new_fallbacks)
     def new_fallbacks(*args)
       config.public_send(:new_fallbacks, *args)
     end

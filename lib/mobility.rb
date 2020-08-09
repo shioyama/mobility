@@ -110,10 +110,7 @@ module Mobility
 
     # (see Mobility::Configuration#plugins)
     # @!method plugins
-    #
-    # (see Mobility::Configuration#default_accessor_locales)
-    # @!method default_accessor_locales
-    %w[accessor_method default_backend plugins default_accessor_locales].each do |method_name|
+    %w[accessor_method default_backend plugins].each do |method_name|
       define_method method_name do
         config.public_send(method_name)
       end

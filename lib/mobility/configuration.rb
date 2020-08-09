@@ -48,22 +48,9 @@ Stores shared Mobility configuration referenced by all backends.
       attributes_class.defaults[:backend]
     end
 
-    # Returns set of default accessor locales to use (defaults to
-    # +I18n.available_locales+)
-    # @return [Array<Symbol>]
-    def default_accessor_locales
-      if @default_accessor_locales.is_a?(Proc)
-        @default_accessor_locales.call
-      else
-        @default_accessor_locales
-      end
-    end
-    attr_writer :default_accessor_locales
-
     def initialize
       @accessor_method = :translates
       @fallbacks_generator = lambda { |fallbacks| Mobility::Fallbacks.build(fallbacks) }
-      @default_accessor_locales = lambda { Mobility.available_locales }
     end
 
     def attributes_class

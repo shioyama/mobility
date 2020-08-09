@@ -39,7 +39,7 @@ available locales for a Rails application) will be used by default.
       # @param [Boolean] option
       initialize_hook do |*names|
         if locales = options[:locale_accessors]
-          locales = Mobility.config.default_accessor_locales if locales == true
+          locales = Mobility.available_locales if locales == true
           names.each do |name|
             locales.each do |locale|
               define_locale_reader(name, locale)

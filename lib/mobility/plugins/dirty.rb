@@ -22,6 +22,13 @@ details.
 
       requires :backend, include: :before
       requires :fallthrough_accessors
+
+      initialize_hook do
+        if options[:dirty] && !options[:fallthrough_accessors]
+          warn 'The Dirty plugin depends on Fallthrough Accessors being enabled,'\
+            'but fallthrough_accessors option is falsey'
+        end
+      end
     end
 
     register_plugin(:dirty, Dirty)

@@ -18,21 +18,6 @@ This is a less efficient (but more open-ended) implementation of locale
 accessors, for use in cases where the locales to be used are not known when the
 model class is generated.
 
-@example Using fallthrough locales on a plain old ruby class
-  class Post
-    def title
-      "title in #{Mobility.locale}"
-    end
-    include Mobility::FallthroughAccessors.new("title")
-  end
-
-  Mobility.locale = :en
-  post = Post.new
-  post.title
-  #=> "title in en"
-  post.title_fr
-  #=> "title in fr"
-
 =end
     module FallthroughAccessors
       extend Plugin

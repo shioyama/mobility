@@ -13,21 +13,6 @@ If no locales are passed as an option to the initializer,
 +Mobility.available_locales+ (i.e. +I18n.available_locales+, or Rails-set
 available locales for a Rails application) will be used by default.
 
-@example
-  class Post
-    def title
-      "title in #{Mobility.locale}"
-    end
-    include Mobility::Plugins::LocaleAccessors.new("title", locales: [:en, :fr])
-  end
-
-  Mobility.locale = :en
-  post = Post.new
-  post.title
-  #=> "title in en"
-  post.title_fr
-  #=> "title in fr"
-
 =end
     module LocaleAccessors
       extend Plugin

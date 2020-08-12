@@ -233,7 +233,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
         expect(instance.title_changed?).to eq(false)
         expect(instance.attribute_changed?(:title_en)).to eq(false)
 
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
+        if ActiveRecord::VERSION::MAJOR >= 5
           expect(instance.title_previously_changed?).to eq(true)
           expect(instance.title_previous_change).to eq(["foo", "bar"])
           expect(instance.title_changed?).to eq(false)
@@ -242,10 +242,10 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
           expect(instance.attribute_changed?(:title_en)).to eq(false)
 
           # Uncomment when Rails 6.1 is released
-          # if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '6.1'
-          #   expect(instance.title_previously_was).to eq('foo')
-          #   expect(instance.attribute_previously_was(:title)).to eq('foo')
-          # end
+          if ActiveRecord::VERSION::STRING >= '6.1'
+            expect(instance.title_previously_was).to eq('foo')
+            expect(instance.attribute_previously_was(:title)).to eq('foo')
+          end
         end
 
         instance.title_will_change!

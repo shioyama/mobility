@@ -37,7 +37,7 @@ describe Mobility::InstallGenerator, type: :generator do
         directory "db" do
           directory "migrate" do
             migration "create_text_translations" do
-              if ENV["RAILS_VERSION"] < "5.0"
+              if ActiveRecord::VERSION::MAJOR < 5
                 contains "class CreateTextTranslations < ActiveRecord::Migration"
               else
                 contains "class CreateTextTranslations < ActiveRecord::Migration[#{version_string_}]"
@@ -62,7 +62,7 @@ describe Mobility::InstallGenerator, type: :generator do
         directory "db" do
           directory "migrate" do
             migration "create_string_translations" do
-              if ENV["RAILS_VERSION"] < "5.0"
+              if ActiveRecord::VERSION::MAJOR < 5
                 contains "class CreateStringTranslations < ActiveRecord::Migration"
               else
                 contains "class CreateStringTranslations < ActiveRecord::Migration[#{version_string_}]"

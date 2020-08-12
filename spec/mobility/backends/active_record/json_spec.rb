@@ -27,7 +27,7 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
 
     include_accessor_examples 'JsonPost'
     include_serialization_examples 'JsonPost', column_affix: column_affix
-    include_querying_examples 'JsonPost' unless ENV['RAILS_VERSION'] < '5.0'
+    include_querying_examples 'JsonPost' unless ActiveRecord::VERSION::MAJOR < 5
     include_validation_examples 'JsonPost'
     include_dup_examples 'JsonPost'
     include_cache_key_examples 'JsonPost'

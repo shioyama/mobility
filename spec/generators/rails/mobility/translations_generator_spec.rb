@@ -58,7 +58,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
           directory "db" do
             directory "migrate" do
               migration "create_post_title_and_content_translations_for_mobility_table_backend" do
-                if ENV["RAILS_VERSION"] < "5.0"
+                if ActiveRecord::VERSION::MAJOR < 5
                   contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration"
                 else
                   contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
@@ -101,7 +101,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
           directory "db" do
             directory "migrate" do
               migration "create_post_title_and_content_translations_for_mobility_table_backend" do
-                if ENV["RAILS_VERSION"] < "5.0"
+                if ActiveRecord::VERSION::MAJOR < 5
                   contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration"
                 else
                   contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
@@ -149,7 +149,7 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
           directory "db" do
             directory "migrate" do
               migration "create_foo_title_and_content_translations_for_mobility_column_backend" do
-                if ENV["RAILS_VERSION"] < "5.0"
+                if ActiveRecord::VERSION::MAJOR < 5
                   contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration"
                 else
                   contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration[#{version_string_}]"

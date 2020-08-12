@@ -1,26 +1,14 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 if !ENV['ORM'].nil? && (ENV['ORM'] != '')
-  orm, orm_version = ENV['ORM'], ENV['ORM_VERSION']
-
-  case orm
-  when 'active_record'
-    ENV['RAILS_VERSION'] = orm_version || '6.0'
-  when 'sequel'
-    ENV['SEQUEL_VERSION'] = orm_version || '5'
-  else
-    raise ArgumentError, 'Invalid ORM'
-  end
-
+  orm = ENV['ORM']
+  raise ArgumentError, 'Invalid ORM' unless %w[active_record sequel].include?(orm)
   require orm
 else
   orm = nil
 end
 
-if ENV['FEATURE'] == 'rails'
-  ENV['RAILS_VERSION'] = '6.0'
-  require 'rails'
-end
+require 'rails' if ENV['FEATURE'] == 'rails'
 
 db = ENV['DB'] || 'none'
 require 'pry-byebug'
@@ -88,7 +76,9 @@ RSpec.configure do |config|
   end
 
   config.before :each do |example|
-    if (version = example.metadata[:rails_version_geq]) && (ENV['RAILS_VERSION'] < version)
+    if (version = example.metadata[:rails_version_geq]) &&
+        defined?(ActiveRecord) &&
+        ActiveRecord::VERSION::STRING < version
       skip "Unsupported for Rails < #{version}"
     end
     # Always clear I18n.fallbacks to avoid "leakage" between specs

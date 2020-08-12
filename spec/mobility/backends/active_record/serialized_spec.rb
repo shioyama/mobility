@@ -44,7 +44,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
           post = SerializedPost.new
           post.title = "foo"
           post.save
-          post.reload if ENV['RAILS_VERSION'] < '5.0' # don't ask me why
+          post.reload if ActiveRecord::VERSION::MAJOR < 5 # don't ask me why
           expect(post.public_send("#{(column_affix % "title")}_before_type_cast")).to eq("---\n:en: foo\n")
         end
 
@@ -73,7 +73,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
           post = SerializedPost.new
           post.title = "foo"
           post.save
-          post.reload if ENV['RAILS_VERSION'] < '5.0' # don't ask me why
+          post.reload if ActiveRecord::VERSION::MAJOR < 5 # don't ask me why
           expect(post.public_send("#{column_affix % "title"}_before_type_cast")).to eq("{\"en\":\"foo\"}")
         end
       end

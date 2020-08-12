@@ -206,13 +206,13 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
         expect(instance.title_changed?).to eq(false)
         expect(instance.title_was).to eq("foo")
 
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
+        if ActiveRecord::VERSION::MAJOR >= 5
           expect(instance.title_previously_changed?).to eq(true)
           expect(instance.title_previous_change).to eq([nil, "foo"])
         end
 
         # AR-specific suffix methods, added in AR 5.1
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
+        if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR > 0
           expect(instance.saved_change_to_title?).to eq(true)
           expect(instance.saved_change_to_title).to eq([nil, "foo"])
           expect(instance.title_before_last_save).to eq(nil)
@@ -237,13 +237,13 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
 
         expect(instance.title_changed?).to eq(false)
 
-        if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] >= '5.0'
+        if ActiveRecord::VERSION::MAJOR >= 5
           expect(instance.title_previously_changed?).to eq(true)
           expect(instance.title_previous_change).to eq(["foo", "bar"])
           expect(instance.title_changed?).to eq(false)
 
           # AR-specific suffix methods, added in 5.1
-          if ENV['RAILS_VERSION'] > '5.0'
+          if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR > 0
             expect(instance.saved_change_to_title?).to eq(true)
             expect(instance.saved_change_to_title).to eq(["foo", "bar"])
             expect(instance.title_before_last_save).to eq("foo")
@@ -269,7 +269,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           expect(instance.title_changed?).to eq(true)
 
           # AR-specific suffix methods
-          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
+          if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR > 0
             expect(instance.saved_change_to_title?).to eq(true)
             expect(instance.saved_change_to_title).to eq(["foo", "bar"])
             expect(instance.title_before_last_save).to eq("foo")
@@ -292,7 +292,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
           expect(instance.title_changed?).to eq(false)
 
           # AR-specific suffix methods, added in 5.1
-          if ENV['RAILS_VERSION'].present? && ENV['RAILS_VERSION'] > '5.0'
+          if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR > 0
             expect(instance.saved_change_to_title?).to eq(true)
             expect(instance.saved_change_to_title).to eq(["bar", "bar"])
             expect(instance.title_before_last_save).to eq("bar")

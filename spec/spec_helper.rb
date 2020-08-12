@@ -49,7 +49,7 @@ Mobility.configure do |config|
     locale_accessors
   end
   config.plugin orm if orm
-  config.plugin :attribute_methods if orm == 'active_record'
+  config.plugin :attribute_methods if defined?(ActiveRecord)
 end
 
 I18n.enforce_available_locales = true

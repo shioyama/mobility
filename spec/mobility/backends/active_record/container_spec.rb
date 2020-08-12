@@ -39,7 +39,7 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
     end
 
     describe "non-text values" do
-      it "stores non-string types as-is when saving", rails_version_geq: '5.0' do
+      it "stores non-string types as-is when saving", active_record_geq: '5.0' do
         backend = post.mobility_backends[:title]
         backend.write(:en, { foo: :bar } )
         post.save

@@ -410,7 +410,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     it_behaves_like "resets on model action", :reload
   end
 
-  describe "#saved_changes", rails_version_geq: '5.1' do
+  describe "#saved_changes", active_record_geq: '5.1' do
     it "includes translated and untranslated attributes" do
       instance = model_class.create
 
@@ -429,7 +429,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
   end
 
-  describe '#changes_to_save', rails_version_geq: '5.1' do
+  describe '#changes_to_save', active_record_geq: '5.1' do
     it "includes translated and untranslated attributes" do
       instance = model_class.new
 
@@ -445,7 +445,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
   end
 
-  describe '#has_changes_to_save?', rails_version_geq: '6.0' do
+  describe '#has_changes_to_save?', active_record_geq: '6.0' do
     it 'detects changes to translated and untranslated attributes' do
       instance = model_class.new
       backend = backend_for(instance, :title)
@@ -461,7 +461,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
   end
 
-  describe '#attributes_in_database', rails_version_geq: '6.0' do
+  describe '#attributes_in_database', active_record_geq: '6.0' do
     it 'includes translated and untranslated attributes' do
       instance = model_class.create
       expect(instance.attributes_in_database).to eq({})
@@ -483,7 +483,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
   end
 
-  describe '#changed_attribute_names_to_save', rails_version_geq: '5.1' do
+  describe '#changed_attribute_names_to_save', active_record_geq: '5.1' do
     it 'includes translated attributes and untranslated attributes' do
       instance = model_class.new
       backend = backend_for(instance, :title)

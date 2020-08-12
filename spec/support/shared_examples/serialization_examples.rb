@@ -54,7 +54,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       expect(instance.read_attribute(column1)).to match_hash({ en: "foo", fr: "bar" })
     end
 
-    it "deletes keys with nil values when saving", rails_version_geq: '5.0' do
+    it "deletes keys with nil values when saving", active_record_geq: '5.0' do
       backend.write(:en, "foo")
       expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
       backend.write(:en, nil)

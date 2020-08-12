@@ -287,7 +287,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
     end
   end
 
-  describe ".pluck", rails_version_geq: '5.0' do
+  describe ".pluck", active_record_geq: '5.0' do
     before do
       [["foo0", "bar3", true],
        ["foo2", "bar0", false],
@@ -341,7 +341,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
     end
   end
 
-  describe ".select/.group", rails_version_geq: '5.0' do
+  describe ".select/.group", active_record_geq: '5.0' do
     before do
       [["foo", "baz", true],
        ["foo", "baz", false],

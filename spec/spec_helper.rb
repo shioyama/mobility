@@ -76,7 +76,7 @@ RSpec.configure do |config|
   end
 
   config.before :each do |example|
-    if (version = example.metadata[:rails_version_geq]) &&
+    if (version = example.metadata[:active_record_geq]) &&
         defined?(ActiveRecord) &&
         ActiveRecord::VERSION::STRING < version
       skip "Unsupported for Rails < #{version}"

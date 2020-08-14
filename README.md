@@ -55,22 +55,15 @@ section of the wiki.
 Installation
 ------------
 
-Add this line to your application's Gemfile:
+To use the latest (unreleased) version of Mobility, add this line to your
+application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 0.8.13'
+gem 'mobility', git: 'https://github.com/shioyama/mobility.git'
 ```
 
-Mobility is cryptographically signed. To be sure the gem you install hasn't
-been tampered with, add my public key as a trusted certificate and install:
-
-```
-gem cert --add <(curl -Ls https://raw.github.com/shioyama/mobility/master/certs/shioyama.pem)
-gem install mobility -P MediumSecurity
-```
-
-The MediumSecurity trust profile will verify signed gems, but allow the
-installation of unsigned dependencies.
+For the latest stable version of Mobility, see the readme on the
+[0-8-stable](https://github.com/shioyama/mobility/tree/0-8-stable) branch.
 
 ### ActiveRecord (Rails)
 
@@ -79,7 +72,7 @@ Requirements:
 
 (Support for most backends and features is also supported with
 ActiveRecord/Rails 4.2, but there are some tests still failing. To see exactly
-what might not work, check pending specs in Rails 4.2 Travis builds.)
+what might not work, check pending specs in Rails 4.2 builds.)
 
 To translate attributes on a model, extend `Mobility`, then call `translates`
 passing in one or more attributes as well as a hash of options (see below).
@@ -96,36 +89,54 @@ rails generate mobility:install
 the `--without_tables` option here to skip the migration generation.)
 
 The generator will create an initializer file `config/initializers/mobility.rb`
-with the lines:
+which looks something like this:
 
 ```ruby
 Mobility.configure do |config|
-  config.default_backend = :key_value
+  # PLUGINS
+
+  config.plugins do
+    backend :key_value
+
+    active_record
+
+    reader
+    writer
+
+    # ...
+  end
+
   config.accessor_method = :translates
-  config.query_method    = :i18n
 end
 ```
 
-To use a different default backend, set `default_backend` to another value (see
-possibilities [below](#backends)).
-
-You will likely also want to set default values for the various translation
-options described below. You can set these defaults by assigning values to keys
-on the `config.default_options` hash. Below, we turn on the Dirty plugin by
-default, so it will be enabled for all models.
-
-You can also set defaults for backend-specific options. Below, we set the
-default `type` option for the KeyValue backend to `:string` (this is
-unnecessary and will be ignored if you are using a different backend).
+Each method call inside the block passed to `config.plugins` declares a plugin,
+along with an optional default. To use a different default backend, you can
+change the default passed to the `backend` plugin, like this:
 
 ```diff
  Mobility.configure do |config|
-   config.default_backend = :key_value
-   config.accessor_method = :translates
-   config.query_method    = :i18n
-+  config.default_options[:dirty] = true
-+  config.default_options[:type]  = :string
-end
+   # PLUGINS
+
+   config.plugins do
+-    backend :key_value
++    backend :table
+```
+
+See other possible backends in the [backends section](#backends).
+
+You can also set defaults for backend-specific options. Below, we set the
+default `type` option for the KeyValue backend to `:string`.
+
+```diff
+ Mobility.configure do |config|
+   # PLUGINS
+
+   config.plugins do
+-    backend :key_value
++    backend :key_value, type: :string
+   end
+ end
 ```
 
 We will assume the configuration above in the examples that follow. Other
@@ -139,6 +150,16 @@ See [Getting Started](#quickstart) to get started translating your models.
 Requirements:
 - Sequel >= 4.0
 
+When configuring Mobility, ensure that you include the `sequel` plugin:
+
+```diff
+ config.plugins do
+   backend :key_value
+
+-    active_record
++    sequel
+```
+
 You can extend `Mobility` just like in ActiveRecord, or you can use the
 `mobility` plugin, which does the same thing:
 
@@ -150,8 +171,8 @@ end
 ```
 
 Otherwise everything is (almost) identical to AR, with the exception that there
-is no equivalent to a Rails generator (so you will need to create the migration
-for any translation table(s) yourself, using Rails generators as a reference).
+is no equivalent to a Rails generator, so you will need to create the migration
+for any translation table(s) yourself, using Rails generators as a reference.
 
 The models in examples below all inherit from `ApplicationRecord`, but
 everything works exactly the same if the parent class is `Sequel::Model`.
@@ -266,15 +287,25 @@ changed and/or customized (see the [Backends](#backends) section below).
 ### <a name="getset"></a> Getting and Setting Translations
 
 The easiest way to get or set a translation is to use the getter and setter
-methods described above (`word.name` and `word.name=`), but you may want to
-access the value of an attribute in a specific locale, independent of the
-current value of `I18n.locale` (or `Mobility.locale`). There are a few ways to
-do this.
+methods described above (`word.name` and `word.name=`), enabled by including
+the `reader` and `writer` plugins.
+
+You may also want to access the value of an attribute in a specific locale,
+independent of the current value of `I18n.locale` (or `Mobility.locale`). There
+are a few ways to do this.
 
 The first way is to define locale-specific methods, one for each locale you
 want to access directly on a given attribute. These are called "locale
-accessors" in Mobility, and they can be defined by passing a `locale_accessors`
-option when defining translated attributes on the model class:
+accessors" in Mobility, and can be enabled by including the `locale_accessors`
+plugin, with a default set of accessors:
+
+```diff
+ config.plugins do
+   # ...
++  locale_accessors [:en, :ja]
+```
+
+You can also override this default from `translates` in any model:
 
 ```ruby
 class Word < ApplicationRecord
@@ -303,24 +334,23 @@ word.name_ru
 #=> NoMethodError: undefined method `name_ru' for #<Word id: ... >
 ```
 
-To generate methods for all locales in `I18n.available_locales` (at the time
-the model is first loaded), use `locale_accessors: true`.
+With no plugin option (or a default of `true`), Mobility generates methods for
+all locales in `I18n.available_locales` at the time the model is first loaded.
 
-An alternative to using the `locale_accessors` option is to use the
-`fallthrough_accessors` option, with `fallthrough_accessors: true`. This uses
-Ruby's [`method_missing`](http://apidock.com/ruby/BasicObject/method_missing)
-method to implicitly define the same methods as above, but supporting any
-locale without any method definitions. (Locale accessors and fallthrough
-locales can be used together without conflict, with locale accessors taking
-precedence if defined for a given locale.)
+An alternative to using the `locale_accessors` plugin is to use the
+`fallthrough_accessors` plugin. This uses Ruby's
+[`method_missing`](http://apidock.com/ruby/BasicObject/method_missing) method
+to implicitly define the same methods as above, but supporting any locale
+without any method definitions. (Locale accessors and fallthrough locales can
+be used together without conflict, with locale accessors taking precedence if
+defined for a given locale.)
 
-For example, if we define `Word` this way:
+Ensure the plugin is enabled:
 
-```ruby
-class Word < ApplicationRecord
-  extend Mobility
-  translates :name, fallthrough_accessors: true
-end
+```diff
+ config.plugins do
+   # ...
++  fallthrough_accessors
 ```
 
 ... then we can access any locale we want, without specifying them upfront:
@@ -439,15 +469,28 @@ details on how to configure it for your use case.
 
 ### <a name="fallbacks"></a>Fallbacks
 
-Mobility offers basic support for translation fallbacks. To enable fallbacks,
-pass a hash with fallbacks for each locale as an option when defining
+Mobility offers basic support for translation fallbacks. First, enable the
+`fallbacks` plugin:
+
+```diff
+ config.plugins do
+   # ...
++  fallbacks
++  locale_accessors
+```
+
+Fallbacks will require `fallthrough_accessors` to handle methods like
+`title_en`, which are used to track changes. For performance reasons it's
+generally best to also enable the `locale_accessors` plugin as shown above.
+
+Now pass a hash with fallbacks for each locale as an option when defining
 translated attributes on a class:
 
 ```ruby
 class Word < ApplicationRecord
   extend Mobility
-  translates :name,    fallbacks: { de: :ja, fr: :ja }, locale_accessors: true
-  translates :meaning, fallbacks: { de: :ja, fr: :ja }, locale_accessors: true
+  translates :name,    fallbacks: { de: :ja, fr: :ja }
+  translates :meaning, fallbacks: { de: :ja, fr: :ja }
 end
 ```
 
@@ -536,7 +579,16 @@ fallbacks](https://github.com/svenfuchs/i18n/wiki/Fallbacks).
 
 ### <a name="default"></a>Default values
 
-Another option is to assign a default value, which will be used if the result of a fetch would otherwise be `nil`:
+Another option is to assign a default value, using the `default` plugin:
+
+```diff
+ config.plugins do
+   # ...
++  default 'foo'
+```
+
+Here we've set a "default default" of `'foo'`, which will be returned if a fetch would
+otherwise return `nil`. This can be overridden from model classes:
 
 ```ruby
 class Word < ApplicationRecord
@@ -578,23 +630,28 @@ support it. Currently this is models which include
 [dirty](http://sequel.jeremyevans.net/rdoc-plugins/classes/Sequel/Plugins/Dirty.html)
 plugin).
 
-Enabling dirty tracking is as simple as sending the `dirty: true` option when
-defining a translated attribute. The way dirty tracking works is somewhat
-dependent on the model class (ActiveModel or Sequel); we will describe the
-ActiveModel implementation here.
+First, ensure the `dirty` plugin is enabled in your configuration, and that you
+have enabled an ORM plugin (either `active_record` or `sequel`), since the
+dirty plugin will depend on one of these being enabled.
 
-First, enable dirty tracking (note that this is a persisted AR model, although
-dirty tracking is not specific to AR and works for non-persisted models as well):
+```diff
+ config.plugins do
+   # ...
+   active_record
++  dirty
+```
+
+(Once enabled globally, the dirty plugin can be selectively disabled on classes
+by passing `dirty: false` to `translates`.)
+
+Take this ActiveRecord class:
 
 ```ruby
 class Post < ApplicationRecord
   extend Mobility
-  translates :title, dirty: true
+  translates :title
 end
 ```
-
-(If you want to enable dirty tracking on all models, set the
-`config.default_options[:dirty]` option in your Mobility configuration.)
 
 Let's assume we start with a post with a title in English and Japanese:
 
@@ -657,9 +714,6 @@ For performance reasons, it is highly recommended that when using the Dirty
 plugin, you also enable [locale accessors](#getset) for all locales which will
 be used, so that methods like `title_en` above are defined; otherwise they will
 be caught by `method_missing` (using fallthrough accessors), which is much slower.
-The easiest way to do this is to set `config.default_options[:locale_accessors]
-= true` in your Mobility config, and make sure that `I18n.available_locales`
-includes all locales you use in production.
 
 For more details on dirty tracking, see the [API
 documentation](http://www.rubydoc.info/gems/mobility/Mobility/Plugins/Dirty).
@@ -667,9 +721,17 @@ documentation](http://www.rubydoc.info/gems/mobility/Mobility/Plugins/Dirty).
 ### Cache
 
 The Mobility cache caches localized values that have been fetched once so they
-can be quickly retrieved again. The cache is enabled by default and should
-generally only be disabled when debugging; this can be done by passing `cache:
-false` when defining an attribute, like this:
+can be quickly retrieved again. The cache plugin is included in the default
+configuration created by the install generator:
+
+```diff
+ config.plugins do
+   # ...
++  cache
+```
+
+It can be disabled selectively per model by passing `cache: false` when
+defining an attribute, like this:
 
 ```ruby
 class Word < ApplicationRecord
@@ -679,7 +741,8 @@ end
 ```
 
 You can also turn off the cache for a single fetch by passing `cache: false` to
-the getter method, i.e. `post.title(cache: false)`.
+the getter method, i.e. `post.title(cache: false)`. To remove the cache plugin
+entirely, remove the `cache` line from the global plugins configuration.
 
 The cache is normally just a hash with locale keys and string (translation)
 values, but some backends (e.g. KeyValue and Table backends) have slightly more
@@ -687,11 +750,23 @@ complex implementations.
 
 ### <a name="querying"></a>Querying
 
-Mobility backends also support querying on translated attributes, in two
-different ways. The first is via query methods like `where` (and `not` and
-`find_by` in ActiveRecord, and `except` in Sequel). To query this way, use the
-`i18n` class method, which will return a model relation or dataset extended
-with Mobility-specific query method overrides.
+Mobility backends also support querying on translated attributes. To enable
+this feature, include the `query` plugin, and ensure you also have an ORM
+plugin enabled (`active_record` or `sequel`):
+
+```diff
+ config.plugins do
+   # ...
+   active_record
++  query
+```
+
+Querying defines a scope or dataset class method, whose default name is `i18n`.
+You can override this by passing a default in the configuration, like
+`query :t` to use a name `t`.
+
+Querying is supported in two different ways. The first is via query methods
+like `where` (and `not` and `find_by` in ActiveRecord, and `except` in Sequel).
 
 So for ActiveRecord, assuming a model using KeyValue as its default backend:
 

@@ -47,9 +47,8 @@ group :development, :test do
   gem 'allocation_stats' if ENV['FEATURE'] == 'performance'
 
   if ENV['FEATURE'] == 'rails'
-    gem 'rails', '>= 6.0.0', '< 6.1'
+    gem 'rails'
     gem 'generator_spec', '~> 0.9.4'
-    gem 'sqlite3', '~> 1.4.1'
   end
 
   platforms :ruby do

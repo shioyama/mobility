@@ -38,7 +38,7 @@ Defines:
 
         if backend_name
           @backend_class = load_backend(backend_name)
-            .with_options(@options.merge(model_class: klass))
+            .with_options(options.merge(model_class: klass))
 
           klass.include InstanceMethods
           klass.extend ClassMethods

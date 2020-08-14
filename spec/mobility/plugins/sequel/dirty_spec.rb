@@ -1,6 +1,8 @@
 require "spec_helper"
 
-describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
+return unless defined?(Sequel)
+
+describe "Mobility::Plugins::Sequel::Dirty", orm: :sequel do
   include Helpers::Plugins
   plugin_setup "title", dirty: true, sequel: true, reader: true, writer: true
 
@@ -223,4 +225,4 @@ describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
       expect(dirty.respond_to?(method_name, true)).to eq(true)
     end
   end
-end if defined?(Sequel)
+end

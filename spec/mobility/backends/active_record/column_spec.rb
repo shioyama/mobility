@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
   require "mobility/backends/active_record/column"
   extend Helpers::ActiveRecord
@@ -115,4 +117,4 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
       include_validation_examples 'Comment', :content, :author
     end
   end
-end if defined?(ActiveRecord)
+end

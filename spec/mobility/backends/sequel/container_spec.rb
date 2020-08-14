@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(Sequel) && defined?(Pg)
+
 describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
   require "mobility/backends/sequel/container"
   extend Helpers::Sequel
@@ -103,4 +105,4 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
                        "foo must be a column of type json or jsonb")
     end
   end
-end if defined?(Sequel) && ENV['DB'] == 'postgres'
+end

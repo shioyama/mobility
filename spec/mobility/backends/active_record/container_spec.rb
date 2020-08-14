@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db: :postgres do
   require "mobility/backends/active_record/container"
   extend Helpers::ActiveRecord
@@ -133,4 +135,4 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       end
     end
   end
-end if defined?(ActiveRecord)
+end

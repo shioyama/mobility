@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 # @note Although this plugin should probably really be tested against an
 #   abstract backend with +build_node+ and +apply_scope+ defined and tested,
 #   doing so would be quite involved, so instead this spec tests against a
@@ -112,4 +114,4 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
       end
     end
   end
-end if defined?(ActiveRecord)
+end

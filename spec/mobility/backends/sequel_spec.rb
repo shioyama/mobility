@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(Sequel)
+
 describe "Mobility::Backends::Sequel", orm: :sequel do
   context "model with multiple backends" do
     before do
@@ -29,4 +31,4 @@ describe "Mobility::Backends::Sequel", orm: :sequel do
       end
     end
   end
-end if defined?(Sequel)
+end

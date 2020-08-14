@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(Sequel)
+
 describe "Mobility::Backends::Sequel::Column", orm: :sequel do
   require "mobility/backends/sequel/column"
   extend Helpers::Sequel
@@ -116,4 +118,4 @@ describe "Mobility::Backends::Sequel::Column", orm: :sequel do
       include_dup_examples 'Comment', :content
     end
   end
-end if defined?(Sequel)
+end

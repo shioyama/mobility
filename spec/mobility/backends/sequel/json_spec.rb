@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(Sequel) && defined?(Pg)
+
 describe "Mobility::Backends::Sequel::Json", orm: :sequel, db: :postgres do
   require "mobility/backends/sequel/json"
   extend Helpers::Sequel
@@ -40,4 +42,4 @@ describe "Mobility::Backends::Sequel::Json", orm: :sequel, db: :postgres do
     include_accessor_examples 'JsonPost'
     include_serialization_examples 'JsonPost', column_affix: column_affix
   end
-end if defined?(Sequel) && ENV['DB'] == 'postgres'
+end

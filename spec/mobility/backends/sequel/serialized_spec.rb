@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(Sequel)
+
 describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
   require "mobility/backends/sequel/serialized"
   extend Helpers::Sequel
@@ -116,4 +118,4 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel do
       end
     end
   end
-end if defined?(Sequel)
+end

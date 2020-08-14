@@ -1,6 +1,8 @@
 require "spec_helper"
 
-describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record do
+return unless defined?(Rails)
+
+describe Mobility::TranslationsGenerator, type: :generator do
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase
   include Helpers::Generators
@@ -189,4 +191,4 @@ describe Mobility::TranslationsGenerator, type: :generator, orm: :active_record 
   def connection
     ActiveRecord::Base.connection
   end
-end if defined?(Rails)
+end

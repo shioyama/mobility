@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(Rails)
+
 describe Mobility::InstallGenerator, type: :generator do
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase
@@ -92,4 +94,4 @@ describe Mobility::InstallGenerator, type: :generator do
       expect((Pathname.new(destination_root) + "db" + "migrate").exist?).to eq(false)
     end
   end
-end if defined?(Rails)
+end

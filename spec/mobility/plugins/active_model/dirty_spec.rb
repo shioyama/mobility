@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveModel)
+
 describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   require "mobility/plugins/active_model/dirty"
 
@@ -394,4 +396,4 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       end
     end
   end
-end if defined?(ActiveRecord)
+end

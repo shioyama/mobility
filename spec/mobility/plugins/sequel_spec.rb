@@ -14,4 +14,4 @@ describe "Mobility::Plugins::Sequel", orm: :sequel do
     expect { klass.include attributes }.to raise_error(TypeError, /should be a subclass of Sequel\:\:Model/)
     expect { sequel_class.include attributes }.not_to raise_error
   end
-end if defined?(Sequel)
+end

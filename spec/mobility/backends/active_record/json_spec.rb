@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :postgres do
   require "mobility/backends/active_record/json"
   extend Helpers::ActiveRecord
@@ -51,4 +53,4 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
     include_accessor_examples 'JsonPost'
     include_serialization_examples 'JsonPost', column_affix: column_affix
   end
-end if defined?(ActiveRecord)
+end

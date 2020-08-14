@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Plugins::ActiveRecord", orm: :active_record do
   include Helpers::Plugins
 
@@ -14,4 +16,4 @@ describe "Mobility::Plugins::ActiveRecord", orm: :active_record do
     expect { klass.include attributes }.to raise_error(TypeError, /should be a subclass of ActiveRecord\:\:Base/)
     expect { ar_class.include attributes }.not_to raise_error
   end
-end if defined?(ActiveRecord)
+end

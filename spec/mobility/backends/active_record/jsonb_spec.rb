@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :postgres do
   require "mobility/backends/active_record/jsonb"
   extend Helpers::ActiveRecord
@@ -99,4 +101,4 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
     # regression for https://github.com/shioyama/mobility/issues/308
     include_querying_examples 'JsonbPost' if ActiveRecord::VERSION::STRING == '5.1'
   end
-end if defined?(ActiveRecord)
+end

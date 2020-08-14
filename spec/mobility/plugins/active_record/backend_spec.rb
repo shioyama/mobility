@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Plugins::ActiveRecord::Backend", orm: :active_record do
   require "mobility/plugins/active_record/backend"
 
@@ -24,4 +26,4 @@ describe "Mobility::Plugins::ActiveRecord::Backend", orm: :active_record do
       end
     end
   end
-end if defined?(ActiveRecord)
+end

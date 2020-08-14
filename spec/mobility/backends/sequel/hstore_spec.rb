@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(Sequel) && defined?(Pg)
+
 describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
   require "mobility/backends/sequel/hstore"
   extend Helpers::Sequel
@@ -51,4 +53,4 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
     include_accessor_examples 'HstorePost'
     include_serialization_examples 'HstorePost', column_affix: column_affix
   end
-end if defined?(Sequel) && ENV['DB'] == 'postgres'
+end

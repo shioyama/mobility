@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(Sequel)
+
 describe "Mobility::Plugins::Sequel::Backend", orm: :sequel do
   require "mobility/plugins/sequel/backend"
 
@@ -24,4 +26,4 @@ describe "Mobility::Plugins::Sequel::Backend", orm: :sequel do
       end
     end
   end
-end if defined?(Sequel)
+end

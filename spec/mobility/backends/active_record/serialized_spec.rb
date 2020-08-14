@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
   require "mobility/backends/active_record/serialized"
   extend Helpers::ActiveRecord
@@ -149,4 +151,4 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
       end
     end
   end
-end if defined?(ActiveRecord)
+end

@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   require "mobility/backends/active_record/table"
   extend Helpers::ActiveRecord
@@ -404,4 +406,4 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
       end
     end
   end
-end if defined?(ActiveRecord)
+end

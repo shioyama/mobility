@@ -1,5 +1,7 @@
 require "spec_helper"
 
+return unless defined?(ActiveRecord)
+
 describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :postgres do
   require "mobility/backends/active_record/hstore"
   extend Helpers::ActiveRecord
@@ -52,4 +54,4 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
     include_accessor_examples 'HstorePost'
     include_serialization_examples 'HstorePost', column_affix: column_affix
   end
-end if defined?(ActiveRecord)
+end

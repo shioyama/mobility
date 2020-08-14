@@ -7,8 +7,6 @@ describe Mobility::Plugins::FallthroughAccessors do
   context "option value is default" do
     plugin_setup do
       fallthrough_accessors
-      reader
-      writer
     end
 
     it_behaves_like "locale accessor", :title, 'en'

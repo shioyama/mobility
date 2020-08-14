@@ -19,6 +19,9 @@ available locales for a Rails application) will be used by default.
 
       default true
 
+      requires :reader
+      requires :writer
+
       # Apply locale accessors plugin to attributes.
       # @param [Attributes] attributes
       # @param [Boolean] option
@@ -27,8 +30,8 @@ available locales for a Rails application) will be used by default.
           locales = Mobility.available_locales if locales == true
           names.each do |name|
             locales.each do |locale|
-              define_locale_reader(name, locale)
-              define_locale_writer(name, locale)
+              define_locale_reader(name, locale) if options[:reader]
+              define_locale_writer(name, locale) if options[:writer]
             end
           end
         end

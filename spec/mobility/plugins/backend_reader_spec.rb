@@ -17,7 +17,7 @@ describe Mobility::Plugins::BackendReader do
 
   context "with custom format string" do
     plugin_setup do
-      backend_reader default: "%s_translations"
+      backend_reader "%s_translations"
     end
 
     it "defines backend reader methods with custom format string" do
@@ -29,7 +29,7 @@ describe Mobility::Plugins::BackendReader do
 
   context "with true as format string" do
     plugin_setup do
-      backend_reader default: true
+      backend_reader true
     end
 
     it "defines backend reader methods with default format string" do
@@ -40,7 +40,7 @@ describe Mobility::Plugins::BackendReader do
 
   context "with falsey format string" do
     plugin_setup do
-      backend_reader default: false
+      backend_reader false
     end
 
     it "does not define backend reader methods" do

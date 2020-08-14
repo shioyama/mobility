@@ -18,7 +18,7 @@ describe Mobility::Pluggable do
     it "merges defaults into @options when initializing" do
       klass = Class.new(described_class)
 
-      klass.plugin :foo, default: 'bar'
+      klass.plugin :foo, 'bar'
       klass.default :baz, 'qux'
 
       pluggable = klass.new(other: 'param')
@@ -31,10 +31,10 @@ describe Mobility::Pluggable do
 
     it "dupes parent class defaults in descendants" do
       klass = Class.new(described_class)
-      klass.plugin(:foo, default: 'foo')
+      klass.plugin(:foo, 'foo')
 
       subclass = Class.new(klass)
-      subclass.plugin(:bar, default: 'bar')
+      subclass.plugin(:bar, 'bar')
 
       expect(klass.defaults).to eq(foo: 'foo')
       expect(subclass.defaults).to eq(foo: 'foo', bar: 'bar')
@@ -42,10 +42,10 @@ describe Mobility::Pluggable do
 
     it "overrides parent default in descendant if set" do
       klass = Class.new(described_class)
-      klass.plugin(:foo, default: 'foo')
+      klass.plugin(:foo, 'foo')
 
       subclass = Class.new(klass)
-      subclass.plugin(:foo, default: 'foo2')
+      subclass.plugin(:foo, 'foo2')
 
       expect(klass.defaults).to eq(foo: 'foo')
       expect(subclass.defaults).to eq(foo: 'foo2')
@@ -53,7 +53,7 @@ describe Mobility::Pluggable do
 
     it "inherits parent default if default unset in descendant" do
       klass = Class.new(described_class)
-      klass.plugin(:foo, default: 'foo')
+      klass.plugin(:foo, 'foo')
 
       subclass = Class.new(klass)
       subclass.plugin(:foo)

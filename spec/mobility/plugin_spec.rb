@@ -18,7 +18,7 @@ describe Mobility::Plugin do
 
       it 'updates defaults for plugin' do
         described_class.configure(pluggable) do
-          __send__ :foo, default: 'somedefault'
+          __send__ :foo, 'somedefault'
         end
         expect(pluggable.defaults).to eq(foo: 'somedefault')
       end

@@ -9,8 +9,8 @@ Works with {Mobility::Plugin}. (Subclassed by {Mobility::Attributes}.)
 =end
   class Pluggable < Module
     class << self
-      def plugin(name, **options)
-        Plugin.configure(self, defaults) { __send__ name, **options }
+      def plugin(name, *args)
+        Plugin.configure(self, defaults) { __send__ name, *args }
       end
 
       def plugins(&block)

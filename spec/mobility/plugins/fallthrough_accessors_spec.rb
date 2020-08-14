@@ -50,7 +50,7 @@ describe Mobility::Plugins::FallthroughAccessors do
 
   context "option value is false" do
     plugin_setup do
-      fallthrough_accessors default: false
+      fallthrough_accessors false
     end
 
     it "does not include instance of FallthroughAccessors into attributes class" do

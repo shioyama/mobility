@@ -10,7 +10,7 @@ Mobility.configure do |config|
     # To default to a different backend globally, replace +:key_value+ by another
     # backend name.
     #
-    backend default: :key_value
+    backend :key_value
 
     # ActiveRecord
     #
@@ -48,7 +48,7 @@ Mobility.configure do |config|
     #
     # Or uncomment this line to include but disable by default, and only enable
     # per model by passing +dirty: true+ to +translates+.
-    # dirty default: false
+    # dirty false
 
     # Fallbacks
     #
@@ -56,7 +56,7 @@ Mobility.configure do |config|
     # fallbacks
     #
     # Or uncomment this line to enable fallbacks with a global default.
-    # fallbacks default: { :pt => :en }
+    # fallbacks { :pt => :en }
 
     # Presence
     #
@@ -71,7 +71,7 @@ Mobility.configure do |config|
     # 'foo'+ sets a default translation string to show in case no translation is
     # present. Can also be passed a proc.
     #
-    # default
+    # default 'foo'
 
     # Fallthrough Accessors
     #
@@ -93,7 +93,7 @@ Mobility.configure do |config|
     # locale_accessors
     #
     # Or define specific defaults by uncommenting line below
-    # locale_accessors default: [:en, :ja]
+    # locale_accessors [:en, :ja]
   end
 
   # You can also include backend-specific default options. For example, if you

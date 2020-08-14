@@ -61,7 +61,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       # @example
       #   Mobility::Plugin.configure(TranslatedAttributes) do
       #     cache
-      #     fallbacks default: [:en, :de]
+      #     fallbacks [:en, :de]
       #   end
       def configure(pluggable, defaults = pluggable.defaults, &block)
         DependencyResolver.new(pluggable, defaults).call(&block)
@@ -236,9 +236,9 @@ Also includes a +configure+ class method to apply plugins to a pluggable
           @defaults = defaults
         end
 
-        def method_missing(m, *_args, **options)
+        def method_missing(m, *args)
           @plugins << m
-          @defaults[m] = options[:default] if options.has_key?(:default)
+          @defaults[m] = args[0] unless args.empty?
         end
       end
     end

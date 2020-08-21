@@ -146,13 +146,10 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
       private
 
-      def create_tree(plugin_names)
+      def create_tree(plugins)
         DependencyTree.new.tap do |tree|
           visited = included_plugins
-          plugin_names.each do |plugin_name|
-            plugin = Plugins.load_plugin(plugin_name)
-            traverse(tree, plugin, visited)
-          end
+          plugins.each { |plugin| traverse(tree, plugin, visited) }
         end
       end
 
@@ -237,7 +234,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
         end
 
         def method_missing(m, *args)
-          @plugins << m
+          @plugins << Plugins.load_plugin(m)
           @defaults[m] = args[0] unless args.empty?
         end
       end

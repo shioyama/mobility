@@ -27,7 +27,7 @@ details.
 
       initialize_hook do
         if options[:dirty] && !options[:fallthrough_accessors]
-          warn 'The Dirty plugin depends on Fallthrough Accessors being enabled,'\
+          warn 'The Dirty plugin depends on Fallthrough Accessors being enabled, '\
             'but fallthrough_accessors option is falsey'
         end
       end

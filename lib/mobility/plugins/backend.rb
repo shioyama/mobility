@@ -30,12 +30,16 @@ Defines:
       # @return [Hash] Options for backend
       attr_reader :backend_options
 
-      initialize_hook do
+      def initialize(*args, **original_options)
+        super(*args, **original_options)
+        return unless Plugins::Backend.dependencies_satisfied?(self.class)
+
         case options[:backend]
         when String, Symbol, Module
           @backend_name, @backend_options = options[:backend], options
         when Array
           @backend_name, @backend_options = options[:backend]
+          @backend_options.merge!(original_options)
         else
           raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
         end

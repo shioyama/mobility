@@ -214,19 +214,25 @@ describe Mobility::Plugins::Backend do
 
       it "passes backend options to backend" do
         attributes = attributes_class.new("title")
-        expect(FooBackend).to receive(:configure).with({ association_name: :foo })
+        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :foo))
         model_class.include(attributes)
       end
 
-      it "passes module options if defined" do
+      it "passes module options if backend_options passed explicitly to initializer" do
         attributes = attributes_class.new("title", backend: [:foo, { association_name: :bar }])
-        expect(FooBackend).to receive(:configure).with({ association_name: :bar })
+        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :bar))
         model_class.include(attributes)
       end
 
-      it "passes module options if overridden with symbol" do
-        attributes = attributes_class.new("title", backend: :foo)
-        expect(FooBackend).to receive(:configure).with({ backend: :foo })
+      it "passes module options if backend options passed implicitly to initializer" do
+        attributes = attributes_class.new("title", backend: :foo, association_name: :bar)
+        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :bar))
+        model_class.include(attributes)
+      end
+
+      it "overrides backend option from options passed to initializer even when backend: key is missing" do
+        attributes = attributes_class.new("title", association_name: :bar)
+        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :bar))
         model_class.include(attributes)
       end
     end

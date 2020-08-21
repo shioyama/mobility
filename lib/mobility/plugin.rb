@@ -71,11 +71,11 @@ Also includes a +configure+ class method to apply plugins to a pluggable
     def initialize_hook(&block)
       plugin = self
 
-      define_method :initialize do |*names, **options|
-        super(*names, **options)
+      define_method :initialize do |*args, **options|
+        super(*args, **options)
         return unless plugin.dependencies_satisfied?(self.class)
 
-        class_exec(*names, &block)
+        class_exec(*args, &block)
       end
     end
 

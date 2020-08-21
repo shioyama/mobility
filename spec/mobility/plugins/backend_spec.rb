@@ -180,4 +180,55 @@ describe Mobility::Plugins::Backend do
       expect(attributes.inspect).to eq("#<Attributes (null) @names=title, content>")
     end
   end
+
+  describe "configuring defaults" do
+    before do
+      stub_const("FooBackend", Class.new(Mobility::Backends::Null))
+      Mobility::Backends.register_backend(:foo, FooBackend)
+    end
+    after { Mobility::Backends.instance_variable_get(:@backends).delete(:foo) }
+
+    describe "default without backend options" do
+      plugin_setup do
+        backend :foo
+      end
+
+      it "shows backend name in inspect string" do
+        expect(attributes_class.new("title").inspect).to eq("#<Attributes (foo) @names=title>")
+      end
+
+      it "calls setup_model on backend" do
+        expect(FooBackend).to receive(:setup_model).with(model_class, ["title"])
+        model_class.include attributes_class.new("title")
+      end
+    end
+
+    describe "default with backend options" do
+      plugin_setup do
+        backend :foo, association_name: :foo
+      end
+
+      it "assigns backend name correctly" do
+        expect(attributes_class.new("title").backend_name).to eq(:foo)
+      end
+
+      it "passes backend options to backend" do
+        attributes = attributes_class.new("title")
+        expect(FooBackend).to receive(:configure).with({ association_name: :foo })
+        model_class.include(attributes)
+      end
+
+      it "passes module options if defined" do
+        attributes = attributes_class.new("title", backend: [:foo, { association_name: :bar }])
+        expect(FooBackend).to receive(:configure).with({ association_name: :bar })
+        model_class.include(attributes)
+      end
+
+      it "passes module options if overridden with symbol" do
+        attributes = attributes_class.new("title", backend: :foo)
+        expect(FooBackend).to receive(:configure).with({ backend: :foo })
+        model_class.include(attributes)
+      end
+    end
+  end
 end

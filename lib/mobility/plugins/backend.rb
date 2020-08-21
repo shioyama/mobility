@@ -26,8 +26,19 @@ Defines:
       # @return [Symbol,Class] Name of backend, or backend class
       attr_reader :backend_name
 
+      # Backend options
+      # @return [Hash] Options for backend
+      attr_reader :backend_options
+
       initialize_hook do
-        @backend_name = options[:backend]
+        case options[:backend]
+        when String, Symbol, Module
+          @backend_name, @backend_options = options[:backend], options
+        when Array
+          @backend_name, @backend_options = options[:backend]
+        else
+          raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
+        end
       end
 
       # Setup backend class, include modules into model class, include/extend
@@ -38,7 +49,7 @@ Defines:
 
         if backend_name
           @backend_class = load_backend(backend_name).
-            build_subclass(klass, options)
+            build_subclass(klass, backend_options)
 
           klass.include InstanceMethods
           klass.extend ClassMethods
@@ -63,6 +74,12 @@ Defines:
         Backends.load_backend(backend)
       rescue Backends::LoadError => e
         raise e, "could not find a #{backend} backend. Did you forget to include an ORM plugin like active_record or sequel?"
+      end
+
+      # Override default argument-handling in DSL to store kwargs passed along
+      # with plugin name.
+      def self.configure_default(defaults, key, *args, **kwargs)
+        defaults[key] = [args[0], kwargs] unless args.empty?
       end
 
       module InstanceMethods

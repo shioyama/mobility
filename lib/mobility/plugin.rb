@@ -106,7 +106,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       @default = value
     end
 
-    def configure_default(defaults, key, *args, **kwargs)
+    def configure_default(defaults, key, *args, **)
       defaults[key] = args[0] unless args.empty?
     end
 

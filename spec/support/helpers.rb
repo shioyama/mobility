@@ -151,19 +151,25 @@ module Helpers
 
         attribute_names = [attribute_name, *other_names]
         let(:attribute_name) { attribute_name }
+
         let(:attributes_class) do
           Class.new(TestAttributes).tap do |attrs|
             attrs.plugins(&plugin_definer)
           end
         end
+
         let(:model_class) do
           Class.new.tap do |klass|
             klass.include attributes
           end
         end unless method_defined?(:model_class)
+
         let(:instance) { model_class.new }
 
-        let(:attributes) { attributes_class.new(*attribute_names, backend: backend_class, **options) }
+        let(:attributes) do
+          attributes_class.new(*attribute_names, backend: backend_class, **options)
+        end
+
         let(:listener) { double(:backend) }
         let(:backend_class) { backend_listener(listener) }
         let(:backend) { instance.mobility_backends[attribute_name] }

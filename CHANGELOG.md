@@ -12,6 +12,8 @@
 - Remove `Mobility::Configuration#default_accessor_locales`. Use plugin option
   to configure global default instead.
   ([#424](https://github.com/shioyama/mobility/pull/424))
+- Pass `model_class` to `Mobility::Backend#configure` via class method rather
+  than on options hash ([#429](https://github.com/shioyama/mobility/pull/429))
 
 ## 0.8
 

@@ -3,15 +3,6 @@ require "spec_helper"
 describe Mobility::Pluggable do
   include Helpers::Plugins
 
-  describe "#default" do
-    it "defines default on defaults hash" do
-      klass = Class.new(described_class)
-
-      klass.default(:foo, 'bar')
-      expect(klass.defaults).to eq(foo: 'bar')
-    end
-  end
-
   describe "#initialize" do
     define_plugins(:foo)
 
@@ -19,10 +10,9 @@ describe Mobility::Pluggable do
       klass = Class.new(described_class)
 
       klass.plugin :foo, 'bar'
-      klass.default :baz, 'qux'
 
       pluggable = klass.new(other: 'param')
-      expect(pluggable.options).to eq(foo: 'bar', baz: 'qux', other: 'param')
+      expect(pluggable.options).to eq(foo: 'bar', other: 'param')
     end
   end
 

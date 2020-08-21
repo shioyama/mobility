@@ -16,13 +16,6 @@ describe Mobility::Plugin do
         expect(included_plugins).to include(foo)
       end
 
-      it 'updates defaults for plugin' do
-        described_class.configure(pluggable) do
-          __send__ :foo, 'somedefault'
-        end
-        expect(pluggable.defaults).to eq(foo: 'somedefault')
-      end
-
       it 'detects before dependency conflict between two plugins' do
         foo.requires :bar, include: :before
         bar.requires :foo, include: :before

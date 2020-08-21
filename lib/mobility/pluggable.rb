@@ -21,10 +21,6 @@ Works with {Mobility::Plugin}. (Subclassed by {Mobility::Attributes}.)
         @defaults ||= {}
       end
 
-      def default(name, value)
-        @defaults[name.to_sym] = value
-      end
-
       def inherited(klass)
         super
         klass.defaults.merge!(defaults)

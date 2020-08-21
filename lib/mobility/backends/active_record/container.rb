@@ -71,7 +71,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
         private
 
         def get_column_type
-          options[:model_class].type_for_attribute(options[:column_name].to_s).try(:type).tap do |type|
+          model_class.type_for_attribute(options[:column_name].to_s).try(:type).tap do |type|
             unless %i[json jsonb].include? type
               raise InvalidColumnType, "#{options[:column_name]} must be a column of type json or jsonb"
             end

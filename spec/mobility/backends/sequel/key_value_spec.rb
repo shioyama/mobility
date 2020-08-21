@@ -359,44 +359,45 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel do
     end
 
     describe ".configure" do
+      let(:backend_class) do
+        Class.new(described_class) { @model_class = Post }
+      end
+
       it "sets association_name, class_name and table_alias_affix from string type" do
-        options = { type: :string, model_class: Post }
-        described_class.configure(options)
+        options = { type: :string }
+        backend_class.configure(options)
         expect(options).to eq({
           type: :string,
           class_name: Mobility::Sequel::StringTranslation,
-          model_class: Post,
           association_name: :string_translations,
           table_alias_affix: "Post_%s_string_translations"
         })
       end
 
       it "sets association_name, class_name and table_alias_affix from text type" do
-        options = { type: :text, model_class: Post }
-        described_class.configure(options)
+        options = { type: :text }
+        backend_class.configure(options)
         expect(options).to eq({
           type: :text,
           class_name: Mobility::Sequel::TextTranslation,
-          model_class: Post,
           association_name: :text_translations,
           table_alias_affix: "Post_%s_text_translations"
         })
       end
 
       it "raises ArgumentError if type has no corresponding model class" do
-        expect { described_class.configure(type: "integer") }
+        expect { backend_class.configure(type: "integer") }
           .to raise_error(ArgumentError,
                           "You must define a Mobility::Sequel::IntegerTranslation class.")
       end
 
 
       it "sets default association_name, class_name and table_alias_affix from type" do
-        options = { type: :text, model_class: Post }
-        described_class.configure(options)
+        options = { type: :text }
+        backend_class.configure(options)
         expect(options).to eq({
           type: :text,
           class_name: Mobility::Sequel::TextTranslation,
-          model_class: Post,
           association_name: :text_translations,
           table_alias_affix: "Post_%s_text_translations"
         })

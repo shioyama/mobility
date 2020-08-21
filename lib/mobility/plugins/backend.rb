@@ -37,8 +37,8 @@ Defines:
         super
 
         if backend_name
-          @backend_class = load_backend(backend_name)
-            .with_options(options.merge(model_class: klass))
+          @backend_class = load_backend(backend_name).
+            build_subclass(klass, options)
 
           klass.include InstanceMethods
           klass.extend ClassMethods

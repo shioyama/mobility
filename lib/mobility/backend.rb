@@ -115,10 +115,7 @@ On top of this, a backend will normally:
     # Extend included class with +setup+ method and other class methods
     def self.included(base)
       base.extend ClassMethods
-      def base.options
-        @options
-      end
-      base.option_reader :model_class
+      base.singleton_class.attr_reader :options, :model_class
     end
 
     # Defines setup hooks for backend to customize model class.
@@ -156,13 +153,14 @@ On top of this, a backend will normally:
       # Build a subclass of this backend class for a given set of options
       # @note This method also freezes the options hash to prevent it from
       #   being changed.
+      # @param [Class] model_class Class
       # @param [Hash] options
       # @return [Class] backend subclass
-      def with_options(options = {})
-        configure(options) if respond_to?(:configure)
-        options.freeze
+      def build_subclass(model_class, options)
         Class.new(self) do
-          @options = options
+          @model_class = model_class
+          configure(options) if respond_to?(:configure)
+          @options = options.freeze
         end
       end
 

@@ -148,24 +148,28 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel do
     end
 
     describe ".configure" do
-      let(:options) { { model_class: Article } }
+      let(:options) { {} }
+      let(:backend_class) do
+        Class.new(described_class) { @model_class = Article }
+      end
+
       it "sets association_name" do
-        described_class.configure(options)
+        backend_class.configure(options)
         expect(options[:association_name]).to eq(:translations)
       end
 
       it "sets subclass_name" do
-        described_class.configure(options)
+        backend_class.configure(options)
         expect(options[:subclass_name]).to eq(:Translation)
       end
 
       it "sets table_name" do
-        described_class.configure(options)
+        backend_class.configure(options)
         expect(options[:table_name]).to eq(:article_translations)
       end
 
       it "sets foreign_key" do
-        described_class.configure(options)
+        backend_class.configure(options)
         expect(options[:foreign_key]).to eq(:article_id)
       end
     end

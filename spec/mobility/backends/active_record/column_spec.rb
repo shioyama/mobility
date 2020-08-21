@@ -18,7 +18,7 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
     let(:attributes) { %w[content author] }
     let(:options) { {} }
     let(:backend) do
-      described_class.with_options(options).new(comment, attributes.first)
+      described_class.build_subclass(Comment, options).new(comment, attributes.first)
     end
     let(:comment) do
       Comment.create(content_en: "Good post!",

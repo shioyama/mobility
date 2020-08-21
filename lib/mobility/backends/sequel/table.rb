@@ -34,7 +34,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         # @raise [CacheRequired] if cache option is false
         def configure(options)
           raise CacheRequired, "Cache required for Sequel::Table backend" if options[:cache] == false
-          table_name = Util.singularize(options[:model_class].table_name)
+          table_name = Util.singularize(model_class.table_name)
           options[:table_name]  ||= :"#{table_name}_translations"
           options[:foreign_key] ||= Util.foreign_key(Util.camelize(table_name.downcase))
           if association_name = options[:association_name]

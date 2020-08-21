@@ -44,7 +44,7 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
       def self.configure(options)
         options[:column_name] ||= :translations
         options[:column_name] = options[:column_name].to_sym
-        column_name, db_schema = options[:column_name], options[:model_class].db_schema
+        column_name, db_schema = options[:column_name], model_class.db_schema
         options[:column_type] = db_schema[column_name] && (db_schema[column_name][:db_type]).to_sym
         unless %i[json jsonb].include?(options[:column_type])
           raise InvalidColumnType, "#{options[:column_name]} must be a column of type json or jsonb"

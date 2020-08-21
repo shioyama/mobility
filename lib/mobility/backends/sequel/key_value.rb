@@ -36,7 +36,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             options[:association_name] ||= :"#{options[:type]}_translations"
             options[:class_name]       ||= Mobility::Sequel.const_get("#{type.capitalize}Translation")
           end
-          options[:table_alias_affix] = "#{options[:model_class]}_%s_#{options[:association_name]}"
+          options[:table_alias_affix] = "#{model_class}_%s_#{options[:association_name]}"
         rescue NameError
           raise ArgumentError, "You must define a Mobility::Sequel::#{type.capitalize}Translation class."
         end

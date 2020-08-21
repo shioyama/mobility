@@ -101,7 +101,7 @@ columns to that table.
         # @option options [Symbol] subclass_name (:Translation) Name of subclass
         #   to append to model class to generate translation class
         def configure(options)
-          table_name = options[:model_class].table_name
+          table_name = model_class.table_name
           options[:table_name]  ||= "#{table_name.singularize}_translations"
           options[:foreign_key] ||= table_name.downcase.singularize.camelize.foreign_key
           if (association_name = options[:association_name]).present?

@@ -13,8 +13,8 @@ describe Mobility::Plugins::Backend do
   let(:model_class) { Class.new }
 
   describe "#included" do
-    it "calls with_options on backend class with options merged with default options" do
-      expect(backend_class).to receive(:with_options).with(hash_including(foo: "bar", model_class: model_class)).and_return(Class.new(backend_class))
+    it "calls build_subclass on backend class with options merged with default options" do
+      expect(backend_class).to receive(:build_subclass).with(model_class, hash_including(foo: "bar")).and_return(Class.new(backend_class))
       attributes = attributes_class.new("title", backend: backend_class, foo: "bar")
       model_class.include attributes
     end
@@ -22,7 +22,7 @@ describe Mobility::Plugins::Backend do
     it "assigns options to backend class" do
       attributes = attributes_class.new("title", backend: backend_class, foo: "bar")
       model_class.include attributes
-      expect(attributes.backend_class.options).to eq(backend: backend_class, model_class: model_class, foo: "bar")
+      expect(attributes.backend_class.options).to eq(backend: backend_class, foo: "bar")
     end
 
     it "freezes backend options after inclusion into model class" do

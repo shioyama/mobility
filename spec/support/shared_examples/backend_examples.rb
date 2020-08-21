@@ -2,8 +2,7 @@ shared_examples_for "Mobility backend" do |backend_class, model_class, attribute
   let(:backend) do
     model_class = model_class.constantize if model_class.is_a?(String)
 
-    options = { model_class: model_class, **options }
-    klass = backend_class.with_options(options)
+    klass = backend_class.build_subclass(model_class, options.dup)
     klass.setup_model(model_class, [attribute])
     klass.new(model_class.new, attribute)
   end

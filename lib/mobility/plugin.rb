@@ -106,6 +106,10 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       @default = value
     end
 
+    def configure_default(defaults, key, *args, **kwargs)
+      defaults[key] = args[0] unless args.empty?
+    end
+
     # Does this class include all plugins this plugin depends (directly) on?
     # @param [Class] klass Pluggable class
     def dependencies_satisfied?(klass)
@@ -233,9 +237,10 @@ Also includes a +configure+ class method to apply plugins to a pluggable
           @defaults = defaults
         end
 
-        def method_missing(m, *args)
-          @plugins << Plugins.load_plugin(m)
-          @defaults[m] = args[0] unless args.empty?
+        def method_missing(m, *args, **kwargs)
+          plugin = Plugins.load_plugin(m)
+          @plugins << plugin
+          plugin.configure_default(@defaults, m, *args, **kwargs)
         end
       end
     end

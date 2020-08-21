@@ -235,6 +235,14 @@ describe Mobility::Plugins::Backend do
         expect(FooBackend).to receive(:configure).with(hash_including(association_name: :baz))
         model_class.include(attributes)
       end
+
+      it "does not override original backend options hash" do
+        backend_options = { association_name: :foo }
+        expect {
+          attributes = attributes_class.new("title", backend: [:foo, backend_options])
+          model_class.include(attributes)
+        }.not_to change { backend_options }
+      end
     end
   end
 end

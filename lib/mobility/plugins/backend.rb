@@ -39,7 +39,7 @@ Defines:
           @backend_name, @backend_options = options[:backend], options
         when Array
           @backend_name, @backend_options = options[:backend]
-          @backend_options.merge!(original_options)
+          @backend_options = @backend_options.merge(original_options)
         else
           raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
         end

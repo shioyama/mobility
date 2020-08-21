@@ -151,6 +151,12 @@ describe Mobility::Backend do
         expect(Class.new(subclass).options).to eq(foo: "bar")
       end
 
+      it "assigns model_class to descendants" do
+        model_class = Class.new
+        subclass = backend_class.build_subclass(model_class, foo: "bar")
+        expect(Class.new(subclass).model_class).to eq(model_class)
+      end
+
       it "concatenates blocks when called multiple times" do
         backend_class.class_eval do
           setup do |attributes, options|

@@ -139,6 +139,7 @@ On top of this, a backend will normally:
       def inherited(subclass)
         subclass.instance_variable_set(:@setup_block, @setup_block)
         subclass.instance_variable_set(:@options, @options)
+        subclass.instance_variable_set(:@model_class, @model_class)
       end
 
       # Call setup block on a class with attributes and options.

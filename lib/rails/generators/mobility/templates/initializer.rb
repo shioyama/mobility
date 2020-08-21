@@ -96,14 +96,6 @@ Mobility.configure do |config|
     # locale_accessors [:en, :ja]
   end
 
-  # You can also include backend-specific default options. For example, if you
-  # want to default to using the text-type translation table with the KeyValue
-  # backend, you can set that as a default by uncommenting this line, or change
-  # it to :string to default to the string-type translation table instead. (For
-  # other backends, this option is ignored.)
-  #
-  # default :type, :text
-
   # OTHER CONFIGURATION
 
   # By default, Mobility uses the +translates+ class method in models to

@@ -205,7 +205,7 @@ describe Mobility::Plugins::Backend do
 
     describe "default with backend options" do
       plugin_setup do
-        backend :foo, association_name: :foo
+        backend :foo, association_name: :bar
       end
 
       it "assigns backend name correctly" do
@@ -214,25 +214,25 @@ describe Mobility::Plugins::Backend do
 
       it "passes backend options to backend" do
         attributes = attributes_class.new("title")
-        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :foo))
+        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :bar))
         model_class.include(attributes)
       end
 
       it "passes module options if backend_options passed explicitly to initializer" do
-        attributes = attributes_class.new("title", backend: [:foo, { association_name: :bar }])
-        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :bar))
+        attributes = attributes_class.new("title", backend: [:foo, { association_name: :baz }])
+        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :baz))
         model_class.include(attributes)
       end
 
       it "passes module options if backend options passed implicitly to initializer" do
-        attributes = attributes_class.new("title", backend: :foo, association_name: :bar)
-        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :bar))
+        attributes = attributes_class.new("title", backend: :foo, association_name: :baz)
+        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :baz))
         model_class.include(attributes)
       end
 
       it "overrides backend option from options passed to initializer even when backend: key is missing" do
-        attributes = attributes_class.new("title", association_name: :bar)
-        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :bar))
+        attributes = attributes_class.new("title", association_name: :baz)
+        expect(FooBackend).to receive(:configure).with(hash_including(association_name: :baz))
         model_class.include(attributes)
       end
     end

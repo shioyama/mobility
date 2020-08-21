@@ -31,7 +31,7 @@ Defines:
       attr_reader :backend_options
 
       def initialize(*args, **original_options)
-        super(*args, **original_options)
+        super
         return unless Plugins::Backend.dependencies_satisfied?(self.class)
 
         case options[:backend]

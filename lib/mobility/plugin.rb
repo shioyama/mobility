@@ -106,6 +106,15 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       @default = value
     end
 
+    # Method called when defining plugins to assign a default based on
+    # arguments and keyword arguments to the plugin method. By default, we
+    # simply assign the first argument, but plugins can opt to customize this
+    # if additional arguments or keyword arguments are required.
+    # (The backend plugin uses keyword arguments to set backend options.)
+    #
+    # @param [Hash] defaults
+    # @param [Symbol] key Plugin key on hash
+    # @param [Array] args Method arguments
     def configure_default(defaults, key, *args, **)
       defaults[key] = args[0] unless args.empty?
     end

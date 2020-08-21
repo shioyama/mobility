@@ -73,9 +73,8 @@ Also includes a +configure+ class method to apply plugins to a pluggable
 
       define_method :initialize do |*args, **options|
         super(*args, **options)
-        return unless plugin.dependencies_satisfied?(self.class)
 
-        class_exec(*args, &block)
+        class_exec(*args, &block) if plugin.dependencies_satisfied?(self.class)
       end
     end
 

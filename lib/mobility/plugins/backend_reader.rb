@@ -15,9 +15,9 @@ different format string as the plugin option.
       requires :backend
 
       initialize_hook do |*names|
-        backend_reader = options[:backend_reader]
-        backend_reader = "%s_backend" if backend_reader == true
-        if backend_reader
+        if backend_reader = options[:backend_reader]
+          backend_reader = "%s_backend" if backend_reader == true
+
           names.each do |name|
             module_eval <<-EOM, __FILE__, __LINE__ + 1
             def #{backend_reader % name}

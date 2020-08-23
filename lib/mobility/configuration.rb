@@ -23,10 +23,6 @@ Stores shared Mobility configuration referenced by all backends.
       attributes_class.plugins(&block)
     end
 
-    def default(name, value)
-      attributes_class.default(name, value)
-    end
-
     # Generate new fallbacks instance
     # @note This method will call the proc defined in the variable set by the
     # +fallbacks_generator=+ setter, passing the first argument to its `call`

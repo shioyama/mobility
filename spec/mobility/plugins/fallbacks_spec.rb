@@ -121,4 +121,28 @@ describe Mobility::Plugins::Fallbacks do
       expect(backend.read(:'en-US', fallback: true)).to eq(nil)
     end
   end
+
+  # We've taken away the ability to customize the fallbacks generator from
+  # configuration, but it is still possible by overriding a private method on
+  # the Attributes class.
+  describe "overriding fallbacks generator" do
+    plugin_setup do
+      fallbacks true
+    end
+
+    before do
+      attributes_class.class_eval do
+        private
+
+        def generate_fallbacks(_)
+          Hash.new([])
+        end
+      end
+    end
+
+    it "uses overridden fallbacks generator" do
+      expect(listener).to receive(:read).once.with(:'en-US', any_args).and_return(nil)
+      expect(backend.read(:'en-US', fallback: true)).to eq(nil)
+    end
+  end
 end

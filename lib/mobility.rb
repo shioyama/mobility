@@ -27,7 +27,6 @@ module Mobility
   require "mobility/backend"
   require "mobility/backends"
   require "mobility/configuration"
-  require "mobility/fallbacks"
   require "mobility/plugin"
   require "mobility/plugins"
   require "mobility/attributes"
@@ -111,11 +110,6 @@ module Mobility
       define_method method_name do
         config.public_send(method_name)
       end
-    end
-
-    # (see Mobility::Configuration#new_fallbacks)
-    def new_fallbacks(*args)
-      config.public_send(:new_fallbacks, *args)
     end
 
     # Configure Mobility

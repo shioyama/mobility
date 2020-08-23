@@ -131,11 +131,25 @@ the current locale was +nil+.
       # on model if option is +false+.
       included_hook do |_, backend_class|
         fallbacks = options[:fallbacks]
-        backend_class.include(Methods.new(fallbacks)) unless fallbacks == false
+        backend_class.include(BackendReader.new(fallbacks, method(:generate_fallbacks))) unless fallbacks == false
       end
 
-      class Methods < Module
-        def initialize(fallbacks_option)
+      private
+
+      def generate_fallbacks(fallbacks)
+        fallbacks_class = I18n.respond_to?(:fallbacks) ? I18nFallbacks : I18n::Locale::Fallbacks
+        fallbacks_class.new(fallbacks)
+      end
+
+      class I18nFallbacks < ::I18n::Locale::Fallbacks
+        def [](locale)
+          super | I18n.fallbacks[locale]
+        end
+      end
+
+      class BackendReader < Module
+        def initialize(fallbacks_option, fallbacks_generator)
+          @fallbacks_generator = fallbacks_generator
           define_read(convert_option_to_fallbacks(fallbacks_option))
         end
 
@@ -157,9 +171,9 @@ the current locale was +nil+.
 
         def convert_option_to_fallbacks(option)
           if option.is_a?(::Hash)
-            Mobility.new_fallbacks(option)
+            @fallbacks_generator[option]
           elsif option == true
-            Mobility.new_fallbacks
+            @fallbacks_generator[{}]
           else
             ::Hash.new { [] }
           end

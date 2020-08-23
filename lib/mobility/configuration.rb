@@ -23,23 +23,6 @@ Stores shared Mobility configuration referenced by all backends.
       attributes_class.plugins(&block)
     end
 
-    # Generate new fallbacks instance
-    # @note This method will call the proc defined in the variable set by the
-    # +fallbacks_generator=+ setter, passing the first argument to its `call`
-    # method. By default the generator returns an instance of
-    # +I18n::Locale::Fallbacks+.
-    # @param fallbacks [Hash] Fallbacks hash passed to generator
-    # @return [I18n::Locale::Fallbacks]
-    def new_fallbacks(fallbacks = {})
-      @fallbacks_generator.call(fallbacks)
-    end
-
-    # Assign proc which, passed a set of fallbacks, returns a default fallbacks
-    # instance. By default this is a proc which takes fallbacks and returns an
-    # instance of +I18n::Locale::Fallbacks+.
-    # @param [Proc] fallbacks generator
-    attr_writer :fallbacks_generator
-
     # Default backend to use (can be symbol or actual backend class)
     # @return [Symbol,Class]
     def default_backend
@@ -48,7 +31,6 @@ Stores shared Mobility configuration referenced by all backends.
 
     def initialize
       @accessor_method = :translates
-      @fallbacks_generator = lambda { |fallbacks| Mobility::Fallbacks.build(fallbacks) }
     end
 
     def attributes_class

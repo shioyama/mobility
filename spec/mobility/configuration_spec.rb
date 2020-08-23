@@ -3,10 +3,6 @@ require "spec_helper"
 describe Mobility::Configuration do
   subject { Mobility::Configuration.new }
 
-  it "initializes new fallbacks instance to I18n::Locale::Fallbacks.new" do
-    expect(subject.new_fallbacks).to be_a(I18n::Locale::Fallbacks)
-  end
-
   it "sets default_backend to nil" do
     expect(subject.default_backend).to eq(nil)
   end

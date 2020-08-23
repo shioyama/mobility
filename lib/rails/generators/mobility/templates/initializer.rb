@@ -26,6 +26,16 @@ Mobility.configure do |config|
     reader
     writer
 
+    # Backend Reader
+    #
+    # Defines reader to access the backend for any attribute, of the form
+    # +<attribute>_backend+.
+    #
+    backend_reader
+    #
+    # Or pass an interpolation string to define a different pattern:
+    # backend_reader "%s_translations"
+
     # Query
     #
     # Defines a scope on the model class which allows querying on

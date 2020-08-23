@@ -24,6 +24,7 @@ describe Mobility::InstallGenerator, type: :generator do
             file "mobility.rb" do
               contains "Mobility.configure do |config|"
               contains "backend :key_value"
+              contains "backend_reader"
               contains "query"
               contains "config.accessor_method = :translates"
             end

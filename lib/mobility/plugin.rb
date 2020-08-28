@@ -114,7 +114,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
     # @param [Hash] defaults
     # @param [Symbol] key Plugin key on hash
     # @param [Array] args Method arguments
-    def configure_default(defaults, key, *args, **)
+    def configure_default(defaults, key, *args)
       defaults[key] = args[0] unless args.empty?
     end
 
@@ -245,10 +245,10 @@ Also includes a +configure+ class method to apply plugins to a pluggable
           @defaults = defaults
         end
 
-        def method_missing(m, *args, **kwargs)
+        def method_missing(m, *args)
           plugin = Plugins.load_plugin(m)
           @plugins << plugin
-          plugin.configure_default(@defaults, m, *args, **kwargs)
+          plugin.configure_default(@defaults, m, *args)
         end
       end
     end

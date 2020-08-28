@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Mobility::Plugin do
-  include Helpers::Plugins
+  include Helpers::PluginSetup
   let(:pluggable) { Class.new(Mobility::Pluggable) }
   let(:included_plugins) { pluggable.included_modules.grep(described_class) }
 

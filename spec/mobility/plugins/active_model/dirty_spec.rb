@@ -2,24 +2,23 @@ require "spec_helper"
 
 return unless defined?(ActiveModel)
 
-describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
+describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record, type: :plugin do
   require "mobility/plugins/active_model/dirty"
-
-  include Helpers::Plugins
-  plugin_setup do
+  plugins do
     active_model
     dirty true
     reader
     writer
   end
+  plugin_setup :title
 
   it "raises TypeError unless class is a subclass of ActiveModel::Dirty" do
     klass = Class.new
     am_class = Class.new
     am_class.include ::ActiveModel::Dirty
 
-    expect { klass.include attributes }.to raise_error(TypeError, /should include ActiveModel\:\:Dirty/)
-    expect { am_class.include attributes }.not_to raise_error
+    expect { klass.include translations }.to raise_error(TypeError, /should include ActiveModel\:\:Dirty/)
+    expect { am_class.include translations }.not_to raise_error
   end
 
   def define_backend_class
@@ -58,7 +57,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
       def save
         changes_applied
       end
-    }.tap { |klass| klass.include attributes }
+    }.tap { |klass| klass.include translations }
   end
   let(:backend_class) { define_backend_class }
 
@@ -348,7 +347,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   end
 
   describe "fallbacks compatiblity" do
-    plugin_setup do
+    plugins do
       active_model
       dirty true
       fallbacks({ en: 'ja' })
@@ -359,7 +358,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
     let(:model_class) do
       stub_const 'ArticleWithFallbacks', Class.new
       ArticleWithFallbacks.include ActiveModel::Dirty
-      ArticleWithFallbacks.include attributes
+      ArticleWithFallbacks.include translations
       ArticleWithFallbacks
     end
 

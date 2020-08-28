@@ -1,37 +1,41 @@
 require "spec_helper"
 
-return unless defined?(Sequel) && defined?(Pg)
+return unless defined?(Sequel) && defined?(PG)
 
-describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
+describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres, type: :backend do
   require "mobility/backends/sequel/hstore"
-  extend Helpers::Sequel
+
+  column_options = { column_prefix: 'my_', column_suffix: '_i18n' }
+  column_affix = "#{column_options[:column_prefix]}%s#{column_options[:column_suffix]}"
+
+  let(:backend) { post.mobility_backends[:title] }
+  let(:post) { JsonbPost.new }
 
   before do
     stub_const 'HstorePost', Class.new(Sequel::Model)
     HstorePost.dataset = DB[:hstore_posts]
-    HstorePost.extend Mobility
   end
-
-  column_options = { column_prefix: 'my_', column_suffix: '_i18n' }
-  column_affix = "#{column_options[:column_prefix]}%s#{column_options[:column_suffix]}"
-  let(:default_options) { { presence: false, cache: false, dirty: false, **column_options } }
 
   context "with no plugins applied" do
-    include_backend_examples described_class, (Class.new(Sequel::Model(:hstore_posts)) do
-      extend Mobility
-    end)
+    include_backend_examples described_class, 'HstorePost'
   end
 
-  context "with standard plugins applied" do
-    let(:backend) { post.mobility_backends[:title] }
+  context "with basic plugins" do
+    plugins :sequel, :reader, :writer
 
-    before { HstorePost.translates :title, :content, backend: :hstore, **default_options }
-    let(:post) { HstorePost.new }
+    before { translates HstorePost, :title, :content, backend: :hstore, **column_options }
 
     include_accessor_examples 'HstorePost'
     include_serialization_examples 'HstorePost', column_affix: column_affix
-    include_querying_examples 'HstorePost'
     include_dup_examples 'HstorePost'
+  end
+
+  context "with query plugin" do
+    plugins :sequel, :reader, :writer, :query
+
+    before { translates HstorePost, :title, :content, backend: :hstore, **column_options }
+
+    include_querying_examples 'HstorePost'
 
     describe "non-text values" do
       it "converts non-string types to strings when saving" do
@@ -44,11 +48,10 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres do
     end
   end
 
-  context "with dirty plugin applied" do
-    let(:backend) { post.mobility_backends[:title] }
+  context "with dirty plugin" do
+    plugins :sequel, :reader, :writer, :dirty
 
-    before { HstorePost.translates :title, :content, backend: :hstore, dirty: true, **default_options }
-    let(:post) { HstorePost.new }
+    before { translates HstorePost, :title, :content, backend: :hstore, **column_options }
 
     include_accessor_examples 'HstorePost'
     include_serialization_examples 'HstorePost', column_affix: column_affix

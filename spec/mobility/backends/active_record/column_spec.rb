@@ -2,35 +2,28 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
+describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record, type: :backend do
   require "mobility/backends/active_record/column"
-  extend Helpers::ActiveRecord
+
+  before { stub_const 'Comment', Class.new(ActiveRecord::Base) }
+  let(:attributes) { %w[content author] }
+  let(:backend) do
+    described_class.build_subclass(Comment, {}).new(comment, attributes.first)
+  end
+  let(:comment) do
+    Comment.create(content_en: "Good post!",
+                   content_ja: "なかなか面白い記事",
+                   content_pt_br: "Olá")
+  end
+
 
   context "with no plugins applied" do
-    model_class = Class.new(ActiveRecord::Base) do
-      extend Mobility
-      self.table_name = 'comments'
-    end
-    include_backend_examples described_class, model_class, "content"
+    include_backend_examples described_class, 'Comment', "content"
   end
 
   context "with standard plugins applied" do
-    let(:attributes) { %w[content author] }
-    let(:options) { {} }
-    let(:backend) do
-      described_class.build_subclass(Comment, options).new(comment, attributes.first)
-    end
-    let(:comment) do
-      Comment.create(content_en: "Good post!",
-                     content_ja: "なかなか面白い記事",
-                     content_pt_br: "Olá")
-    end
-
-    before do
-      stub_const 'Comment', Class.new(ActiveRecord::Base)
-      Comment.extend Mobility
-      Comment.translates *attributes, backend: :column, cache: false, dirty: false
-    end
+    plugins :active_record, :reader, :writer
+    before { translates Comment, *attributes, backend: :column }
 
     subject { comment }
 
@@ -72,49 +65,57 @@ describe "Mobility::Backends::ActiveRecord::Column", orm: :active_record do
     end
 
     describe "with locale accessors" do
+      plugins :active_record, :reader, :writer, :locale_accessors
+
       it "still works as usual" do
-        Comment.translates *attributes, backend: :column, cache: false, locale_accessors: true
+        translates Comment, *attributes, backend: :column, locale_accessors: true
         backend.write(:en, "Crappy post!")
         expect(comment.content_en).to eq("Crappy post!")
       end
     end
+  end
 
-    describe "with dirty" do
-      it "still works as usual" do
-        Comment.translates *attributes, backend: :column, cache: false, dirty: true
-        backend.write(:en, "Crappy post!")
-        expect(comment.content_en).to eq("Crappy post!")
-      end
+  context "with dirty plugin" do
+    plugins :active_record, :reader, :writer, :dirty
+    before { translates Comment, *attributes, backend: :column }
 
-      it "tracks changed attributes" do
-        Comment.translates *attributes, backend: :column, cache: false, dirty: true
-        comment = Comment.new
+    it "still works as usual" do
+      translates Comment, *attributes, backend: :column
+      backend.write(:en, "Crappy post!")
+      expect(comment.content_en).to eq("Crappy post!")
+    end
 
-        aggregate_failures do
-          expect(comment.content).to eq(nil)
-          expect(comment.changed?).to eq(false)
-          expect(comment.changed).to eq([])
-          expect(comment.changes).to eq({})
+    it "tracks changed attributes" do
+      translates Comment, *attributes, backend: :column
+      comment = Comment.new
 
-          comment.content = "foo"
-          expect(comment.content).to eq("foo")
-          expect(comment.changed?).to eq(true)
-          expect(comment.changed).to eq(["content_en"])
-          expect(comment.changes).to eq({ "content_en" => [nil, "foo"] })
-        end
-      end
+      aggregate_failures do
+        expect(comment.content).to eq(nil)
+        expect(comment.changed?).to eq(false)
+        expect(comment.changed).to eq([])
+        expect(comment.changes).to eq({})
 
-      it "returns nil for locales with no column defined" do
-        Comment.translates *attributes, backend: :column, cache: false, dirty: true
-        comment = Comment.new
-
-        expect(comment.content(locale: :fr)).to eq(nil)
+        comment.content = "foo"
+        expect(comment.content).to eq("foo")
+        expect(comment.changed?).to eq(true)
+        expect(comment.changed).to eq(["content_en"])
+        expect(comment.changes).to eq({ "content_en" => [nil, "foo"] })
       end
     end
 
-    describe "mobility scope (.i18n)" do
-      include_querying_examples 'Comment', :content, :author
-      include_validation_examples 'Comment', :content, :author
+    it "returns nil for locales with no column defined" do
+      translates Comment, *attributes, backend: :column
+      comment = Comment.new
+
+      expect(comment.content(locale: :fr)).to eq(nil)
     end
+  end
+
+  describe "with query plugin" do
+    plugins :active_record, :reader, :writer, :query
+    before { translates Comment, *attributes, backend: :column }
+
+    include_querying_examples 'Comment', :content, :author
+    include_validation_examples 'Comment', :content, :author
   end
 end

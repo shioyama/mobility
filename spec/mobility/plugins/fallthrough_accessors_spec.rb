@@ -1,11 +1,11 @@
 require "spec_helper"
 require "mobility/plugins/fallthrough_accessors"
 
-describe Mobility::Plugins::FallthroughAccessors do
-  include Helpers::Plugins
+describe Mobility::Plugins::FallthroughAccessors, type: :plugin do
+  plugin_setup :title
 
   context "option value is default" do
-    plugin_setup do
+    plugins do
       fallthrough_accessors
     end
 
@@ -22,8 +22,7 @@ describe Mobility::Plugins::FallthroughAccessors do
       end
 
       model_class = Class.new
-      model_class.include mod
-      model_class.include attributes
+      model_class.include translations, mod
 
       instance = model_class.new
 
@@ -39,8 +38,7 @@ describe Mobility::Plugins::FallthroughAccessors do
       end
 
       model_class = Class.new
-      model_class.include mod
-      model_class.include attributes
+      model_class.include translations, mod
 
       instance = model_class.new
 
@@ -49,7 +47,7 @@ describe Mobility::Plugins::FallthroughAccessors do
   end
 
   context "option value is false" do
-    plugin_setup do
+    plugins do
       fallthrough_accessors false
     end
 

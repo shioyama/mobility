@@ -2,36 +2,25 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
+describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type: :backend do
   require "mobility/backends/active_record/key_value"
-  extend Helpers::ActiveRecord
 
-  context "with no plugins applied" do
-    before do
-      stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.extend Mobility
-    end
+  before { stub_const 'Article', Class.new(ActiveRecord::Base) }
 
+  let(:title_backend)   { backend_for(article, :title) }
+  let(:content_backend) { backend_for(article, :content) }
+  let(:article) { Article.new }
+
+  context "with no plugins" do
     include_backend_examples described_class, 'Article', type: :text
   end
 
-  context "with standard plugins applied" do
-    let(:title_backend)   { backend_for(article, :title) }
-    let(:content_backend) { backend_for(article, :content) }
-    let(:cache) { false }
-
-    before do
-      stub_const 'Article', Class.new(ActiveRecord::Base)
-      cache_ = cache
-      Article.class_eval do
-        extend Mobility
-        translates :title, :content, backend: :key_value, type: :text, cache: cache_, dirty: false
-        translates :subtitle, backend: :key_value, type: :text, dirty: false
-      end
-    end
+  context "with basic plugins" do
+    plugins :active_record, :reader, :writer
 
     context "without cache" do
-      let(:article) { Article.new }
+      before { translates Article, :title, :content, backend: :key_value, type: :text }
+
       include_accessor_examples "Article"
       include_dup_examples "Article"
       include_cache_key_examples "Article"
@@ -45,8 +34,9 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     end
 
     context "with cache" do
-      let(:article) { Article.new }
-      let(:cache) { true }
+      plugins :active_record, :reader, :writer, :cache
+      before { translates Article, :title, :content, backend: :key_value, type: :text }
+
       include_accessor_examples "Article"
 
       it "only fetches translation once per locale" do
@@ -87,8 +77,12 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     end
 
     describe "Backend methods" do
-      before { %w[foo bar baz].each { |slug| Article.create!(slug: slug) } }
-      let(:article) { Article.find_by(slug: "baz") }
+      plugins :active_record
+      before do
+        translates Article, :title, :content, backend: :key_value, type: :text
+        2.times { Article.create! }
+      end
+      let(:article) { Article.last }
 
       subject { article }
 
@@ -199,19 +193,25 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
           end
 
           it "removes unpersisted translation if value is nil when record is saved" do
-            article = Article.find_by(slug: "foo")
-            expect(article.title).to eq(nil)
-            article.title = ""
-            expect(article.send(title_backend.association_name).size).to eq(1)
+            article = Article.first
+            backend = article.mobility_backends[:title]
+            expect(backend.read(:en)).to eq(nil)
+            backend.write(:en, "")
+            expect(article.send(backend.association_name).size).to eq(1)
             article.save
-            expect(article.send(title_backend.association_name).size).to eq(0)
+            expect(article.send(backend.association_name).size).to eq(0)
           end
         end
       end
     end
 
     describe "translations association" do
-      let(:article) { Article.create(title: "Article", subtitle: "Article subtitle", content: "Content") }
+      plugins :active_record, :writer
+
+      before do
+        translates Article, :title, :content, :subtitle, backend: :key_value, type: :text
+        Article.create(title: "Article", subtitle: "Article subtitle", content: "Content")
+      end
 
       it "limits association to translations with keys matching attributes" do
         # This limits the results returned by the association to only those whose keys match the set of
@@ -229,6 +229,9 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     end
 
     describe "creating a new record with translations" do
+      plugins :active_record, :reader, :writer
+
+      before { translates Article, :title, :content, backend: :key_value, type: :text }
       let!(:article) { Article.create(title: "New Article", content: "Once upon a time...") }
 
       it "creates record and translation in current locale" do
@@ -279,10 +282,10 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     end
 
     context "with separate string and text translations" do
+      plugins :active_record, :reader, :writer
       before do
-        Article.class_eval do
-          translates :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :string_translations
-        end
+        translates Article, :title, backend: :key_value, type: :text
+        translates Article, :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :string_translations
       end
 
       it "saves translations correctly" do
@@ -308,6 +311,14 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     end
 
     describe "after destroy" do
+      plugins :active_record, :reader, :writer
+      before do
+        translates Article, :title, :content, backend: :key_value, type: :text
+        stub_const 'Post', Class.new(ActiveRecord::Base)
+        translates Post, :title, backend: :key_value, type: :string
+        translates Post, :content, backend: :key_value, type: :text
+      end
+
       # In case we change the translated attributes on a model, we need to make
       # sure we clean them up when the model is destroyed.
       it "cleans up all associated translations, regardless of key" do
@@ -333,8 +344,12 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     end
 
     describe ".configure" do
+      plugins :active_record
+
+      before { translates Article, :title, :content, backend: :key_value, type: :text }
+
       let(:backend_class) do
-        Class.new(described_class) { @model_class = Post }
+        Class.new(described_class) { @model_class = Article }
       end
 
       it "sets association_name, class_name and table_alias_affix from string type" do
@@ -344,7 +359,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
           type: :string,
           class_name: Mobility::ActiveRecord::StringTranslation,
           association_name: :string_translations,
-          table_alias_affix: "Post_%s_string_translations"
+          table_alias_affix: "Article_%s_string_translations"
         })
       end
 
@@ -355,7 +370,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
           type: :text,
           class_name: Mobility::ActiveRecord::TextTranslation,
           association_name: :text_translations,
-          table_alias_affix: "Post_%s_text_translations"
+          table_alias_affix: "Article_%s_text_translations"
         })
       end
 
@@ -372,24 +387,31 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
           type: :text,
           class_name: Mobility::ActiveRecord::TextTranslation,
           association_name: :text_translations,
-          table_alias_affix: "Post_%s_text_translations"
+          table_alias_affix: "Article_%s_text_translations"
         })
       end
     end
 
     describe "mobility scope (.i18n)" do
+      plugins :active_record, :reader, :writer, :query
+
+      before do
+        translates Article, :title, :content, backend: :key_value, type: :text
+        translates Article, :subtitle, backend: :key_value, type: :text
+      end
+
       include_querying_examples('Article')
       include_validation_examples('Article')
 
       describe "joins" do
         it "uses inner join for WHERE queries" do
-          expect(Post.i18n.where(title: "foo").to_sql).not_to match(/OUTER/)
+          expect(Article.i18n.where(title: "foo").to_sql).not_to match(/OUTER/)
         end
 
         it "does not use OUTER JOIN with .not" do
           # we don't need an OUTER join when matching nil values since
           # we're searching for negative matches
-          expect(Post.i18n.where.not(title: nil).to_sql).not_to match /OUTER/
+          expect(Article.i18n.where.not(title: nil).to_sql).not_to match /OUTER/
         end
 
         describe "Arel queries" do
@@ -426,9 +448,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
 
       context "model with two translated attributes on different tables" do
         before do
-          Article.class_eval do
-            translates :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :string_translations
-          end
+          translates Article, :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :string_translations
           @article1 = Article.create(title: "foo post", short_title: "bar short 1")
           @article2 = Article.create(title: "foo post", short_title: "bar short 2")
           @article3 = Article.create(                   short_title: "bar short 1")
@@ -454,6 +474,9 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record do
     end
 
     describe "Model.i18n.find_by_<translated attribute>" do
+      plugins :active_record, :reader, :writer, :query
+      before { translates Article, :title, backend: :key_value, type: :text }
+
       it "finds correct translation if exists in current locale" do
         Mobility.locale = :ja
         article = Article.create(title: "タイトル")

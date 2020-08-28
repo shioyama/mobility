@@ -2,21 +2,19 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
+describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :backend do
   require "mobility/backends/active_record/table"
-  extend Helpers::ActiveRecord
 
-  before do
-    stub_const 'Article', Class.new(ActiveRecord::Base)
-    Article.extend Mobility
-  end
+  before { stub_const 'Article', Class.new(ActiveRecord::Base) }
 
   context "with no plugins applied" do
     include_backend_examples described_class, 'Article'
   end
 
-  context "without cache" do
-    before { Article.translates :title, :content, backend: :table, cache: false, dirty: false }
+  context "with basic plugins" do
+    plugins :active_record, :reader, :writer
+    before { translates Article, :title, :content, backend: :table }
+
     include_accessor_examples "Article"
     include_dup_examples "Article"
     include_cache_key_examples "Article"
@@ -32,7 +30,9 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   end
 
   context "with cache" do
-    before { Article.translates :title, :content, backend: :table, cache: true }
+    plugins :active_record, :reader, :writer, :cache
+    before { translates Article, :title, :content, backend: :table, cache: true }
+
     include_accessor_examples "Article"
 
     it "only fetches translation once per locale" do
@@ -76,7 +76,8 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   end
 
   describe "translations association" do
-    before { Article.translates :title, :content, backend: :table, cache: true, dirty: false }
+    plugins :active_record, :reader, :writer
+    before { translates Article, :title, :content, backend: :table }
 
     describe "cleaning up blank translations" do
       let(:title_backend) { backend_for(article, :title) }
@@ -124,21 +125,13 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
     end
   end
 
-  # Using Article to test separate backends with separate tables fails
-  # when these specs are run together with other specs, due to code
-  # assigning subclasses (Article::Translation, Article::FooTranslation).
-  # Maybe an issue with RSpec const stubbing.
-  context "attributes defined separately" do
-    include_accessor_examples "MultitablePost", :title, :foo
-    include_querying_examples "MultitablePost", :title, :foo
-  end
-
   describe "Backend methods" do
+    plugins :active_record
     before do
-      Article.translates :title, :content, backend: :table, cache: false
-      %w[foo bar baz].each { |slug| Article.create!(slug: slug) }
+      translates Article, :title, :content, backend: :table
+      2.times { Article.create! }
     end
-    let(:article) { Article.find_by(slug: "baz") }
+    let(:article) { Article.last }
     let(:title_backend) { backend_for(article, :title) }
     let(:content_backend) { backend_for(article, :content) }
 
@@ -238,6 +231,8 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   end
 
   describe ".configure" do
+    plugins :active_record
+
     let(:options) { {} }
     let(:backend_class) do
       Class.new(described_class) { @model_class = Article }
@@ -264,10 +259,19 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
     end
   end
 
-  describe "mobility scope (.i18n)" do
-    before { Article.translates :title, :content, backend: :table, cache: false }
-    include_querying_examples('Article')
-    include_validation_examples('Article')
+  describe "with query plugin" do
+    plugins :active_record, :reader, :writer, :query
+    before { translates Article, :title, :content, backend: :table }
+
+    include_querying_examples 'Article'
+    include_validation_examples 'Article'
+
+    context "with multitable translations" do
+      before { translates Article, :foo, backend: :table, table_name: :article_foo_translations, association_name: :foo_translations }
+
+      include_querying_examples 'Article', :title, :foo
+      include_validation_examples 'Article', :title, :foo
+    end
 
     describe "joins" do
       it "uses inner join for WHERE queries if query has at least one non-null attribute" do
@@ -291,7 +295,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
       end
 
       describe "Arel queries" do
-        before { Article.translates :subtitle, backend: :table }
+        before { translates Article, :subtitle, backend: :table }
 
         describe "uses correct join type" do
           it "works on one attribute with non-null values" do
@@ -383,7 +387,8 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record do
   end
 
   describe "Model.i18n.find_by_<translated attribute>" do
-    before { Article.translates :title, backend: :table, cache: false }
+    plugins :active_record, :writer, :query
+    before { translates Article, :title, backend: :table }
 
     it "finds correct translation if exists in current locale" do
       Mobility.locale = :ja

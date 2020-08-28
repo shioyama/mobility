@@ -28,22 +28,9 @@ module Mobility
             t.timestamps null: false
           end
 
-          create_table "multitable_posts" do |t|
-            t.string :slug
-            t.boolean :published
-            t.timestamps null: false
-          end
-
-          create_table "multitable_post_translations" do |t|
+          create_table "article_foo_translations" do |t|
             t.string :locale
-            t.integer :multitable_post_id
-            t.string :title
-            t.timestamps null: false
-          end
-
-          create_table "multitable_post_foo_translations" do |t|
-            t.string :locale
-            t.integer :multitable_post_id
+            t.integer :article_id
             t.string :foo
             t.timestamps null: false
           end

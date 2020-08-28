@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe "Mobility::Sequel::TextTranslation", orm: :sequel do
   let(:described_class) { Mobility::Sequel::TextTranslation }
+  before do
+    stub_const 'Post', Class.new(Sequel::Model)
+    Post.dataset = DB[:posts]
+  end
 
   describe "#translatable" do
     it "gets translatable model" do

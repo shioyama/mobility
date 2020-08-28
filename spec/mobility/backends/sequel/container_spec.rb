@@ -2,30 +2,34 @@ require "spec_helper"
 
 return unless defined?(Sequel) && defined?(PG)
 
-describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
+describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres, type: :backend do
   require "mobility/backends/sequel/container"
-  extend Helpers::Sequel
+
   before do
     stub_const 'ContainerPost', Class.new(Sequel::Model)
     ContainerPost.dataset = DB[:container_posts]
-    ContainerPost.extend Mobility
   end
+
+  let(:backend) { post.mobility_backends[:title] }
+  let(:post) { ContainerPost.new }
 
   context "with no plugins applied" do
-    include_backend_examples described_class, (Class.new(Sequel::Model(:container_posts)) do
-      extend Mobility
-    end)
+    include_backend_examples described_class, 'ContainerPost'
   end
 
-  context "with standard plugins applied" do
-    let(:backend) { post.mobility_backends[:title] }
-
-    before { ContainerPost.translates :title, :content, backend: :container, presence: false, cache: false, dirty: false }
-    let(:post) { ContainerPost.new }
+  context "with basic plugins" do
+    plugins :sequel, :reader, :writer
+    before { translates ContainerPost, :title, :content, backend: :container }
 
     include_accessor_examples 'ContainerPost'
-    include_querying_examples 'ContainerPost'
     include_dup_examples 'ContainerPost'
+  end
+
+  context "with query plugin" do
+    plugins :sequel, :reader, :writer, :query
+    before { translates ContainerPost, :title, :content, backend: :container }
+
+    include_querying_examples 'ContainerPost'
 
     it "uses existence operator instead of NULL match" do
       aggregate_failures do
@@ -72,37 +76,36 @@ describe "Mobility::Backends::Sequel::Container", orm: :sequel, db: :postgres do
       end
       it_behaves_like "jsonb translated value", :array,   [1, "a", nil]
     end
-  end
 
-  context "with a json column_name" do
-    before(:all) do
-      DB.create_table!(:json_container_posts) { primary_key :id; json :json_translations, default: '{}'; TrueClass :published }
+    context "with a json column_name" do
+      before(:all) do
+        DB.create_table!(:json_container_posts) { primary_key :id; json :json_translations, default: '{}'; TrueClass :published }
+      end
+      before(:each) do
+        stub_const 'JsonContainerPost', Class.new(Sequel::Model)
+        JsonContainerPost.dataset = DB[:json_container_posts]
+        translates JsonContainerPost, :title, :content, backend: :container, column_name: :json_translations
+      end
+      after(:all) { DB.drop_table?(:json_container_posts) }
+
+      include_accessor_examples 'JsonContainerPost'
+      include_querying_examples 'JsonContainerPost'
     end
-    before(:each) do
-      stub_const 'JsonContainerPost', Class.new(Sequel::Model)
-      JsonContainerPost.dataset = DB[:json_container_posts]
-      JsonContainerPost.extend Mobility
-      JsonContainerPost.translates :title, :content, backend: :container, presence: false, cache: false, dirty: false, column_name: :json_translations
-    end
-    after(:all) { DB.drop_table?(:json_container_posts) }
 
-    include_accessor_examples 'JsonContainerPost'
-    include_querying_examples 'JsonContainerPost'
-  end
+    context "with a non-json/jsonb column" do
+      before(:all) do
+        DB.create_table!(:string_column_posts) { primary_key :id; String :foo, default: ''; TrueClass :published }
+      end
+      after(:all) { DB.drop_table?(:string_column_posts) }
 
-  context "with a non-json/jsonb column" do
-    before(:all) do
-      DB.create_table!(:string_column_posts) { primary_key :id; String :foo, default: ''; TrueClass :published }
-    end
-    after(:all) { DB.drop_table?(:string_column_posts) }
-
-    it "raises InvalidColumnType exception" do
-      stub_const 'StringColumnPost', Class.new(Sequel::Model)
-      StringColumnPost.dataset = DB[:string_column_posts]
-      StringColumnPost.extend Mobility
-      expect { StringColumnPost.translates :title, backend: :container, column_name: :foo
-      }.to raise_error(Mobility::Backends::Sequel::Container::InvalidColumnType,
-                       "foo must be a column of type json or jsonb")
+      it "raises InvalidColumnType exception" do
+        stub_const 'StringColumnPost', Class.new(Sequel::Model)
+        StringColumnPost.dataset = DB[:string_column_posts]
+        StringColumnPost.extend Mobility
+        expect { translates StringColumnPost, :title, backend: :container, column_name: :foo
+        }.to raise_error(Mobility::Backends::Sequel::Container::InvalidColumnType,
+                         "foo must be a column of type json or jsonb")
+      end
     end
   end
 end

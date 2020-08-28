@@ -1,21 +1,19 @@
 require "spec_helper"
 require "mobility/plugins/dirty"
 
-describe Mobility::Plugins::Dirty do
-  include Helpers::Plugins
+describe Mobility::Plugins::Dirty, type: :plugin do
+  plugin_setup
 
   context "dirty default option" do
-    plugin_setup do
-      dirty
-    end
+    plugins :dirty
 
     it "requires fallthrough_accessors" do
-      expect(attributes).to have_plugin(:fallthrough_accessors)
+      expect(translations).to have_plugin(:fallthrough_accessors)
     end
   end
 
   context "fallthrough accessors is falsey" do
-    plugin_setup do
+    plugins do
       dirty true
       fallthrough_accessors false
     end

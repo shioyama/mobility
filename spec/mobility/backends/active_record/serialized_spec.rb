@@ -2,30 +2,25 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
+describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record, type: :backend do
   require "mobility/backends/active_record/serialized"
-  extend Helpers::ActiveRecord
+
+  before { stub_const 'SerializedPost', Class.new(ActiveRecord::Base) }
 
   column_options = { column_prefix: 'my_', column_suffix: '_i18n' }
   column_affix = "#{column_options[:column_prefix]}%s#{column_options[:column_suffix]}"
-  let(:default_options) { { presence: false, dirty: false, **column_options } }
 
-  context "with no plugins applied" do
-    include_backend_examples described_class, (Class.new(ActiveRecord::Base) do
-      extend Mobility
-      self.table_name = 'serialized_posts'
-    end), column_options
+  context "with no plugins" do
+    include_backend_examples described_class, 'SerializedPost', column_options
   end
 
-  context "with standard plugins applied" do
-    before do
-      stub_const 'SerializedPost', Class.new(ActiveRecord::Base)
-      SerializedPost.extend Mobility
-    end
+  context "with basic plugins" do
+    plugins :active_record, :reader, :writer
 
     describe "serialized backend without cache" do
       context "yaml format" do
-        before { SerializedPost.translates :title, :content, backend: :serialized, format: :yaml, cache: false, **default_options }
+        before { translates SerializedPost, :title, :content, backend: :serialized, format: :yaml, **column_options }
+
         include_accessor_examples 'SerializedPost'
         include_serialization_examples 'SerializedPost', column_affix: column_affix
         include_dup_examples 'SerializedPost'
@@ -66,7 +61,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
       end
 
       context "json format" do
-        before { SerializedPost.translates :title, :content, backend: :serialized, format: :json, cache: false, **default_options }
+        before { translates SerializedPost, :title, :content, backend: :serialized, format: :json, **column_options }
         include_accessor_examples 'SerializedPost'
         include_serialization_examples 'SerializedPost', column_affix: column_affix
 
@@ -82,7 +77,9 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
     end
 
     describe "serialized backend with cache" do
-      before { SerializedPost.translates :title, :content, backend: :serialized, **default_options }
+      plugins :active_record, :reader, :writer, :cache
+      before { translates SerializedPost, :title, :content, backend: :serialized, **column_options }
+
       include_accessor_examples 'SerializedPost'
       include_serialization_examples 'SerializedPost', column_affix: column_affix
 
@@ -95,7 +92,8 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
     end
 
     describe "mobility scope (.i18n)" do
-      before { SerializedPost.translates :title, backend: :serialized, **default_options }
+      plugins :active_record, :reader, :writer, :query
+      before { translates SerializedPost, :title, backend: :serialized, **column_options }
 
       def error_msg(*attributes)
         "You cannot query on mobility attributes translated with the Serialized backend (#{attributes.join(", ")})."
@@ -107,7 +105,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
         end
 
         it "does not raise error for queries on attributes translated with other backends" do
-          SerializedPost.translates :subtitle, backend: :key_value, type: :text
+          translates SerializedPost, :subtitle, backend: :key_value, type: :text
 
           post = SerializedPost.create(subtitle: "foo")
           expect(SerializedPost.i18n.where(subtitle: "foo")).to eq([post])
@@ -119,7 +117,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
         end
 
         it "raises error with multiple serialized attributes defined separatly" do
-          SerializedPost.translates :content, backend: :serialized
+          translates SerializedPost, :content, backend: :serialized
           expect { SerializedPost.i18n.where(content: "foo") }.to raise_error(ArgumentError, error_msg("content"))
           expect { SerializedPost.i18n.where(title: "foo")   }.to raise_error(ArgumentError, error_msg("title"))
         end
@@ -131,7 +129,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
         end
 
         it "does not raise error for queries on attributes translated with other backends" do
-          SerializedPost.translates :subtitle, backend: :key_value, type: :text
+          translates SerializedPost, :subtitle, backend: :key_value, type: :text
 
           post = SerializedPost.create(subtitle: "foo")
           expect(SerializedPost.i18n.where.not(subtitle: "bar")).to eq([post])
@@ -143,7 +141,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record do
         end
 
         it "raises error with multiple serialized attributes defined separatly" do
-          SerializedPost.translates :content, backend: :serialized
+          translates SerializedPost, :content, backend: :serialized
 
           expect { SerializedPost.i18n.where.not(content: "foo") }.to raise_error(ArgumentError, error_msg("content"))
           expect { SerializedPost.i18n.where.not(title: "foo")   }.to raise_error(ArgumentError, error_msg("title"))

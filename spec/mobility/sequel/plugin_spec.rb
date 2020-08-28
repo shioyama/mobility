@@ -1,20 +1,19 @@
 require "spec_helper"
 
 describe "Sequel::Plugins::Mobility", orm: :sequel do
+  include Helpers::Plugins
+
+  plugins :sequel, :reader, :writer
+
   before do
     stub_const 'Article', Class.new(Sequel::Model)
     Article.dataset = DB[:articles]
   end
 
   it "includes Mobility class" do
-    Article.class_eval do
-      plugin :mobility
-      translates :title, backend: :table
-    end
-    expect(Article.ancestors).to include(Mobility)
+    Article.plugin :mobility
+    Article.translates :title, backend: :table
 
-    article = Article.new
-    article.title = "foo"
-    expect(article.title).to eq("foo")
+    expect(Article.ancestors).to include(Mobility)
   end
 end

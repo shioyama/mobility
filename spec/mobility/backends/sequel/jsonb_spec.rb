@@ -2,35 +2,38 @@ require "spec_helper"
 
 return unless defined?(Sequel) && defined?(PG)
 
-describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
+describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres, type: :backend do
   require "mobility/backends/sequel/jsonb"
-  extend Helpers::Sequel
-  before do
-    stub_const 'JsonbPost', Class.new(Sequel::Model)
-    JsonbPost.dataset = DB[:jsonb_posts]
-    JsonbPost.extend Mobility
-  end
 
   column_options = { column_prefix: 'my_', column_suffix: '_i18n' }
   column_affix = "#{column_options[:column_prefix]}%s#{column_options[:column_suffix]}"
-  let(:default_options) { { presence: false, cache: false, dirty: false, **column_options } }
 
-  context "with no plugins applied" do
-    include_backend_examples described_class, (Class.new(Sequel::Model(:jsonb_posts)) do
-      extend Mobility
-    end)
+  before do
+    stub_const 'JsonbPost', Class.new(Sequel::Model)
+    JsonbPost.dataset = DB[:jsonb_posts]
   end
 
-  context "with standard plugins applied" do
-    let(:backend) { post.mobility_backends[:title] }
+  let(:backend) { post.mobility_backends[:title] }
+  let(:post) { JsonbPost.new }
 
-    before { JsonbPost.translates :title, :content, backend: :jsonb, **default_options }
-    let(:post) { JsonbPost.new }
+  context "with no plugins" do
+    include_backend_examples described_class, 'JsonbPost', column_options
+  end
+
+  context "with basic plugins" do
+    plugins :sequel, :reader, :writer
+    before { translates JsonbPost, :title, :content, backend: :jsonb, **column_options }
 
     include_accessor_examples 'JsonbPost'
     include_serialization_examples 'JsonbPost', column_affix: column_affix
-    include_querying_examples 'JsonbPost'
     include_dup_examples 'JsonbPost'
+  end
+
+  context "with query plugin" do
+    plugins :sequel, :reader, :writer, :query
+    before { translates JsonbPost, :title, :content, backend: :jsonb, **column_options }
+
+    include_querying_examples 'JsonbPost'
 
     it "uses existence operator instead of NULL match" do
       aggregate_failures do
@@ -82,11 +85,9 @@ describe "Mobility::Backends::Sequel::Jsonb", orm: :sequel, db: :postgres do
     end
   end
 
-  context "with dirty plugin applied" do
-    let(:backend) { post.mobility_backends[:title] }
-
-    before { JsonbPost.translates :title, :content, backend: :jsonb, dirty: true, **default_options }
-    let(:post) { JsonbPost.new }
+  context "with dirty plugin" do
+    plugins :sequel, :reader, :writer, :dirty
+    before { translates JsonbPost, :title, :content, backend: :jsonb, **column_options }
 
     include_accessor_examples 'JsonbPost'
     include_serialization_examples 'JsonbPost', column_affix: column_affix

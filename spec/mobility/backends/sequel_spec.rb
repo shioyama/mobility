@@ -2,14 +2,15 @@ require "spec_helper"
 
 return unless defined?(Sequel)
 
-describe "Mobility::Backends::Sequel", orm: :sequel do
+describe "Mobility::Backends::Sequel", orm: :sequel, type: :backend do
+  plugins :sequel, :reader, :writer, :query, :cache
+
   context "model with multiple backends" do
     before do
       stub_const 'Comment', Class.new(Sequel::Model)
       Comment.dataset = DB[:comments]
-      Comment.extend Mobility
-      Comment.translates :content, backend: :column
-      Comment.translates :title, :author, backend: :key_value, type: :text
+      translates Comment, :content, backend: :column
+      translates Comment, :title, :author, backend: :key_value, type: :text
       @comment1 = Comment.create(content: "foo content 1", title: "foo title 1", author: "Foo author 1")
       @comment2 = Comment.create(                          title: "foo title 2", author: "Foo author 2")
       Mobility.with_locale(:ja) { @comment1.update(content: "コンテンツ 1", title: "タイトル 1", author: "オーサー 1") }

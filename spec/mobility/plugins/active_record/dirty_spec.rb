@@ -2,19 +2,19 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
-  include Helpers::Plugins
-  plugin_setup "title" do
+describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record, type: :plugin do
+  plugins do
     dirty true
     active_record
     reader
     writer
   end
 
+  plugin_setup :title
+
   let(:model_class) do
     stub_const 'Article', Class.new(ActiveRecord::Base)
-    Article.include attributes
-    Article.include attributes_class.new("content", backend: backend_listener(double(:backend)), dirty: true)
+    Article.include translations
 
     # ensure we include these methods as a module rather than override in class
     changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
@@ -152,6 +152,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
     end
 
     it "tracks forced changes" do
+      model_class.include translations_class.new("content", backend: backend_listener(double(:backend)), dirty: true)
       instance = model_class.create(title: "foo")
 
       instance.title_will_change!

@@ -15,7 +15,7 @@ describe Mobility::Attributes, orm: 'none' do
 
   # These options disable all inclusion of modules into backend, which is useful
   # for many specs in this suite.
-  let(:clean_options) { { cache: false, fallbacks: false, presence: false } }
+  let(:clean_options) { { cache: false, fallbacks: false } }
 
   describe "including Attributes in a model" do
     describe "model class methods" do

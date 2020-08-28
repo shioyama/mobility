@@ -32,26 +32,9 @@ module Mobility
             DateTime    :updated_at, allow_null: false
           end
 
-          DB.create_table? :multitable_posts do
+          DB.create_table? :article_foo_translations do
             primary_key :id
-            TrueClass   :published
-            DateTime    :created_at, allow_null: false
-            DateTime    :updated_at, allow_null: false
-          end
-
-          DB.create_table? :multitable_post_translations do
-            primary_key :id
-            Integer     :multitable_post_id, allow_null: false
-            String      :locale,             allow_null: false
-            String      :title
-            DateTime    :created_at,         allow_null: false
-            DateTime    :updated_at,         allow_null: false
-          end
-
-
-          DB.create_table? :multitable_post_foo_translations do
-            primary_key :id
-            Integer     :multitable_post_id, allow_null: false
+            Integer     :article_id,         allow_null: false
             String      :locale,             allow_null: false
             String      :foo
             DateTime    :created_at,         allow_null: false

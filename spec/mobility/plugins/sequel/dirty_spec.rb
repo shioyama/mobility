@@ -2,19 +2,20 @@ require "spec_helper"
 
 return unless defined?(Sequel)
 
-describe "Mobility::Plugins::Sequel::Dirty", orm: :sequel do
-  include Helpers::Plugins
-  plugin_setup "title" do
+describe "Mobility::Plugins::Sequel::Dirty", orm: :sequel, type: :plugin do
+  plugins do
     dirty true
     sequel
     reader
     writer
   end
 
+  plugin_setup :title
+
   let(:model_class) do
     stub_const 'Article', Class.new(Sequel::Model)
     Article.dataset = DB[:articles]
-    Article.include attributes
+    Article.include translations
     Article
   end
 
@@ -159,13 +160,20 @@ describe "Mobility::Plugins::Sequel::Dirty", orm: :sequel do
   end
 
   describe "fallbacks compatiblity" do
+    plugins do
+      dirty true
+      sequel
+      reader
+      writer
+      fallbacks
+    end
+
     before do
       stub_const 'ArticleWithFallbacks', Class.new(Sequel::Model)
       ArticleWithFallbacks.class_eval do
         dataset = DB[:articles]
-        extend Mobility
       end
-      ArticleWithFallbacks.translates :title, backend: backend_class, dirty: true, cache: false, fallbacks: { en: 'ja' }
+      translates ArticleWithFallbacks, :title, backend: backend_class, dirty: true, cache: false, fallbacks: { en: 'ja' }
     end
 
     it "does not compare with fallback value" do

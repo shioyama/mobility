@@ -2,13 +2,10 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Plugins::AttributeMethods", orm: :active_record do
-  include Helpers::Plugins
-  plugin_setup do
-    active_record
-    attribute_methods true
-    reader
-  end
+describe "Mobility::Plugins::AttributeMethods", orm: :active_record, type: :plugin do
+  plugins :active_record, :attribute_methods, :reader
+
+  plugin_setup :title
 
   let(:untranslated_attributes) do
     {
@@ -21,7 +18,7 @@ describe "Mobility::Plugins::AttributeMethods", orm: :active_record do
   end
   let(:model_class) do
     stub_const 'Article', Class.new(ActiveRecord::Base)
-    Article.include(attributes)
+    Article.include(translations)
     Article
   end
 

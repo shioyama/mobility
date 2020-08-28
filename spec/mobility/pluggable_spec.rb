@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Mobility::Pluggable do
-  include Helpers::Plugins
+  include Helpers::PluginSetup
 
   describe "#initialize" do
     define_plugins(:foo)

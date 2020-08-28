@@ -1,12 +1,13 @@
 require "spec_helper"
 
-describe "Mobility::Backends::ActiveRecord", orm: :active_record do
+describe "Mobility::Backends::ActiveRecord", orm: :active_record, type: :backend do
+  plugins :active_record, :writer, :query
+
   context "model with multiple backends" do
     before do
       stub_const 'Comment', Class.new(ActiveRecord::Base)
-      Comment.include Mobility
-      Comment.translates :content, backend: :column
-      Comment.translates :title, :author, backend: :key_value, type: :text
+      translates Comment, :content, backend: :column
+      translates Comment, :title, :author, backend: :key_value, type: :text
       @comment1 = Comment.create(content: "foo content 1", title: "foo title 1", author: "Foo author 1")
       Mobility.with_locale(:ja) { @comment1.update(content: "コンテンツ 1", title: "タイトル 1", author: "オーサー 1") }
       @comment2 = Comment.create(                          title: "foo title 2", author: "Foo author 2")

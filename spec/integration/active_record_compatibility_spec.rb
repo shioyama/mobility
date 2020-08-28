@@ -1,7 +1,17 @@
 require "spec_helper"
 
+# TODO: Remove these tests or move to a more appropriate place.
+
 describe "ActiveRecord compatibility", orm: :active_record do
+  include Helpers::Plugins
+  include Helpers::Translates
+  # Enable all plugins that are enabled by default pre v1.0
+  plugins :active_record, :reader, :writer, :cache, :dirty, :presence, :query, :attribute_methods
+
+  before { stub_const 'Post', Class.new(ActiveRecord::Base) }
+
   describe "#assign_attributes" do
+    before { translates Post, :title, backend: :key_value, type: :string }
     let!(:post) { Post.create(title: "foo title") }
 
     it "assigns translated attributes" do
@@ -26,6 +36,7 @@ describe "ActiveRecord compatibility", orm: :active_record do
   end
 
   describe "cache" do
+    before { translates Post, :title, backend: :key_value, type: :string }
     let!(:post) { Post.create(title: "foo title") }
 
     it "updates cache when translations association is modified directly" do
@@ -46,6 +57,7 @@ describe "ActiveRecord compatibility", orm: :active_record do
   end
 
   describe "dirty tracking" do
+    before { translates Post, :title, backend: :key_value, type: :string }
     let!(:post) { Post.create(title: "foo title") }
 
     it "tracks translated attributes" do
@@ -75,7 +87,8 @@ describe "ActiveRecord compatibility", orm: :active_record do
   end
 
   describe "fallbacks" do
-    let!(:post) { FallbackPost.create(title: "foo title") }
+    before { translates Post, :title, backend: :key_value, type: :string, fallbacks: true }
+    let!(:post) { Post.create(title: "foo title") }
 
     it "does not fall through to default locale when fallback: false option passed in" do
       Mobility.locale = :ja
@@ -94,6 +107,11 @@ describe "ActiveRecord compatibility", orm: :active_record do
   end
 
   describe "#attributes" do
+    before do
+      translates Post, :title, backend: :key_value, type: :string
+      translates Post, :content, backend: :key_value, type: :text
+    end
+
     it "includes both original and translated attributes" do
       post = Post.new
       post.title = "foo"
@@ -103,6 +121,11 @@ describe "ActiveRecord compatibility", orm: :active_record do
   end
 
   describe "#translated_attributes" do
+    before do
+      translates Post, :title, backend: :key_value, type: :string
+      translates Post, :content, backend: :key_value, type: :text
+    end
+
     it "includes only translated attributes" do
       post = Post.new
       post.title = "foo"
@@ -112,6 +135,11 @@ describe "ActiveRecord compatibility", orm: :active_record do
   end
 
   describe "#untranslated_attributes" do
+    before do
+      translates Post, :title, backend: :key_value, type: :string
+      translates Post, :content, backend: :key_value, type: :text
+    end
+
     it "includes only original attributes" do
       post = Post.new
       post.title = "foo"
@@ -123,10 +151,8 @@ describe "ActiveRecord compatibility", orm: :active_record do
   describe "uniqueness validation" do
     it "works without any translated attributes" do
       stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.class_eval do
-        extend Mobility
-        validates :slug, uniqueness: true
-      end
+      translates Article, :title, backend: :key_value, type: :string
+      Article.validates :slug, uniqueness: true
 
       article = Article.create(slug: "foo")
       expect(Article.new(slug: "bar")).to be_valid
@@ -137,31 +163,26 @@ describe "ActiveRecord compatibility", orm: :active_record do
   describe "merging translated and untranslated scopes" do
     # regression for https://github.com/shioyama/mobility/issues/266
     it "returns correct result" do
-      # Need to name Comment here Comment_ to avoid issue with stub_const on AR
-      # models with associations - for reasons unknown the stub is not
-      # completely removed, so we need to use a different name to avoid
-      # conflict with other spec in AR query plugin.
-      stub_const 'Comment_', Class.new(ActiveRecord::Base)
-      Comment_.table_name = "comments"
-      Comment_.extend Mobility
-      Comment_.translates :content, backend: :column
+      stub_const 'Comment', Class.new(ActiveRecord::Base)
+      translates Comment, :content, backend: :column
 
       stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.has_many :comments, class_name: 'Comment_'
+      Article.has_many :comments
 
       Article.create
       article = Article.create
       article.comments.create(content: "foo", published: true)
       other = Article.create
       other.comments.create(content: "foo", published: false)
+
       # It's necessary to dup the relation before querying on it after merging,
       # because Mobility uses Arel nodes when building queries and this sets a
       # flag causing ActiveRecord to raise an ImmutableRelation exception.
       #
       # See:
       # https://github.com/rails/rails/blob/fc5dd0b85189811062c85520fd70de8389b55aeb/activerecord/lib/active_record/relation/query_methods.rb#L923
-      expect(Article.joins(:comments).merge(Comment_.i18n.where(content: "foo")).dup.find_by(comments: { published: true })).to eq(article)
-      expect(Article.joins(:comments).merge(Comment_.i18n.where(content: "foo")).dup.find_by(comments: { published: false })).to eq(other)
+      expect(Article.joins(:comments).merge(Comment.i18n.where(content: "foo")).dup.find_by(comments: { published: true })).to eq(article)
+      expect(Article.joins(:comments).merge(Comment.i18n.where(content: "foo")).dup.find_by(comments: { published: false })).to eq(other)
     end
   end
 end

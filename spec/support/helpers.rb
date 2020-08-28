@@ -69,9 +69,69 @@ module Helpers
     end
   end
 
-  module ActiveRecord
-    include Backend
+  module Plugins
+    def self.included(base)
+      base.extend ClassMethods
+    end
 
+    module ClassMethods
+      # Pass plugin names as arguments if no plugin defaults to set
+      def plugins(*args, &block)
+        if args.empty?
+          plugins_block = block
+        else
+          plugins_block = proc do
+            args.each { |arg| __send__ arg }
+          end
+        end
+        let(:translations_class) do
+          Class.new(Mobility::Attributes).tap do |attrs|
+            attrs.plugins(&plugins_block)
+          end
+        end
+      end
+    end
+  end
+
+  # Simple module for setting up translated attributes on a class
+  module Translates
+    def self.included(base)
+      base.extend ClassMethods
+    end
+
+    def translates(klass, *attribute_names, **options)
+      raise ArgumentError, "You have not declared plugins for this test" unless respond_to?(:translations_class)
+      klass.include translations_class.new(*attribute_names, **options)
+      klass
+    end
+
+    module ClassMethods
+      def translates(*attribute_names)
+        unless method_defined?(:translations)
+          let(:translations) do
+            translations_class.new(
+              *attribute_names,
+              **(respond_to?(:translation_options) ? translation_options : {})
+            )
+          end
+        end
+
+        unless method_defined?(:model_class)
+          let(:model_class) do
+            Class.new.tap do |klass|
+              klass.include translations
+            end
+          end
+        end
+
+        unless method_defined?(:instance)
+          let(:instance) { model_class.new }
+        end
+      end
+    end
+  end
+
+  module ActiveRecord
     def include_accessor_examples *args
       it_behaves_like "model with translated attribute accessors", *args
     end
@@ -90,8 +150,6 @@ module Helpers
   end
 
   module Sequel
-    include Backend
-
     def include_accessor_examples *args
       it_behaves_like "model with translated attribute accessors", *args
       it_behaves_like "Sequel model with translated attribute accessors", *args
@@ -112,14 +170,19 @@ module Helpers
     end
   end
 
-  module Plugins
+  module PluginSetup
     include Backend
 
     def self.included(base)
+      base.include Helpers::Translates
       base.extend ClassMethods
+
+      base.include Helpers::Plugins
     end
 
     module ClassMethods
+      DUMMY_NAMES = ["dummy"].freeze
+
       # Define new plugin, register it, then remove after spec is done
       def define_plugins(*names)
         names.each do |name|
@@ -138,35 +201,20 @@ module Helpers
         end
       end
       alias_method :define_plugin, :define_plugins
+
       # Sets up attributes module with a listener to listen on reads/writes to the
       # backend.
-      # Pass block to define plugins in block.
-      def plugin_setup(attribute_name = "title", *other_names, **options, &block)
-        attribute_names = [attribute_name, *other_names]
-        let(:attribute_name) { attribute_name }
+      def plugin_setup(*attribute_names, **kwargs)
+        attribute_names = DUMMY_NAMES if attribute_names.empty?
 
-        let(:attributes_class) do
-          Class.new(TestAttributes).tap do |attrs|
-            attrs.plugins(&block)
-          end
-        end
-
-        let(:model_class) do
-          Class.new.tap do |klass|
-            klass.include attributes
-          end
-        end unless method_defined?(:model_class)
-
-        let(:instance) { model_class.new }
-
-        let(:attributes) do
-          attributes_class.new(*attribute_names, backend: backend_class, **options)
-        end
+        let(:translation_options) { { backend: backend_class, **kwargs } }
 
         let(:listener) { double(:backend) }
         let(:backend_class) { backend_listener(listener) }
-        let(:backend) { instance.mobility_backends[attribute_name] }
+        let(:backend) { instance.mobility_backends[attribute_names.first] }
         attribute_names.each { |name| let(:"#{name}_backend") { instance.send("#{name}_backend") } }
+
+        translates(*attribute_names)
       end
     end
   end

@@ -21,25 +21,6 @@ require 'json'
 require 'mobility'
 require "mobility/backends/null"
 
-# Enable default plugins
-Mobility.configure do |config|
-  config.plugins do
-    backend
-    reader
-    writer
-    query
-    cache
-    dirty
-    fallbacks
-    presence
-    default
-    fallthrough_accessors
-    locale_accessors
-  end
-  config.plugin orm if orm
-  config.plugin :attribute_methods if defined?(ActiveRecord)
-end
-
 I18n.enforce_available_locales = true
 I18n.available_locales = [:en, :'en-US', :ja, :fr, :de, :'de-DE', :cz, :pl, :pt, :'pt-BR']
 I18n.default_locale = :en
@@ -57,8 +38,6 @@ if orm
   DB.extension :pg_json, :pg_hstore if orm == 'sequel' && db == 'postgres'
   # for in-memory sqlite database
   Mobility::Test::Database.auto_migrate
-
-  require "#{orm}/models"
 end
 
 RSpec.configure do |config|
@@ -74,6 +53,16 @@ RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
     mocks.verify_partial_doubles = true
   end
+
+  config.include Helpers::Plugins, type: :plugin
+  config.include Helpers::PluginSetup, type: :plugin
+
+  config.extend Helpers::Backend, type: :backend
+  config.include Helpers::Plugins, type: :backend
+  config.include Helpers::Translates, type: :backend
+
+  config.extend Helpers::ActiveRecord, orm: :active_record
+  config.extend Helpers::Sequel, orm: :sequel
 
   config.before :each do |example|
     if (version = example.metadata[:active_record_geq]) &&
@@ -101,7 +90,4 @@ RSpec.configure do |config|
 
   config.order = "random"
   config.filter_run_excluding orm: lambda { |v| ![*v].include?(orm&.to_sym) || (orm && (v == 'none')) }, db: lambda { |v| ![*v].include?(db.to_sym) }
-end
-
-class TestAttributes < Mobility::Attributes
 end

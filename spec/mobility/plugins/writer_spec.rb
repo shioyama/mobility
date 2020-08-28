@@ -1,12 +1,9 @@
 require "spec_helper"
 require "mobility/plugins/writer"
 
-describe Mobility::Plugins::Writer do
-  include Helpers::Plugins
-
-  plugin_setup do
-    writer
-  end
+describe Mobility::Plugins::Writer, type: :plugin do
+  plugins :writer
+  plugin_setup :title
 
   describe "getters" do
     let(:instance) { model_class.new }
@@ -44,7 +41,7 @@ describe Mobility::Plugins::Writer do
             "set title to #{title}"
           end
         end
-        klass.include attributes, mod
+        klass.include translations, mod
         klass
       end
     end

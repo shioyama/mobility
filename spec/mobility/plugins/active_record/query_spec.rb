@@ -8,30 +8,27 @@ return unless defined?(ActiveRecord)
 #   complex combination of existing backends, which is less precise but should
 #   be sufficient at this stage.
 #
-describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
-  include Helpers::Plugins
+describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record, type: :plugin do
   require "mobility/plugins/active_record/query"
+
+  plugins :active_record, :writer, :query
+  plugin_setup
 
   describe "query scope" do
     let(:model_class) do
       stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.include attributes
+      Article.include translations
       Article
     end
 
     context "default query scope" do
-      plugin_setup do
-        query
-        active_record
-      end
-
       it "defines query scope" do
         expect(model_class.i18n).to eq(model_class.__mobility_query_scope__)
       end
     end
 
     context "custom query scope" do
-      plugin_setup do
+      plugins do
         query :foo
         active_record
       end
@@ -46,10 +43,7 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
   describe "query methods" do
     before do
       stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.class_eval do
-        extend Mobility
-        translates :title, backend: :table
-      end
+      translates Article, :title, backend: :table
     end
 
     it "does not modify original opts hash" do
@@ -65,10 +59,7 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
     # intended for internal use.
     it "creates a __mobility_query_scope__ method" do
       stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.class_eval do
-        extend Mobility
-        translates :title, backend: :table
-      end
+      translates Article, :title, backend: :table
       article = Article.create(title: "foo")
       expect(Article.__mobility_query_scope__.first).to eq(article)
     end
@@ -77,21 +68,16 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
   describe "virtual row handling" do
     before do
       stub_const 'Article', Class.new(ActiveRecord::Base)
-      Article.class_eval do
-        extend Mobility
-        translates :title, backend: :table
-        translates :subtitle, backend: :table
-        translates :content, type: :text, backend: :key_value
-        translates :author, type: :string, backend: :key_value
-        has_many :comments
-      end
+      translates Article, :title, backend: :table
+      translates Article, :subtitle, backend: :table
+      translates Article, :content, type: :text, backend: :key_value
+      translates Article, :author, type: :string, backend: :key_value
+
+      Article.has_many :comments
 
       stub_const 'Comment', Class.new(ActiveRecord::Base)
-      Comment.class_eval do
-        extend Mobility
-        belongs_to :article
-        translates :author, backend: :column
-      end
+      translates Comment, :author, backend: :column
+      Comment.belongs_to :article
     end
 
     # TODO: Test more thoroughly

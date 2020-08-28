@@ -1,4 +1,5 @@
 require "spec_helper"
+require "mobility/backends/key_value"
 
 describe "Mobility::Backends::KeyValue", orm: [:active_record, :sequel] do
   describe "ClassMethods" do

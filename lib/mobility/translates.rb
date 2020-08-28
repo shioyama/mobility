@@ -49,7 +49,7 @@ passed to accessors to configure backend (see example below).
     #   @param [Hash] options
     #   @yield Yields to block with backend as context
     def mobility_accessor(*args, **options, &block)
-      attributes = Mobility.config.attributes_class.new(*args, reader: true, writer: true, **options)
+      attributes = Mobility.config.translations_class.new(*args, reader: true, writer: true, **options)
       attributes.backend.instance_eval(&block) if block_given?
       include attributes
     end
@@ -60,7 +60,7 @@ passed to accessors to configure backend (see example below).
     #   @param [Hash] options
     #   @yield Yields to block with backend as context
     def mobility_reader(*args, **options, &block)
-      attributes = Mobility.config.attributes_class.new(*args, reader: true, writer: false, **options)
+      attributes = Mobility.config.translations_class.new(*args, reader: true, writer: false, **options)
       attributes.backend.instance_eval(&block) if block_given?
       include attributes
     end
@@ -71,7 +71,7 @@ passed to accessors to configure backend (see example below).
     #   @param [Hash] options
     #   @yield Yields to block with backend as context
     def mobility_writer(*args, **options, &block)
-      attributes = Mobility.config.attributes_class.new(*args, reader: false, writer: true, **options)
+      attributes = Mobility.config.translations_class.new(*args, reader: false, writer: true, **options)
       attributes.backend.instance_eval(&block) if block_given?
       include attributes
     end

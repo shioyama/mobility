@@ -9,7 +9,7 @@ describe Mobility::Configuration do
 
   describe "#plugin" do
     it "delegates to attributes_class#plugin" do
-      expect(subject.attributes_class).to receive(:plugin).with(:foo, these: 'params')
+      expect(subject.translations_class).to receive(:plugin).with(:foo, these: 'params')
       subject.plugin :foo, these: 'params'
     end
   end

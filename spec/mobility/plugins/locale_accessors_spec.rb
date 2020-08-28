@@ -1,11 +1,11 @@
 require "spec_helper"
 require "mobility/plugins/locale_accessors"
 
-describe Mobility::Plugins::LocaleAccessors do
-  include Helpers::Plugins
+describe Mobility::Plugins::LocaleAccessors, type: :plugin do
+  plugin_setup :title
 
   context "with option = [locales]" do
-    plugin_setup do
+    plugins do
       locale_accessors [:cz, :de, :'pt-BR']
       reader
       writer
@@ -37,7 +37,7 @@ describe Mobility::Plugins::LocaleAccessors do
   end
 
   context "with default option" do
-    plugin_setup do
+    plugins do
       locale_accessors
     end
 
@@ -67,8 +67,7 @@ describe Mobility::Plugins::LocaleAccessors do
               spy_.title_en = value
             end
           end
-          klass.include mod
-          klass.include attributes
+          klass.include translations, mod
         end
       end
 
@@ -90,7 +89,7 @@ describe Mobility::Plugins::LocaleAccessors do
   end
 
   context "with falsey option" do
-    plugin_setup do
+    plugins do
       locale_accessors false
     end
 

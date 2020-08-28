@@ -1,12 +1,9 @@
 require "spec_helper"
 require "mobility/plugins/writer"
 
-describe Mobility::Plugins::Backend do
-  include Helpers::Plugins
-
-  plugin_setup do
-    backend
-  end
+describe Mobility::Plugins::Backend, type: :plugin do
+  plugins :backend
+  plugin_setup
 
   # Override default helper-defined model_class which has attributes module
   # pre-included, so we can explicitly include it in specs.
@@ -15,25 +12,25 @@ describe Mobility::Plugins::Backend do
   describe "#included" do
     it "calls build_subclass on backend class with options merged with default options" do
       expect(backend_class).to receive(:build_subclass).with(model_class, hash_including(foo: "bar")).and_return(Class.new(backend_class))
-      attributes = attributes_class.new("title", backend: backend_class, foo: "bar")
-      model_class.include attributes
+      translations = translations_class.new("title", backend: backend_class, foo: "bar")
+      model_class.include translations
     end
 
     it "assigns options to backend class" do
-      attributes = attributes_class.new("title", backend: backend_class, foo: "bar")
-      model_class.include attributes
-      expect(attributes.backend_class.options).to eq(backend: backend_class, foo: "bar")
+      translations = translations_class.new("title", backend: backend_class, foo: "bar")
+      model_class.include translations
+      expect(translations.backend_class.options).to eq(backend: backend_class, foo: "bar")
     end
 
     it "freezes backend options after inclusion into model class" do
-      attributes = attributes_class.new("title", backend: backend_class)
-      model_class.include attributes
+      translations = translations_class.new("title", backend: backend_class)
+      model_class.include translations
       expect(backend_class.options).to be_frozen
     end
 
     it "calls setup_model on backend class with model_class and attributes" do
       expect(backend_class).to receive(:setup_model).with(model_class, ["title"])
-      model_class.include attributes_class.new("title", backend: backend_class)
+      model_class.include translations_class.new("title", backend: backend_class)
     end
 
     describe ".mobility_backend_class" do
@@ -43,8 +40,8 @@ describe Mobility::Plugins::Backend do
         backend_class2 = Class.new
         backend_class2.include(Mobility::Backend)
 
-        mod1 = attributes_class.new("title", "content", backend: backend_class1)
-        mod2 = attributes_class.new("subtitle", backend: backend_class2)
+        mod1 = translations_class.new("title", "content", backend: backend_class1)
+        mod2 = translations_class.new("subtitle", backend: backend_class2)
 
         model_class.include mod1
         model_class.include mod2
@@ -58,12 +55,12 @@ describe Mobility::Plugins::Backend do
         backend_class1 = Class.new
         backend_class1.include(Mobility::Backend)
 
-        mod = attributes_class.new("title", backend: :null)
+        mod = translations_class.new("title", backend: :null)
         model_class.include mod
 
         expect(model_class.mobility_backend_class("title")).to eq(mod.backend_class)
 
-        other_mod = attributes_class.new("content", backend: :null)
+        other_mod = translations_class.new("content", backend: :null)
         model_class.include other_mod
 
         expect(model_class.mobility_backend_class("content")).to eq(other_mod.backend_class)
@@ -73,14 +70,14 @@ describe Mobility::Plugins::Backend do
         backend_class_1 = Class.new
         backend_class_1.include Mobility::Backend
 
-        mod1 = attributes_class.new("title", backend: backend_class_1)
+        mod1 = translations_class.new("title", backend: backend_class_1)
         model_class.include mod1
 
         backend_class_2 = Class.new
         backend_class_2.include Mobility::Backend
 
         model_subclass = Class.new(model_class)
-        mod2 = attributes_class.new("content", backend: backend_class_2)
+        mod2 = translations_class.new("content", backend: backend_class_2)
 
         model_subclass.include mod2
 
@@ -100,8 +97,8 @@ describe Mobility::Plugins::Backend do
 
     describe "#mobility_backends" do
       it "returns instance of backend for attribute" do
-        mod1 = attributes_class.new("title", backend: :null)
-        mod2 = attributes_class.new("content", backend: :null, foo: :bar)
+        mod1 = translations_class.new("title", backend: :null)
+        mod2 = translations_class.new("content", backend: :null, foo: :bar)
         model_class.include mod1
         model_class.include mod2
         instance1 = model_class.new
@@ -127,7 +124,7 @@ describe Mobility::Plugins::Backend do
       end
 
       it "maps string keys to symbol key values" do
-        mod = attributes_class.new("title", backend: :null)
+        mod = translations_class.new("title", backend: :null)
         model_class.include mod
 
         article = model_class.new
@@ -141,7 +138,7 @@ describe Mobility::Plugins::Backend do
       end
 
       it "resets when model is duplicated" do
-        mod = attributes_class.new("title", backend: :null)
+        mod = translations_class.new("title", backend: :null)
         model_class.include mod
 
         article = model_class.new
@@ -154,7 +151,7 @@ describe Mobility::Plugins::Backend do
   end
 
   describe "defining attribute backend on model" do
-    before { model_class.include attributes_class.new("title", backend: backend_class, foo: "bar") }
+    before { model_class.include translations_class.new("title", backend: backend_class, foo: "bar") }
 
     it "defines <attribute_name>_backend method which returns backend instance" do
       expect(backend_class).to receive(:new).once.with(instance, "title").and_call_original
@@ -169,15 +166,15 @@ describe Mobility::Plugins::Backend do
 
   describe "#backend" do
     it "returns backend name" do
-      attributes = attributes_class.new("title", "content", backend: :null)
-      expect(attributes.backend).to eq(:null)
+      translations = translations_class.new("title", "content", backend: :null)
+      expect(translations.backend).to eq(:null)
     end
   end
 
   describe "#inspect" do
     it "includes backend name and attribute names" do
-      attributes = attributes_class.new("title", "content", backend: :null)
-      expect(attributes.inspect).to eq("#<Attributes (null) @names=title, content>")
+      translations = translations_class.new("title", "content", backend: :null)
+      expect(translations.inspect).to eq("#<Attributes (null) @names=title, content>")
     end
   end
 
@@ -189,58 +186,58 @@ describe Mobility::Plugins::Backend do
     after { Mobility::Backends.instance_variable_get(:@backends).delete(:foo) }
 
     describe "default without backend options" do
-      plugin_setup do
+      plugins do
         backend :foo
       end
 
       it "shows backend name in inspect string" do
-        expect(attributes_class.new("title").inspect).to eq("#<Attributes (foo) @names=title>")
+        expect(translations_class.new("title").inspect).to eq("#<Attributes (foo) @names=title>")
       end
 
       it "calls setup_model on backend" do
         expect(FooBackend).to receive(:setup_model).with(model_class, ["title"])
-        model_class.include attributes_class.new("title")
+        model_class.include translations_class.new("title")
       end
     end
 
     describe "default with backend options" do
-      plugin_setup do
+      plugins do
         backend :foo, association_name: :bar
       end
 
       it "assigns backend name correctly" do
-        expect(attributes_class.new("title").backend).to eq(:foo)
+        expect(translations_class.new("title").backend).to eq(:foo)
       end
 
       it "passes backend options to backend" do
-        attributes = attributes_class.new("title")
+        translations = translations_class.new("title")
         expect(FooBackend).to receive(:configure).with(hash_including(association_name: :bar))
-        model_class.include(attributes)
+        model_class.include(translations)
       end
 
       it "passes module options if backend_options passed explicitly to initializer" do
-        attributes = attributes_class.new("title", backend: [:foo, { association_name: :baz }])
+        translations = translations_class.new("title", backend: [:foo, { association_name: :baz }])
         expect(FooBackend).to receive(:configure).with(hash_including(association_name: :baz))
-        model_class.include(attributes)
+        model_class.include(translations)
       end
 
       it "passes module options if backend options passed implicitly to initializer" do
-        attributes = attributes_class.new("title", backend: :foo, association_name: :baz)
+        translations = translations_class.new("title", backend: :foo, association_name: :baz)
         expect(FooBackend).to receive(:configure).with(hash_including(association_name: :baz))
-        model_class.include(attributes)
+        model_class.include(translations)
       end
 
       it "overrides backend option from options passed to initializer even when backend: key is missing" do
-        attributes = attributes_class.new("title", association_name: :baz)
+        translations = translations_class.new("title", association_name: :baz)
         expect(FooBackend).to receive(:configure).with(hash_including(association_name: :baz))
-        model_class.include(attributes)
+        model_class.include(translations)
       end
 
       it "does not override original backend options hash" do
         backend_options = { association_name: :foo }
         expect {
-          attributes = attributes_class.new("title", backend: [:foo, backend_options])
-          model_class.include(attributes)
+          translations = translations_class.new("title", backend: [:foo, backend_options])
+          model_class.include(translations)
         }.not_to change { backend_options }
       end
     end

@@ -1,12 +1,9 @@
 require "spec_helper"
 require "mobility/plugins/reader"
 
-describe Mobility::Plugins::Reader do
-  include Helpers::Plugins
-
-  plugin_setup do
-    reader
-  end
+describe Mobility::Plugins::Reader, type: :plugin do
+  plugins :reader
+  plugin_setup :title
 
   describe "getters" do
     let(:instance) { model_class.new }
@@ -59,7 +56,7 @@ describe Mobility::Plugins::Reader do
             "title?"
           end
         end
-        klass.include attributes, mod
+        klass.include translations, mod
         klass
       end
     end

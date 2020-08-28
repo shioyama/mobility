@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'mobility/plugins/backend'
 
 describe Mobility::Backend do
   context "included in backend" do

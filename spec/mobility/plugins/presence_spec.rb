@@ -1,13 +1,11 @@
 require "spec_helper"
 require "mobility/plugins/presence"
 
-describe Mobility::Plugins::Presence do
-  include Helpers::Plugins
+describe Mobility::Plugins::Presence, type: :plugin do
+  plugin_setup
 
   context "default option value" do
-    plugin_setup do
-      presence
-    end
+    plugins :presence
 
     describe "#read" do
       it "passes through present values unchanged" do
@@ -79,7 +77,7 @@ describe Mobility::Plugins::Presence do
   end
 
   context "option = false" do
-    plugin_setup do
+    plugins do
       presence false
     end
 

@@ -63,8 +63,9 @@ shared_examples_for "dupable model"  do |model_class_name, attribute=:title|
   end
 
   def skip_if_duping_not_implemented
-    if ENV['ORM'] == 'sequel' && described_class < Mobility::Backends::KeyValue
-      skip "Duping has not been properly implemented"
+    if ENV['ORM'] == 'sequel'
+      require "mobility/backends/key_value"
+      skip "Duping has not been properly implemented" if described_class < Mobility::Backends::KeyValue
     end
   end
 end

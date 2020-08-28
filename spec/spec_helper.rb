@@ -84,6 +84,10 @@ RSpec.configure do |config|
     # Always clear I18n.fallbacks to avoid "leakage" between specs
     reset_i18n_fallbacks
     Mobility.locale = :en
+
+    if defined?(ActiveSupport)
+      ActiveSupport::Dependencies::Reference.clear!
+    end
   end
 
   if orm

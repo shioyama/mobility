@@ -5,7 +5,11 @@ describe Mobility::Plugins::LocaleAccessors do
   include Helpers::Plugins
 
   context "with option = [locales]" do
-    plugin_setup locale_accessors: [:cz, :de, :'pt-BR'], reader: true, writer: true
+    plugin_setup do
+      locale_accessors [:cz, :de, :'pt-BR']
+      reader
+      writer
+    end
 
     it_behaves_like "locale accessor", :title, :cz
     it_behaves_like "locale accessor", :title, :de
@@ -86,7 +90,9 @@ describe Mobility::Plugins::LocaleAccessors do
   end
 
   context "with falsey option" do
-    plugin_setup locale_accesors: false
+    plugin_setup do
+      locale_accessors false
+    end
 
     it "does not locale accessors for any locales" do
       methods = model_class.instance_methods

@@ -20,7 +20,10 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
     end
 
     context "default query scope" do
-      plugin_setup query: true, active_record: true
+      plugin_setup do
+        query
+        active_record
+      end
 
       it "defines query scope" do
         expect(model_class.i18n).to eq(model_class.__mobility_query_scope__)
@@ -28,7 +31,10 @@ describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record do
     end
 
     context "custom query scope" do
-      plugin_setup query: :foo, active_record: true
+      plugin_setup do
+        query :foo
+        active_record
+      end
 
       it "defines query scope" do
         expect(model_class.foo).to eq(model_class.__mobility_query_scope__)

@@ -15,7 +15,10 @@ describe Mobility::Plugins::Dirty do
   end
 
   context "fallthrough accessors is falsey" do
-    plugin_setup dirty: true, fallthrough_accessors: false
+    plugin_setup do
+      dirty true
+      fallthrough_accessors false
+    end
 
     it "emits warning" do
       expect { instance }.to output(

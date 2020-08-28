@@ -79,7 +79,9 @@ describe Mobility::Plugins::Presence do
   end
 
   context "option = false" do
-    plugin_setup presence: false
+    plugin_setup do
+      presence false
+    end
 
     describe "#read" do
       it "does not convert blank strings to nil" do

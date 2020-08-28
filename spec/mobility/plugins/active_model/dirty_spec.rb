@@ -6,7 +6,12 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   require "mobility/plugins/active_model/dirty"
 
   include Helpers::Plugins
-  plugin_setup active_model: true, dirty: true, reader: true, writer: true
+  plugin_setup do
+    active_model
+    dirty true
+    reader
+    writer
+  end
 
   it "raises TypeError unless class is a subclass of ActiveModel::Dirty" do
     klass = Class.new
@@ -343,7 +348,13 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   end
 
   describe "fallbacks compatiblity" do
-    plugin_setup active_model: true, dirty: true, fallbacks: { en: 'ja' }, reader: true, writer: true
+    plugin_setup do
+      active_model
+      dirty true
+      fallbacks({ en: 'ja' })
+      reader
+      writer
+    end
 
     let(:model_class) do
       stub_const 'ArticleWithFallbacks', Class.new

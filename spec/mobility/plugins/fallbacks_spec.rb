@@ -5,7 +5,9 @@ describe Mobility::Plugins::Fallbacks do
   include Helpers::Plugins
 
   context "fallbacks is a hash" do
-    plugin_setup fallbacks: { :'en-US' => 'de-DE', :pt => 'de-DE' }
+    plugin_setup do
+      fallbacks({ :'en-US' => 'de-DE', :pt => 'de-DE' })
+    end
 
     it "returns value when value is not nil" do
       allow(listener).to receive(:read).once.with(:ja, any_args).and_return("ja val")
@@ -74,7 +76,9 @@ describe Mobility::Plugins::Fallbacks do
 
   if ENV['FEATURE'] == 'i18n_fallbacks'
     context "fallbacks is true" do
-      plugin_setup fallbacks: true
+      plugin_setup do
+        fallbacks true
+      end
 
       it "uses default fallbacks" do
         i18n_fallbacks = I18n.fallbacks

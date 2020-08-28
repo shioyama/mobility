@@ -2,7 +2,10 @@ require "spec_helper"
 
 describe "Mobility::Plugins::ActiveRecord::Cache", orm: :active_record do
   include Helpers::Plugins
-  plugin_setup active_record: true, cache: true
+  plugin_setup do
+    active_record
+    cache
+  end
 
   let(:model_class) do
     klass = Class.new(ActiveRecord::Base)

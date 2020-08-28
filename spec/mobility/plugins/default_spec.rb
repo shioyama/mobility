@@ -5,7 +5,9 @@ describe Mobility::Plugins::Default do
   include Helpers::Plugins
 
   context "option = 'foo'" do
-    plugin_setup default: 'default foo'
+    plugin_setup do
+      default 'default foo'
+    end
 
     describe "#read" do
       it "returns value if not nil" do
@@ -41,7 +43,9 @@ describe Mobility::Plugins::Default do
   end
 
   context "default is a Proc" do
-    plugin_setup default: Proc.new { |attribute, locale, options| "#{attribute} in #{locale} with #{options[:this]}" }
+    plugin_setup do
+      default Proc.new { |attribute, locale, options| "#{attribute} in #{locale} with #{options[:this]}" }
+    end
 
     it "calls default with model and attribute as args if default is a Proc" do
       expect(listener).to receive(:read).once.with(:fr, this: 'option').and_return(nil)

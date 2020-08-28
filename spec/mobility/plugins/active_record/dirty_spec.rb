@@ -4,7 +4,12 @@ return unless defined?(ActiveRecord)
 
 describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   include Helpers::Plugins
-  plugin_setup "title", dirty: true, active_record: true, reader: true, writer: true
+  plugin_setup "title" do
+    dirty true
+    active_record
+    reader
+    writer
+  end
 
   let(:model_class) do
     stub_const 'Article', Class.new(ActiveRecord::Base)

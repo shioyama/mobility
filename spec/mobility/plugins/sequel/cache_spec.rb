@@ -2,7 +2,10 @@ require "spec_helper"
 
 describe "Mobility::Plugins::Sequel::Cache", orm: :sequel do
   include Helpers::Plugins
-  plugin_setup sequel: true, cache: true
+  plugin_setup do
+    sequel
+    cache
+  end
 
   let(:model_class) do
     stub_const 'Article', Class.new(Sequel::Model)

@@ -4,7 +4,12 @@ return unless defined?(Sequel)
 
 describe "Mobility::Plugins::Sequel::Dirty", orm: :sequel do
   include Helpers::Plugins
-  plugin_setup "title", dirty: true, sequel: true, reader: true, writer: true
+  plugin_setup "title" do
+    dirty true
+    sequel
+    reader
+    writer
+  end
 
   let(:model_class) do
     stub_const 'Article', Class.new(Sequel::Model)

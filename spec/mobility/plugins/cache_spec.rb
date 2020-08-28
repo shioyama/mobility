@@ -100,7 +100,10 @@ describe Mobility::Plugins::Cache do
 
     context "ActiveRecord model", orm: :active_record do
       context "with one backend" do
-        plugin_setup cache: true, active_record: true
+        plugin_setup do
+          cache
+          active_record
+        end
 
         let(:model_class) do
           stub_const 'Article', Class.new(ActiveRecord::Base)
@@ -132,7 +135,10 @@ describe Mobility::Plugins::Cache do
       end
 
       context "with multiple backends" do
-        plugin_setup "title", cache: true, active_record: true
+        plugin_setup "title" do
+          cache
+          active_record
+        end
 
         let(:instance) { model_class.create }
         let(:content_listener) { double(:backend) }
@@ -150,7 +156,10 @@ describe Mobility::Plugins::Cache do
 
     context "Sequel model", orm: :sequel do
       context "with one backend" do
-        plugin_setup "title", cache: true, sequel: true
+        plugin_setup "title" do
+          cache
+          sequel
+        end
         let(:instance) { model_class.create }
         let(:model_class) do
           stub_const 'Article', Class.new(Sequel::Model)
@@ -163,7 +172,10 @@ describe Mobility::Plugins::Cache do
       end
 
       context "with multiple backends" do
-        plugin_setup "title", cache: true, sequel: true
+        plugin_setup "title" do
+          cache
+          sequel
+        end
 
         let(:instance) { model_class.create }
         let(:content_listener) { double(:backend) }

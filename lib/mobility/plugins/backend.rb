@@ -40,6 +40,8 @@ Defines:
         when Array
           @backend_name, @backend_options = options[:backend]
           @backend_options = @backend_options.merge(original_options)
+        when NilClass
+          @backend_name = @backend_options = nil
         else
           raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
         end
@@ -51,12 +53,12 @@ Defines:
       def included(klass)
         super
 
+        klass.include InstanceMethods
+        klass.extend ClassMethods
+
         if backend_name
           @backend_class = load_backend(backend_name).
             build_subclass(klass, backend_options)
-
-          klass.include InstanceMethods
-          klass.extend ClassMethods
 
           backend_class.setup_model(klass, names)
 

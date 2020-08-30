@@ -167,7 +167,7 @@ describe Mobility::Plugins::Backend do
     end
   end
 
-  describe "#backend_name" do
+  describe "#backend" do
     it "returns backend name" do
       attributes = attributes_class.new("title", "content", backend: :null)
       expect(attributes.backend).to eq(:null)

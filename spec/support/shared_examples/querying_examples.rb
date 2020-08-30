@@ -1,5 +1,5 @@
 shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:title, a2=:content|
-  let(:backend_name) { model_class.ancestors.grep(Mobility::Attributes).first.backend_name }
+  let(:backend) { model_class.ancestors.grep(Mobility::Attributes).first.backend }
   let(:model_class) { model_class_name.constantize }
   let(:query_scope) { model_class.i18n }
   let(:ordered_results) { query_scope.order("#{model_class.table_name}.id asc") }
@@ -271,7 +271,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
     end
 
     it "orders records correctly with 2-key hash argument" do
-      skip "Not supported by #{backend_name}" if [:table, :key_value].include?(backend_name)
+      skip "Not supported by #{backend}" if [:table, :key_value].include?(backend)
 
       added = model_class.create(a1 => "foo2", a2 => "foo2")
       expect(query_scope.order(a1 => :desc, a2 => :asc)).to eq([i[3], i[1], added, i[2], i[0]])
@@ -630,7 +630,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
   let(:model_class) { constantize(model_class_name) }
   let(:table_name) { model_class.table_name }
   let(:query_scope) { model_class.i18n }
-  let(:backend_name) { model_class.ancestors.grep(Mobility::Attributes).first.backend_name }
+  let(:backend) { model_class.ancestors.grep(Mobility::Attributes).first.backend }
 
   describe ".where" do
     context "querying on one translated attribute" do
@@ -820,7 +820,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
       # result which satisfies the second (or) condition. This is impossible to
       # avoid without modification of an earlier dataset, which is probably not
       # a good idea.
-      skip "Not supported by #{backend_name}" if [:table, :key_value].include?(backend_name)
+      skip "Not supported by #{backend}" if [:table, :key_value].include?(backend)
       expect(query_scope.where(a1 => "foo").or(:published => false, a2 => "foo content").select_all(table_name).all).to match_array([@instance2, @instance3])
     end
   end

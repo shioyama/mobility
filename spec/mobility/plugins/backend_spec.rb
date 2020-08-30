@@ -170,7 +170,7 @@ describe Mobility::Plugins::Backend do
   describe "#backend_name" do
     it "returns backend name" do
       attributes = attributes_class.new("title", "content", backend: :null)
-      expect(attributes.backend_name).to eq(:null)
+      expect(attributes.backend).to eq(:null)
     end
   end
 
@@ -209,7 +209,7 @@ describe Mobility::Plugins::Backend do
       end
 
       it "assigns backend name correctly" do
-        expect(attributes_class.new("title").backend_name).to eq(:foo)
+        expect(attributes_class.new("title").backend).to eq(:foo)
       end
 
       it "passes backend options to backend" do

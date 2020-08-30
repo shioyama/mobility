@@ -22,9 +22,9 @@ Defines:
       # @return [Class] Backend class
       attr_reader :backend_class
 
-      # Name of backend
-      # @return [Symbol,Class] Name of backend, or backend class
-      attr_reader :backend_name
+      # Backend
+      # @return [Symbol,Class,Class] Name of backend, or backend class
+      attr_reader :backend
 
       # Backend options
       # @return [Hash] Options for backend
@@ -35,13 +35,13 @@ Defines:
         return unless Plugins::Backend.dependencies_satisfied?(self.class)
 
         case options[:backend]
-        when String, Symbol, Module
-          @backend_name, @backend_options = options[:backend], options
+        when String, Symbol, Class
+          @backend, @backend_options = options[:backend], options
         when Array
-          @backend_name, @backend_options = options[:backend]
+          @backend, @backend_options = options[:backend]
           @backend_options = @backend_options.merge(original_options)
         when NilClass
-          @backend_name = @backend_options = nil
+          @backend = @backend_options = nil
         else
           raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
         end
@@ -56,8 +56,8 @@ Defines:
         klass.include InstanceMethods
         klass.extend ClassMethods
 
-        if backend_name
-          @backend_class = load_backend(backend_name).
+        if backend
+          @backend_class = load_backend(backend).
             build_subclass(klass, backend_options)
 
           backend_class.setup_model(klass, names)
@@ -73,7 +73,7 @@ Defines:
       # Include backend name in inspect string.
       # @return [String]
       def inspect
-        "#<Attributes (#{backend_name}) @names=#{names.join(", ")}>"
+        "#<Attributes (#{backend}) @names=#{names.join(", ")}>"
       end
 
       def load_backend(backend)

@@ -102,6 +102,12 @@ end
 To use a different default backend, set `default_backend` to another value (see
 possibilities [below](#backends)).
 
+If you choose `key_value` as `default_backend`, and **MySQL / MariaDB** is your
+database. Then, index-key-length problem (see
+[MySQL#innodb-limits](https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html),
+[mariadb#page-sizes](https://mariadb.com/kb/en/innodb-limitations/#page-sizes))
+might bother you (see discussion [github-mobility#issue-276642771](https://github.com/shioyama/mobility/issues/110#issue-276642771)).
+
 You will likely also want to set default values for the various translation
 options described below. You can set these defaults by assigning values to keys
 on the `config.default_options` hash. Below, we turn on the Dirty plugin by

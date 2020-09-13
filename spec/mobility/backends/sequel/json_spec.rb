@@ -1,6 +1,6 @@
 require "spec_helper"
 
-return unless defined?(Sequel) && defined?(Pg)
+return unless defined?(Sequel) && defined?(PG)
 
 describe "Mobility::Backends::Sequel::Json", orm: :sequel, db: :postgres do
   require "mobility/backends/sequel/json"

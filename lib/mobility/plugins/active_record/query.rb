@@ -24,6 +24,8 @@ enabled for any one attribute on the model.
         included_hook do |klass, backend_class|
           plugin = self
           if options[:query]
+            raise MissingBackend, "backend required for Query plugin" unless backend_class
+
             klass.class_eval do
               extend QueryMethod
               extend FindByMethods.new(*plugin.names)
@@ -273,6 +275,8 @@ enabled for any one attribute on the model.
 
         private_constant :QueryExtension, :FindByMethods
       end
+
+      class MissingBackend < Mobility::Error; end
     end
 
     register_plugin(:active_record_query, ActiveRecord::Query)

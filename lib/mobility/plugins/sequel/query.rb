@@ -15,6 +15,8 @@ See ActiveRecord::Query plugin.
         included_hook do |klass, _|
           plugin = self
           if options[:query]
+            raise MissingBackend, "backend required for Query plugin" unless backend_class
+
             klass.class_eval do
               extend QueryMethod
               singleton_class.send :alias_method, plugin.query_method, :__mobility_query_dataset__
@@ -144,6 +146,8 @@ See ActiveRecord::Query plugin.
           end
         end
       end
+
+      class MissingBackend < Mobility::Error; end
     end
 
     register_plugin(:sequel_query, Sequel::Query)

@@ -102,7 +102,7 @@ end
 To use a different default backend, set `default_backend` to another value (see
 possibilities [below](#backends)).
 
-If you choose `key_value` as `default_backend`, and **MySQL / MariaDB** is your
+If you use `key_value` as your backend, and **MySQL / MariaDB** is your
 database. Then, index-key-length problem (see
 [MySQL#innodb-limits](https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html),
 [mariadb#page-sizes](https://mariadb.com/kb/en/innodb-limitations/#page-sizes))

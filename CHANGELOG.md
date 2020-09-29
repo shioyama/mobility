@@ -16,6 +16,8 @@
   than on options hash ([#429](https://github.com/shioyama/mobility/pull/429))
 - Remove `Mobility.new_fallbacks` and `Configuration#fallbacks_generator`
   ([#433](https://github.com/shioyama/mobility/pull/433))
+- Rename `backend_name` to `backend`
+  ([#443](https://github.com/shioyama/mobility/pull/443))
 
 ## 0.8
 

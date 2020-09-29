@@ -13,14 +13,6 @@ module Mobility
             DateTime    :updated_at, allow_null: false
           end
 
-          DB.create_table? :post_metadatas do
-            primary_key :id
-            String      :metadata
-            Integer     :post_id,    allow_null: false
-            DateTime    :created_at, allow_null: false
-            DateTime    :updated_at, allow_null: false
-          end
-
           DB.create_table? :articles do
             primary_key :id
             String      :slug

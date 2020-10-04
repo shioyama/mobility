@@ -32,7 +32,7 @@ module Helpers
       while this_metadata do
         candidate = this_metadata[:description_args].first
         begin
-          return candidate.constantize if String === candidate
+          return Object.const_get(candidate) if String === candidate
         rescue NameError, NoMethodError
         end
         this_metadata = this_metadata[:parent_example_group]

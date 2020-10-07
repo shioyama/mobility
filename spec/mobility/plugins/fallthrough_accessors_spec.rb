@@ -33,6 +33,22 @@ describe Mobility::Plugins::FallthroughAccessors do
       options = { some: 'params' }
       expect(instance.foo(**options)).to eq(options)
     end
+
+    it 'does not pass on empty keyword options hash to super' do
+      mod = Module.new do
+        def method_missing(method_name, *args, &block)
+          method_name == :bar ? args : super
+        end
+      end
+
+      klass = Class.new
+      klass.include mod
+      klass.include described_class.new
+
+      instance = klass.new
+
+      expect(instance.bar).to eq([])
+    end
   end
 
   describe ".apply" do

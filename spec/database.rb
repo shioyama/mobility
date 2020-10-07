@@ -1,3 +1,5 @@
+require 'erb'
+
 module Mobility
   module Test
     class Database
@@ -13,8 +15,11 @@ module Mobility
           when 'sequel'
             adapter = config[driver]['adapter'].gsub(/^sqlite3$/,'sqlite')
             user = config[driver]['username']
+            password = config[driver]['password']
             database = config[driver]['database']
-            ::Sequel.connect(adapter: adapter, database: database, username: user)
+            port = config[driver]['port']
+            host = config[driver]['host']
+            ::Sequel.connect(adapter: adapter, database: database, username: user, password: password, port: port, host: host)
           end
         end
 
@@ -23,7 +28,11 @@ module Mobility
         end
 
         def config
-          @config ||= YAML::load(File.open(File.expand_path("../databases.yml", __FILE__)))
+          @config ||=
+            begin
+              erb = ERB.new(File.read(File.expand_path("../databases.yml", __FILE__)))
+              YAML::load(erb.result)
+            end
         end
 
         def driver

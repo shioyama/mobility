@@ -2,10 +2,17 @@
 
 ## 0.8
 
-### 0.8.12 (May 15, 2020)
+### 0.8.13 (May 27, 2020)
+
 * Fix fallthrough accessor method_missing not passing all options to super
-  ([#364](https://github.com/shioyama/mobility/pull/364), thanks
+  ([#364](https://github.com/shioyama/mobility/pull/364),
+  [#384](https://github.com/shioyama/mobility/pull/384),
+  [#377](https://github.com/shioyama/mobility/pull/377), thanks
   [doits](https://github.com/doits)!)
+
+### 0.8.12 (May 15, 2020)
+
+(yanked)
 
 ### 0.8.11 (May 14, 2020)
 * Handle select with block

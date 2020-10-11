@@ -22,6 +22,7 @@
   ([#443](https://github.com/shioyama/mobility/pull/443))
 - Remove `Configuration#accessor_method`
   ([#450](https://github.com/shioyama/mobility/pull/450))
+- Rename `Mobility::Attributes` to `Mobility::Translations`
 
 ## 0.8
 

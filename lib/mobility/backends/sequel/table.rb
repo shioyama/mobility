@@ -2,6 +2,7 @@
 require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/table"
+require "mobility/sequel/column_changes"
 require "mobility/sequel/model_translation"
 require "mobility/sequel/sql"
 

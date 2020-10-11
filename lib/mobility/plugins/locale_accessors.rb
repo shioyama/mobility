@@ -23,7 +23,7 @@ available locales for a Rails application) will be used by default.
       requires :writer
 
       # Apply locale accessors plugin to attributes.
-      # @param [Attributes] attributes
+      # @param [Translations] translations
       # @param [Boolean] option
       initialize_hook do |*names|
         if locales = options[:locale_accessors]

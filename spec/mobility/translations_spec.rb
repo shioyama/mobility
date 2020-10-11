@@ -1,11 +1,11 @@
 require "spec_helper"
 
-describe Mobility::Attributes, orm: 'none' do
+describe Mobility::Translations, orm: 'none' do
   include Helpers::Backend
   before { stub_const 'Article', Class.new }
 
   # In order to be able to stub methods on backend instance methods, which will be
-  # hidden when the backend class is subclassed in Attributes, we inject a double
+  # hidden when the backend class is subclassed in Translations, we inject a double
   # and delegate read and write to the double. (Nice trick, eh?)
   #
   let(:listener) { double("backend") }
@@ -17,7 +17,7 @@ describe Mobility::Attributes, orm: 'none' do
   # for many specs in this suite.
   let(:clean_options) { { cache: false, fallbacks: false } }
 
-  describe "including Attributes in a model" do
+  describe "including Translations in a model" do
     describe "model class methods" do
       describe ".mobility_attributes" do
         it "returns attribute names" do
@@ -59,7 +59,7 @@ describe Mobility::Attributes, orm: 'none' do
   describe "#inspect" do
     it "returns attribute names" do
       attributes = described_class.new("title", "content")
-      expect(attributes.inspect).to eq("#<Attributes @names=title, content>")
+      expect(attributes.inspect).to eq("#<Translations @names=title, content>")
     end
   end
 end

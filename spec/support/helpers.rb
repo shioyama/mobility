@@ -85,7 +85,7 @@ module Helpers
           end
         end
         let(:translations_class) do
-          Class.new(Mobility::Attributes).tap do |attrs|
+          Class.new(Mobility::Translations).tap do |attrs|
             attrs.plugins(&plugins_block)
           end
         end

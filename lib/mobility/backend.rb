@@ -47,7 +47,7 @@ On top of this, a backend will normally:
     end
   end
 
-@see Mobility::Attributes
+@see Mobility::Translations
 
 =end
 

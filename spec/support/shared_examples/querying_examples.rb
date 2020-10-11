@@ -1,5 +1,5 @@
 shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:title, a2=:content|
-  let(:backend) { model_class.ancestors.grep(Mobility::Attributes).first.backend }
+  let(:backend) { model_class.ancestors.grep(Mobility::Translations).first.backend }
   let(:model_class) { model_class_name.constantize }
   let(:query_scope) { model_class.i18n }
   let(:ordered_results) { query_scope.order("#{model_class.table_name}.id asc") }
@@ -630,7 +630,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
   let(:model_class) { constantize(model_class_name) }
   let(:table_name) { model_class.table_name }
   let(:query_scope) { model_class.i18n }
-  let(:backend) { model_class.ancestors.grep(Mobility::Attributes).first.backend }
+  let(:backend) { model_class.ancestors.grep(Mobility::Translations).first.backend }
 
   describe ".where" do
     context "querying on one translated attribute" do

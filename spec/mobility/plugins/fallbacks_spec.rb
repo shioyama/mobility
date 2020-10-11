@@ -128,7 +128,7 @@ describe Mobility::Plugins::Fallbacks, type: :plugin do
 
   # We've taken away the ability to customize the fallbacks generator from
   # configuration, but it is still possible by overriding a private method on
-  # the Attributes class.
+  # the Translations class.
   describe "overriding fallbacks generator" do
     plugins do
       fallbacks

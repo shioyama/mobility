@@ -18,7 +18,7 @@ describe Mobility, orm: 'none' do
 
     context "with translated attributes" do
       it "includes backend module into model class" do
-        expect(described_class::Attributes).to receive(:new).
+        expect(described_class::Translations).to receive(:new).
           with(:title, reader: true, writer: true, backend: :null, foo: :bar).
           and_call_original
         model.extend described_class

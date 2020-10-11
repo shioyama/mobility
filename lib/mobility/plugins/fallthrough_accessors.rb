@@ -28,7 +28,7 @@ model class is generated.
       requires :writer
 
       # Apply fallthrough accessors plugin to attributes.
-      # @param [Attributes] attributes
+      # @param [Translations] translations
       # @param [Boolean] option
       initialize_hook do
         if options[:fallthrough_accessors] && options[:reader] && options[:writer]

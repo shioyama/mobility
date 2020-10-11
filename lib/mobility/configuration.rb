@@ -26,7 +26,7 @@ Stores shared Mobility configuration referenced by all backends.
     end
 
     def translations_class
-      @translations_class ||= Class.new(Attributes)
+      @translations_class ||= Class.new(Translations)
     end
   end
 end

@@ -28,7 +28,7 @@ module Mobility
   require "mobility/configuration"
   require "mobility/plugin"
   require "mobility/plugins"
-  require "mobility/attributes"
+  require "mobility/translations"
 
   # General error for version compatibility conflicts
   class VersionNotSupportedError < ArgumentError; end

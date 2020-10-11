@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mobility::Attributes, orm: 'none' do
+describe Mobility::Translations, orm: 'none' do
   describe "initializing" do
     specify {
       expect { described_class.new(backend: :null) }.to allocate_under(25).objects

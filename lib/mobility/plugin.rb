@@ -36,15 +36,15 @@ Also includes a +configure+ class method to apply plugins to a pluggable
   end
 
 @example Configure an attributes class with plugins
-  class TranslatedAttributes < Mobility::Attributes
+  class Translations < Mobility::Translations
   end
 
-  Mobility::Plugin.configure(TranslatedAttributes) do
+  Mobility::Plugin.configure(Translations) do
     cache
     fallbacks
   end
 
-  TranslatedAttributes.included_modules
+  Translations.included_modules
   #=> [Mobility::Plugins::Fallbacks, Mobility::Plugins::Cache, ...]
 =end
   module Plugin
@@ -59,7 +59,7 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       # @return [Hash] Updated plugin defaults
       # @raise [Mobility::Plugin::CyclicDependency] if dependencies cannot be met
       # @example
-      #   Mobility::Plugin.configure(TranslatedAttributes) do
+      #   Mobility::Plugin.configure(Translations) do
       #     cache
       #     fallbacks [:en, :de]
       #   end

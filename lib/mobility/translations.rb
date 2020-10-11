@@ -5,7 +5,7 @@ module Mobility
 =begin
 
 Defines accessor methods to include on model class. Inspired by Traco's
-+Traco::Attributes+ class.
++Traco::Translations+ class.
 
 Normally this class will be created through class methods defined using
 {Mobility::Translates} accessor methods, and need not be created directly.
@@ -13,12 +13,12 @@ However, the class is central to how Mobility hooks into models to add
 accessors and other methods, and should be useful as a reference when
 understanding and designing backends.
 
-==Including Attributes in a Class
+==Including Translations in a Class
 
-Since {Attributes} is a subclass of +Module+, including an instance of it is
+Since {Translations} is a subclass of +Module+, including an instance of it is
 like including a module. Creating an instance like this:
 
-  Attributes.new("title", backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
+  Translations.new("title", backend: :my_backend, locale_accessors: [:en, :ja], cache: true, fallbacks: true)
 
 will generate an anonymous module that behaves approximately like this:
 
@@ -94,7 +94,7 @@ model class. This hook is provided by the {Backend::Setup#setup_model} method,
 which is added to every backend class when it includes the {Backend} module.
 
 Assuming the backend has defined a setup block by calling +setup+, this block
-will be called when {Attributes} is {#included} in the model class, passed
+will be called when {Translations} is {#included} in the model class, passed
 attributes and options defined when the backend was defined on the model class.
 This allows a backend to do things like (for example) define associations on a
 model class required by the backend, as happens in the {Backends::KeyValue} and
@@ -107,7 +107,7 @@ necessary, ensure that names are defined in such a way as to avoid conflicts
 with other backends.
 
 =end
-  class Attributes < Pluggable
+  class Translations < Pluggable
     include ::Mobility::Plugins.load_plugin(:attributes)
   end
 end

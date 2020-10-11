@@ -18,7 +18,7 @@ Then the +Foo+ plugin will be applied with the option value +true+. Applying a
 module calls a class method, +apply+ (in this case +Foo.apply+), which takes
 two arguments:
 
-- an instance of the {Attributes} class, +attributes+, from which the backend
+- an instance of the {Translations} class, +attributes+, from which the backend
   can configure the backend class (+attributes.backend_class+) and the model
   (+attributes.model_class+), and the +attributes+ module itself (which
   will be included into the backend).

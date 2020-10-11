@@ -4,7 +4,7 @@ module Mobility
 =begin
 
 Abstract Module subclass with methods to define plugins and defaults.
-Works with {Mobility::Plugin}. (Subclassed by {Mobility::Attributes}.)
+Works with {Mobility::Plugin}. (Subclassed by {Mobility::Translations}.)
 
 =end
   class Pluggable < Module

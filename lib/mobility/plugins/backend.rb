@@ -74,7 +74,7 @@ Defines:
       # Include backend name in inspect string.
       # @return [String]
       def inspect
-        "#<Attributes (#{backend}) @names=#{names.join(", ")}>"
+        "#<Translations (#{backend}) @names=#{names.join(", ")}>"
       end
 
       def load_backend(backend)

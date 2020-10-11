@@ -223,7 +223,7 @@ enabled for any one attribute on the model.
               end
 
               def attribute_modules(scope)
-                scope.model.ancestors.grep(::Mobility::Attributes)
+                scope.model.ancestors.grep(::Mobility::Translations)
               end
 
               def build_predicate(node, values)

@@ -174,7 +174,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
   describe "#inspect" do
     it "includes backend name and attribute names" do
       translations = translations_class.new("title", "content", backend: :null)
-      expect(translations.inspect).to eq("#<Attributes (null) @names=title, content>")
+      expect(translations.inspect).to eq("#<Translations (null) @names=title, content>")
     end
   end
 
@@ -191,7 +191,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
       end
 
       it "shows backend name in inspect string" do
-        expect(translations_class.new("title").inspect).to eq("#<Attributes (foo) @names=title>")
+        expect(translations_class.new("title").inspect).to eq("#<Translations (foo) @names=title>")
       end
 
       it "calls setup_model on backend" do

@@ -135,7 +135,7 @@ See ActiveRecord::Query plugin.
             end
 
             def attribute_modules(model)
-              model.ancestors.grep(::Mobility::Attributes)
+              model.ancestors.grep(::Mobility::Translations)
             end
 
             def build_predicate(op, values)

@@ -45,6 +45,8 @@ Defines:
         else
           raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
         end
+
+        include InstanceMethods
       end
 
       # Setup backend class, include modules into model class, include/extend
@@ -53,7 +55,6 @@ Defines:
       def included(klass)
         super
 
-        klass.include InstanceMethods
         klass.extend ClassMethods
 
         if backend

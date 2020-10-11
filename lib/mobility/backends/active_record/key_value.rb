@@ -119,7 +119,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       # The title predicate has a non-nil value, so we can use an INNER JOIN,
       # whereas we are searching for nil content, which requires an OUTER JOIN.
       #
-      class Visitor < Arel::Visitor
+      class Visitor < ::Mobility::Arel::Visitor
         private
 
         def visit_Arel_Nodes_Equality(object)

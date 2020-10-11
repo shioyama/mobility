@@ -1,4 +1,4 @@
-require "mobility/arel"
+# frozen_string_literal: true
 require_relative "./active_record/backend"
 require_relative "./active_record/dirty"
 require_relative "./active_record/cache"

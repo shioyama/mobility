@@ -96,8 +96,8 @@ module Mobility
           if ENV['DB'] == 'postgres'
             DB.create_table? :jsonb_posts do
               primary_key :id
-              jsonb       :my_title_i18n,   default: '{}', allow_null: false
-              jsonb       :my_content_i18n, default: '{}', allow_null: false
+              jsonb       :my_title_i18n,   default: '{}'
+              jsonb       :my_content_i18n, default: '{}'
               TrueClass   :published
               DateTime    :created_at,                     allow_null: false
               DateTime    :updated_at,                     allow_null: false
@@ -105,8 +105,8 @@ module Mobility
 
             DB.create_table? :json_posts do
               primary_key :id
-              json        :my_title_i18n,   default: '{}', allow_null: false
-              json        :my_content_i18n, default: '{}', allow_null: false
+              json        :my_title_i18n,   default: '{}'
+              json        :my_content_i18n, default: '{}'
               TrueClass   :published
               DateTime    :created_at,                     allow_null: false
               DateTime    :updated_at,                     allow_null: false
@@ -114,7 +114,7 @@ module Mobility
 
             DB.create_table? :container_posts do
               primary_key :id
-              jsonb       :translations, default: '{}',    allow_null: false
+              jsonb       :translations, default: '{}'
               TrueClass   :published
               DateTime    :created_at,                     allow_null: false
               DateTime    :updated_at,                     allow_null: false
@@ -123,8 +123,8 @@ module Mobility
             DB.run "CREATE EXTENSION IF NOT EXISTS hstore"
             DB.create_table? :hstore_posts do
               primary_key :id
-              hstore      :my_title_i18n, default: '',   allow_null: false
-              hstore      :my_content_i18n, default: '', allow_null: false
+              hstore      :my_title_i18n, default: ''
+              hstore      :my_content_i18n, default: ''
               TrueClass   :published
               DateTime    :created_at,                   allow_null: false
               DateTime    :updated_at,                   allow_null: false

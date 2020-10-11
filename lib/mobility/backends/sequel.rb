@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+require "mobility/backend"
+
 module Mobility
   module Backends
     module Sequel

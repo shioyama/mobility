@@ -1,6 +1,8 @@
 # Mobility Changelog
 
 ## 1.0.0.alpha (unreleased)
+- Default fallbacks plugin to `true` when enabled
+  ([#447](https://github.com/shioyama/mobility/pull/447))
 - Remove `Mobility::Backend.method_name`
   ([#400](https://github.com/shioyama/mobility/pull/400))
 - Remove `translated_attribute_names` as alias for `mobility_attributes`

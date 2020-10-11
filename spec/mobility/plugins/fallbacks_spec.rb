@@ -75,9 +75,9 @@ describe Mobility::Plugins::Fallbacks, type: :plugin do
   end
 
   if ENV['FEATURE'] == 'i18n_fallbacks'
-    context "fallbacks is true" do
+    context "fallbacks is default" do
       plugins do
-        fallbacks true
+        fallbacks
       end
 
       it "uses default fallbacks" do
@@ -93,9 +93,9 @@ describe Mobility::Plugins::Fallbacks, type: :plugin do
     end
   end
 
-  context "fallbacks is default" do
+  context "fallbacks is nil" do
     plugins do
-      fallbacks
+      fallbacks nil
     end
 
     it "does not use fallbacks when accessor fallback option is false or nil" do
@@ -131,7 +131,7 @@ describe Mobility::Plugins::Fallbacks, type: :plugin do
   # the Attributes class.
   describe "overriding fallbacks generator" do
     plugins do
-      fallbacks true
+      fallbacks
     end
 
     before do

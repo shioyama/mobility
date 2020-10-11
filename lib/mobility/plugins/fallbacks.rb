@@ -112,6 +112,7 @@ the current locale was +nil+.
     module Fallbacks
       extend Plugin
 
+      default true
       requires :backend, include: :before
 
       # Applies fallbacks plugin to attributes. Completely disables fallbacks

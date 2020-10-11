@@ -14,6 +14,8 @@ attributes only.
     module AttributeMethods
       extend Plugin
 
+      default true
+
       initialize_hook do |*names|
         include InstanceMethods
 

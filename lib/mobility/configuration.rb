@@ -7,10 +7,6 @@ Stores shared Mobility configuration referenced by all backends.
 
 =end
   class Configuration
-    # Alias for mobility_accessor (defaults to +translates+)
-    # @return [Symbol]
-    attr_accessor :accessor_method
-
     # @param [Symbol] name Plugin name
     def plugin(name, **options)
       translations_class.plugin(name, **options)
@@ -27,10 +23,6 @@ Stores shared Mobility configuration referenced by all backends.
     # @return [Symbol,Class]
     def default_backend
       translations_class.defaults[:backend]
-    end
-
-    def initialize
-      @accessor_method = :translates
     end
 
     def translations_class

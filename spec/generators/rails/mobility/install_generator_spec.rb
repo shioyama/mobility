@@ -26,7 +26,6 @@ describe Mobility::InstallGenerator, type: :generator do
               contains "backend :key_value"
               contains "backend_reader"
               contains "query"
-              contains "config.accessor_method = :translates"
             end
           end
         end

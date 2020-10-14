@@ -10,8 +10,7 @@ on a class. The {Mobility} module includes all necessary methods and modules to
 support defining backend accessors on a class.
 
 To enable Mobility on a class, simply include or extend the {Mobility} module,
-and define any attribute accessors using {Translates#mobility_accessor} (aliased to the
-value of {Mobility.accessor_method}, which defaults to +translates+).
+and define any attribute accessors using {Translates#translates}.
 
   class MyClass
     extend Mobility
@@ -41,13 +40,7 @@ module Mobility
 
   class << self
     def extended(model_class)
-      return if model_class.respond_to? :mobility_accessor
-
       model_class.extend Translates
-
-      if translates = Mobility.config.accessor_method
-        model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
-      end
     end
 
     # Extends model with this class so that +include Mobility+ is equivalent to
@@ -97,15 +90,12 @@ module Mobility
       @configuration ||= Configuration.new
     end
 
-    # (see Mobility::Configuration#accessor_method)
-    # @!method accessor_method
-    #
     # (see Mobility::Configuration#default_backend)
     # @!method default_backend
 
     # (see Mobility::Configuration#plugins)
     # @!method plugins
-    %w[accessor_method default_backend plugins].each do |method_name|
+    %w[default_backend plugins].each do |method_name|
       define_method method_name do
         config.public_send(method_name)
       end

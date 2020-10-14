@@ -43,37 +43,13 @@ passed to accessors to configure backend (see example below).
   instance.foo = "foo" #=> (sets attribute to value "foo")
 =end
   module Translates
-    # Defines mobility accessor on model class.
-    # @!method mobility_accessor(*attributes, **options)
+    # Includes translated attributes on model class.
+    # @!method translates(*attributes, **options)
     #   @param [Array<String>] attributes
     #   @param [Hash] options
     #   @yield Yields to block with backend as context
-    def mobility_accessor(*args, **options, &block)
-      attributes = Mobility.config.translations_class.new(*args, reader: true, writer: true, **options)
-      attributes.backend.instance_eval(&block) if block_given?
-      include attributes
-    end
-
-    # Defines mobility reader and presence method on model class.
-    # @!method mobility_reader(*attributes, **options)
-    #   @param [Array<String>] attributes
-    #   @param [Hash] options
-    #   @yield Yields to block with backend as context
-    def mobility_reader(*args, **options, &block)
-      attributes = Mobility.config.translations_class.new(*args, reader: true, writer: false, **options)
-      attributes.backend.instance_eval(&block) if block_given?
-      include attributes
-    end
-
-    # Defines mobility writer on model class.
-    # @!method mobility_writer(*attributes, **options)
-    #   @param [Array<String>] attributes
-    #   @param [Hash] options
-    #   @yield Yields to block with backend as context
-    def mobility_writer(*args, **options, &block)
-      attributes = Mobility.config.translations_class.new(*args, reader: false, writer: true, **options)
-      attributes.backend.instance_eval(&block) if block_given?
-      include attributes
+    def translates(*args, **options)
+      include Mobility.config.translations_class.new(*args, **options)
     end
   end
 end

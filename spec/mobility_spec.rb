@@ -16,21 +16,6 @@ describe Mobility, orm: 'none' do
       model
     end
 
-    it "aliases mobility_accessor if Mobility.config.accessor_method is set" do
-      expect(described_class.config).to receive(:accessor_method).and_return(:foo_translates)
-      model.extend described_class
-      expect { described_class.translates }.to raise_error(NoMethodError)
-      model.foo_translates :title, backend: :null, foo: :bar
-      expect(model.new.methods).to include :title
-      expect(model.new.methods).to include :title=
-    end
-
-    it "does not alias mobility_accessor to anything if Mobility.config.accessor_method is falsy" do
-      expect(described_class.config).to receive(:accessor_method).and_return(nil)
-      model.extend described_class
-      expect { described_class.translates }.to raise_error(NoMethodError)
-    end
-
     context "with translated attributes" do
       it "includes backend module into model class" do
         expect(described_class::Attributes).to receive(:new).

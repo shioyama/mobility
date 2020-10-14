@@ -105,12 +105,4 @@ Mobility.configure do |config|
     # Or define specific defaults by uncommenting line below
     # locale_accessors [:en, :ja]
   end
-
-  # OTHER CONFIGURATION
-
-  # By default, Mobility uses the +translates+ class method in models to
-  # describe translated attributes, but you can configure this method to be
-  # whatever you like. This may be useful if using Mobility alongside another
-  # translation gem which uses the same method name.
-  config.accessor_method = :translates
 end

@@ -105,8 +105,6 @@ Mobility.configure do |config|
 
     # ...
   end
-
-  config.accessor_method = :translates
 end
 ```
 

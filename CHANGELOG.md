@@ -20,6 +20,8 @@
   ([#433](https://github.com/shioyama/mobility/pull/433))
 - Rename `backend_name` to `backend`
   ([#443](https://github.com/shioyama/mobility/pull/443))
+- Remove `Configuration#accessor_method`
+  ([#450](https://github.com/shioyama/mobility/pull/450))
 
 ## 0.8
 

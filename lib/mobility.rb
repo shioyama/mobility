@@ -44,7 +44,6 @@ module Mobility
       return if model_class.respond_to? :mobility_accessor
 
       model_class.extend Translates
-      model_class.extend ClassMethods
 
       if translates = Mobility.config.accessor_method
         model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
@@ -183,14 +182,6 @@ module Mobility
       locale = locale.to_sym if locale
       enforce_available_locales!(locale) if I18n.enforce_available_locales
       storage[:mobility_locale] = locale
-    end
-  end
-
-  module ClassMethods
-    # Return translated attribute names on this model.
-    # @return [Array<String>] Attribute names
-    def mobility_attribute?(_)
-      false
     end
   end
 

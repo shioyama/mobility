@@ -29,7 +29,6 @@ module Mobility
   require "mobility/plugin"
   require "mobility/plugins"
   require "mobility/attributes"
-  require "mobility/translates"
 
   # General error for version compatibility conflicts
   class VersionNotSupportedError < ArgumentError; end
@@ -172,6 +171,17 @@ module Mobility
       locale = locale.to_sym if locale
       enforce_available_locales!(locale) if I18n.enforce_available_locales
       storage[:mobility_locale] = locale
+    end
+  end
+
+  module Translates
+    # Includes translated attributes on model class.
+    # @!method translates(*attributes, **options)
+    #   @param [Array<String>] attributes
+    #   @param [Hash] options
+    #   @yield Yields to block with backend as context
+    def translates(*args, **options)
+      include Mobility.config.translations_class.new(*args, **options)
     end
   end
 

@@ -2,10 +2,10 @@ require "spec_helper"
 
 return unless defined?(Sequel)
 
+require "mobility/plugins/sequel"
+
 describe Mobility::Plugins::Sequel, orm: :sequel, type: :plugin do
-  plugins do
-    sequel
-  end
+  plugins :sequel
 
   it "raises TypeError unless class is a subclass of Sequel::Model" do
     klass = Class.new

@@ -28,7 +28,7 @@ for aggregating attributes.
       # Show useful information about this module.
       # @return [String]
       def inspect
-        "#<#{name} @names=#{names.join(", ")}>"
+        "#<Translations @names=#{names.join(", ")}>"
       end
 
       included_hook do |klass|

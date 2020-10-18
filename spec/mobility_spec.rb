@@ -183,4 +183,15 @@ describe Mobility, orm: :none do
       }.to yield_with_args(described_class.config)
     end
   end
+
+  describe "#translates" do
+    it "delegates to Configuration translation_class" do
+      expect(Mobility.config.translations_class).to receive(:new).once.with("title", foo: "bar").and_return(mod = Module.new)
+
+      klass = Class.new
+      klass.extend Mobility
+      klass.translates "title", foo: "bar"
+      expect(klass.included_modules).to include(mod)
+    end
+  end
 end

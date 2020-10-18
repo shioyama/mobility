@@ -1,7 +1,7 @@
 require "spec_helper"
 require "mobility/backends/hash"
 
-describe Mobility::Backends::Hash, orm: :none do
+describe Mobility::Backends::Hash, type: :backend, orm: :none do
   describe "#read/#write" do
     it "returns value for locale key" do
       backend = described_class.new
@@ -26,15 +26,15 @@ describe Mobility::Backends::Hash, orm: :none do
   end
 
   context "included in model" do
-    let(:model_class) do
-      klass = Class.new
-      klass.extend Mobility
-      klass.translates :name, backend: :hash
-      klass
+    plugins :reader, :writer
+
+    before do
+      stub_const 'HashPost', Class.new
+      translates HashPost, :name, backend: :hash
     end
 
     it "defines reader and writer methods" do
-      instance = model_class.new
+      instance = HashPost.new
       Mobility.with_locale(:en) { instance.name = "foo" }
       Mobility.with_locale(:ja) { instance.name = "アアア" }
       expect(instance.name(locale: :en)).to eq("foo")

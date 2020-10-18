@@ -2,9 +2,9 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Plugins::ActiveRecord::Backend", orm: :active_record, type: :plugin do
-  require "mobility/plugins/active_record/backend"
+require "mobility/plugins/active_record/backend"
 
+describe Mobility::Plugins::ActiveRecord::Backend, orm: :active_record, type: :plugin do
   plugins :active_record_backend
   plugin_setup
 

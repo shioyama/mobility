@@ -1,6 +1,10 @@
 require "spec_helper"
 
-describe "Mobility::Plugins::Sequel::Cache", orm: :sequel, type: :plugin do
+return unless defined?(Sequel)
+
+require "mobility/plugins/sequel/cache"
+
+describe Mobility::Plugins::Sequel::Cache, orm: :sequel, type: :plugin do
   plugins :sequel, :cache
   plugin_setup :title
 

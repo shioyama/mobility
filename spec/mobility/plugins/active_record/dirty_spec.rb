@@ -2,7 +2,9 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record, type: :plugin do
+require "mobility/plugins/active_record/dirty"
+
+describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plugin do
   plugins do
     dirty true
     active_record

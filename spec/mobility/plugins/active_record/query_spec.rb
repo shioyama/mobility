@@ -2,15 +2,15 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
+require "mobility/plugins/active_record/query"
+
 # @note Although this plugin should probably really be tested against an
 #   abstract backend with +build_node+ and +apply_scope+ defined and tested,
 #   doing so would be quite involved, so instead this spec tests against a
 #   complex combination of existing backends, which is less precise but should
 #   be sufficient at this stage.
 #
-describe "Mobility::Plugins::ActiveRecord::Query", orm: :active_record, type: :plugin do
-  require "mobility/plugins/active_record/query"
-
+describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plugin do
   plugins :active_record, :writer, :query
   plugin_setup
 

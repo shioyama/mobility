@@ -1,6 +1,10 @@
 require "spec_helper"
 
-describe "Mobility::Plugins::ActiveModel::Cache", orm: :active_record, type: :plugin do
+return unless defined?(ActiveModel)
+
+require "mobility/plugins/active_model/cache"
+
+describe Mobility::Plugins::ActiveModel::Cache, orm: :active_record, type: :plugin do
   plugins :active_model, :cache
   plugin_setup :title
 

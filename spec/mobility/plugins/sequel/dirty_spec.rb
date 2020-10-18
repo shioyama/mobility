@@ -2,7 +2,9 @@ require "spec_helper"
 
 return unless defined?(Sequel)
 
-describe "Mobility::Plugins::Sequel::Dirty", orm: :sequel, type: :plugin do
+require "mobility/plugins/sequel/dirty"
+
+describe Mobility::Plugins::Sequel::Dirty, orm: :sequel, type: :plugin do
   plugins do
     dirty true
     sequel

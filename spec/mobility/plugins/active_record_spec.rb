@@ -2,7 +2,9 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Plugins::ActiveRecord", orm: :active_record, type: :plugin do
+require "mobility/plugins/active_record"
+
+describe Mobility::Plugins::ActiveRecord, orm: :active_record, type: :plugin do
   plugins :active_record
 
   it "raises TypeError unless class is a subclass of ActiveRecord::Base" do

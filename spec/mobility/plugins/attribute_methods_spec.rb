@@ -2,7 +2,9 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Plugins::AttributeMethods", orm: :active_record, type: :plugin do
+require "mobility/plugins/attribute_methods"
+
+describe Mobility::Plugins::AttributeMethods, orm: :active_record, type: :plugin do
   plugins :active_record, :attribute_methods, :reader
 
   plugin_setup :title

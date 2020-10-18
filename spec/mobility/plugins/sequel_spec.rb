@@ -1,6 +1,8 @@
 require "spec_helper"
 
-describe "Mobility::Plugins::Sequel", orm: :sequel, type: :plugin do
+return unless defined?(Sequel)
+
+describe Mobility::Plugins::Sequel, orm: :sequel, type: :plugin do
   plugins do
     sequel
   end

@@ -5,7 +5,7 @@ if !ENV['ORM'].nil? && (ENV['ORM'] != '')
   raise ArgumentError, 'Invalid ORM' unless %w[active_record sequel].include?(orm)
   require orm
 else
-  orm = nil
+  orm = 'none'
 end
 
 require 'rails' if ENV['FEATURE'] == 'rails'
@@ -27,7 +27,7 @@ I18n.default_locale = :en
 
 Dir[File.expand_path("./spec/support/**/*.rb")].each { |f| require f }
 
-if orm
+unless orm == 'none'
   require "database"
   require "#{orm}/schema"
 
@@ -79,7 +79,7 @@ RSpec.configure do |config|
     end
   end
 
-  if orm
+  unless orm == 'none'
     config.before :each do
       DatabaseCleaner.start
     end
@@ -89,5 +89,5 @@ RSpec.configure do |config|
   end
 
   config.order = "random"
-  config.filter_run_excluding orm: lambda { |v| ![*v].include?(orm&.to_sym) || (orm && (v == 'none')) }, db: lambda { |v| ![*v].include?(db.to_sym) }
+  config.filter_run_excluding orm: lambda { |v| ![*v].include?(orm&.to_sym) }, db: lambda { |v| ![*v].include?(db.to_sym) }
 end

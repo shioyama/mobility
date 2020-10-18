@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Mobility, orm: 'none' do
+describe Mobility, orm: :none do
   it 'has a version number' do
     expect(described_class.gem_version).not_to be nil
   end

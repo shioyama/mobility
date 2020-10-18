@@ -25,7 +25,6 @@ module Mobility
 
   require "mobility/backend"
   require "mobility/backends"
-  require "mobility/configuration"
   require "mobility/plugin"
   require "mobility/plugins"
   require "mobility/translations"
@@ -47,6 +46,34 @@ module Mobility
     # @param model_class
     def included(model_class)
       model_class.extend self
+    end
+
+    # @return [Symbol,Class]
+    def default_backend
+      translations_class.defaults[:backend]
+    end
+
+    # Configure Mobility
+    # @yield [Mobility::Translations]
+    def configure
+      translates_with(Class.new(Translations)) unless translations_class
+      yield translations_class
+    end
+    # @!endgroup
+
+    def translates_with(pluggable)
+      raise ArgumentError, "translations class must be a subclass of Module." unless Module === pluggable
+      @translations_class = pluggable
+    end
+
+    def translations_class
+      @translations_class ||
+        raise(Error, "Mobility has not been configured. "\
+              "Configure with Mobility.configure, or assign a translations class with Mobility.translates_with(<class>)")
+    end
+
+    def reset_translations_class
+      @translations_class = nil
     end
 
     # @!group Locale Accessors
@@ -82,30 +109,6 @@ module Mobility
     def storage
       RequestStore.store
     end
-
-    # @!group Configuration Methods
-    # @return [Mobility::Configuration] Mobility configuration
-    def config
-      @configuration ||= Configuration.new
-    end
-
-    # (see Mobility::Configuration#default_backend)
-    # @!method default_backend
-
-    # (see Mobility::Configuration#plugins)
-    # @!method plugins
-    %w[default_backend plugins].each do |method_name|
-      define_method method_name do
-        config.public_send(method_name)
-      end
-    end
-
-    # Configure Mobility
-    # @yield [Mobility::Configuration] Mobility configuration
-    def configure
-      yield config
-    end
-    # @!endgroup
 
     # Return normalized locale
     # @param [String,Symbol] locale
@@ -181,7 +184,7 @@ module Mobility
     #   @param [Hash] options
     #   @yield Yields to block with backend as context
     def translates(*args, **options)
-      include Mobility.config.translations_class.new(*args, **options)
+      include Mobility.translations_class.new(*args, **options)
     end
   end
 

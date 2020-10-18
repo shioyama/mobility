@@ -18,7 +18,9 @@ describe Mobility, orm: :none do
 
     context "with translated attributes" do
       it "includes backend module into model class" do
-        expect(described_class::Translations).to receive(:new).
+        klass = Class.new(described_class::Translations)
+        Mobility.translates_with(klass)
+        expect(klass).to receive(:new).
           with(:title, backend: :null, foo: :bar).
           and_call_original
         model.extend described_class
@@ -166,32 +168,42 @@ describe Mobility, orm: :none do
     end
   end
 
-  describe '.config' do
-    it 'initializes a new configuration' do
-      expect(described_class.config).to be_a(described_class::Configuration)
-    end
-
-    it 'memoizes configuration' do
-      expect(described_class.config).to be(described_class.config)
-    end
-  end
-
   describe ".configure" do
-    it "yields configuration" do
+    it "yields the translation class, or creates one if not defined" do
+      klass = Class.new
+      described_class.translates_with(klass)
       expect { |block|
         described_class.configure &block
-      }.to yield_with_args(described_class.config)
+      }.to yield_with_args(klass)
     end
   end
 
   describe "#translates" do
-    it "delegates to Configuration translation_class" do
-      expect(Mobility.config.translations_class).to receive(:new).once.with("title", foo: "bar").and_return(mod = Module.new)
+    it "delegates to translation_class" do
+      translations_class = Class.new(Mobility::Translations)
+      Mobility.translates_with(translations_class)
+      expect(translations_class).to receive(:new).once.with("title", foo: "bar").and_return(mod = Module.new)
 
       klass = Class.new
       klass.extend Mobility
       klass.translates "title", foo: "bar"
       expect(klass.included_modules).to include(mod)
+    end
+  end
+
+  describe ".translates_with" do
+    it "sets translations_class" do
+      klass = Class.new(Mobility::Translations)
+      described_class.translates_with(klass)
+      expect(described_class.translations_class).to eq(klass)
+    end
+  end
+
+  describe "#default_backend" do
+    it "defaults to nil" do
+      translations_class = Class.new(Mobility::Translations)
+      subject.translates_with translations_class
+      expect(subject.default_backend).to eq(nil)
     end
   end
 end

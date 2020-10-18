@@ -8,10 +8,9 @@ module Mobility
 Falls back to one or more alternative locales in case no value is defined for a
 given locale.
 
-For +fallbacks: true+, Mobility will use the value of
-{Mobility::Configuration#new_fallbacks} for the fallbacks instance. This
-defaults to an instance of +I18n::Locale::Fallbacks+, but can be
-configured (see {Mobility::Configuration}).
+For +fallbacks: true+, Mobility will use an instance of
++I18n::Locale::Fallbacks+, but this can be configured by overriding
++generate_fallbacks+ in the translations class.
 
 If a hash is passed to the +fallbacks+ option, a new fallbacks instance will be
 created for the model with the hash defining additional fallbacks. To set a

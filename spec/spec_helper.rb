@@ -77,6 +77,9 @@ RSpec.configure do |config|
     if defined?(ActiveSupport)
       ActiveSupport::Dependencies::Reference.clear!
     end
+
+    # ensure this is reset in each run
+    Mobility.reset_translations_class
   end
 
   unless orm == 'none'

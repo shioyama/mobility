@@ -56,7 +56,7 @@ module Mobility
     # Configure Mobility
     # @yield [Mobility::Translations]
     def configure
-      translates_with(Class.new(Translations)) unless translations_class
+      translates_with(Class.new(Translations)) unless @translations_class
       yield translations_class
     end
     # @!endgroup

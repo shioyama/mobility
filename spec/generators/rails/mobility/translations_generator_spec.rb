@@ -2,15 +2,22 @@ require "spec_helper"
 
 return unless defined?(Rails)
 
+require "rails/generators/mobility/translations_generator"
+
 describe Mobility::TranslationsGenerator, type: :generator do
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase
   include Helpers::Generators
-  require "rails/generators/mobility/translations_generator"
 
   destination File.expand_path("../tmp", __FILE__)
 
   after(:all) { prepare_destination }
+
+  before do
+    Mobility.configure do |config|
+      config.plugin :backend, :key_value
+    end
+  end
 
   describe "--backend=table" do
     after(:each) { connection.drop_table :post_translations if connection.data_source_exists?(:post_translations) }

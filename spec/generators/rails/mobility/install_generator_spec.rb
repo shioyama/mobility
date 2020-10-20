@@ -2,6 +2,8 @@ require "spec_helper"
 
 return unless defined?(Rails)
 
+require "rails/generators/mobility/install_generator"
+
 describe Mobility::InstallGenerator, type: :generator do
   require "generator_spec/test_case"
   include GeneratorSpec::TestCase

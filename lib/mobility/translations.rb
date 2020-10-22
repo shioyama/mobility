@@ -90,6 +90,6 @@ with other backends.
 
 =end
   class Translations < Pluggable
-    include ::Mobility::Plugins.load_plugin(:attributes)
+    include Plugins.load_plugin(:attributes)
   end
 end

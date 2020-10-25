@@ -153,7 +153,7 @@ columns to that table.
         def already_joined?(relation, locale, join_type)
           if join = get_join(relation, locale)
             return true if (join_type == Visitor::OUTER_JOIN) || (Visitor::INNER_JOIN === join)
-            relation.joins_values = relation.joins_values - [join]
+            relation.joins_values -= [join]
           end
           false
         end

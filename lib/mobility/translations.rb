@@ -7,9 +7,9 @@ module Mobility
 Module containing translation accessor methods and other methods for accessing
 translations.
 
-Normally this class will be created by calling
-{Mobility::Translates#translates}, which is a class method on any model that
-extends {Mobility}, but it can also be used independent of that macro.
+Normally this class will be created by calling +translates+ on the model class,
+added when extending {Mobility}, but it can also be used independent of that
+macro.
 
 ==Including Translations in a Class
 

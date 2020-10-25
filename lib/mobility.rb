@@ -38,7 +38,9 @@ module Mobility
 
   class << self
     def extended(model_class)
-      model_class.extend Translates
+      def model_class.translates(*args, **options)
+        include Mobility.translations_class.new(*args, **options)
+      end
     end
 
     # Extends model with this class so that +include Mobility+ is equivalent to
@@ -174,17 +176,6 @@ module Mobility
       locale = locale.to_sym if locale
       enforce_available_locales!(locale) if I18n.enforce_available_locales
       storage[:mobility_locale] = locale
-    end
-  end
-
-  module Translates
-    # Includes translated attributes on model class.
-    # @!method translates(*attributes, **options)
-    #   @param [Array<String>] attributes
-    #   @param [Hash] options
-    #   @yield Yields to block with backend as context
-    def translates(*args, **options)
-      include Mobility.translations_class.new(*args, **options)
     end
   end
 

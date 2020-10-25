@@ -1,6 +1,11 @@
 # Mobility Changelog
 
-## 1.0.0.alpha (unreleased)
+## 1.0
+
+1.0 is a rewrite of many internals of the gem. Please see the [wiki page on v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0) for more details on how to upgrade.
+
+## 1.0.0.alpha (pre-release)
+
 - Default fallbacks plugin to `true` when enabled
   ([#447](https://github.com/shioyama/mobility/pull/447))
 - Remove `Mobility::Backend.method_name`

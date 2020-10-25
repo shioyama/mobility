@@ -6,7 +6,6 @@ Mobility
 [![Code Climate](https://api.codeclimate.com/v1/badges/72200f2b00c339ec4537/maintainability.svg)][codeclimate]
 [![Gitter Chat](https://badges.gitter.im/mobility-ruby/mobility.svg)](https://gitter.im/mobility-ruby/mobility)
 
-
 [gem]: https://rubygems.org/gems/mobility
 [actions]: https://github.com/shioyama/mobility/actions
 [codeclimate]: https://codeclimate.com/github/shioyama/mobility
@@ -14,9 +13,9 @@ Mobility
 [wiki]: https://github.com/shioyama/mobility/wiki
 
 **This is the readme for the [`master`](https://github.com/shioyama/mobility)
-branch, which will eventually become version 1.0 and has changes not included
-in the latest 0.8.x releases. Unless you are actually pointing your Gemfile at
-`master`, you probably want the readme on the [0-8-stable
+branch, which corresponds to v1.0.0.alpha, a pre-release version of Mobility.
+If you are using an earlier version (0.8.x or earlier), you probably want the
+readme on the [0-8-stable
 branch](https://github.com/shioyama/mobility/tree/0-8-stable).**
 
 Mobility is a gem for storing and retrieving translations as attributes on a

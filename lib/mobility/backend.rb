@@ -9,7 +9,7 @@ Defines a minimum set of shared components included in any backend. These are:
   ({#attribute})
 - a constructor setting these two elements (+model+, +attribute+)
 - a +setup+ method adding any configuration code to the model class
-  ({Setup#setup})
+  ({ClassMethods#setup})
 
 On top of this, a backend will normally:
 

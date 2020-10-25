@@ -101,8 +101,8 @@ other backends on model (otherwise one will overwrite the other).
         end
 
         # Apply custom processing for plugin
-        # @param (see Backend::Setup#apply_plugin)
-        # @return (see Backend::Setup#apply_plugin)
+        # @param (see Backend::ClassMethods#apply_plugin)
+        # @return (see Backend::ClassMethods#apply_plugin)
         def apply_plugin(name)
           if name == :cache
             include self::Cache

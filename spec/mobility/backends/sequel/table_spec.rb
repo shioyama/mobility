@@ -22,7 +22,7 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel, type: :backend do
     plugins :cache
 
     backend_class_with_cache = Class.new(described_class)
-    backend_class_with_cache.apply_plugin(:cache)
+    backend_class_with_cache.include_cache
 
     include_backend_examples backend_class_with_cache, 'Article'
   end

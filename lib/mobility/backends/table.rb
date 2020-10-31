@@ -113,16 +113,9 @@ set.
       end
 
       module ClassMethods
-        # Apply custom processing for plugin
-        # @param (see Backend::Setup#apply_plugin)
-        # @return (see Backend::Setup#apply_plugin)
-        def apply_plugin(name)
-          if name == :cache
-            include self::Cache
-            true
-          else
-            super
-          end
+        # Apply custom processing for cache plugin
+        def include_cache
+          include self::Cache
         end
 
         def table_alias(locale)

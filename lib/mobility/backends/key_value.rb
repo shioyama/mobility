@@ -100,16 +100,9 @@ other backends on model (otherwise one will overwrite the other).
           end
         end
 
-        # Apply custom processing for plugin
-        # @param (see Backend::ClassMethods#apply_plugin)
-        # @return (see Backend::ClassMethods#apply_plugin)
-        def apply_plugin(name)
-          if name == :cache
-            include self::Cache
-            true
-          else
-            super
-          end
+        # Apply custom processing for cache plugin
+        def include_cache
+          include self::Cache
         end
 
         def table_alias(attr, locale)

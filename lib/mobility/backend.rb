@@ -179,15 +179,6 @@ On top of this, a backend will normally:
         EOM
       end
 
-      # Called from plugins to apply custom processing for this backend.
-      # Name is the name of the plugin.
-      # @param [Symbol] name Name of plugin
-      # @return [Boolean] Whether the plugin was applied
-      # @note This is currently only called by Plugins::Cache.
-      def apply_plugin(_)
-        false
-      end
-
       # Show useful information about this backend class, if it has no name.
       # @return [String]
       def inspect

@@ -7,8 +7,7 @@ module Mobility
 Caches values fetched from the backend so subsequent fetches can be performed
 more quickly. The cache stores cached values in a simple hash, which is not
 optimal for some storage strategies, so some backends (KeyValue, Table) use a
-custom module through the {Mobility::Backend::Setup#apply_plugin} hook. For
-details see the documentation for these backends.
+custom module by defining a method, +include_cache+, on the backend class.
 
 The cache is reset when one of a set of events happens (saving, reloading,
 etc.). See {BackendResetter} for details.
@@ -28,11 +27,19 @@ Values are added to the cache in two ways:
       # Applies cache plugin to attributes.
       included_hook do |_, backend_class|
         if options[:cache]
-          backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
+          if backend_class.respond_to?(:include_cache)
+            backend_class.include_cache
+          else
+            include_cache(backend_class)
+          end
         end
       end
 
       private
+
+      def include_cache(backend_class)
+        backend_class.include BackendMethods
+      end
 
       # Used in ORM cache plugins
       def define_cache_hooks(klass, *reset_methods)

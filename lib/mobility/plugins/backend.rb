@@ -32,7 +32,6 @@ Defines:
 
       def initialize(*args, **original_options)
         super
-        return unless Plugins::Backend.dependencies_satisfied?(self.class)
 
         case options[:backend]
         when String, Symbol, Class

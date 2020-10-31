@@ -14,6 +14,8 @@ declared in any order (dependencies will be resolved).
     class << self
       # @param [Symbol] name Name of plugin to load.
       def load_plugin(name)
+        return name if Module === name || name.nil?
+
         unless (plugin = @plugins[name])
           require "mobility/plugins/#{name}"
           raise LoadError, "plugin #{name} did not register itself correctly in Mobility::Plugins" unless (plugin = @plugins[name])

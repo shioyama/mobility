@@ -45,6 +45,8 @@ Defines:
           raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
         end
 
+        @backend = load_backend(backend)
+
         include InstanceMethods
       end
 
@@ -57,8 +59,7 @@ Defines:
         klass.extend ClassMethods
 
         if backend
-          @backend_class = load_backend(backend).
-            build_subclass(klass, backend_options)
+          @backend_class = backend.build_subclass(klass, backend_options)
 
           backend_class.setup_model(klass, names)
 

@@ -5,7 +5,7 @@ module Mobility
     class << self
       # @param [Symbol, Object] backend Name of backend to load.
       def load_backend(name)
-        return name if Module === name
+        return name if Module === name || name.nil?
 
         unless (backend = @backends[name])
           require "mobility/backends/#{name}"

@@ -166,16 +166,16 @@ describe Mobility::Plugins::Backend, type: :plugin do
   end
 
   describe "#backend" do
-    it "returns backend name" do
+    it "returns backend superclass" do
       translations = translations_class.new("title", "content", backend: :null)
-      expect(translations.backend).to eq(:null)
+      expect(translations.backend).to eq(Mobility::Backends::Null)
     end
   end
 
   describe "#inspect" do
     it "includes backend name and attribute names" do
       translations = translations_class.new("title", "content", backend: :null)
-      expect(translations.inspect).to eq("#<Translations (null) @names=title, content>")
+      expect(translations.inspect).to eq("#<Translations (Mobility::Backends::Null) @names=title, content>")
     end
   end
 
@@ -192,7 +192,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
       end
 
       it "shows backend name in inspect string" do
-        expect(translations_class.new("title").inspect).to eq("#<Translations (foo) @names=title>")
+        expect(translations_class.new("title").inspect).to eq("#<Translations (FooBackend) @names=title>")
       end
 
       it "calls setup_model on backend" do
@@ -207,7 +207,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
       end
 
       it "assigns backend name correctly" do
-        expect(translations_class.new("title").backend).to eq(:foo)
+        expect(translations_class.new("title").backend).to eq(FooBackend)
       end
 
       it "passes backend options to backend" do

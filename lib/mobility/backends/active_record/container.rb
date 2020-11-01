@@ -17,6 +17,10 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       #   @return [Symbol] (:translations) Name of translations column
       option_reader :column_name
 
+      def self.valid_keys
+        [:column_name]
+      end
+
       # @!group Backend Accessors
       #
       # @note Translation may be a string, integer, boolean, hash or array

@@ -36,6 +36,10 @@ Sequel serialization plugin.
       include Sequel
       include HashValued
 
+      def self.valid_keys
+        super + [:format]
+      end
+
       # @!group Backend Configuration
       # @param (see Backends::Serialized.configure)
       # @option (see Backends::Serialized.configure)

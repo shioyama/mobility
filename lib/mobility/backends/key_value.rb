@@ -83,6 +83,10 @@ other backends on model (otherwise one will overwrite the other).
       end
 
       module ClassMethods
+        def valid_keys
+          [:type, :association_name, :class_name]
+        end
+
         # @!group Backend Configuration
         # @option options [Symbol,String] type Column type to use
         # @option options [Symbol] association_name (:<type>_translations) Name

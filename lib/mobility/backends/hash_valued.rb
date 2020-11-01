@@ -36,6 +36,10 @@ Defines read and write methods that access the value at a key with value
       end
 
       module ClassMethods
+        def valid_keys
+          [:column_prefix, :column_suffix]
+        end
+
         def configure(options)
           options[:column_affix] = "#{options[:column_prefix]}%s#{options[:column_suffix]}"
         end

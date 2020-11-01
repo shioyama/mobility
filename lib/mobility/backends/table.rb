@@ -113,6 +113,10 @@ set.
       end
 
       module ClassMethods
+        def valid_keys
+          [:association_name, :subclass_name, :foreign_key, :table_name]
+        end
+
         # Apply custom processing for cache plugin
         def include_cache
           include self::Cache

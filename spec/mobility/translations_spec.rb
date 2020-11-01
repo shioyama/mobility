@@ -4,32 +4,21 @@ describe Mobility::Translations, orm: :none do
   include Helpers::Backend
   before { stub_const 'Article', Class.new }
 
-  # In order to be able to stub methods on backend instance methods, which will be
-  # hidden when the backend class is subclassed in Translations, we inject a double
-  # and delegate read and write to the double. (Nice trick, eh?)
-  #
-  let(:listener) { double("backend") }
-  let(:backend_class) { backend_listener(listener) }
-  let(:backend) { backend_class.new }
   let(:model_class) { Article }
-
-  # These options disable all inclusion of modules into backend, which is useful
-  # for many specs in this suite.
-  let(:clean_options) { { cache: false, fallbacks: false } }
 
   describe "including Translations in a model" do
     describe "model class methods" do
       describe ".mobility_attributes" do
         it "returns attribute names" do
-          model_class.include described_class.new("title", "content", backend: backend_class)
-          model_class.include described_class.new("foo", backend: backend_class)
+          model_class.include described_class.new("title", "content")
+          model_class.include described_class.new("foo")
 
           expect(model_class.send(:mobility_attributes)).to match_array(["title", "content", "foo"])
         end
 
         it "only returns unique attributes" do
-          model_class.include described_class.new("title", backend: :null)
-          model_class.include described_class.new("title", backend: :null)
+          model_class.include described_class.new("title")
+          model_class.include described_class.new("title")
 
           expect(model_class.send(:mobility_attributes)).to eq(["title"])
         end
@@ -38,7 +27,7 @@ describe Mobility::Translations, orm: :none do
       describe ".mobility_attribute?" do
         it "returns true if and only if attribute name is translated" do
           names = %w[title content]
-          model_class.include described_class.new(*names, backend: :null)
+          model_class.include described_class.new(*names)
           names.each do |name|
             expect(model_class.mobility_attribute?(name)).to eq(true)
             expect(model_class.mobility_attribute?(name.to_sym)).to eq(true)
@@ -51,7 +40,7 @@ describe Mobility::Translations, orm: :none do
 
   describe "#each" do
     it "delegates to attributes" do
-      attributes = described_class.new("title", "content", backend: :null)
+      attributes = described_class.new("title", "content")
       expect { |b| attributes.each(&b) }.to yield_successive_args("title", "content")
     end
   end

@@ -8,6 +8,8 @@
 
 - Remove `Mobility::Backend#apply_plugin`
   ([#454](https://github.com/shioyama/mobility/pull/454))
+- Instance exec configure block if it takes no arguments
+  ([#456](https://github.com/shioyama/mobility/pull/456))
 
 ## 1.0.0.alpha (pre-release)
 

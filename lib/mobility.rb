@@ -57,9 +57,13 @@ module Mobility
 
     # Configure Mobility
     # @yield [Mobility::Translations]
-    def configure
+    def configure(&block)
       translates_with(Class.new(Translations)) unless @translations_class
-      yield translations_class
+      if block.arity == 0
+        translations_class.instance_exec(&block)
+      else
+        yield translations_class
+      end
     end
     # @!endgroup
 

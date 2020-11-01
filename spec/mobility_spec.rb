@@ -176,6 +176,15 @@ describe Mobility, orm: :none do
         described_class.configure &block
       }.to yield_with_args(klass)
     end
+
+    it "yields in context of class if block is not passed an argument" do
+      klass = Class.new(Mobility::Translations)
+      described_class.translates_with(klass)
+      expect(klass).to receive(:plugins).once
+      described_class.configure do
+        plugins
+      end
+    end
   end
 
   describe "#translates" do

@@ -17,8 +17,14 @@ describe Mobility, orm: :none do
     end
 
     context "with translated attributes" do
+      include Helpers::PluginSetup
+      define_plugins :foo
+      plugins :foo, :backend
+
       it "includes backend module into model class" do
         klass = Class.new(described_class::Translations)
+        klass.plugin :foo
+        klass.plugin :backend
         Mobility.translates_with(klass)
         expect(klass).to receive(:new).
           with(:title, backend: :null, foo: :bar).

@@ -32,9 +32,25 @@ Works with {Mobility::Plugin}. (Subclassed by {Mobility::Translations}.)
     end
 
     def initialize(*, **options)
-      @options = self.class.defaults.merge(options)
+      initialize_options(options)
+      validate_options(@options)
     end
 
     attr_reader :options
+
+    private
+
+    def initialize_options(options)
+      @options = self.class.defaults.merge(options)
+    end
+
+    # This is overridden by backend plugin to exclude mixed-in backend options.
+    def validate_options(options)
+      plugin_keys = self.class.included_plugins.map { |p| Plugins.lookup_name(p) }
+      extra_keys = options.keys - plugin_keys
+      raise InvalidOptionKey, "No plugin configured for these keys: #{extra_keys.join(', ')}." unless extra_keys.empty?
+    end
+
+    class InvalidOptionKey < Error; end
   end
 end

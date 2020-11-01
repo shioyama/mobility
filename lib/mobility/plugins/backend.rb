@@ -33,19 +33,7 @@ Defines:
       def initialize(*args, **original_options)
         super
 
-        case options[:backend]
-        when String, Symbol, Class
-          @backend, @backend_options = options[:backend], options
-        when Array
-          @backend, @backend_options = options[:backend]
-          @backend_options = @backend_options.merge(original_options)
-        when NilClass
-          @backend = @backend_options = nil
-        else
-          raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
-        end
-
-        @backend = load_backend(backend)
+        Backend.validate_default(self.class.defaults[:backend])
 
         include InstanceMethods
       end
@@ -83,10 +71,47 @@ Defines:
         raise e, "could not find a #{backend} backend. Did you forget to include an ORM plugin like active_record or sequel?"
       end
 
+      private
+
+      # Override to extract backend options from options hash.
+      def initialize_options(original_options)
+        super
+
+        case options[:backend]
+        when String, Symbol, Class
+          @backend, @backend_options = options[:backend], options
+        when Array
+          @backend, @backend_options = options[:backend]
+          @backend_options = @backend_options.merge(original_options)
+        when NilClass
+          @backend = @backend_options = nil
+        else
+          raise ArgumentError, "backend must be either a backend name, a backend class, or a two-element array"
+        end
+
+        @backend = load_backend(backend)
+      end
+
+      # Override default validation to exclude backend options, which may be
+      # mixed in with plugin options.
+      def validate_options(options)
+        return super unless backend
+        super(options.slice(*(options.keys - backend.valid_keys)))
+      end
+
       # Override default argument-handling in DSL to store kwargs passed along
       # with plugin name.
       def self.configure_default(defaults, key, *args, **kwargs)
         defaults[key] = [args[0], kwargs] unless args.empty?
+      end
+
+      def self.validate_default(default)
+        return unless default
+
+        name, backend_options = default
+        backend = Backends.load_backend(name)
+        extra_keys = backend_options.keys - backend.valid_keys
+        raise InvalidOptionKey, "These are not valid #{name} backend keys: #{extra_keys.join(', ')}." unless extra_keys.empty?
       end
 
       module InstanceMethods
@@ -131,6 +156,8 @@ Defines:
           @mobility_backend_classes ||= {}
         end
       end
+
+      class InvalidOptionKey < Error; end
     end
 
     register_plugin(:backend, Backend)

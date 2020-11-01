@@ -6,9 +6,15 @@ describe Mobility::Plugins::Backend, type: :plugin do
   plugins :backend
   plugin_setup
 
+  define_plugins :foo
+
   # Override default helper-defined model_class which has attributes module
   # pre-included, so we can explicitly include it in specs.
   let(:model_class) { Class.new }
+  before do
+    # Define 'foo' as a valid option key for this backend
+    allow(backend_class).to receive(:valid_keys).and_return([:foo])
+  end
 
   describe "#included" do
     it "calls build_subclass on backend class with options merged with default options" do
@@ -99,7 +105,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
     describe "#mobility_backends" do
       it "returns instance of backend for attribute" do
         mod1 = translations_class.new("title", backend: :null)
-        mod2 = translations_class.new("content", backend: :null, foo: :bar)
+        mod2 = translations_class.new("content", backend: :null)
         model_class.include mod1
         model_class.include mod2
         instance1 = model_class.new
@@ -151,6 +157,28 @@ describe Mobility::Plugins::Backend, type: :plugin do
     end
   end
 
+  describe "#initialize" do
+    define_plugins :foo
+
+    it "excludes backend options from plugin key validation" do
+      klass = Class.new(Mobility::Pluggable)
+      backend_class = Class.new
+      def backend_class.valid_keys
+        [:bar]
+      end
+      klass.plugin :backend, backend_class
+      klass.plugin :foo
+
+      expect {
+        klass.new(foo: 'foo', bar: 'bar')
+      }.not_to raise_error(Mobility::Pluggable::InvalidOptionKey, "No plugin configured for these keys: foo, bar.")
+
+      expect {
+        klass.new(foo: 'foo', other: 'other')
+      }.to raise_error(Mobility::Pluggable::InvalidOptionKey)
+    end
+  end
+
   describe "defining attribute backend on model" do
     before { model_class.include translations_class.new("title", backend: backend_class, foo: "bar") }
 
@@ -181,7 +209,8 @@ describe Mobility::Plugins::Backend, type: :plugin do
 
   describe "configuring defaults" do
     before do
-      stub_const("FooBackend", Class.new(Mobility::Backends::Null))
+      backend_class = stub_const("FooBackend", Class.new(Mobility::Backends::Null))
+      expect(backend_class).to receive(:valid_keys).twice.and_return([:association_name])
       Mobility::Backends.register_backend(:foo, FooBackend)
     end
     after { Mobility::Backends.instance_variable_get(:@backends).delete(:foo) }
@@ -198,6 +227,19 @@ describe Mobility::Plugins::Backend, type: :plugin do
       it "calls setup_model on backend" do
         expect(FooBackend).to receive(:setup_model).with(model_class, ["title"])
         model_class.include translations_class.new("title")
+      end
+    end
+
+    describe "default with invalid backend option" do
+      plugins do
+        backend :foo, invalid_option: :bar
+      end
+
+      it "raises exception when instantiated" do
+        expect {
+          translations_class.new("title")
+        }.to raise_error(Mobility::Plugins::Backend::InvalidOptionKey,
+                         "These are not valid foo backend keys: invalid_option.")
       end
     end
 

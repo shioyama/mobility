@@ -6,12 +6,12 @@ describe "ActiveRecord compatibility", orm: :active_record do
   include Helpers::Plugins
   include Helpers::Translates
   # Enable all plugins that are enabled by default pre v1.0
-  plugins :active_record, :reader, :writer, :cache, :dirty, :presence, :query, :attribute_methods
+  plugins :active_record, :reader, :writer, :cache, :dirty, :presence, :query, :attribute_methods, :fallbacks
 
   before { stub_const 'Post', Class.new(ActiveRecord::Base) }
 
   describe "#assign_attributes" do
-    before { translates Post, :title, backend: :key_value, type: :string }
+    before { translates Post, :title, backend: :key_value, type: :string, fallbacks: false }
     let!(:post) { Post.create(title: "foo title") }
 
     it "assigns translated attributes" do

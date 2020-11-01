@@ -120,6 +120,11 @@ On top of this, a backend will normally:
 
     # Defines setup hooks for backend to customize model class.
     module ClassMethods
+      # @return [Array] Valid option keys for this backend
+      def valid_keys
+        []
+      end
+
       # Assign block to be called on model class.
       # @yield [attribute_names, options]
       # @note When called multiple times, setup blocks will be appended

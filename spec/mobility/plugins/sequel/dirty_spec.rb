@@ -175,7 +175,7 @@ describe Mobility::Plugins::Sequel::Dirty, orm: :sequel, type: :plugin do
       ArticleWithFallbacks.class_eval do
         dataset = DB[:articles]
       end
-      translates ArticleWithFallbacks, :title, backend: backend_class, dirty: true, cache: false, fallbacks: { en: 'ja' }
+      translates ArticleWithFallbacks, :title, backend: backend_class, dirty: true, fallbacks: { en: 'ja' }
     end
 
     it "does not compare with fallback value" do

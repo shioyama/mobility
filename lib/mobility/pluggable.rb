@@ -17,6 +17,10 @@ Works with {Mobility::Plugin}. (Subclassed by {Mobility::Translations}.)
         Plugin.configure(self, defaults, &block)
       end
 
+      def included_plugins
+        included_modules.grep(Plugin)
+      end
+
       def defaults
         @defaults ||= {}
       end

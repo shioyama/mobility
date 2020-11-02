@@ -169,9 +169,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
       klass.plugin :backend, backend_class
       klass.plugin :foo
 
-      expect {
-        klass.new(foo: 'foo', bar: 'bar')
-      }.not_to raise_error(Mobility::Pluggable::InvalidOptionKey, "No plugin configured for these keys: foo, bar.")
+      expect { klass.new(foo: 'foo', bar: 'bar') }.not_to raise_error
 
       expect {
         klass.new(foo: 'foo', other: 'other')

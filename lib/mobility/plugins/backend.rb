@@ -33,7 +33,12 @@ Defines:
       def initialize(*args, **original_options)
         super
 
-        Backend.validate_default(self.class.defaults[:backend])
+        # Validate that the default backend from config has valid keys
+        if (default = self.class.defaults[:backend])
+          name, backend_options = default
+          extra_keys = backend_options.keys - backend.valid_keys
+          raise InvalidOptionKey, "These are not valid #{name} backend keys: #{extra_keys.join(', ')}." unless extra_keys.empty?
+        end
 
         include InstanceMethods
       end
@@ -103,15 +108,6 @@ Defines:
       # with plugin name.
       def self.configure_default(defaults, key, *args, **kwargs)
         defaults[key] = [args[0], kwargs] unless args.empty?
-      end
-
-      def self.validate_default(default)
-        return unless default
-
-        name, backend_options = default
-        backend = Backends.load_backend(name)
-        extra_keys = backend_options.keys - backend.valid_keys
-        raise InvalidOptionKey, "These are not valid #{name} backend keys: #{extra_keys.join(', ')}." unless extra_keys.empty?
       end
 
       module InstanceMethods

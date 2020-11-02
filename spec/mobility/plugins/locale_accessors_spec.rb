@@ -3,12 +3,20 @@ require "mobility/plugins/locale_accessors"
 
 describe Mobility::Plugins::LocaleAccessors, type: :plugin do
   plugin_setup :title
+  let(:translation_options) { {} } # override to disable passing backend option
+  let(:model_class) do
+    klass = Class.new do
+      def title(**); end
+      def title?(**); end
+      def title=(value, **); end
+    end
+    klass.include translations
+    klass
+  end
 
   context "with option = [locales]" do
     plugins do
       locale_accessors [:cz, :de, :'pt-BR']
-      reader
-      writer
     end
 
     it_behaves_like "locale accessor", :title, :cz

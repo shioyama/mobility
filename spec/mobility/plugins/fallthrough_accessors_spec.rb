@@ -3,6 +3,16 @@ require "mobility/plugins/fallthrough_accessors"
 
 describe Mobility::Plugins::FallthroughAccessors, type: :plugin do
   plugin_setup :title
+  let(:translation_options) { {} }
+  let(:model_class) do
+    klass = Class.new do
+      def title(**); end
+      def title?(**); end
+      def title=(_, **); end
+    end
+    klass.include translations
+    klass
+  end
 
   context "option value is default" do
     plugins do

@@ -24,14 +24,11 @@ model class is generated.
 
       default true
 
-      requires :reader
-      requires :writer
-
       # Apply fallthrough accessors plugin to attributes.
       # @param [Translations] translations
       # @param [Boolean] option
       initialize_hook do
-        if options[:fallthrough_accessors] && options[:reader] && options[:writer]
+        if options[:fallthrough_accessors]
           define_fallthrough_accessors(names)
         end
       end

@@ -1,29 +1,36 @@
 require "spec_helper"
 
-describe Mobility::Translations, orm: 'none' do
+describe Mobility::Translations, orm: :none do
+  let!(:translations_class) do
+    klass = Class.new(Mobility::Translations)
+    klass.plugins do
+      backend
+      reader
+      writer
+    end
+    klass
+  end
+
   describe "initializing" do
     specify {
-      expect { described_class.new(backend: :null) }.to allocate_under(25).objects
+      expect { translations_class.new(backend: :null) }.to allocate_under(60).objects
     }
   end
 
   describe "including into a class" do
     specify {
-      klass = Class.new do
-        extend Mobility
-      end
       expect {
-        klass.include(described_class.new(backend: :null))
+        klass = Class.new
+        klass.include(translations_class.new(backend: :null))
       }.to allocate_under(170).objects
     }
   end
 
   describe "accessors" do
     let(:klass) do
-      Class.new do
-        include Mobility
-        translates :title, backend: :null
-      end
+      klass = Class.new
+      klass.include(translations_class.new(:title, backend: :null))
+      klass
     end
 
     describe "calling attribute getter" do

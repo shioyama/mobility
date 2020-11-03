@@ -104,12 +104,12 @@ set.
         model.send(association_name)
       end
 
-      def self.included(backend)
-        backend.extend ClassMethods
-        backend.option_reader :association_name
-        backend.option_reader :subclass_name
-        backend.option_reader :foreign_key
-        backend.option_reader :table_name
+      def self.included(backend_class)
+        backend_class.extend ClassMethods
+        backend_class.option_reader :association_name
+        backend_class.option_reader :subclass_name
+        backend_class.option_reader :foreign_key
+        backend_class.option_reader :table_name
       end
 
       module ClassMethods
@@ -154,7 +154,5 @@ set.
         end
       end
     end
-
-    register_backend(:table, Table)
   end
 end

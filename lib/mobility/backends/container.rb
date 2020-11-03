@@ -19,8 +19,16 @@ stored).
 
 =end
     module Container
-    end
+      def self.included(backend_class)
+        backend_class.extend ClassMethods
+        backend_class.option_reader :column_name
+      end
 
-    register_backend(:container, Container)
+      module ClassMethods
+        def valid_keys
+          [:column_name]
+        end
+      end
+    end
   end
 end

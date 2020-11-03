@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "mobility/backends/active_record"
+require "mobility/backends/container"
 require "mobility/arel/nodes/pg_ops"
 
 module Mobility
@@ -11,15 +12,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
 =end
     class ActiveRecord::Container
       include ActiveRecord
-
-      # @!method column_name
-      #   Returns name of json or jsonb column used to store translations
-      #   @return [Symbol] (:translations) Name of translations column
-      option_reader :column_name
-
-      def self.valid_keys
-        [:column_name]
-      end
+      include Container
 
       # @!group Backend Accessors
       #

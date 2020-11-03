@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'mobility/backends/sequel/pg_hash'
 
 Sequel.extension :pg_json, :pg_json_ops

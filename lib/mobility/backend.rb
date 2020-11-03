@@ -120,7 +120,9 @@ On top of this, a backend will normally:
 
     # Defines setup hooks for backend to customize model class.
     module ClassMethods
-      # @return [Array] Valid option keys for this backend
+      # Returns valid option keys for this backend. This is overriden in
+      # backends to define which keys are valid for each backend class.
+      # @return [Array]
       def valid_keys
         []
       end

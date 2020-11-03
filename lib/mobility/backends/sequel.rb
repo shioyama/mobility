@@ -5,8 +5,8 @@ module Mobility
   module Backends
     module Sequel
       def self.included(backend_class)
-        backend_class.include(Backend)
-        backend_class.extend(ClassMethods)
+        backend_class.include Backend
+        backend_class.extend ClassMethods
       end
 
       module ClassMethods

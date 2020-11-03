@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-require "mobility/backends/sequel/json"
+require "mobility/backends/sequel"
 require "mobility/backends/sequel/jsonb"
+require "mobility/backends/container"
 
 module Mobility
   module Backends
@@ -11,14 +12,7 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
 =end
     class Sequel::Container
       include Sequel
-
-      # @!method column_name
-      #   @return [Symbol] (:translations) Name of translations column
-      option_reader :column_name
-
-      def self.valid_keys
-        [:column_name]
-      end
+      include Container
 
       # @!group Backend Accessors
       #

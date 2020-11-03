@@ -106,8 +106,8 @@ Defines:
 
       # Override default argument-handling in DSL to store kwargs passed along
       # with plugin name.
-      def self.configure_default(defaults, key, *args, **kwargs)
-        defaults[key] = [args[0], kwargs] unless args.empty?
+      def self.configure_default(defaults, key, backend = nil, backend_options = {})
+        defaults[key] = [backend, backend_options] if backend
       end
 
       module InstanceMethods

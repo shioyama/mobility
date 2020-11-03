@@ -79,8 +79,8 @@ the ActiveRecord dirty plugin for more information.
         def define_dirty_methods(attribute_names)
           attribute_names.each do |name|
             dirty_handler_methods.each_pattern(name) do |method_name, attribute_method|
-              define_method(method_name) do |*args, **kwargs|
-                mutations_from_mobility.send(attribute_method, Dirty.append_locale(name), *args, **kwargs)
+              define_method(method_name) do |*args|
+                mutations_from_mobility.send(attribute_method, Dirty.append_locale(name), *args)
               end
             end
 
@@ -131,12 +131,12 @@ the ActiveRecord dirty plugin for more information.
               method_name = pattern % 'attribute'
 
               module_eval <<-EOM, __FILE__, __LINE__ + 1
-              def #{method_name}(attr_name, *rest, **kwargs)
+              def #{method_name}(attr_name, *rest)
                 if (mutations_from_mobility.attribute_changed?(attr_name) ||
                     mutations_from_mobility.attribute_previously_changed?(attr_name))
-                  mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest, **kwargs)
+                  mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest)
                 else
-                  super
+                  super(attr_name, *rest)
                 end
               end
               EOM

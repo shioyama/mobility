@@ -240,6 +240,8 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
 
       aggregate_failures "changed after save" do
         expect(instance.title_changed?).to eq(true)
+        expect(instance.title_changed?(from: 'foo', to: 'bar')).to eq(true)
+        expect(instance.title_changed?(from: 'foo', to: 'baz')).to eq(false)
         expect(instance.title_change).to eq(["foo", "bar"])
         expect(instance.title_was).to eq("foo")
 

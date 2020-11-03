@@ -4,7 +4,7 @@
 
 1.0 is a rewrite of many internals of the gem. Please see the [wiki page on v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0) for more details on how to upgrade.
 
-## 1.0.0.beta.1 (unreleased)
+## 1.0.0.beta.1 (pre-release)
 
 - Remove `Mobility::Backend#apply_plugin`
   ([#454](https://github.com/shioyama/mobility/pull/454))
@@ -12,6 +12,8 @@
   ([#456](https://github.com/shioyama/mobility/pull/456))
 - Raise an exception if invalid options are passed to Translations initializer
   ([#457](https://github.com/shioyama/mobility/pull/457/files))
+- Fix Ruby 2.7 deprecation warnings
+  ([#460](https://github.com/shioyama/mobility/pull/460))
 
 ## 1.0.0.alpha (pre-release)
 

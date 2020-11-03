@@ -26,8 +26,8 @@ describe Mobility::Plugins::FallthroughAccessors, type: :plugin do
 
     it 'passes arguments and options to super when method does not match' do
       mod = Module.new do
-        def method_missing(method_name, *_args, **options, &block)
-          (method_name == :foo) ? options : super
+        def method_missing(method_name, *args, &block)
+          (method_name == :foo) ? args : super
         end
       end
 
@@ -37,7 +37,7 @@ describe Mobility::Plugins::FallthroughAccessors, type: :plugin do
       instance = model_class.new
 
       options = { some: 'params' }
-      expect(instance.foo(**options)).to eq(options)
+      expect(instance.foo(**options)).to eq([options])
     end
 
     it 'does not pass on empty keyword options hash to super' do

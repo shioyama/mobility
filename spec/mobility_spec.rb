@@ -26,11 +26,23 @@ describe Mobility, orm: :none do
         klass.plugin :foo
         klass.plugin :backend
         Mobility.translates_with(klass)
-        expect(klass).to receive(:new).
-          with(:title, backend: :null, foo: :bar).
-          and_call_original
+
+        # but I can't get the expectation to handle keyword arguments without
+        # this workaround. Using receive(:new) patches with no keyword
+        # arguments which triggers a warning.
+        called = false
+        scope = self
+        klass.define_singleton_method(:new) do |*args, **kwargs|
+          called = true
+          scope.instance_eval do
+            expect(args).to eq([:title])
+            expect(kwargs).to eq({ backend: :null, foo: :bar })
+          end
+          super(*args, **kwargs)
+        end
         model.extend described_class
         model.translates :title, backend: :null, foo: :bar
+        expect(called).to eq(true)
       end
     end
   end

@@ -58,7 +58,7 @@ To use the latest pre-version of Mobility 1.0, add this line to your
 application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 1.0.0.beta.1'
+gem 'mobility', '~> 1.0.0.beta1'
 ```
 
 For the latest stable version of Mobility, see the readme on the

@@ -13,7 +13,7 @@ Mobility
 [wiki]: https://github.com/shioyama/mobility/wiki
 
 **This is the readme for the [`master`](https://github.com/shioyama/mobility)
-branch, which corresponds to v1.0.0.alpha, a pre-release version of Mobility.
+branch, which corresponds to v1.0.0.beta, a pre-release version of Mobility.
 If you are using an earlier version (0.8.x or earlier), you probably want the
 readme on the [0-8-stable
 branch](https://github.com/shioyama/mobility/tree/0-8-stable).**
@@ -54,11 +54,11 @@ section of the wiki.
 Installation
 ------------
 
-To use the latest (unreleased) version of Mobility, add this line to your
+To use the latest pre-version of Mobility 1.0, add this line to your
 application's Gemfile:
 
 ```ruby
-gem 'mobility', git: 'https://github.com/shioyama/mobility.git'
+gem 'mobility', '~> 1.0.0.beta.1'
 ```
 
 For the latest stable version of Mobility, see the readme on the

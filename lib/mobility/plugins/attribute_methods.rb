@@ -15,6 +15,7 @@ attributes only.
       extend Plugin
 
       default true
+      requires :attributes
 
       initialize_hook do |*names|
         include InstanceMethods

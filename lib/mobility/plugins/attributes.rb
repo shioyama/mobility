@@ -32,8 +32,15 @@ for aggregating attributes.
       end
 
       included_hook do |klass|
-        klass.extend ClassMethods
-        @names.each { |name| klass.register_mobility_attribute(name) }
+        names = @names
+
+        klass.class_eval do
+          extend ClassMethods
+          names.each { |name| mobility_attributes << name.to_s }
+          mobility_attributes.uniq!
+        rescue FrozenError
+          raise FrozenAttributesError, "Attempting to translate these attributes on #{klass}, which has already been subclassed: #{names.join(', ')}."
+        end
       end
 
       module ClassMethods
@@ -44,23 +51,20 @@ for aggregating attributes.
           mobility_attributes.include?(name.to_s)
         end
 
-        # Register a new attribute name. Public, but treat as internal.
-        # @param [String, Symbol] Attribute name
-        def register_mobility_attribute(name)
-          (self.mobility_attributes << name.to_s).uniq!
-        end
-
-        def inherited(klass)
-          super
-          mobility_attributes.each { |name| klass.register_mobility_attribute(name) }
-        end
-
         # Return translated attribute names on this model.
         # @return [Array<String>] Attribute names
         def mobility_attributes
           @mobility_attributes ||= []
         end
+
+        def inherited(klass)
+          super
+          attrs = mobility_attributes.freeze # ensure attributes are not modified after being inherited
+          klass.class_eval { @mobility_attributes = attrs.dup }
+        end
       end
+
+      class FrozenAttributesError < Error; end
     end
 
     register_plugin(:attributes, Attributes)

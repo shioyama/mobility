@@ -100,6 +100,18 @@ describe Mobility::Plugins::Backend, type: :plugin do
         content_backend_class = model_subclass.mobility_backend_class("content")
         expect(content_backend_class).to be <(backend_class_2)
       end
+
+      it "freezes backends after subclassing" do
+        backend_class_1 = Class.new
+        backend_class_1.include Mobility::Backend
+
+        mod1 = translations_class.new("title", backend: backend_class_1)
+        model_class.include mod1
+
+        Class.new(model_class)
+
+        expect(model_class.send(:mobility_backend_classes)).to be_frozen
+      end
     end
 
     describe "#mobility_backends" do

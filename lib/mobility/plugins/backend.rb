@@ -56,8 +56,11 @@ Defines:
 
           backend_class.setup_model(klass, names)
 
-          @names.each do |name|
-            klass.register_mobility_backend_class(name, @backend_class)
+          names = @names
+          backend_class = @backend_class
+
+          klass.class_eval do
+            names.each { |name| mobility_backend_classes[name.to_sym] = backend_class }
           end
 
           backend_class
@@ -137,12 +140,9 @@ Defines:
           raise KeyError, "No backend for: #{name}"
         end
 
-        def register_mobility_backend_class(name, backend_class)
-          mobility_backend_classes[name.to_sym] = backend_class
-        end
-
         def inherited(klass)
-          klass.mobility_backend_classes.merge!(@mobility_backend_classes)
+          parent_classes = mobility_backend_classes.freeze # ensure backend classes are not modified after being inherited
+          klass.class_eval { @mobility_backend_classes = parent_classes.dup }
           super
         end
 

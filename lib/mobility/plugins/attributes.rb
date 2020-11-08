@@ -55,8 +55,6 @@ for aggregating attributes.
           mobility_attributes.each { |name| klass.register_mobility_attribute(name) }
         end
 
-        protected
-
         # Return translated attribute names on this model.
         # @return [Array<String>] Attribute names
         def mobility_attributes

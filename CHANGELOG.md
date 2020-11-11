@@ -4,6 +4,13 @@
 
 1.0 is a rewrite of many internals of the gem. Please see the [wiki page on v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0) for more details on how to upgrade.
 
+## 1.0.0.beta2 (pre-release)
+
+- Refactor attributes & backend plugins and make `mobility_attributes` public
+  ([#462](https://github.com/shioyama/mobility/pull/462))
+- Make attribute_methods plugin depend on attributes
+  ([#461](https://github.com/shioyama/mobility/pull/461))
+
 ## 1.0.0.beta1 (pre-release)
 
 - Remove `Mobility::Backend#apply_plugin`

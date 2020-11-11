@@ -91,10 +91,10 @@ The generator will create an initializer file `config/initializers/mobility.rb`
 which looks something like this:
 
 ```ruby
-Mobility.configure do |config|
+Mobility.configure do
   # PLUGINS
 
-  config.plugins do
+  plugins do
     backend :key_value
 
     active_record

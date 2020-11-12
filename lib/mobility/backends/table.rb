@@ -140,17 +140,21 @@ set.
         end
 
         def clear_cache
-          model_cache && model_cache.clear
+          cache.clear
         end
 
         private
 
         def cache
-          model_cache || model.instance_variable_set(:"@__mobility_#{association_name}_cache", {})
+          if model.instance_variable_defined?(cache_name)
+            model.instance_variable_get(cache_name)
+          else
+            model.instance_variable_set(cache_name, {})
+          end
         end
 
-        def model_cache
-          model.instance_variable_get(:"@__mobility_#{association_name}_cache")
+        def cache_name
+          @cache_name ||= :"@__mobility_#{association_name}_cache"
         end
       end
     end

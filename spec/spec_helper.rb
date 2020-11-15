@@ -19,7 +19,6 @@ require 'allocation_stats' if ENV['FEATURE'] == 'performance'
 require 'json'
 
 require 'mobility'
-require "mobility/backends/null"
 
 I18n.enforce_available_locales = true
 I18n.available_locales = [:en, :'en-US', :ja, :fr, :de, :'de-DE', :cz, :pl, :pt, :'pt-BR']

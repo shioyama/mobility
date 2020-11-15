@@ -104,6 +104,7 @@ module Mobility
       model_class.extend self
     end
 
+    # Alias to default backend defined on *translations_class+.
     # @return [Symbol,Class]
     def default_backend
       translations_class.defaults[:backend]

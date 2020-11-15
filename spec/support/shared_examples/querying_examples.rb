@@ -827,7 +827,7 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
 
   describe "dataset queries" do
     # Shortcut for passing block to e.g. Post.i18n
-    def query(*args, &block); model_class.i18n(*args, &block); end
+    def query(*args, **options, &block); model_class.i18n(*args, **options, &block); end
 
     context "single-block querying" do
       let!(:i) { [

@@ -165,7 +165,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       # Returns translation for a given locale, or initializes one if none is present.
       # @param [Symbol] locale
       # @return [Mobility::Sequel::TextTranslation,Mobility::Sequel::StringTranslation]
-      def translation_for(locale, _)
+      def translation_for(locale, **)
         translation = model.send(association_name).find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= class_name.new(locale: locale, key: attribute)
         translation

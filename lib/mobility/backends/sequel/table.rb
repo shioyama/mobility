@@ -158,7 +158,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         include Mobility::Sequel::ColumnChanges.new(attributes)
       end
 
-      def translation_for(locale, _)
+      def translation_for(locale, **)
         translation = model.send(association_name).find { |t| t.locale == locale.to_s }
         translation ||= translation_class.new(locale: locale)
         translation

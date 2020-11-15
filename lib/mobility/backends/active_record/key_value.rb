@@ -193,7 +193,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       # Returns translation for a given locale, or builds one if none is present.
       # @param [Symbol] locale
       # @return [Mobility::Backends::ActiveRecord::KeyValue::TextTranslation,Mobility::Backends::ActiveRecord::KeyValue::StringTranslation]
-      def translation_for(locale, _options = {})
+      def translation_for(locale, **)
         translation = translations.find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= translations.build(locale: locale, key: attribute)
         translation

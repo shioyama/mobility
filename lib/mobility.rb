@@ -6,16 +6,70 @@ require 'mobility/version'
 =begin
 
 Mobility is a gem for storing and retrieving localized data through attributes
-on a class. The {Mobility} module includes all necessary methods and modules to
-support defining backend accessors on a class.
+on a class.
 
-To enable Mobility on a class, simply include or extend the {Mobility} module,
-and define any attribute accessors using {Translates#translates}.
+There are two ways to translate attributes on a class, both of which are
+variations on the same basic mechanism. The first and most common way is to
+extend the `Mobility` module, which adds a class method +translates+.
+Translated attributes can then be defined like this:
 
-  class MyClass
+  class Post
     extend Mobility
     translates :title, backend: :key_value
   end
+
+Behind the scenes, +translates+ simply creates an instance of
++Mobility.translations_class+, passes it whatever arguments are passed to
++translates+, and includes the instance (which is a module) into the class.
+
+So the above example is equivalent to:
+
+  class Post
+    Mobility.translations_class.new(:title, backend: :key_value)
+  end
+
+`Mobility.translations_class` is a subclass of `Mobility::Translations` created
+when `Mobility.configure` is called to configure Mobility. In fact, when you
+call `Mobility.configure`, it is the subclass of `Mobility::Translations` which
+is passed to the block as `config`. Plugins and plugin configuration is all
+applied to the same `Mobility.translations_class`.
+
+There is another way to use Mobility, which is to create your own subclass or
+subclasses of +Mobility::Translations+ and include them explicitly, without
+using +translates+.
+
+For example:
+
+  class Translations < Mobility::Translations
+    plugins do
+      backend :key_value
+      # ...
+    end
+  end
+
+  class Post
+    include Translations.new(:title)
+  end
+
+This usage might be handy if, for example, you want to have more complex
+configuration, where some models use some plugins while others do not. Since
+`Mobility::Translations` is a class like any other, you can subclass it and
+define plugins specifically on the subclass which are not present on its
+parent:
+
+  class TranslationsWithFallbacks < Translations
+    plugins do
+      fallbacks
+    end
+  end
+
+  class Comment
+    include TranslationsWithFallbacks.new(:author)
+  end
+
+In this case, +Comment+ uses +TranslationsWithFallbacks+ and thus has the
+fallbacks plugin, whereas +Post+ uses +Translations+ which does not have that
+plugin enabled.
 
 =end
 module Mobility

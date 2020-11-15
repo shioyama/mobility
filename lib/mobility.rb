@@ -120,7 +120,6 @@ module Mobility
         yield translations_class
       end
     end
-    # @!endgroup
 
     def translates_with(pluggable)
       raise ArgumentError, "translations class must be a subclass of Module." unless Module === pluggable

@@ -11,6 +11,9 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
   let(:content_backend) { backend_for(article, :content) }
   let(:article) { Article.new }
 
+  let(:string_translation_class) { Mobility::Backends::ActiveRecord::KeyValue::StringTranslation }
+  let(:text_translation_class) { Mobility::Backends::ActiveRecord::KeyValue::TextTranslation }
+
   context "with no plugins" do
     include_backend_examples described_class, 'Article', type: :text
   end
@@ -93,7 +96,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
             { key: "title", value: "新規記事", locale: "ja", translatable: article },
             { key: "content", value: "Once upon a time...", locale: "en", translatable: article },
             { key: "content", value: "昔々あるところに…", locale: "ja", translatable: article }
-          ].each { |attrs| Mobility::ActiveRecord::TextTranslation.create!(attrs) }
+          ].each { |attrs| text_translation_class.create!(attrs) }
         end
 
         it "returns attribute in locale from translations table" do
@@ -133,7 +136,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
               title_backend.write(:en, "New Article")
             }.to change(subject.send(title_backend.association_name), :size).by(1)
 
-            expect { subject.save! }.to change(Mobility::ActiveRecord::TextTranslation, :count).by(1)
+            expect { subject.save! }.to change(text_translation_class, :count).by(1)
           end
 
           it "assigns attributes to translation" do
@@ -151,7 +154,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
 
         context "translation for locale exists" do
           before do
-            Mobility::ActiveRecord::TextTranslation.create!(
+            text_translation_class.create!(
               key: "title",
               value: "foo",
               locale: "en",
@@ -180,7 +183,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
           end
 
           it "removes persisted translation if assigned nil when record is saved" do
-            expect(Mobility::ActiveRecord::TextTranslation.count).to eq(1)
+            expect(text_translation_class.count).to eq(1)
             expect {
               title_backend.write(:en, nil)
             }.not_to change(subject.send(title_backend.association_name), :count)
@@ -189,7 +192,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
               subject.save!
             }.to change(subject.send(title_backend.association_name), :count).by(-1)
 
-            expect(Mobility::ActiveRecord::TextTranslation.count).to eq(0)
+            expect(text_translation_class.count).to eq(0)
           end
 
           it "removes unpersisted translation if value is nil when record is saved" do
@@ -218,7 +221,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         # translated attributes we have defined. This matters if, say, we save some translations, then change
         # the translated attributes for the model; we should only see the new translations, not the ones
         # created earlier with different keys.
-        translation = Mobility::ActiveRecord::TextTranslation.create(key: "foo", value: "bar", locale: "en", translatable: article)
+        translation = text_translation_class.create(key: "foo", value: "bar", locale: "en", translatable: article)
         article = Article.first
 
         aggregate_failures do
@@ -239,7 +242,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
 
         aggregate_failures do
           expect(Article.count).to eq(1)
-          expect(Mobility::ActiveRecord::TextTranslation.count).to eq(2)
+          expect(text_translation_class.count).to eq(2)
           expect(article.send(title_backend.association_name).size).to eq(2)
           expect(article.title).to eq("New Article")
           expect(article.content).to eq("Once upon a time...")
@@ -261,7 +264,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
           expect(article.title).to eq("新規記事")
           expect(article.content).to eq("昔々あるところに…")
           expect(Article.count).to eq(1)
-          expect(Mobility::ActiveRecord::TextTranslation.count).to eq(4)
+          expect(text_translation_class.count).to eq(4)
           expect(article.send(title_backend.association_name).size).to eq(4)
         end
       end
@@ -285,7 +288,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
       plugins :active_record, :reader, :writer
       before do
         translates Article, :title, backend: :key_value, type: :text
-        translates Article, :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :string_translations
+        translates Article, :short_title, backend: :key_value, class_name: string_translation_class, association_name: :string_translations
       end
 
       it "saves translations correctly" do
@@ -301,10 +304,10 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
           expect(article.title).to eq("foo title")
           expect(article.short_title).to eq("bar short title")
 
-          text = Mobility::ActiveRecord::TextTranslation.first
+          text = text_translation_class.first
           expect(text.value).to eq("foo title")
 
-          string = Mobility::ActiveRecord::StringTranslation.first
+          string = string_translation_class.first
           expect(string.value).to eq("bar short title")
         end
       end
@@ -329,17 +332,17 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         # Create translations on another model, to check they do not get destroyed
         Post.create(title: "post title", content: "post content")
 
-        expect(Mobility::ActiveRecord::StringTranslation.count).to eq(1)
-        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(5)
+        expect(string_translation_class.count).to eq(1)
+        expect(text_translation_class.count).to eq(5)
 
-        Mobility::ActiveRecord::TextTranslation.create!(translatable: article, key: "key1", value: "value1", locale: "de")
-        Mobility::ActiveRecord::StringTranslation.create!(translatable: article, key: "key2", value: "value2", locale: "fr")
-        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(6)
-        expect(Mobility::ActiveRecord::StringTranslation.count).to eq(2)
+        text_translation_class.create!(translatable: article, key: "key1", value: "value1", locale: "de")
+        string_translation_class.create!(translatable: article, key: "key2", value: "value2", locale: "fr")
+        expect(text_translation_class.count).to eq(6)
+        expect(string_translation_class.count).to eq(2)
 
         article.destroy!
-        expect(Mobility::ActiveRecord::TextTranslation.count).to eq(1)
-        expect(Mobility::ActiveRecord::StringTranslation.count).to eq(1)
+        expect(text_translation_class.count).to eq(1)
+        expect(string_translation_class.count).to eq(1)
       end
     end
 
@@ -357,7 +360,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         backend_class.configure(options)
         expect(options).to eq({
           type: :string,
-          class_name: Mobility::ActiveRecord::StringTranslation,
+          class_name: string_translation_class,
           association_name: :string_translations,
           table_alias_affix: "Article_%s_string_translations"
         })
@@ -368,7 +371,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         backend_class.configure(options)
         expect(options).to eq({
           type: :text,
-          class_name: Mobility::ActiveRecord::TextTranslation,
+          class_name: text_translation_class,
           association_name: :text_translations,
           table_alias_affix: "Article_%s_text_translations"
         })
@@ -377,7 +380,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
       it "raises ArgumentError if type has no corresponding model class" do
         expect { backend_class.configure(type: "integer") }
           .to raise_error(ArgumentError,
-                          "You must define a Mobility::ActiveRecord::IntegerTranslation class.")
+                          "You must define a Mobility::Backends::ActiveRecord::KeyValue::IntegerTranslation class.")
       end
 
       it "sets default association_name and class_name from type" do
@@ -385,7 +388,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         backend_class.configure(options)
         expect(options).to eq({
           type: :text,
-          class_name: Mobility::ActiveRecord::TextTranslation,
+          class_name: text_translation_class,
           association_name: :text_translations,
           table_alias_affix: "Article_%s_text_translations"
         })
@@ -448,7 +451,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
 
       context "model with two translated attributes on different tables" do
         before do
-          translates Article, :short_title, backend: :key_value, class_name: Mobility::ActiveRecord::StringTranslation, association_name: :string_translations
+          translates Article, :short_title, backend: :key_value, class_name: string_translation_class, association_name: :string_translations
           @article1 = Article.create(title: "foo post", short_title: "bar short 1")
           @article2 = Article.create(title: "foo post", short_title: "bar short 2")
           @article3 = Article.create(                   short_title: "bar short 1")

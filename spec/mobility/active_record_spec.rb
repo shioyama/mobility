@@ -10,7 +10,7 @@ describe "Mobility::ActiveRecord", orm: :active_record do
   require "mobility/backends/active_record/table"
   require "mobility/backends/active_record/key_value"
 
-  pending "resolves ActiveRecord to ::ActiveRecord in model class" do
+  it "resolves ActiveRecord to ::ActiveRecord in model class" do
     ar_class = Class.new(ActiveRecord::Base)
     ar_class.extend Mobility
 

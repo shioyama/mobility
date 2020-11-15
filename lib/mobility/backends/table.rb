@@ -10,8 +10,9 @@ Stores attribute translation as rows on a model-specific translation table
 the table name for a model +Post+ with table +posts+ will be
 +post_translations+, and the translation class will be +Post::Translation+. The
 translation class is dynamically created when the backend is initialized on the
-model class, and subclasses {Mobility::ActiveRecord::ModelTranslation} (for AR
-models) or inherits {Mobility::Sequel::ModelTranslation} (for Sequel models).
+model class, and subclasses
+{Mobility::Backends::ActiveRecord::Table::Translation} (for AR models) or
+inherits {Mobility::Backends::Sequel::Table::Translation} (for Sequel models).
 
 The backend expects the translations table (+post_translations+) to have:
 

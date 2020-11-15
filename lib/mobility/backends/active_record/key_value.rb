@@ -1,8 +1,6 @@
 # frozen-string-literal: true
 require "mobility/backends/active_record"
 require "mobility/backends/key_value"
-require "mobility/active_record/string_translation"
-require "mobility/active_record/text_translation"
 
 module Mobility
   module Backends
@@ -37,11 +35,11 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           super
           if type = options[:type]
             options[:association_name] ||= :"#{options[:type]}_translations"
-            options[:class_name]       ||= Mobility::ActiveRecord.const_get("#{type.capitalize}Translation")
+            options[:class_name]       ||= const_get("#{type.capitalize}Translation")
           end
           options[:table_alias_affix] = "#{model_class}_%s_#{options[:association_name]}"
         rescue NameError
-          raise ArgumentError, "You must define a Mobility::ActiveRecord::#{type.capitalize}Translation class."
+          raise ArgumentError, "You must define a Mobility::Backends::ActiveRecord::KeyValue::#{type.capitalize}Translation class."
         end
         # @!endgroup
 
@@ -194,7 +192,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
       # Returns translation for a given locale, or builds one if none is present.
       # @param [Symbol] locale
-      # @return [Mobility::ActiveRecord::TextTranslation,Mobility::ActiveRecord::StringTranslation]
+      # @return [Mobility::Backends::ActiveRecord::KeyValue::TextTranslation,Mobility::Backends::ActiveRecord::KeyValue::StringTranslation]
       def translation_for(locale, _options = {})
         translation = translations.find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= translations.build(locale: locale, key: attribute)
@@ -205,11 +203,29 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         def self.included(model_class)
           model_class.after_destroy do
             [:string, :text].each do |type|
-              Mobility::ActiveRecord.const_get("#{type.capitalize}Translation").
+              Mobility::Backends::ActiveRecord::KeyValue.const_get("#{type.capitalize}Translation").
                 where(translatable: self).destroy_all
             end
           end
         end
+      end
+
+      class Translation < ::ActiveRecord::Base
+        self.abstract_class = true
+
+        belongs_to :translatable, polymorphic: true, touch: true
+
+        validates :key, presence: true, uniqueness: { scope: [:translatable_id, :translatable_type, :locale], case_sensitive: true }
+        validates :translatable, presence: true
+        validates :locale, presence: true
+      end
+
+      class TextTranslation < Translation
+        self.table_name = "mobility_text_translations"
+      end
+
+      class StringTranslation < Translation
+        self.table_name = "mobility_string_translations"
       end
     end
 

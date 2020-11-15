@@ -1,7 +1,6 @@
 # frozen-string-literal: true
 require "mobility/backends/active_record"
 require "mobility/backends/table"
-require "mobility/active_record/model_translation"
 
 module Mobility
   module Backends
@@ -245,7 +244,7 @@ columns to that table.
           if self.const_defined?(subclass_name, false)
             const_get(subclass_name, false)
           else
-            const_set(subclass_name, Class.new(Mobility::ActiveRecord::ModelTranslation))
+            const_set(subclass_name, Class.new(Translation))
           end
 
         translation_class.table_name = options[:table_name]
@@ -302,6 +301,12 @@ columns to that table.
           empty_translations = select{ |t| required_attributes.map(&t.method(:send)).none? }
           destroy(empty_translations) if empty_translations.any?
         end
+      end
+
+      # Subclassed dynamically to generate translation class.
+      class Translation < ::ActiveRecord::Base
+        self.abstract_class = true
+        validates :locale, presence: true
       end
     end
 

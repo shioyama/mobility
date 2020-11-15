@@ -3,6 +3,7 @@ require "spec_helper"
 return unless defined?(Sequel)
 
 require "mobility/plugins/sequel/dirty"
+require "mobility/backends/null"
 
 describe Mobility::Plugins::Sequel::Dirty, orm: :sequel, type: :plugin do
   plugins do

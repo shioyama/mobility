@@ -1,6 +1,7 @@
 require "spec_helper"
 require "mobility/plugins/backend"
 require "mobility/plugins/writer"
+require "mobility/backends/null"
 
 describe Mobility::Plugins::Backend, type: :plugin do
   plugins :backend

@@ -197,4 +197,18 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel, type: :backend do
       end
     end
   end
+
+  describe "translation class validations" do
+    plugins :sequel, :reader, :writer, :cache
+    before { translates Article, :title, backend: :table }
+
+    it "validates presence of locale" do
+      article.title = "foo"
+      article.save
+      translation = article.translations.first
+      translation.locale = nil
+      expect(translation.valid?).to eq(false)
+      expect(translation.errors).to eq(locale: ["is not present"])
+    end
+  end
 end

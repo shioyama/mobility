@@ -6,7 +6,6 @@ require "mobility/sequel/column_changes"
 require "mobility/sequel/hash_initializer"
 require "mobility/sequel/string_translation"
 require "mobility/sequel/text_translation"
-require "mobility/sequel/sql"
 
 module Mobility
   module Backends
@@ -43,7 +42,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         # @!endgroup
 
         def build_op(attr, locale)
-          ::Mobility::Sequel::SQL::QualifiedIdentifier.new(table_alias(attr, locale), :value, locale, self, attribute_name: attr)
+          QualifiedIdentifier.new(table_alias(attr, locale), :value, locale, self, attr)
         end
 
         # @param [Sequel::Dataset] dataset Dataset to prepare
@@ -75,7 +74,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           case predicate
           when Array
             visit_collection(predicate, locale)
-          when ::Mobility::Sequel::SQL::QualifiedIdentifier
+          when QualifiedIdentifier
             visit_sql_identifier(predicate, locale)
           when ::Sequel::SQL::BooleanExpression
             visit_boolean(predicate, locale)
@@ -199,6 +198,17 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
         def translations
           (model.send(association_name) + cache.values).uniq
+        end
+      end
+
+      class QualifiedIdentifier < ::Sequel::SQL::QualifiedIdentifier
+        attr_reader :backend_class, :locale, :attribute_name
+
+        def initialize(table, column, locale, backend_class, attribute_name)
+          @backend_class = backend_class
+          @locale = locale
+          @attribute_name = attribute_name || column
+          super(table, column)
         end
       end
     end

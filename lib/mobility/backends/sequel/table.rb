@@ -4,7 +4,6 @@ require "mobility/backends/sequel"
 require "mobility/backends/table"
 require "mobility/sequel/column_changes"
 require "mobility/sequel/model_translation"
-require "mobility/sequel/sql"
 
 module Mobility
   module Backends
@@ -52,7 +51,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         # @param [Symbol] locale Locale
         # @return [Sequel::SQL::QualifiedIdentifier]
         def build_op(attr, locale)
-          ::Mobility::Sequel::SQL::QualifiedIdentifier.new(table_alias(locale), attr, locale, self, attribute_name: attr)
+          ::Sequel::SQL::QualifiedIdentifier.new(table_alias(locale), attr || :value)
         end
 
         # @param [Sequel::Dataset] dataset Dataset to prepare
@@ -83,7 +82,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
           case predicate
           when Array
             visit_collection(predicate, locale)
-          when ::Mobility::Sequel::SQL::QualifiedIdentifier
+          when ::Sequel::SQL::QualifiedIdentifier
             visit_sql_identifier(predicate, locale)
           when ::Sequel::SQL::BooleanExpression
             visit_boolean(predicate, locale)

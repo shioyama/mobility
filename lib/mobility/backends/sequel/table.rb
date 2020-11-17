@@ -3,7 +3,6 @@ require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/table"
 require "mobility/sequel/column_changes"
-require "mobility/sequel/model_translation"
 
 module Mobility
   module Backends
@@ -127,7 +126,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
             const_get(subclass_name, false)
           else
             const_set(subclass_name, Class.new(::Sequel::Model(options[:table_name]))).tap do |klass|
-              klass.include ::Mobility::Sequel::ModelTranslation
+              klass.include Translation
             end
           end
 
@@ -173,6 +172,16 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         end
       end
 
+      module Translation
+        def self.included(base)
+          base.plugin :validation_helpers
+        end
+
+        def validate
+          super
+          validates_presence [:locale]
+        end
+      end
       class CacheRequired < ::StandardError; end
     end
 

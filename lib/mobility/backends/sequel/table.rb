@@ -2,7 +2,6 @@
 require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/table"
-require "mobility/sequel/column_changes"
 
 module Mobility
   module Backends
@@ -117,6 +116,8 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         end
       end
 
+      backend = self
+
       setup do |attributes, options|
         association_name = options[:association_name]
         subclass_name    = options[:subclass_name]
@@ -153,7 +154,8 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         end
         include callback_methods
 
-        include Mobility::Sequel::ColumnChanges.new(attributes)
+        include(mod = Module.new)
+        backend.define_column_changes(mod, attributes)
       end
 
       def translation_for(locale, **)

@@ -2,7 +2,6 @@
 require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/key_value"
-require "mobility/sequel/column_changes"
 require "mobility/sequel/hash_initializer"
 
 module Mobility
@@ -125,6 +124,8 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
       end
 
+      backend = self
+
       setup do |attributes, options|
         association_name   = options[:association_name]
         translations_class = options[:class_name]
@@ -156,7 +157,8 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         include callback_methods
 
         include DestroyKeyValueTranslations
-        include Mobility::Sequel::ColumnChanges.new(attributes)
+        include(mod = Module.new)
+        backend.define_column_changes(mod, attributes)
       end
 
       # Returns translation for a given locale, or initializes one if none is present.

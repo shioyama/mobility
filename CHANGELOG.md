@@ -4,6 +4,11 @@
 
 1.0 is a rewrite of many internals of the gem. Please see the [wiki page on v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0) for more details on how to upgrade.
 
+## 1.0.0.rc1 (pre-release)
+
+- Remove `Mobility::ActiveRecord`, `Mobility::Sequel` and `Mobility::Arel`, and
+  general cleanup ([#464](https://github.com/shioyama/mobility/pull/464))
+
 ## 1.0.0.beta2 (pre-release)
 
 - Refactor attributes & backend plugins and make `mobility_attributes` public

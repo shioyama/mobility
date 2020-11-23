@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "mobility/backends/active_record"
 require "mobility/backends/container"
-require 'mobility/plugins/arel/nodes/pg_ops'
+require "mobility/plugins/arel/nodes/pg_ops"
 
 module Mobility
   module Backends

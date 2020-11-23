@@ -118,7 +118,7 @@ columns to that table.
         # @return [Mobility::Plugins::Arel::Attribute] Arel node for column on translation table
         def build_node(attr, locale)
           aliased_table = model_class.const_get(subclass_name).arel_table.alias(table_alias(locale))
-          Mobility::Plugins::Arel::Attribute.new(aliased_table, attr, locale, self)
+          Plugins::Arel::Attribute.new(aliased_table, attr, locale, self)
         end
 
         # Joins translations using either INNER/OUTER join appropriate to the
@@ -189,7 +189,7 @@ columns to that table.
       # we need an OUTER JOIN. In the second case, one attribute is matched
       # against a non-nil value, so we can use an INNER JOIN.
       #
-      class Visitor < ::Mobility::Plugins::Arel::Visitor
+      class Visitor < Plugins::Arel::Visitor
         private
 
         def visit_Arel_Nodes_Equality(object)

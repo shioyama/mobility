@@ -28,7 +28,7 @@ Implements the {Mobility::Backends::Hstore} backend for ActiveRecord models.
         #   attribute key on hstore column
         def self.build_node(attr, locale)
           column_name = column_affix % attr
-          Mobility::Plugins::Arel::Nodes::Hstore.new(model_class.arel_table[column_name], build_quoted(locale))
+          Plugins::Arel::Nodes::Hstore.new(model_class.arel_table[column_name], build_quoted(locale))
         end
       end
     end

@@ -55,9 +55,9 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
           column = model_class.arel_table[column_name]
           case column_type
           when :json
-            Mobility::Plugins::Arel::Nodes::JsonContainer.new(column, build_quoted(locale), build_quoted(attr))
+            Plugins::Arel::Nodes::JsonContainer.new(column, build_quoted(locale), build_quoted(attr))
           when :jsonb
-            Mobility::Plugins::Arel::Nodes::JsonbContainer.new(column, build_quoted(locale), build_quoted(attr))
+            Plugins::Arel::Nodes::JsonbContainer.new(column, build_quoted(locale), build_quoted(attr))
           end
         end
 

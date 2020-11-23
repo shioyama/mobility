@@ -57,7 +57,7 @@ can be run again to add new attributes or locales.)
       #   on model table
       def self.build_node(attr, locale)
         model_class.arel_table[Column.column_name_for(attr, locale)]
-          .extend(::Mobility::Plugins::Arel::MobilityExpressions)
+          .extend(Plugins::Arel::MobilityExpressions)
       end
 
       private

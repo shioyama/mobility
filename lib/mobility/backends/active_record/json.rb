@@ -36,7 +36,7 @@ Implements the {Mobility::Backends::Json} backend for ActiveRecord models.
         #   attribute key on jsonb column
         def self.build_node(attr, locale)
           column_name = column_affix % attr
-          Mobility::Plugins::Arel::Nodes::Json.new(model_class.arel_table[column_name], build_quoted(locale))
+          Plugins::Arel::Nodes::Json.new(model_class.arel_table[column_name], build_quoted(locale))
         end
       end
     end

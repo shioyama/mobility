@@ -2,7 +2,6 @@
 require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/hash_valued"
-require "mobility/sequel/hash_initializer"
 
 module Mobility
   module Backends
@@ -39,7 +38,7 @@ jsonb).
         setup do |attributes, options|
           columns = attributes.map { |attribute| (options[:column_affix] % attribute).to_sym }
 
-          before_validation = Module.new do
+          mod = Module.new do
             define_method :before_validation do
               columns.each do |column|
                 self[column].delete_if { |_, v| Util.blank?(v) }
@@ -47,9 +46,8 @@ jsonb).
               super()
             end
           end
-          include before_validation
-          include Mobility::Sequel::HashInitializer.new(*columns)
-          include(mod = Module.new)
+          include mod
+          backend.define_hash_initializer(mod, columns)
           backend.define_column_changes(mod, attributes, column_affix: options[:column_affix])
 
           plugin :defaults_setter

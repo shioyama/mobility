@@ -2,7 +2,6 @@
 require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/key_value"
-require "mobility/sequel/hash_initializer"
 
 module Mobility
   module Backends

@@ -57,9 +57,11 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
         end
       end
 
+      backend = self
+
       setup do |attributes, options|
         column_name = options[:column_name]
-        before_validation = Module.new do
+        mod = Module.new do
           define_method :before_validation do
             self[column_name].each do |k, v|
               v.delete_if { |_locale, translation| Util.blank?(translation) }
@@ -68,8 +70,8 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
             super()
           end
         end
-        include before_validation
-        include Mobility::Sequel::HashInitializer.new(column_name)
+        include mod
+        backend.define_hash_initializer(mod, [column_name])
 
         plugin :defaults_setter
         attributes.each { |attribute| default_values[attribute.to_sym] = {} }

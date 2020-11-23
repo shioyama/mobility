@@ -49,6 +49,19 @@ module Mobility
             end
           end
         end
+
+        # Initialize column value(s) by default to a hash.
+        # TODO: Find a better way to do this.
+        def define_hash_initializer(mod, columns)
+          mod.class_eval do
+            class_eval <<-EOM, __FILE__, __LINE__ + 1
+              def initialize_set(values)
+                #{columns.map { |c| "self[:#{c}] = {}" }.join(';')}
+                super
+              end
+            EOM
+          end
+        end
       end
     end
   end

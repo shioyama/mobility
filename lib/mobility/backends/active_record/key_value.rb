@@ -45,11 +45,11 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
         # @param [String] attr Attribute name
         # @param [Symbol] _locale Locale
-        # @return [Mobility::Arel::Attribute] Arel attribute for aliased
+        # @return [Mobility::Plugins::Arel::Attribute] Arel attribute for aliased
         #   translation table value column
         def build_node(attr, locale)
           aliased_table = class_name.arel_table.alias(table_alias(attr, locale))
-          Arel::Attribute.new(aliased_table, :value, locale, self, attr.to_sym)
+          Mobility::Plugins::Arel::Attribute.new(aliased_table, :value, locale, self, attr.to_sym)
         end
 
         # Joins translations using either INNER/OUTER join appropriate to the query.
@@ -117,7 +117,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       # The title predicate has a non-nil value, so we can use an INNER JOIN,
       # whereas we are searching for nil content, which requires an OUTER JOIN.
       #
-      class Visitor < ::Mobility::Arel::Visitor
+      class Visitor < ::Mobility::Plugins::Arel::Visitor
         private
 
         def visit_Arel_Nodes_Equality(object)
@@ -139,7 +139,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             transform_values { OUTER_JOIN }
         end
 
-        def visit_Mobility_Arel_Attribute(object)
+        def visit_Mobility_Plugins_Arel_Attribute(object)
           if object.backend_class == backend_class && object.locale == locale
             { object.attribute_name => OUTER_JOIN }
           end

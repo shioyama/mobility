@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "mobility/backends/active_record"
 require "mobility/backends/container"
-require "mobility/arel/nodes/pg_ops"
+require 'mobility/plugins/arel/nodes/pg_ops'
 
 module Mobility
   module Backends
@@ -49,15 +49,15 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
 
         # @param [String] attr Attribute name
         # @param [Symbol] locale Locale
-        # @return [Mobility::Arel::Nodes::Json,Mobility::Arel::Nodes::Jsonb] Arel
+        # @return [Mobility::Plugins::Arel::Nodes::Json,Mobility::Arel::Nodes::Jsonb] Arel
         #   node for attribute on json or jsonb column
         def build_node(attr, locale)
           column = model_class.arel_table[column_name]
           case column_type
           when :json
-            Arel::Nodes::JsonContainer.new(column, build_quoted(locale), build_quoted(attr))
+            Mobility::Plugins::Arel::Nodes::JsonContainer.new(column, build_quoted(locale), build_quoted(attr))
           when :jsonb
-            Arel::Nodes::JsonbContainer.new(column, build_quoted(locale), build_quoted(attr))
+            Mobility::Plugins::Arel::Nodes::JsonbContainer.new(column, build_quoted(locale), build_quoted(attr))
           end
         end
 

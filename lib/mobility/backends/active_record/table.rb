@@ -115,10 +115,10 @@ columns to that table.
 
         # @param [String] attr Attribute name
         # @param [Symbol] _locale Locale
-        # @return [Mobility::Arel::Attribute] Arel node for column on translation table
+        # @return [Mobility::Plugins::Arel::Attribute] Arel node for column on translation table
         def build_node(attr, locale)
           aliased_table = model_class.const_get(subclass_name).arel_table.alias(table_alias(locale))
-          Arel::Attribute.new(aliased_table, attr, locale, self)
+          Mobility::Plugins::Arel::Attribute.new(aliased_table, attr, locale, self)
         end
 
         # Joins translations using either INNER/OUTER join appropriate to the
@@ -189,7 +189,7 @@ columns to that table.
       # we need an OUTER JOIN. In the second case, one attribute is matched
       # against a non-nil value, so we can use an INNER JOIN.
       #
-      class Visitor < Arel::Visitor
+      class Visitor < ::Mobility::Plugins::Arel::Visitor
         private
 
         def visit_Arel_Nodes_Equality(object)
@@ -226,7 +226,7 @@ columns to that table.
           end
         end
 
-        def visit_Mobility_Arel_Attribute(object)
+        def visit_Mobility_Plugins_Arel_Attribute(object)
           # We compare table names here to ensure that attributes defined on
           # different backends but the same table will correctly get an OUTER
           # join when required. Use options[:table_name] here since we don't

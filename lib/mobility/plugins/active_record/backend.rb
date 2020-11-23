@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Mobility
   module Plugins
     module ActiveRecord

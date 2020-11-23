@@ -15,11 +15,14 @@ Plugin for ActiveRecord models.
     module ActiveRecord
       extend Plugin
 
+      requires :arel
+
       requires :active_record_backend, include: :after
       requires :active_record_dirty
       requires :active_record_cache
       requires :active_record_query
       requires :active_record_uniqueness_validation
+
 
       included_hook do |klass|
         unless active_record_class?(klass)

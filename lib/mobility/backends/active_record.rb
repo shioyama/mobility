@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require "mobility/backend"
-require "mobility/arel"
+require "mobility/plugins/arel"
 
 module Mobility
   module Backends

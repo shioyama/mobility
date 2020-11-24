@@ -107,15 +107,15 @@ Mobility.configure do
 end
 ```
 
-Each method call inside the block passed to `config.plugins` declares a plugin,
-along with an optional default. To use a different default backend, you can
+Each method call inside the block passed to `plugins` declares a plugin, along
+with an optional default. To use a different default backend, you can
 change the default passed to the `backend` plugin, like this:
 
 ```diff
- Mobility.configure do |config|
+ Mobility.configure do
    # PLUGINS
 
-   config.plugins do
+   plugins do
 -    backend :key_value
 +    backend :table
 ```
@@ -126,10 +126,10 @@ You can also set defaults for backend-specific options. Below, we set the
 default `type` option for the KeyValue backend to `:string`.
 
 ```diff
- Mobility.configure do |config|
+ Mobility.configure do
    # PLUGINS
 
-   config.plugins do
+   plugins do
 -    backend :key_value
 +    backend :key_value, type: :string
    end
@@ -150,7 +150,7 @@ Requirements:
 When configuring Mobility, ensure that you include the `sequel` plugin:
 
 ```diff
- config.plugins do
+ plugins do
    backend :key_value
 
 -    active_record
@@ -297,7 +297,7 @@ accessors" in Mobility, and can be enabled by including the `locale_accessors`
 plugin, with a default set of accessors:
 
 ```diff
- config.plugins do
+ plugins do
    # ...
 +  locale_accessors [:en, :ja]
 ```
@@ -345,7 +345,7 @@ defined for a given locale.)
 Ensure the plugin is enabled:
 
 ```diff
- config.plugins do
+ plugins do
    # ...
 +  fallthrough_accessors
 ```
@@ -470,7 +470,7 @@ Mobility offers basic support for translation fallbacks. First, enable the
 `fallbacks` plugin:
 
 ```diff
- config.plugins do
+ plugins do
    # ...
 +  fallbacks
 +  locale_accessors
@@ -579,7 +579,7 @@ fallbacks](https://github.com/svenfuchs/i18n/wiki/Fallbacks).
 Another option is to assign a default value, using the `default` plugin:
 
 ```diff
- config.plugins do
+ plugins do
    # ...
 +  default 'foo'
 ```
@@ -632,7 +632,7 @@ have enabled an ORM plugin (either `active_record` or `sequel`), since the
 dirty plugin will depend on one of these being enabled.
 
 ```diff
- config.plugins do
+ plugins do
    # ...
    active_record
 +  dirty
@@ -722,7 +722,7 @@ can be quickly retrieved again. The cache plugin is included in the default
 configuration created by the install generator:
 
 ```diff
- config.plugins do
+ plugins do
    # ...
 +  cache
 ```
@@ -752,7 +752,7 @@ this feature, include the `query` plugin, and ensure you also have an ORM
 plugin enabled (`active_record` or `sequel`):
 
 ```diff
- config.plugins do
+ plugins do
    # ...
    active_record
 +  query

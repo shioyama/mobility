@@ -92,8 +92,8 @@ which looks something like this:
 
 ```ruby
 Mobility.configure do
-  # PLUGINS
 
+  # PLUGINS
   plugins do
     backend :key_value
 
@@ -113,8 +113,8 @@ change the default passed to the `backend` plugin, like this:
 
 ```diff
  Mobility.configure do
-   # PLUGINS
 
+   # PLUGINS
    plugins do
 -    backend :key_value
 +    backend :table
@@ -127,8 +127,8 @@ default `type` option for the KeyValue backend to `:string`.
 
 ```diff
  Mobility.configure do
-   # PLUGINS
 
+   # PLUGINS
    plugins do
 -    backend :key_value
 +    backend :key_value, type: :string

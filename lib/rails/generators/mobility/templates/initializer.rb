@@ -104,5 +104,14 @@ Mobility.configure do
     #
     # Or define specific defaults by uncommenting line below
     # locale_accessors [:en, :ja]
+
+    # Attribute Methods
+    #
+    # Adds translated attributes to +attributes+ hash, and defines methods
+    # +translated_attributes+ and +untranslated_attributes+ which return hashes
+    # with translatd and untranslated attributes, respectively. Be aware that
+    # this plugin can create conflicts with other gems.
+    #
+    # attribute_methods
   end
 end

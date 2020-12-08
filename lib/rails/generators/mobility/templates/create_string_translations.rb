@@ -1,5 +1,4 @@
 class CreateStringTranslations < <%= activerecord_migration_class %>
-
   def change
     create_table :mobility_string_translations do |t|
       t.string :locale, null: false

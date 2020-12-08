@@ -1,5 +1,4 @@
 Mobility.configure do
-
   # PLUGINS
   plugins do
     # Backend

@@ -10,6 +10,10 @@ module Mobility
           klass.class_eval do
             unless const_defined?(:UniquenessValidator, false)
               self.const_set(:UniquenessValidator, Class.new(UniquenessValidator))
+
+              def self.validates_uniqueness_of(*attr_names)
+                validates_with(UniquenessValidator, _merge_attributes(attr_names))
+              end
             end
           end
         end

@@ -26,6 +26,19 @@ shared_examples_for "AR Model validation" do |model_class_name, attribute1=:titl
       end
     end
 
+    context "with validates_uniqueness_of" do
+      let(:model_class) do
+        model_class = model_class_name.constantize
+        model_class.validates_uniqueness_of(attribute1)
+        model_class
+      end
+
+      it "is invalid if other record has same attribute value in this locale" do
+        model_class.create(attribute1 => "foo")
+        expect(model_class.new(attribute1 => "foo")).not_to be_valid
+      end
+    end
+
     context "with untranslated scope on translated attribute" do
       let(:model_class) do
         model_class_name.constantize.tap do |klass|

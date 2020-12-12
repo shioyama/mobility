@@ -7,6 +7,9 @@
 ## (unreleased)
 
 - Fix setting a locale from Rails config ([#468](https://github.com/shioyama/mobility/pull/468))
+- Fixes validations with validates_uniqueness_of
+  ([#470](https://github.com/shioyama/mobility/pull/470)) thanks
+  [artplan1](https://github.com/shioyama/mobility/pull/470)!
 
 ## 1.0.0.rc1 (pre-release)
 

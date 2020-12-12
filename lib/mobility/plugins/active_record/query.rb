@@ -108,7 +108,7 @@ enabled for any one attribute on the model.
             end
           end
         end
-        private_constant :QueryMethod, :VirtualRow
+        private_constant :QueryMethod
 
         module QueryExtension
           def where!(opts, *rest)

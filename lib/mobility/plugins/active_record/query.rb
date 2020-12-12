@@ -71,9 +71,9 @@ enabled for any one attribute on the model.
           end
         end
 
-        # Internal class to create a "clean room" for manipulating translated
-        # attribute nodes in an instance-eval'ed block. Inspired by Sequel's
-        # (much more sophisticated) virtual rows.
+        # Creates a "clean room" for manipulating translated attribute nodes in
+        # an instance-eval'ed block. Inspired by Sequel's (much more
+        # sophisticated) virtual rows.
         class VirtualRow < BasicObject
           attr_reader :__backends
 

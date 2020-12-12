@@ -39,6 +39,10 @@ enabled for any one attribute on the model.
           def attribute_alias(attribute, locale = Mobility.locale)
             "__mobility_%s_%s__"  % [attribute, ::Mobility.normalize_locale(locale)]
           end
+
+          def build_query(klass, locale = Mobility.locale, &block)
+            VirtualRow.build_query(klass, locale, &block)
+          end
         end
 
         module BackendMethods

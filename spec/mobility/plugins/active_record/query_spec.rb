@@ -106,4 +106,30 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
       end
     end
   end
+
+  describe ".build_query" do
+    it "builds VirtualRow" do
+      stub_const 'Article', Class.new(ActiveRecord::Base)
+      translates Article, :title, backend: :table
+
+      article_en = Article.create(title: "foo")
+      article_ja = Mobility.with_locale(:ja) { Article.create(title: "ほげ") }
+
+      expect(described_class.build_query(Article) do
+        title.eq('foo')
+      end).to eq([article_en])
+
+      expect(described_class.build_query(Article) do
+        title.eq('ほげ')
+      end).to eq([])
+
+      expect(described_class.build_query(Article, :ja) do
+        title.eq('foo')
+      end).to eq([])
+
+      expect(described_class.build_query(Article, :ja) do
+        title.eq('ほげ')
+      end).to eq([article_ja])
+    end
+  end
 end

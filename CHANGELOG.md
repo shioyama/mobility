@@ -11,7 +11,7 @@
 	[sergey-alekseev](https://github.com/sergey-alekseev)!
 - Fixes validations with validates_uniqueness_of
   ([#470](https://github.com/shioyama/mobility/pull/470)) thanks
-  [artplan1](https://github.com/shioyama/mobility/pull/470)!
+  [artplan1](https://github.com/artplan1)!
 
 ## 1.0.0.rc1 (pre-release)
 

@@ -41,7 +41,11 @@ enabled for any one attribute on the model.
           end
 
           def build_query(klass, locale = Mobility.locale, &block)
-            VirtualRow.build_query(klass, locale, &block)
+            if block_given?
+              VirtualRow.build_query(klass, locale, &block)
+            else
+              klass.all.extending(QueryExtension)
+            end
           end
         end
 
@@ -63,11 +67,7 @@ enabled for any one attribute on the model.
         module QueryMethod
           # This is required for UniquenessValidator.
           def __mobility_query_scope__(locale: Mobility.locale, &block)
-            if block_given?
-              VirtualRow.build_query(self, locale, &block)
-            else
-              all.extending(QueryExtension)
-            end
+            Query.build_query(self, locale, &block)
           end
         end
 

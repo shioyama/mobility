@@ -4,7 +4,7 @@
 
 1.0 is a rewrite of many internals of the gem. Please see the [wiki page on v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0) for more details on how to upgrade.
 
-## (unreleased)
+## 1.0.0
 
 - Fix setting a locale from Rails config
 	([#468](https://github.com/shioyama/mobility/pull/468)) thanks

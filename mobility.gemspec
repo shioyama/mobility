@@ -35,4 +35,12 @@ Gem::Specification.new do |spec|
 
   spec.cert_chain = ["certs/shioyama.pem"]
   spec.signing_key = File.expand_path("~/.ssh/gem-private_key.pem") if $0 =~ /gem\z/
+
+  spec.post_install_message = %q{
+Warning: Mobility v1.0 includes backwards-incompatible changes (mostly around configuration).
+
+If you are upgrading from an earlier version, please see:
+- https://github.com/shioyama/mobility/releases/tag/v1.0.0
+- https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0
+}
 end

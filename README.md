@@ -12,10 +12,8 @@ Mobility
 [docs]: http://www.rubydoc.info/gems/mobility
 [wiki]: https://github.com/shioyama/mobility/wiki
 
-**This is the readme for the [`master`](https://github.com/shioyama/mobility)
-branch, which corresponds to v1.0.0.rc1, a pre-release version of Mobility.
-If you are using an earlier version (0.8.x or earlier), you probably want the
-readme on the [0-8-stable
+**This is the readme for version 1.0 of Mobility. If you are using an earlier
+version (0.8.x or earlier), you probably want the readme on the [0-8-stable
 branch](https://github.com/shioyama/mobility/tree/0-8-stable).**
 
 Mobility is a gem for storing and retrieving translations as attributes on a
@@ -58,7 +56,7 @@ To use the latest pre-version of Mobility 1.0, add this line to your
 application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 1.0.0.rc1'
+gem 'mobility', '~> 1.0.0'
 ```
 
 For the latest stable version of Mobility, see the readme on the

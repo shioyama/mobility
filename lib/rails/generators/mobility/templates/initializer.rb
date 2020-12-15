@@ -108,7 +108,7 @@ Mobility.configure do
     #
     # Adds translated attributes to +attributes+ hash, and defines methods
     # +translated_attributes+ and +untranslated_attributes+ which return hashes
-    # with translatd and untranslated attributes, respectively. Be aware that
+    # with translated and untranslated attributes, respectively. Be aware that
     # this plugin can create conflicts with other gems.
     #
     # attribute_methods

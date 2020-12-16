@@ -4,7 +4,7 @@
 
 1.0 is a rewrite of many internals of the gem. Please see the [wiki page on v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0) for more details on how to upgrade.
 
-## 1.0.0
+### 1.0.0
 
 - Fix setting a locale from Rails config
 	([#468](https://github.com/shioyama/mobility/pull/468)) thanks
@@ -13,19 +13,19 @@
   ([#470](https://github.com/shioyama/mobility/pull/470)) thanks
   [artplan1](https://github.com/artplan1)!
 
-## 1.0.0.rc1 (pre-release)
+### 1.0.0.rc1 (pre-release)
 
 - Remove `Mobility::ActiveRecord`, `Mobility::Sequel` and `Mobility::Arel`, and
   general cleanup ([#464](https://github.com/shioyama/mobility/pull/464))
 
-## 1.0.0.beta2 (pre-release)
+### 1.0.0.beta2 (pre-release)
 
 - Refactor attributes & backend plugins and make `mobility_attributes` public
   ([#462](https://github.com/shioyama/mobility/pull/462))
 - Make attribute_methods plugin depend on attributes
   ([#461](https://github.com/shioyama/mobility/pull/461))
 
-## 1.0.0.beta1 (pre-release)
+### 1.0.0.beta1 (pre-release)
 
 - Remove `Mobility::Backend#apply_plugin`
   ([#454](https://github.com/shioyama/mobility/pull/454))
@@ -36,7 +36,7 @@
 - Fix Ruby 2.7 deprecation warnings
   ([#460](https://github.com/shioyama/mobility/pull/460))
 
-## 1.0.0.alpha (pre-release)
+### 1.0.0.alpha (pre-release)
 
 - Default fallbacks plugin to `true` when enabled
   ([#447](https://github.com/shioyama/mobility/pull/447))

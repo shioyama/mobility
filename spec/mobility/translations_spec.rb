@@ -13,14 +13,14 @@ describe Mobility::Translations, orm: :none do
           model_class.include described_class.new("title", "content")
           model_class.include described_class.new("foo")
 
-          expect(model_class.send(:mobility_attributes)).to match_array(["title", "content", "foo"])
+          expect(model_class.mobility_attributes).to match_array(["title", "content", "foo"])
         end
 
         it "only returns unique attributes" do
           model_class.include described_class.new("title")
           model_class.include described_class.new("title")
 
-          expect(model_class.send(:mobility_attributes)).to eq(["title"])
+          expect(model_class.mobility_attributes).to eq(["title"])
         end
       end
 

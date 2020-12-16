@@ -38,13 +38,6 @@ describe Mobility::Translations, orm: :none do
     end
   end
 
-  describe "#each" do
-    it "delegates to attributes" do
-      attributes = described_class.new("title", "content")
-      expect { |b| attributes.each(&b) }.to yield_successive_args("title", "content")
-    end
-  end
-
   describe "#inspect" do
     it "returns attribute names" do
       attributes = described_class.new("title", "content")

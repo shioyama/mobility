@@ -19,12 +19,6 @@ for aggregating attributes.
         @names = names.map(&:to_s).freeze
       end
 
-      # Yield each attribute name to block
-      # @yieldparam [String] Attribute
-      def each &block
-        names.each(&block)
-      end
-
       # Show useful information about this module.
       # @return [String]
       def inspect

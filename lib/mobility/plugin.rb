@@ -121,8 +121,8 @@ Also includes a +configure+ class method to apply plugins to a pluggable
     # Does this class include all plugins this plugin depends (directly) on?
     # @param [Class] klass Pluggable class
     def dependencies_satisfied?(klass)
-      required_plugins = dependencies.keys.map { |name| Plugins.load_plugin(name) }
-      (required_plugins - klass.included_modules).none?
+      plugin_keys = klass.included_plugins.map { |plugin| Plugins.lookup_name(plugin) }
+      (dependencies.keys - plugin_keys).none?
     end
 
     # Specifies a dependency of this plugin.

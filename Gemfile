@@ -8,20 +8,11 @@ orm, orm_version = ENV['ORM'], ENV['ORM_VERSION']
 group :development, :test do
   case orm
   when 'active_record'
-    orm_version ||= '6.0'
+    orm_version ||= '6.1'
     case orm_version
-    when '4.2'
-      gem 'activerecord', '>= 4.2.6', '< 5.0'
-    when '5.0'
-      gem 'activerecord', '>= 5.0', '< 5.1'
-    when '5.1'
-      gem 'activerecord', '>= 5.1', '< 5.2'
-    when '5.2'
-      gem 'activerecord', '>= 5.2.0', '< 5.3'
-      gem 'railties', '>= 5.2.0.rc2', '< 5.3'
-    when '6.0'
-      gem 'activerecord', '>= 6.0.0', '< 6.1'
-    when '6.1'
+    when '4.2', '5.0', '5.1', '5.2', '6.0', '6.1'
+      gem 'activerecord', "~> #{orm_version}.0"
+    when '6.2'
       git 'https://github.com/rails/rails.git' do
         gem 'activerecord'
         gem 'activesupport'
@@ -32,10 +23,8 @@ group :development, :test do
   when 'sequel'
     orm_version ||= '5'
     case orm_version
-    when '4'
-      gem 'sequel', '>= 4.46.0', '< 5.0'
     when '5'
-      gem 'sequel', '>= 5.0.0', '< 6.0.0'
+      gem 'sequel', "~> #{orm_version}.0"
     else
       raise ArgumentError, 'Invalid Sequel version'
     end

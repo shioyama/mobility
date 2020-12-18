@@ -36,6 +36,8 @@ jobs:
             version: '5.2'
           - name: 'active_record'
             version: '6.0'
+          - name: 'active_record'
+            version: '6.1'
           - name: 'sequel'
             version: '5'
         experimental: [false]
@@ -57,7 +59,7 @@ jobs:
             feature: 'rails'
             orm:
               name: 'active_record'
-              version: '6.0'
+              version: '6.1'
             database: 'sqlite3'
             experimental: false
           - ruby: '2.7'
@@ -71,21 +73,21 @@ jobs:
             feature: 'unit'
             orm:
               name: 'active_record'
-              version: '6.1'
+              version: '6.2'
             experimental: true
           - ruby: '2.7'
             database: 'mysql'
             feature: 'unit'
             orm:
               name: 'active_record'
-              version: '6.1'
+              version: '6.2'
             experimental: true
           - ruby: '2.7'
             database: 'postgres'
             feature: 'unit'
             orm:
               name: 'active_record'
-              version: '6.1'
+              version: '6.2'
             experimental: true
         exclude:
           - ruby: '2.7'

@@ -65,7 +65,7 @@ For the latest stable version of Mobility, see the readme on the
 ### ActiveRecord (Rails)
 
 Requirements:
-- ActiveRecord >= 5.0 (including 6.0)
+- ActiveRecord >= 5.0 (including 6.x)
 
 (Support for most backends and features is also supported with
 ActiveRecord/Rails 4.2, but there are some tests still failing. To see exactly

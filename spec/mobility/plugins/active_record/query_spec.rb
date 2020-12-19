@@ -87,6 +87,25 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
           end
         end
       end
+
+      context "multiple locales" do
+        it "applies locale argument to node" do
+          article1 = Article.create(author: "foo")
+          Mobility.with_locale(:ja) { article1.author = "ほげ"; article1.save }
+          article2 = Article.create(author: "bar")
+          Mobility.with_locale(:ja) { article2.author = "ふが"; article2.save }
+
+          expect(Article.i18n { author(:en).eq("foo").and(author(:ja).eq("ほげ")) }).to eq([article1])
+          expect(Article.i18n { author(:en).eq("foo").and(author(:ja).eq("ふが")) }).to eq([])
+          expect(Article.i18n { author(:en).eq("bar").and(author(:ja).eq("ふが")) }).to eq([article2])
+          expect(Article.i18n { author(:en).eq("bar").and(author(:ja).eq("ほげ")) }).to eq([])
+
+          expect(Article.i18n { author(:en).eq("foo").or(author(:ja).eq("ほげ")) }).to eq([article1])
+          expect(Article.i18n { author(:en).eq("foo").or(author(:ja).eq("ふが")) }).to match_array([article1, article2])
+          expect(Article.i18n { author(:en).eq("bar").or(author(:ja).eq("ふが")) }).to eq([article2])
+          expect(Article.i18n { author(:en).eq("bar").or(author(:ja).eq("ほげ")) }).to match_array([article1, article2])
+        end
+      end
     end
 
     # TODO: Test more thoroughly

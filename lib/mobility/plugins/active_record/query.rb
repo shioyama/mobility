@@ -77,16 +77,18 @@ enabled for any one attribute on the model.
         # an instance-eval'ed block. Inspired by Sequel's (much more
         # sophisticated) virtual rows.
         class VirtualRow < BasicObject
-          attr_reader :__backends
+          attr_reader :__backends, :__locales
 
           def initialize(model_class, locale)
-            @model_class, @locale, @__backends = model_class, locale, []
+            @model_class, @locale, @__locales, @__backends = model_class, locale, [], []
           end
 
-          def method_missing(m, *)
+          def method_missing(m, *args)
             if @model_class.mobility_attribute?(m)
               @__backends |= [@model_class.mobility_backend_class(m)]
-              @model_class.mobility_backend_class(m).build_node(m, @locale)
+              locale = args[0] || @locale
+              @__locales |= [locale]
+              @model_class.mobility_backend_class(m).build_node(m, locale)
             elsif @model_class.column_names.include?(m.to_s)
               @model_class.arel_table[m]
             else
@@ -101,16 +103,20 @@ enabled for any one attribute on the model.
 
               if ::ActiveRecord::Relation === query
                 predicates = query.arel.constraints
-                apply_scopes(klass.all, row.__backends, locale, predicates).merge(query)
+                apply_scopes(klass.all, row.__backends, row.__locales, predicates).merge(query)
               else
-                apply_scopes(klass.all, row.__backends, locale, query).where(query)
+                apply_scopes(klass.all, row.__backends, row.__locales, query).where(query)
               end
             end
 
             private
 
-            def apply_scopes(scope, backends, locale, predicates)
-              backends.inject(scope) { |r, b| b.apply_scope(r, predicates, locale) }
+            def apply_scopes(scope, backends, locales, predicates)
+              backends.inject(scope) do |scope_, b|
+                locales.inject(scope_) do |r, locale|
+                  b.apply_scope(r, predicates, locale)
+                end
+              end
             end
           end
         end

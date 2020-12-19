@@ -23,7 +23,7 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
 
     context "default query scope" do
       it "defines query scope" do
-        expect(model_class.i18n).to eq(model_class.__mobility_query_scope__)
+        expect(model_class.i18n).to eq(described_class.build_query(model_class, Mobility.locale))
       end
     end
 
@@ -34,7 +34,7 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
       end
 
       it "defines query scope" do
-        expect(model_class.foo).to eq(model_class.__mobility_query_scope__)
+        expect(model_class.foo).to eq(described_class.build_query(model_class, Mobility.locale))
         expect { model_class.i18n }.to raise_error(NoMethodError)
       end
     end
@@ -55,13 +55,11 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
   end
 
   describe "query method" do
-    # NOTE: __mobility_query_scope__ is a public method for convenience, but is
-    # intended for internal use.
     it "creates a __mobility_query_scope__ method" do
       stub_const 'Article', Class.new(ActiveRecord::Base)
       translates Article, :title, backend: :table
       article = Article.create(title: "foo")
-      expect(Article.__mobility_query_scope__.first).to eq(article)
+      expect(Article.i18n.first).to eq(article)
     end
   end
 

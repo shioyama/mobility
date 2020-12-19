@@ -273,7 +273,7 @@ enabled for any one attribute on the model.
           end
         end
 
-        private_constant :QueryExtension, :FindByMethods
+        private_constant :FindByMethods
       end
 
       class MissingBackend < Mobility::Error; end

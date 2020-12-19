@@ -55,7 +55,7 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
   end
 
   describe "query method" do
-    it "creates a __mobility_query_scope__ method" do
+    it "creates a query method method" do
       stub_const 'Article', Class.new(ActiveRecord::Base)
       translates Article, :title, backend: :table
       article = Article.create(title: "foo")

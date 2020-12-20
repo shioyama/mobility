@@ -77,17 +77,17 @@ enabled for any one attribute on the model.
         # an instance-eval'ed block. Inspired by Sequel's (much more
         # sophisticated) virtual rows.
         class VirtualRow < BasicObject
-          attr_reader :__backends, :__locales
+          attr_reader :backends, :locales
 
-          def initialize(klass, locale)
-            @klass, @locale, @__locales, @__backends = klass, locale, [], []
+          def initialize(klass, global_locale)
+            @klass, @global_locale, @locales, @backends = klass, global_locale, [], []
           end
 
           def method_missing(m, *args)
             if @klass.mobility_attribute?(m)
-              @__backends |= [@klass.mobility_backend_class(m)]
-              locale = args[0] || @locale
-              @__locales |= [locale]
+              @backends |= [@klass.mobility_backend_class(m)]
+              locale = args[0] || @global_locale
+              @locales |= [locale]
               @klass.mobility_backend_class(m).build_node(m, locale)
             elsif @klass.column_names.include?(m.to_s)
               @klass.arel_table[m]
@@ -103,9 +103,9 @@ enabled for any one attribute on the model.
 
               if ::ActiveRecord::Relation === query
                 predicates = query.arel.constraints
-                apply_scopes(klass.all, row.__backends, row.__locales, predicates).merge(query)
+                apply_scopes(klass.all, row.backends, row.locales, predicates).merge(query)
               else
-                apply_scopes(klass.all, row.__backends, row.__locales, query).where(query)
+                apply_scopes(klass.all, row.backends, row.locales, query).where(query)
               end
             end
 

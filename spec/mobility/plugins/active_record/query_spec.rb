@@ -105,6 +105,10 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
           expect(Article.i18n { author(:en).eq("bar").or(author(:ja).eq("ふが")) }).to eq([article2])
           expect(Article.i18n { author(:en).eq("bar").or(author(:ja).eq("ほげ")) }).to match_array([article1, article2])
         end
+
+        it "raises InvalidLocale exception if locale is invalid" do
+          expect { Article.i18n { author([]).eq("foo") } }.to raise_error(Mobility::InvalidLocale)
+        end
       end
     end
 

@@ -86,6 +86,7 @@ enabled for any one attribute on the model.
           def method_missing(m, *args)
             if @klass.mobility_attribute?(m)
               @backends |= [@klass.mobility_backend_class(m)]
+              ::Mobility.validate_locale!(args[0]) if args[0]
               locale = args[0] || @global_locale
               @locales |= [locale]
               @klass.mobility_backend_class(m).build_node(m, locale)
@@ -98,6 +99,8 @@ enabled for any one attribute on the model.
 
           class << self
             def build_query(klass, locale, &block)
+              ::Mobility.validate_locale!(locale)
+
               row = new(klass, locale)
               query = block.arity.zero? ? row.instance_eval(&block) : block.call(row)
 

@@ -79,18 +79,18 @@ enabled for any one attribute on the model.
         class VirtualRow < BasicObject
           attr_reader :__backends, :__locales
 
-          def initialize(model_class, locale)
-            @model_class, @locale, @__locales, @__backends = model_class, locale, [], []
+          def initialize(klass, locale)
+            @klass, @locale, @__locales, @__backends = klass, locale, [], []
           end
 
           def method_missing(m, *args)
-            if @model_class.mobility_attribute?(m)
-              @__backends |= [@model_class.mobility_backend_class(m)]
+            if @klass.mobility_attribute?(m)
+              @__backends |= [@klass.mobility_backend_class(m)]
               locale = args[0] || @locale
               @__locales |= [locale]
-              @model_class.mobility_backend_class(m).build_node(m, locale)
-            elsif @model_class.column_names.include?(m.to_s)
-              @model_class.arel_table[m]
+              @klass.mobility_backend_class(m).build_node(m, locale)
+            elsif @klass.column_names.include?(m.to_s)
+              @klass.arel_table[m]
             else
               super
             end

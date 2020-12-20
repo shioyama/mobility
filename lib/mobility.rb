@@ -201,6 +201,14 @@ module Mobility
       end
     end
 
+    # Check that a non-nil locale is valid. (Does not actually parse locale to
+    # check its format.)
+    # @raise [InvalidLocale] if locale is not a Symbol or not available
+    def validate_locale!(locale)
+      raise Mobility::InvalidLocale.new(locale) unless Symbol === locale
+      enforce_available_locales!(locale) if I18n.enforce_available_locales
+    end
+
     # Raises InvalidLocale exception if the locale passed in is present but not available.
     # @param [String,Symbol] locale
     # @raise [InvalidLocale] if locale is present but not available
@@ -231,8 +239,8 @@ module Mobility
     end
 
     def set_locale(locale)
-      locale = locale.to_sym if locale
-      enforce_available_locales!(locale) if I18n.enforce_available_locales
+      locale = locale.to_sym if String === locale
+      validate_locale!(locale) if locale
       storage[:mobility_locale] = locale
     end
   end

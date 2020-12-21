@@ -5,6 +5,10 @@
   ([#475](https://github.com/shioyama/mobility/pull/475))
 - Add public method `Mobility::Plugins::ActiveRecord::Query.build_query`
   ([#471](https://github.com/shioyama/mobility/pull/471))
+- Allow setting locale per node in query block
+  ([#479](https://github.com/shioyama/mobility/pull/479))
+- Add `Mobility.validate_locale!`
+  ([#479](https://github.com/shioyama/mobility/pull/479))
 
 ## 1.0
 

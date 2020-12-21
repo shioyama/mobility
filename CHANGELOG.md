@@ -22,7 +22,7 @@ for more details on how to upgrade.
 
 - Make `Mobility::Plugins::ActiveRecord::Query::VirtualRow` and
   `Mobility::Plugins::ActiveRecord::Query::QueryExtension`
-  ([#471](https://github.com/shioyama/mobility/pull/471)) public
+  public ([#471](https://github.com/shioyama/mobility/pull/471))
 - Fix typo in initializer template
   ([#474](https://github.com/shioyama/mobility/pull/474))
 

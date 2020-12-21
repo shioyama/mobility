@@ -1,12 +1,24 @@
 # Mobility Changelog
 
-## 1.0
-
-1.0 is a rewrite of many internals of the gem. Please see the [wiki page on v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0) for more details on how to upgrade.
-
 ### Unreleased
 - Remove `Mobility::Plugins::Attributes#each`
   ([#475](https://github.com/shioyama/mobility/pull/475))
+- Add public method `Mobility::Plugins::ActiveRecord::Query.build_query`
+  ([#471](https://github.com/shioyama/mobility/pull/471))
+
+## 1.0
+
+1.0 is a rewrite of many internals of the gem. Please see the [wiki page on
+v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0)
+for more details on how to upgrade.
+
+### 1.0.1
+
+- Make `Mobility::Plugins::ActiveRecord::Query::VirtualRow` and
+  `Mobility::Plugins::ActiveRecord::Query::QueryExtension`
+  ([#471](https://github.com/shioyama/mobility/pull/471)) public
+- Fix typo in initializer template
+  ([#474](https://github.com/shioyama/mobility/pull/474))
 
 ### 1.0.0
 

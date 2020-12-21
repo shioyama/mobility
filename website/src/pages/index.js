@@ -131,7 +131,7 @@ function Hero() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
   return  (
-    <header className={clsx('hero hero--light', styles.heroBanner)}>
+    <header className='hero hero--light'>
       <div className="container margin-vert--lg">
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
@@ -140,7 +140,7 @@ function Hero() {
             'button button--outline button--primary button--lg',
             styles.getStarted,
           )}
-          to={useBaseUrl('docs/getting-started')}>
+          to={useBaseUrl('docs/installation')}>
           Get Started
         </Link>
         <Link

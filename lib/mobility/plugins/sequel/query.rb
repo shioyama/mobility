@@ -19,18 +19,27 @@ See ActiveRecord::Query plugin.
 
             klass.class_eval do
               extend QueryMethod
-              singleton_class.send :alias_method, plugin.query_method, :__mobility_query_dataset__
+              singleton_class.define_method(plugin.query_method) do |locale: Mobility.locale, &block|
+                Query.build_query(self, locale, &block)
+              end
+            end
+          end
+        end
+
+        class << self
+          def build_query(klass, locale = Mobility.locale, &block)
+            if block_given?
+              VirtualRow.build_query(klass, locale, &block)
+            else
+              klass.dataset.with_extend(QueryExtension)
             end
           end
         end
 
         module QueryMethod
           def __mobility_query_dataset__(locale: Mobility.locale, &block)
-            if block_given?
-              VirtualRow.build_query(self, locale, &block)
-            else
-              dataset.with_extend(QueryExtension)
-            end
+            warn '__mobility_query_dataset__ is an internal method and will be deprecated in the next release.'
+            Query.build_query(self, locale, &block)
           end
         end
 
@@ -38,16 +47,19 @@ See ActiveRecord::Query plugin.
         # attribute nodes in an instance-eval'ed block. Inspired by Sequel's
         # (much more sophisticated) virtual rows.
         class VirtualRow < BasicObject
-          attr_reader :__backends
+          attr_reader :backends, :locales
 
-          def initialize(model_class, locale)
-            @model_class, @locale, @__backends = model_class, locale, []
+          def initialize(model_class, global_locale)
+            @model_class, @global_locale, @backends, @locales = model_class, global_locale, [], []
           end
 
-          def method_missing(m, *)
+          def method_missing(m, *args)
             if @model_class.mobility_attribute?(m)
-              @__backends |= [@model_class.mobility_backend_class(m)]
-              @model_class.mobility_backend_class(m).build_op(m.to_s, @locale)
+              @backends |= [@model_class.mobility_backend_class(m)]
+              ::Mobility.validate_locale!(args[0]) if args[0]
+              locale = args[0] || @global_locale
+              @locales |= [locale]
+              @model_class.mobility_backend_class(m).build_op(m.to_s, locale)
             elsif @model_class.columns.include?(m.to_s)
               ::Sequel::SQL::QualifiedIdentifier.new(@model_class.table_name, m)
             else
@@ -57,21 +69,27 @@ See ActiveRecord::Query plugin.
 
           class << self
             def build_query(klass, locale, &block)
+              ::Mobility.validate_locale!(locale)
+
               row = new(klass, locale)
               query = block.arity.zero? ? row.instance_eval(&block) : block.call(row)
 
               if ::Sequel::Dataset === query
                 predicates = query.opts[:where]
-                prepare_datasets(query, row.__backends, locale, predicates)
+                prepare_datasets(query, row.backends, row.locales, predicates)
               else
-                prepare_datasets(klass.dataset, row.__backends, locale, query).where(query)
+                prepare_datasets(klass.dataset, row.backends, row.locales, query).where(query)
               end
             end
 
             private
 
-            def prepare_datasets(dataset, backends, locale, predicates)
-              backends.inject(dataset) { |ds, b| b.prepare_dataset(ds, predicates, locale) }
+            def prepare_datasets(dataset, backends, locales, predicates)
+              backends.inject(dataset) do |dataset_, b|
+                locales.inject(dataset_) do |ds, locale|
+                  b.prepare_dataset(ds, predicates, locale)
+                end
+              end
             end
           end
         end

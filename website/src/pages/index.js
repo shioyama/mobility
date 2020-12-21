@@ -69,7 +69,7 @@ Translate them:
 \`\`\`rb
 Mobility.with_locale(:ja) do
   post.title = "Mobilityの紹介"
-  post.subtitle = "モデルデータの翻訳を簡単に"
+  post.subtitle = "モデルデータの翻訳は簡単"
 end
 
 post.title

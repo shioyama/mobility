@@ -9,6 +9,8 @@
   ([#479](https://github.com/shioyama/mobility/pull/479))
 - Add `Mobility.validate_locale!`
   ([#479](https://github.com/shioyama/mobility/pull/479))
+- Include query_scope in `find_by_` methods
+  ([#480](https://github.com/shioyama/mobility/pull/480))
 
 ## 1.0
 

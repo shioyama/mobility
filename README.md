@@ -13,8 +13,8 @@ Mobility
 [wiki]: https://github.com/shioyama/mobility/wiki
 
 **This is the readme for version 1.0 of Mobility. If you are using an earlier
-version (0.8.x or earlier), you probably want the readme on the [0-8-stable
-branch](https://github.com/shioyama/mobility/tree/0-8-stable).**
+version (0.8.x or earlier), you probably want the readme on the [0-8
+branch](https://github.com/shioyama/mobility/tree/0-8).**
 
 Mobility is a gem for storing and retrieving translations as attributes on a
 class. These translations could be the content of blog posts, captions on
@@ -58,9 +58,6 @@ application's Gemfile:
 ```ruby
 gem 'mobility', '~> 1.0.0'
 ```
-
-For the latest stable version of Mobility, see the readme on the
-[0-8-stable](https://github.com/shioyama/mobility/tree/0-8-stable) branch.
 
 ### ActiveRecord (Rails)
 

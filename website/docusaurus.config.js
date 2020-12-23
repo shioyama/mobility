@@ -67,6 +67,18 @@ module.exports = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Chris Salzberg, Inc. Built with Docusaurus.`,
     },
+    metadatas: [
+      {
+        name: 'description',
+        content: 'A framework for managing translation data in Ruby',
+      },
+      {property: 'og:title', content: 'Mobility'},
+      {
+        property: 'og:description',
+        content: 'A framework for managing translation data in Ruby',
+      },
+      {property: 'og:url', content: 'https://shioyama.github.io/mobility'},
+    ],
   },
   presets: [
     [

@@ -27,7 +27,7 @@ function Demo() {
   return md.render(`
 ## I18n for Model Data
 
-Choose a [backend](docs/backends) to store your translations and specify your ORM as well as any other [plugins](docs/plugins) to include:
+Choose a [backend](docs/backends) and ORM to store your translations and any other [plugins](docs/plugins) to include:
 
 \`\`\`rb
 Mobility.configure do
@@ -57,10 +57,8 @@ post = Post.new(
   title: "Introduction to Mobility",
   subtitle: "Translating Model Data is Easy"
 )
-post.title
-#=> "Mobility"
-post.subtitle
-#=> "Translating Model Data is Easy"
+post.title    #=> "Mobility"
+post.subtitle #=> "Translating Model Data is Easy"
 post.save
 \`\`\`
 
@@ -71,12 +69,18 @@ Mobility.with_locale(:ja) do
   post.title = "Mobilityの紹介"
   post.subtitle = "モデルデータの翻訳は簡単"
 end
+\`\`\`
 
-post.title
-#=> "Mobilityの紹介"
+Retrieve them:
 
-post.subtitle
-#=> "モデルデータの翻訳を簡単に"
+\`\`\`rb
+Mobility.locale = :en
+post.title    #=> "Mobility"
+post.subtitle #=> "Translating Model Data is Easy"
+
+Mobility.locale = :ja
+post.title    #=> "Mobilityの紹介"
+post.subtitle #=> "モデルデータの翻訳は簡単"
 \`\`\`
 
 

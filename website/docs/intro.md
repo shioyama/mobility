@@ -33,8 +33,8 @@ has multiple meanings:
 
 Given that the term for these two meanings overlaps, it is perhaps not
 surprising that many imagine translation to be a simple mapping
-(along a straight line, if you will) of words from one language to another. In
-reality, as any translator will tell you, translation is actually an incredibly
+of words (along a straight line) from one language to another. In
+reality, as any translator will tell you, translation is an incredibly
 challenging and complex process.
 
 The same can be said of _storing translations_, which can be more complicated

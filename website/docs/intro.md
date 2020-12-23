@@ -66,5 +66,5 @@ a **minimalist framework**, and designed that way from the bottom up.
 
 [^1]: [Globalize](https://github.com/globalize/globalize) and
 [Traco](https://github.com/barsoom/traco) are two popular model translation
-[^2]: See [this talk](https://www.youtube.com/watch?v=RZkemV_-__A) for more on this.
 gems, but there are many more.
+[^2]: See [this talk](https://www.youtube.com/watch?v=RZkemV_-__A) for more on this.

@@ -27,7 +27,7 @@ function Demo() {
   return md.render(`
 ## I18n for Model Data
 
-Choose a backend to store your translations:
+Choose a [backend](docs/backends) to store your translations and specify your ORM as well as any other [plugins](docs/plugins) to include:
 
 \`\`\`rb
 Mobility.configure do

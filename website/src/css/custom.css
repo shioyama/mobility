@@ -53,3 +53,11 @@ section {
 .main-wrapper {
   margin-bottom: 2rem;
 }
+
+.footnotes {
+  font-size: 80%;
+}
+
+article blockquote p {
+  font-size: 85%;
+}

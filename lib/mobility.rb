@@ -225,7 +225,7 @@ module Mobility
     #   simply default to +I18n.available_locales+, we may define many more
     #   methods (in LocaleAccessors) than is really necessary.
     def available_locales
-      if defined?(Rails) && Rails.application
+      if defined?(Rails) && Rails.respond_to?(:application) && Rails.application
         Rails.application.config.i18n.available_locales&.map(&:to_sym) || I18n.available_locales
       else
         I18n.available_locales

@@ -55,18 +55,18 @@ other backends on model (otherwise one will overwrite the other).
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, **options)
-        translation_for(locale, **options).value
+        translation_for(locale, **options).send(value_column)
       end
 
       # @!macro backend_writer
       def write(locale, value, **options)
-        translation_for(locale, **options).value = value
+        translation_for(locale, **options).send(:"#{value_column}=", value)
       end
       # @!endgroup
 
       # @!macro backend_iterator
       def each_locale
-        translations.each { |t| yield(t.locale.to_sym) if t.key == attribute }
+        translations.each { |t| yield(t.locale.to_sym) if t.send(key_column) == attribute }
       end
 
       private
@@ -80,6 +80,9 @@ other backends on model (otherwise one will overwrite the other).
         backend_class.option_reader :association_name
         backend_class.option_reader :class_name
         backend_class.option_reader :table_alias_affix
+        backend_class.option_reader :key_column
+        backend_class.option_reader :value_column
+        backend_class.option_reader :translatable
       end
 
       module ClassMethods
@@ -99,6 +102,9 @@ other backends on model (otherwise one will overwrite the other).
           options[:type]             &&= options[:type].to_sym
           options[:association_name] &&= options[:association_name].to_sym
           options[:class_name]       &&= Util.constantize(options[:class_name])
+          options[:key_column]       ||= :key
+          options[:value_column]     ||= :value
+          options[:translatable]     ||= :translatable
           if !(options[:type] || (options[:class_name] && options[:association_name]))
             raise ArgumentError, "KeyValue backend requires an explicit type option, either text or string."
           end

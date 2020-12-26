@@ -17,8 +17,10 @@ On top of this, a backend will normally:
 - implement a +write+ instance method to write to the backend
 - implement an +each_locale+ instance method to iterate through available locales
   (used to define other +Enumerable+ traversal and search methods)
+- implement a +valid_keys+ class method returning an array of symbols
+  corresponding to valid keys for configuring this backend.
 - implement a +configure+ class method to apply any normalization to the
-  options hash
+  keys on the options hash included in +valid_keys+
 - call the +setup+ method yielding attributes and options to configure the
   model class
 

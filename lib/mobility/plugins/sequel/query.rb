@@ -3,7 +3,8 @@ module Mobility
   module Plugins
 =begin
 
-See ActiveRecord::Query plugin.
+Supports querying on Sequel model translated attributes. Similar API to the
+ActiveRecord query plugin.
 
 =end
     module Sequel

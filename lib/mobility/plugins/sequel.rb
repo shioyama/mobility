@@ -1,5 +1,4 @@
 require "sequel"
-raise VersionNotSupportedError, "Mobility is only compatible with Sequel 4.0 and greater" if ::Sequel::MAJOR < 4
 require "sequel/plugins/mobility"
 unless defined?(ActiveSupport::Inflector)
   # TODO: avoid automatically including the inflector extension

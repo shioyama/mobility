@@ -84,8 +84,6 @@ module Mobility
   require "mobility/plugins"
   require "mobility/translations"
 
-  # General error for version compatibility conflicts
-  class VersionNotSupportedError < ArgumentError; end
   CALL_COMPILABLE_REGEXP = /\A[a-zA-Z_]\w*[!?]?\z/
   private_constant :CALL_COMPILABLE_REGEXP
 

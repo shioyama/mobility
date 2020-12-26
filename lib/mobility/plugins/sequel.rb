@@ -12,6 +12,13 @@ require_relative "./sequel/query"
 
 module Mobility
   module Plugins
+=begin
+
+Plugin for Sequel models. This plugin automatically requires sequel related
+plugins, which are not actually "active" unless their base plugin (e.g. dirty
+for sequel_dirty) is also enabled.
+
+=end
     module Sequel
       extend Plugin
 

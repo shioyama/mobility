@@ -210,6 +210,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         def self.included(model_class)
           model_class.after_destroy do
             [:string, :text].each do |type|
+              # FIXME: undefined local variable or method `translatable'
               Mobility::Backends::ActiveRecord::KeyValue.const_get("#{type.capitalize}Translation").
                 where(translatable => self).destroy_all
             end

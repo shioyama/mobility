@@ -13,6 +13,18 @@ module Mobility
             t.timestamps null: false
           end
 
+          create_table "action_text_rich_texts", force: :cascade do |t|
+            t.string "name", null: false
+            t.text "body"
+            t.string "record_type", null: false
+            t.bigint "record_id", null: false
+            t.datetime "created_at", precision: 6, null: false
+            t.datetime "updated_at", precision: 6, null: false
+            t.string "locale"
+            t.index ["record_id", "record_type", "locale", "name"], name: "index_rich_texts_uniqueness", unique: true
+            t.index ["record_id", "record_type", "name"], name: "index_action_text_rich_texts_on_name"
+          end
+
           create_table "articles" do |t|
             t.string :slug
             t.boolean :published

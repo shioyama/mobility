@@ -95,6 +95,14 @@ module Mobility
       def model_class.translates(*args, **options)
         include Mobility.translations_class.new(*args, **options)
       end
+
+      # FIXME move this elsewhere?
+      def model_class.has_translated_rich_text(name)
+        has_rich_text(name)
+        has_one :"rich_text_#{name}", -> { where(name: name, locale: I18n.locale) },
+                class_name: "ActionText::RichText", as: :record, inverse_of: :record, autosave: true, dependent: :destroy
+        translates name, backend: :action_text
+      end
     end
 
     # Extends model with this class so that +include Mobility+ is equivalent to

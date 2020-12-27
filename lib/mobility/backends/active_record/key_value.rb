@@ -176,6 +176,8 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             send(association_name).destroy(translation)
           end
         end
+        # FIXME: for some reason a single after_destroy hook gets called even if there are several
+        # (e.g. if model has both string and text translations)
         after_destroy do
           translations_class.where(translatable => self).destroy_all
         end

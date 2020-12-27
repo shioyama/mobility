@@ -176,6 +176,9 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             send(association_name).destroy(translation)
           end
         end
+        after_destroy do
+          translations_class.where(translatable => self).destroy_all
+        end
 
         module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"
         unless const_defined?(module_name)
@@ -191,8 +194,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           end
           include const_set(module_name, callback_methods)
         end
-
-        include DestroyKeyValueTranslations
       end
 
       # Returns translation for a given locale, or builds one if none is present.
@@ -204,18 +205,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
         translation ||= translations.build(locale: locale, key_column => attribute)
         translation
-      end
-
-      module DestroyKeyValueTranslations
-        def self.included(model_class)
-          model_class.after_destroy do
-            [:string, :text].each do |type|
-              # FIXME: undefined local variable or method `translatable'
-              Mobility::Backends::ActiveRecord::KeyValue.const_get("#{type.capitalize}Translation").
-                where(translatable => self).destroy_all
-            end
-          end
-        end
       end
 
       # FIXME: replace:

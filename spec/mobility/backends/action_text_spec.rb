@@ -5,10 +5,8 @@ return unless defined?(ActiveRecord)
 describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend do
   require "mobility/backends/action_text"
 
-  before do
-    stub_const 'Article', Class.new(ActiveRecord::Base) do
-      has_rich_text :title, :content
-    end
+  class Article < ActiveRecord::Base
+    has_rich_text :title, :content
   end
 
   let(:title_backend)   { backend_for(article, :title) }

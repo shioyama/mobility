@@ -5,9 +5,7 @@ return unless defined?(ActiveRecord)
 describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend do
   require "mobility/backends/action_text"
 
-  class Article < ActiveRecord::Base
-    has_rich_text :title, :content
-  end
+  before { stub_const 'Article', Class.new(ActiveRecord::Base) }
 
   let(:title_backend)   { backend_for(article, :title) }
   let(:content_backend) { backend_for(article, :content) }
@@ -23,7 +21,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
     plugins :active_record, :reader, :writer
 
     context "without cache" do
-      before { translates Article, :title, :content, backend: :action_text }
+      before { has_translated_rich_text Article, :title, :content }
 
       include_accessor_examples "Article"
       include_dup_examples "Article"
@@ -39,7 +37,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
 
     context "with cache" do
       plugins :active_record, :reader, :writer, :cache
-      before { translates Article, :title, :content, backend: :action_text }
+      before { has_translated_rich_text Article, :title, :content }
 
       include_accessor_examples "Article"
 
@@ -82,7 +80,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
 
     describe "Backend methods" do
       before do
-        translates Article, :title, :content, backend: :action_text
+        has_translated_rich_text Article, :title, :content
         2.times { Article.create! }
       end
       let(:article) { Article.last }
@@ -212,7 +210,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
       plugins :active_record, :writer
 
       before do
-        translates Article, :title, :content, :subtitle, backend: :action_text
+        has_translated_rich_text Article, :title, :content, :subtitle
         Article.create(title: "Article", subtitle: "Article subtitle", content: "Content")
       end
 
@@ -234,7 +232,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
     describe "creating a new record with translations" do
       plugins :active_record, :reader, :writer
 
-      before { translates Article, :title, :content, backend: :action_text }
+      before { has_translated_rich_text Article, :title, :content }
       let!(:article) { Article.create(title: "New Article", content: "Once upon a time...") }
 
       it "creates record and translation in current locale" do
@@ -287,8 +285,8 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
     # context "with separate string and text translations" do
     #   plugins :active_record, :reader, :writer
     #   before do
-    #     translates Article, :title, backend: :action_text
-    #     translates Article, :short_title, backend: :action_text, class_name: translation_class, association_name: :rich_text_translations
+    #     has_translated_rich_text Article, :title
+    #     has_translated_rich_text Article, :short_title, class_name: translation_class, association_name: :rich_text_translations
     #   end
     #
     #   it "saves translations correctly" do
@@ -316,12 +314,9 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
     describe "after destroy" do
       plugins :active_record, :reader, :writer
       before do
-        translates Article, :title, :content, backend: :action_text
-        stub_const 'Post', Class.new(ActiveRecord::Base) do
-          has_rich_text :title, :content
-        end
-        translates Post, :title, backend: :action_text
-        translates Post, :content, backend: :action_text
+        has_translated_rich_text Article, :title, :content
+        stub_const 'Post', Class.new(ActiveRecord::Base)
+        has_translated_rich_text Post, :title, :content
       end
 
       # In case we change the translated attributes on a model, we need to make
@@ -348,7 +343,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
     # describe ".configure" do
     #   plugins :active_record
     #
-    #   before { translates Article, :title, :content, backend: :action_text }
+    #   before { has_translated_rich_text Article, :title, :content }
     #
     #   let(:backend_class) do
     #     Class.new(described_class) { @model_class = Article }
@@ -398,8 +393,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
       plugins :active_record, :reader, :writer, :query
 
       before do
-        translates Article, :title, :content, backend: :action_text
-        translates Article, :subtitle, backend: :action_text
+        has_translated_rich_text Article, :title, :content, :subtitle
       end
 
       include_querying_examples('Article')
@@ -450,7 +444,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
 
       # context "model with two translated attributes on different tables" do
       #   before do
-      #     translates Article, :short_title, backend: :action_text, class_name: translation_class, association_name: :rich_text_translations
+      #     has_translated_rich_text Article, :short_title, class_name: translation_class, association_name: :rich_text_translations
       #     @article1 = Article.create(title: "foo post", short_title: "bar short 1")
       #     @article2 = Article.create(title: "foo post", short_title: "bar short 2")
       #     @article3 = Article.create(                   short_title: "bar short 1")
@@ -477,7 +471,7 @@ describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend d
 
     describe "Model.i18n.find_by_<translated attribute>" do
       plugins :active_record, :reader, :writer, :query
-      before { translates Article, :title, backend: :action_text }
+      before { has_translated_rich_text Article, :title }
 
       it "finds correct translation if exists in current locale" do
         Mobility.locale = :ja

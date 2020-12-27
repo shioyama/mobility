@@ -30,6 +30,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActionText.
         # @!group Backend Configuration
         # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
         def configure(options)
+          raise ArgumentError, "The type option is unsupported with this backend." if options[:type]
           options[:association_name] ||= "rich_text_translations"
           options[:class_name]       ||= Translation
           options[:key_column]       ||= :name

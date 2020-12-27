@@ -2,8 +2,8 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Backends::ActiveRecord::ActionText", orm: :active_record, type: :backend do
-  require "mobility/backends/active_record/action_text"
+describe "Mobility::Backends::ActionText", orm: :active_record, type: :backend do
+  require "mobility/backends/action_text"
 
   before do
     stub_const 'Article', Class.new(ActiveRecord::Base) do
@@ -15,7 +15,7 @@ describe "Mobility::Backends::ActiveRecord::ActionText", orm: :active_record, ty
   let(:content_backend) { backend_for(article, :content) }
   let(:article) { Article.new }
 
-  let(:translation_class) { Mobility::Backends::ActiveRecord::ActionText::RichTextTranslation }
+  let(:translation_class) { Mobility::Backends::ActionText::Translation }
 
   context "with no plugins" do
     include_backend_examples described_class, 'Article'

@@ -374,25 +374,23 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
       Class.new(described_class) { @model_class = Post }
     end
 
-    it "sets association_name, class_name and table_alias_affix from string type" do
+    it "sets association_name and class_name from string type" do
       options = { type: :string }
       backend_class.configure(options)
       expect(options).to eq({
         type: :string,
         class_name: string_translation_class,
-        association_name: :string_translations,
-        table_alias_affix: "Post_%s_string_translations"
+        association_name: :string_translations
       })
     end
 
-    it "sets association_name, class_name and table_alias_affix from text type" do
+    it "sets association_name and class_name from text type" do
       options = { type: :text }
       backend_class.configure(options)
       expect(options).to eq({
         type: :text,
         class_name: text_translation_class,
-        association_name: :text_translations,
-        table_alias_affix: "Post_%s_text_translations"
+        association_name: :text_translations
       })
     end
 
@@ -403,14 +401,13 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
     end
 
 
-    it "sets default association_name, class_name and table_alias_affix from type" do
+    it "sets default association_name and class_name from type" do
       options = { type: :text }
       backend_class.configure(options)
       expect(options).to eq({
         type: :text,
         class_name: text_translation_class,
-        association_name: :text_translations,
-        table_alias_affix: "Post_%s_text_translations"
+        association_name: :text_translations
       })
     end
   end

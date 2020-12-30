@@ -9,6 +9,8 @@
   ([#479](https://github.com/shioyama/mobility/pull/479))
 - Add `Mobility.validate_locale!`
   ([#479](https://github.com/shioyama/mobility/pull/479))
+- Call after_destroy in setup block to delete associated translations
+  ([#487](https://github.com/shioyama/mobility/pull/487))
 
 ## 1.0
 

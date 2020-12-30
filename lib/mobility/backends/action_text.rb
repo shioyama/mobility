@@ -41,7 +41,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActionText.
           options[:key_column]       ||= :name
           options[:value_column]     ||= :body
           options[:translatable]     ||= :record
-          options[:table_alias_affix] = "#{model_class}_%s_#{options[:association_name]}"
           super
         end
         # @!endgroup

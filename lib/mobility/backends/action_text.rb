@@ -55,9 +55,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActionText.
         end
       end
 
-      # FIXME: replace:
-      #   - `:translatable` with `options[:translatable]`
-      #   - `:key` with `options[:key_column]`
       class Translation < ::ActionText::RichText
         validates :name, presence: true, uniqueness: { scope: [:record_id, :record_type, :locale], case_sensitive: true }
         validates :record, presence: true

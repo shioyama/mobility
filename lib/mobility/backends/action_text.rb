@@ -26,6 +26,11 @@ Implements the {Mobility::Backends::KeyValue} backend for ActionText.
 
 =end
     class ActionText < ActiveRecord::KeyValue
+      # override to return record instead of value
+      def read(locale, **options)
+        translation_for(locale, **options)
+      end
+
       class << self
         # @!group Backend Configuration
         # @option (see Mobility::Backends::KeyValue::ClassMethods#configure)
@@ -42,14 +47,19 @@ Implements the {Mobility::Backends::KeyValue} backend for ActionText.
         # @!endgroup
       end
 
+      setup do |attributes, _options|
+        attributes.each do |name|
+          has_one :"rich_text_#{name}", -> { where(name: name, locale: Mobility.locale) },
+            class_name: "ActionText::RichText", as: :record, inverse_of: :record, autosave: true, dependent: :destroy
+          scope :"with_rich_text_#{name}", -> { includes("rich_text_#{name}") }
+          scope :"with_rich_text_#{name}_and_embeds", -> { includes("rich_text_#{name}": { embeds_attachments: :blob }) }
+        end
+      end
+
       # FIXME: replace:
       #   - `:translatable` with `options[:translatable]`
       #   - `:key` with `options[:key_column]`
-      class Translation < ::ActiveRecord::Base
-        self.table_name = "action_text_rich_texts"
-
-        belongs_to :record, polymorphic: true, touch: true
-
+      class Translation < ::ActionText::RichText
         validates :name, presence: true, uniqueness: { scope: [:record_id, :record_type, :locale], case_sensitive: true }
         validates :record, presence: true
         validates :locale, presence: true

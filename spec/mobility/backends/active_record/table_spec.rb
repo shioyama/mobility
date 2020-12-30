@@ -386,23 +386,23 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
     end
   end
 
-  describe "Model.i18n.find_by_<translated attribute>" do
+  describe "Model.find_by_<translated attribute>" do
     plugins :active_record, :writer, :query
     before { translates Article, :title, backend: :table }
 
     it "finds correct translation if exists in current locale" do
       Mobility.locale = :ja
       article = Article.create(title: "タイトル")
-      expect(Article.i18n.find_by_title("タイトル")).to eq(article)
-      expect(Article.i18n.find_by_title("foo")).to be_nil
+      expect(Article.find_by_title("タイトル")).to eq(article)
+      expect(Article.find_by_title("foo")).to be_nil
     end
 
     it "returns nil if no matching translation exists in this locale" do
       Mobility.locale = :ja
       article = Article.create(title: "タイトル")
       Mobility.locale = :en
-      expect(Article.i18n.find_by_title("タイトル")).to eq(nil)
-      expect(Article.i18n.find_by_title("foo")).to be_nil
+      expect(Article.find_by_title("タイトル")).to eq(nil)
+      expect(Article.find_by_title("foo")).to be_nil
     end
 
     it "works on a scope" do
@@ -411,7 +411,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
       Mobility.locale = :en
       article2 = Article.create(title: "title")
       Mobility.with_locale(:ja) do
-        expect(Article.i18n.all.find_by_title("タイトル")).to eq(article1)
+        expect(Article.all.find_by_title("タイトル")).to eq(article1)
       end
     end
   end

@@ -28,7 +28,7 @@ enabled for any one attribute on the model.
 
             klass.class_eval do
               extend QueryMethod
-              extend FindByMethods.new(*plugin.names)
+              extend FindByMethods.new(plugin.query_method, *plugin.names)
               singleton_class.define_method(plugin.query_method) do |locale: Mobility.locale, &block|
                 Query.build_query(self, locale, &block)
               end
@@ -277,11 +277,11 @@ enabled for any one attribute on the model.
         end
 
         class FindByMethods < Module
-          def initialize(*attributes)
+          def initialize(query_method, *attributes)
             attributes.each do |attribute|
               module_eval <<-EOM, __FILE__, __LINE__ + 1
               def find_by_#{attribute}(value)
-                find_by(#{attribute}: value)
+                #{query_method}.find_by(#{attribute}: value)
               end
               EOM
             end

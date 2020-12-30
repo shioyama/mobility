@@ -11,6 +11,9 @@
   ([#479](https://github.com/shioyama/mobility/pull/479))
 - Call after_destroy in setup block to delete associated translations
   ([#487](https://github.com/shioyama/mobility/pull/487))
+- Add key, value and belongs_to options to key-value backend
+  ([#488](https://github.com/shioyama/mobility/pull/488)) thanks
+  [sedubois](https://github.com/sedubois)!
 
 ## 1.0
 

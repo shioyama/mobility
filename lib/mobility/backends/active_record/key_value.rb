@@ -150,8 +150,8 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       end
 
       setup do |attributes, options|
-        association_name   = options[:association_name]
-        translations_class = options[:class_name]
+        association_name  = options[:association_name]
+        translation_class = options[:class_name]
 
         # Track all attributes for this association, so that we can limit the scope
         # of keys for the association to only these attributes. We need to track the
@@ -164,7 +164,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
         has_many association_name, ->{ where key: association_attributes },
           as: :translatable,
-          class_name: translations_class.name,
+          class_name: translation_class.name,
           inverse_of: :translatable,
           autosave:   true
         before_save do
@@ -186,7 +186,13 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           include const_set(module_name, callback_methods)
         end
 
-        include DestroyKeyValueTranslations
+        # Ensure we only call after destroy hook once per translations class
+        translation_classes = [translation_class, *Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants].uniq
+        after_destroy do
+          @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
+          (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(translatable: self).destroy_all }
+          @mobility_after_destroy_translation_classes += translation_classes
+        end
       end
 
       # Returns translation for a given locale, or builds one if none is present.
@@ -196,17 +202,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         translation = translations.find { |t| t.key == attribute && t.locale == locale.to_s }
         translation ||= translations.build(locale: locale, key: attribute)
         translation
-      end
-
-      module DestroyKeyValueTranslations
-        def self.included(model_class)
-          model_class.after_destroy do
-            [:string, :text].each do |type|
-              Mobility::Backends::ActiveRecord::KeyValue.const_get("#{type.capitalize}Translation").
-                where(translatable: self).destroy_all
-            end
-          end
-        end
       end
 
       class Translation < ::ActiveRecord::Base

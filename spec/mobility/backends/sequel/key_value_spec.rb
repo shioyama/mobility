@@ -208,34 +208,60 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
 
     describe "after destroy" do
       plugins :sequel, :reader, :writer, :cache
-      before do
-        stub_const 'Post', Class.new(Sequel::Model)
-        Post.dataset = DB[:posts]
-        translates Post, :title, backend: :key_value, type: :string
-        translates Post, :content, backend: :key_value, type: :text
+
+      before(:all) do
+        DB.create_table!(:mobility_foo_translations) do
+          primary_key :id
+          String      :locale,            allow_null: false
+          String      :key
+          String      :value
+          Integer     :translatable_id,   allow_null: false
+          String      :translatable_type, allow_null: false
+          DateTime    :created_at,        allow_null: false
+          DateTime    :updated_at,        allow_null: false
+        end
       end
+      after(:all) { DB.drop_table?(:mobility_foo_translations) }
 
       # In case we change the translated attributes on a model, we need to make
       # sure we clean them up when the model is destroyed.
       it "cleans up all associated translations, regardless of key" do
-        article = Article.create(title: "foo title", content: "foo content")
-        Mobility.with_locale(:ja) { article.update(title: "あああ", content: "ばばば") }
+        # test with custom subclass
+        foo_translation_class = Class.new(Sequel::Model(:mobility_foo_translations))
+        foo_translation_class.include Mobility::Backends::Sequel::KeyValue::Translation
+        stub_const('Mobility::Backends::Sequel::KeyValue::FooTranslation', foo_translation_class)
+        Mobility::Backends::Sequel::KeyValue::FooTranslation.dataset = DB[:mobility_foo_translations]
+
+        translates Article, :title, backend: :key_value, type: :string
+        translates Article, :subtitle, backend: :key_value, type: :string
+        translates Article, :content, backend: :key_value, type: :text
+        translates Article, :author, backend: :key_value, type: :foo
+        article = Article.create(title: "foo title", content: "foo content", subtitle: "foo subtitle", author: "foo author")
+        Mobility.with_locale(:ja) { article.update(title: "あああ", content: "ばばば", subtitle: "ぱぱぱ", author: "ややや") }
         article.save
 
         # Create translations on another model, to check they do not get destroyed
+        stub_const 'Post', Class.new(Sequel::Model)
+        Post.dataset = DB[:posts]
+        translates Post, :title, backend: :key_value, type: :string
+        translates Post, :content, backend: :key_value, type: :text
         Post.create(title: "post title", content: "post content")
 
-        expect(string_translation_class.count).to eq(1)
-        expect(text_translation_class.count).to eq(5)
+        expect(string_translation_class.count).to eq(5)
+        expect(text_translation_class.count).to eq(3)
+        expect(foo_translation_class.count).to eq(2)
 
         text_translation_class.create(translatable: article, key: "key1", value: "value1", locale: "de")
         string_translation_class.create(translatable: article, key: "key2", value: "value2", locale: "fr")
-        expect(text_translation_class.count).to eq(6)
-        expect(string_translation_class.count).to eq(2)
+        foo_translation_class.create(translatable: article, key: "key3", value: "value3", locale: "ja")
+        expect(string_translation_class.count).to eq(6)
+        expect(text_translation_class.count).to eq(4)
+        expect(foo_translation_class.count).to eq(3)
 
         article.destroy
         expect(text_translation_class.count).to eq(1)
         expect(string_translation_class.count).to eq(1)
+        expect(foo_translation_class.count).to eq(0)
       end
 
       it "only destroys translations once when cleaning up" do

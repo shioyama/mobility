@@ -74,8 +74,8 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           relation.joins(m.join(t, join_type).
                          on(t[key_column].eq(key).
                             and(t[:locale].eq(locale).
-                                and(t[:"#{translatable}_type"].eq(model_class.base_class.name).
-                                    and(t[:"#{translatable}_id"].eq(m[:id]))))).join_sources)
+                                and(t[:"#{belongs_to}_type"].eq(model_class.base_class.name).
+                                    and(t[:"#{belongs_to}_id"].eq(m[:id]))))).join_sources)
         end
 
         def already_joined?(relation, name, locale, join_type)
@@ -154,7 +154,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         translation_class = options[:class_name]
         key_column         = options[:key_column]
         value_column       = options[:value_column]
-        translatable       = options[:translatable]
+        belongs_to         = options[:belongs_to]
 
         # Track all attributes for this association, so that we can limit the scope
         # of keys for the association to only these attributes. We need to track the
@@ -166,9 +166,9 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         instance_variable_set(:"@#{attrs_method_name}", association_attributes)
 
         has_many association_name, ->{ where key_column => association_attributes },
-          as: translatable,
+          as: belongs_to,
           class_name: translation_class.name,
-          inverse_of: translatable,
+          inverse_of: belongs_to,
           autosave:   true
         before_save do
           send(association_name).select { |t| t.send(value_column).blank? }.each do |translation|
@@ -184,7 +184,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
               self.send("#{association_name}=", source.send(association_name).map(&:dup))
               # Set inverse on associations
               send(association_name).each do |translation|
-                translation.send(:"#{translatable}=", self)
+                translation.send(:"#{belongs_to}=", self)
               end
             end
           end
@@ -195,7 +195,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         translation_classes = [translation_class, *Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants].uniq
         after_destroy do
           @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
-          (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(translatable => self).destroy_all }
+          (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(belongs_to => self).destroy_all }
           @mobility_after_destroy_translation_classes += translation_classes
         end
       end

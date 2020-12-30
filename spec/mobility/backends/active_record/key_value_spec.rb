@@ -403,7 +403,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         Class.new(described_class) { @model_class = Article }
       end
 
-      it "sets association_name, class_name, key_column, value_colum and translatable from string type" do
+      it "sets association_name, class_name, key_column, value_colum and belongs_to from string type" do
         options = { type: :string }
         backend_class.configure(options)
         expect(options).to eq({
@@ -412,11 +412,11 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
           association_name: :string_translations,
           key_column: :key,
           value_column: :value,
-          translatable: :translatable
+          belongs_to: :translatable
         })
       end
 
-      it "sets association_name, class_name, key_column, value_colum and translatable from text type" do
+      it "sets association_name, class_name, key_column, value_colum and belongs_to from text type" do
         options = { type: :text }
         backend_class.configure(options)
         expect(options).to eq({
@@ -425,7 +425,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
           association_name: :text_translations,
           key_column: :key,
           value_column: :value,
-          translatable: :translatable
+          belongs_to: :translatable
         })
       end
 
@@ -435,7 +435,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
                           "You must define a Mobility::Backends::ActiveRecord::KeyValue::IntegerTranslation class.")
       end
 
-      it "sets default association_name, class_name, key_column, value_colum and translatable from type" do
+      it "sets default association_name, class_name, key_column, value_colum and belongs_to from type" do
         options = { type: :text }
         backend_class.configure(options)
         expect(options).to eq({
@@ -444,7 +444,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
           association_name: :text_translations,
           key_column: :key,
           value_column: :value,
-          translatable: :translatable
+          belongs_to: :translatable
         })
       end
     end

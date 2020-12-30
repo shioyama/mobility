@@ -403,23 +403,29 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         Class.new(described_class) { @model_class = Article }
       end
 
-      it "sets association_name and class_name from string type" do
+      it "sets association_name, class_name, key_column, value_colum and belongs_to from string type" do
         options = { type: :string }
         backend_class.configure(options)
         expect(options).to eq({
           type: :string,
           class_name: string_translation_class,
-          association_name: :string_translations
+          association_name: :string_translations,
+          key_column: :key,
+          value_column: :value,
+          belongs_to: :translatable
         })
       end
 
-      it "sets association_name and class_name from text type" do
+      it "sets association_name, class_name, key_column, value_colum and belongs_to from text type" do
         options = { type: :text }
         backend_class.configure(options)
         expect(options).to eq({
           type: :text,
           class_name: text_translation_class,
-          association_name: :text_translations
+          association_name: :text_translations,
+          key_column: :key,
+          value_column: :value,
+          belongs_to: :translatable
         })
       end
 
@@ -429,13 +435,16 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
                           "You must define a Mobility::Backends::ActiveRecord::KeyValue::IntegerTranslation class.")
       end
 
-      it "sets default association_name and class_name from type" do
+      it "sets default association_name, class_name, key_column, value_colum and belongs_to from type" do
         options = { type: :text }
         backend_class.configure(options)
         expect(options).to eq({
           type: :text,
           class_name: text_translation_class,
-          association_name: :text_translations
+          association_name: :text_translations,
+          key_column: :key,
+          value_column: :value,
+          belongs_to: :translatable
         })
       end
     end

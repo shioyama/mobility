@@ -8,7 +8,9 @@ require_relative "./active_record/uniqueness_validation"
 module Mobility
 =begin
 
-Plugin for ActiveRecord models.
+Plugin for ActiveRecord models. This plugin automatically requires activerecord
+related plugins, which are not actually "active" unless their base plugin (e.g.
+dirty for active_record_dirty) is also enabled.
 
 =end
   module Plugins

@@ -3,6 +3,11 @@
 module Mobility
   module Plugins
     module ActiveRecord
+=begin
+
+Maps backend names to ActiveRecord namespaced backends.
+
+=end
       module Backend
         extend Plugin
 

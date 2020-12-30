@@ -31,7 +31,6 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             options[:association_name] ||= :"#{options[:type]}_translations"
             options[:class_name]       ||= const_get("#{type.capitalize}Translation")
           end
-          options[:table_alias_affix] = "#{model_class}_%s_#{options[:association_name]}"
         rescue NameError
           raise ArgumentError, "You must define a Mobility::Sequel::#{type.capitalize}Translation class."
         end
@@ -126,8 +125,8 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       backend = self
 
       setup do |attributes, options|
-        association_name   = options[:association_name]
-        translations_class = options[:class_name]
+        association_name  = options[:association_name]
+        translation_class = options[:class_name]
 
         attrs_method_name = :"#{association_name}_attributes"
         association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
@@ -141,7 +140,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           adder:           proc { |translation| translation.update(translatable_id: pk, translatable_type: self.class.to_s) },
           remover:         proc { |translation| translation.update(translatable_id: nil, translatable_type: nil) },
           clearer:         proc { send(:"#{association_name}_dataset").update(translatable_id: nil, translatable_type: nil) },
-          class:           translations_class
+          class:           translation_class
 
         callback_methods = Module.new do
           define_method :before_save do
@@ -155,7 +154,17 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
         include callback_methods
 
-        include DestroyKeyValueTranslations
+        # Clean up *all* leftover translations of this model, only once.
+        translation_classes = [translation_class, *Mobility::Backends::Sequel::KeyValue::Translation.descendants].uniq
+        define_method :after_destroy do
+          super()
+
+          @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
+          (translation_classes - @mobility_after_destroy_translation_classes).each do |klass|
+            klass.where(translatable_id: id, translatable_type: self.class.name).destroy
+          end
+          @mobility_after_destroy_translation_classes += translation_classes
+        end
         include(mod = Module.new)
         backend.define_column_changes(mod, attributes)
       end
@@ -174,17 +183,6 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         cache.each_value do |translation|
           next unless present?(translation.value)
           translation.id ? translation.save : model.send("add_#{singularize(association_name)}", translation)
-        end
-      end
-
-      # Clean up *all* leftover translations of this model, only once.
-      module DestroyKeyValueTranslations
-        def after_destroy
-          super
-          [:string, :text].freeze.each do |type|
-            Mobility::Backends::Sequel::KeyValue.const_get("#{type.capitalize}Translation").
-              where(translatable_id: id, translatable_type: self.class.name).destroy
-          end
         end
       end
 
@@ -212,7 +210,15 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       end
 
       module Translation
+        # Strictly these are not "descendants", but to keep terminology
+        # consistent with ActiveRecord KeyValue backend.
+        def self.descendants
+          @descendants ||= Set.new
+        end
+
         def self.included(base)
+          @descendants ||= Set.new
+          @descendants << base
           base.class_eval do
             plugin :validation_helpers
 

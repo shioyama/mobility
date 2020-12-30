@@ -37,7 +37,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             options[:association_name] ||= :"#{options[:type]}_translations"
             options[:class_name]       ||= const_get("#{type.capitalize}Translation")
           end
-          options[:table_alias_affix] = "#{model_class}_%s_#{options[:association_name]}"
         rescue NameError
           raise ArgumentError, "You must define a Mobility::Backends::ActiveRecord::KeyValue::#{type.capitalize}Translation class."
         end
@@ -151,8 +150,8 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       end
 
       setup do |attributes, options|
-        association_name   = options[:association_name]
-        translations_class = options[:class_name]
+        association_name  = options[:association_name]
+        translation_class = options[:class_name]
         key_column         = options[:key_column]
         value_column       = options[:value_column]
         translatable       = options[:translatable]
@@ -168,18 +167,13 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
 
         has_many association_name, ->{ where key_column => association_attributes },
           as: translatable,
-          class_name: translations_class.name,
+          class_name: translation_class.name,
           inverse_of: translatable,
           autosave:   true
         before_save do
           send(association_name).select { |t| t.send(value_column).blank? }.each do |translation|
             send(association_name).destroy(translation)
           end
-        end
-        # FIXME: for some reason a single after_destroy hook gets called even if there are several
-        # (e.g. if model has both string and text translations)
-        after_destroy do
-          translations_class.where(translatable => self).destroy_all
         end
 
         module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"
@@ -195,6 +189,14 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             end
           end
           include const_set(module_name, callback_methods)
+        end
+
+        # Ensure we only call after destroy hook once per translations class
+        translation_classes = [translation_class, *Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants].uniq
+        after_destroy do
+          @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
+          (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(translatable: self).destroy_all }
+          @mobility_after_destroy_translation_classes += translation_classes
         end
       end
 

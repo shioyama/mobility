@@ -1,6 +1,11 @@
 module Mobility
   module Plugins
     module Sequel
+=begin
+
+Maps backend names to Sequel namespaced backends.
+
+=end
       module Backend
         extend Plugin
 

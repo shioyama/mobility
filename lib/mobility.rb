@@ -31,8 +31,9 @@ So the above example is equivalent to:
 `Mobility.translations_class` is a subclass of `Mobility::Translations` created
 when `Mobility.configure` is called to configure Mobility. In fact, when you
 call `Mobility.configure`, it is the subclass of `Mobility::Translations` which
-is passed to the block as `config`. Plugins and plugin configuration is all
-applied to the same `Mobility.translations_class`.
+is passed to the block as `config` (or as `self` if no argument is passed to
+the block). Plugins and plugin configuration is all applied to the same
+`Mobility.translations_class`.
 
 There is another way to use Mobility, which is to create your own subclass or
 subclasses of +Mobility::Translations+ and include them explicitly, without
@@ -83,8 +84,6 @@ module Mobility
   require "mobility/plugins"
   require "mobility/translations"
 
-  # General error for version compatibility conflicts
-  class VersionNotSupportedError < ArgumentError; end
   CALL_COMPILABLE_REGEXP = /\A[a-zA-Z_]\w*[!?]?\z/
   private_constant :CALL_COMPILABLE_REGEXP
 

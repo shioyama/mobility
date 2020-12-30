@@ -79,7 +79,6 @@ other backends on model (otherwise one will overwrite the other).
         backend_class.extend ClassMethods
         backend_class.option_reader :association_name
         backend_class.option_reader :class_name
-        backend_class.option_reader :table_alias_affix
         backend_class.option_reader :key_column
         backend_class.option_reader :value_column
         backend_class.option_reader :translatable
@@ -116,7 +115,7 @@ other backends on model (otherwise one will overwrite the other).
         end
 
         def table_alias(attr, locale)
-          table_alias_affix % "#{attr}_#{Mobility.normalize_locale(locale)}"
+          "#{model_class}_#{attr}_#{Mobility.normalize_locale(locale)}_#{options[:association_name]}"
         end
       end
 

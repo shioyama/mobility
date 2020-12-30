@@ -60,7 +60,7 @@ describe Mobility::Plugins::Sequel::Query, orm: :sequel, type: :plugin do
     end
   end
 
-  describe "virtual row handling", focus:true do
+  describe "virtual row handling" do
     before do
       stub_const 'Article', Class.new(Sequel::Model)
       Article.dataset = DB[:articles]

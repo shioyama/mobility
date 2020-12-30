@@ -315,34 +315,82 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
 
     describe "after destroy" do
       plugins :active_record, :reader, :writer
-      before do
-        translates Article, :title, :content, backend: :key_value, type: :text
-        stub_const 'Post', Class.new(ActiveRecord::Base)
-        translates Post, :title, backend: :key_value, type: :string
-        translates Post, :content, backend: :key_value, type: :text
+
+      before(:all) do
+        m = ActiveRecord::Migration.new
+        m.verbose = false
+        m.create_table :mobility_foo_translations do |t|
+          t.string :locale, null: false
+          t.string :key, null: false
+          t.string :value
+          t.references :translatable, polymorphic: true, index: false
+          t.timestamps null: false
+        end
+      end
+      after(:all) do
+        m = ActiveRecord::Migration.new
+        m.verbose = false
+        m.drop_table :mobility_foo_translations
       end
 
       # In case we change the translated attributes on a model, we need to make
       # sure we clean them up when the model is destroyed.
       it "cleans up all associated translations, regardless of key" do
-        article = Article.create(title: "foo title", content: "foo content")
-        Mobility.with_locale(:ja) { article.update(title: "あああ", content: "ばばば") }
+        # test with custom subclass
+        foo_translation_class = Class.new(Mobility::Backends::ActiveRecord::KeyValue::Translation)
+        foo_translation_class.table_name = "mobility_foo_translations"
+        stub_const('Mobility::Backends::ActiveRecord::KeyValue::FooTranslation', foo_translation_class)
+
+        translates Article, :title, backend: :key_value, type: :string
+        translates Article, :subtitle, backend: :key_value, type: :string
+        translates Article, :content, backend: :key_value, type: :text
+        translates Article, :author, backend: :key_value, type: :foo
+        article = Article.create(title: "foo title", content: "foo content", subtitle: "foo subtitle", author: "foo author")
+        Mobility.with_locale(:ja) { article.update(title: "あああ", content: "ばばば", subtitle: "ぱぱぱ", author: "ややや") }
         article.save
 
         # Create translations on another model, to check they do not get destroyed
+        stub_const 'Post', Class.new(ActiveRecord::Base)
+        translates Post, :title, backend: :key_value, type: :string
+        translates Post, :content, backend: :key_value, type: :text
         Post.create(title: "post title", content: "post content")
 
-        expect(string_translation_class.count).to eq(1)
-        expect(text_translation_class.count).to eq(5)
+        expect(string_translation_class.count).to eq(5)
+        expect(text_translation_class.count).to eq(3)
+        expect(foo_translation_class.count).to eq(2)
 
         text_translation_class.create!(translatable: article, key: "key1", value: "value1", locale: "de")
         string_translation_class.create!(translatable: article, key: "key2", value: "value2", locale: "fr")
-        expect(text_translation_class.count).to eq(6)
-        expect(string_translation_class.count).to eq(2)
+        foo_translation_class.create!(translatable: article, key: "key3", value: "value3", locale: "ja")
+        expect(string_translation_class.count).to eq(6)
+        expect(text_translation_class.count).to eq(4)
+        expect(foo_translation_class.count).to eq(3)
 
-        article.destroy!
+        # ensure we're doing the right number of deletes
+        deletes = []
+        selects = []
+        callback = ->(_name, _started, _finished, _unique_id, payload) do
+          selects << payload[:sql] if payload[:sql].start_with?('SELECT')
+          deletes << payload[:sql] if payload[:sql].start_with?('DELETE')
+        end
+        ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
+          article.destroy!
+        end
+
         expect(text_translation_class.count).to eq(1)
         expect(string_translation_class.count).to eq(1)
+        expect(foo_translation_class.count).to eq(0)
+
+        expect(deletes.grep(/mobility_string_translations/).size).to eq(5)
+        expect(deletes.grep(/mobility_text_translations/).size).to eq(3)
+        expect(deletes.grep(/mobility_foo_translations/).size).to eq(3)
+        expect(deletes.size).to eq(12)
+
+        # We should only need one select per table, if we're doing more it
+        # means we've assigned multiple callback hooks for the same table.
+        expect(selects.grep(/mobility_string_translations/).size).to eq(1)
+        expect(selects.grep(/mobility_text_translations/).size).to eq(1)
+        expect(selects.grep(/mobility_foo_translations/).size).to eq(1)
       end
     end
 
@@ -355,25 +403,23 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         Class.new(described_class) { @model_class = Article }
       end
 
-      it "sets association_name, class_name and table_alias_affix from string type" do
+      it "sets association_name and class_name from string type" do
         options = { type: :string }
         backend_class.configure(options)
         expect(options).to eq({
           type: :string,
           class_name: string_translation_class,
-          association_name: :string_translations,
-          table_alias_affix: "Article_%s_string_translations"
+          association_name: :string_translations
         })
       end
 
-      it "sets association_name, class_name and table_alias_affix from text type" do
+      it "sets association_name and class_name from text type" do
         options = { type: :text }
         backend_class.configure(options)
         expect(options).to eq({
           type: :text,
           class_name: text_translation_class,
-          association_name: :text_translations,
-          table_alias_affix: "Article_%s_text_translations"
+          association_name: :text_translations
         })
       end
 
@@ -389,8 +435,7 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
         expect(options).to eq({
           type: :text,
           class_name: text_translation_class,
-          association_name: :text_translations,
-          table_alias_affix: "Article_%s_text_translations"
+          association_name: :text_translations
         })
       end
     end

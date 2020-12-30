@@ -1,5 +1,4 @@
 require "sequel"
-raise VersionNotSupportedError, "Mobility is only compatible with Sequel 4.0 and greater" if ::Sequel::MAJOR < 4
 require "sequel/plugins/mobility"
 unless defined?(ActiveSupport::Inflector)
   # TODO: avoid automatically including the inflector extension
@@ -13,6 +12,13 @@ require_relative "./sequel/query"
 
 module Mobility
   module Plugins
+=begin
+
+Plugin for Sequel models. This plugin automatically requires sequel related
+plugins, which are not actually "active" unless their base plugin (e.g. dirty
+for sequel_dirty) is also enabled.
+
+=end
     module Sequel
       extend Plugin
 

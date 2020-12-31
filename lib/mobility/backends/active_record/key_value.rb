@@ -211,9 +211,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         translation
       end
 
-      # FIXME: replace:
-      #   - `:translatable` with `options[:translatable]`
-      #   - `:key` with `options[:key_column]`
       class Translation < ::ActiveRecord::Base
         self.abstract_class = true
 

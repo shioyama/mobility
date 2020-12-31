@@ -37,7 +37,7 @@ module Mobility
 
               if relation.exists?
                 error_options = options.except(:case_sensitive, :scope, :conditions)
-                error_options[:body] = value
+                error_options[:value] = value
 
                 record.errors.add(attribute, :taken, **error_options)
               end

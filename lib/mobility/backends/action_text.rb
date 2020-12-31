@@ -39,7 +39,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActionText.
           options[:class_name]       ||= Translation
           options[:key_column]       ||= :name
           options[:value_column]     ||= :body
-          options[:translatable]     ||= :record
+          options[:belongs_to]       ||= :record
           super
         end
         # @!endgroup

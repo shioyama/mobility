@@ -11,7 +11,6 @@ Implements the {Mobility::Backends::KeyValue} backend for ActionText.
   class Post < ApplicationRecord
     extend Mobility
     translates :content, backend: :action_text
-    has_rich_text :content
   end
 
   post = Post.create(content: "<h1>My text is rich</h1>")

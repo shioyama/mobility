@@ -81,7 +81,7 @@ other backends on model (otherwise one will overwrite the other).
         backend_class.option_reader :class_name
         backend_class.option_reader :key_column
         backend_class.option_reader :value_column
-        backend_class.option_reader :translatable
+        backend_class.option_reader :belongs_to
       end
 
       module ClassMethods
@@ -103,7 +103,7 @@ other backends on model (otherwise one will overwrite the other).
           options[:class_name]       &&= Util.constantize(options[:class_name])
           options[:key_column]       ||= :key
           options[:value_column]     ||= :value
-          options[:translatable]     ||= :translatable
+          options[:belongs_to]       ||= :translatable
           if !(options[:type] || (options[:class_name] && options[:association_name]))
             raise ArgumentError, "KeyValue backend requires an explicit type option, either text or string."
           end

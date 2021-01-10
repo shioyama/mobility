@@ -133,6 +133,11 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         belongs_to_id     = :"#{belongs_to}_id"
         belongs_to_type   = :"#{belongs_to}_type"
 
+        # Track all attributes for this association, so that we can limit the scope
+        # of keys for the association to only these attributes. We need to track the
+        # attributes assigned to the association in case this setup code is called
+        # multiple times, so we don't "forget" earlier attributes.
+        #
         attrs_method_name = :"#{association_name}_attributes"
         association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
         instance_variable_set(:"@#{attrs_method_name}", association_attributes)

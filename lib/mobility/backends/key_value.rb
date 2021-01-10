@@ -86,7 +86,7 @@ other backends on model (otherwise one will overwrite the other).
 
       module ClassMethods
         def valid_keys
-          [:type, :association_name, :class_name]
+          [:type, :association_name, :class_name, :key_column, :value_column, :belongs_to]
         end
 
         # @!group Backend Configuration

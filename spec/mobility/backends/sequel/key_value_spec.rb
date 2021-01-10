@@ -436,7 +436,7 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
       Class.new(described_class) { @model_class = Post }
     end
 
-    it "sets association_name, class_name, key_column, value_colum and belongs_to from string type" do
+    it "sets association_name, class_name, key_column, value_column and belongs_to from string type" do
       options = { type: :string }
       backend_class.configure(options)
       expect(options).to eq({
@@ -449,7 +449,7 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
       })
     end
 
-    it "sets association_name, class_name, key_column, value_colum and belongs_to from text type" do
+    it "sets association_name, class_name, key_column, value_column and belongs_to from text type" do
       options = { type: :text }
       backend_class.configure(options)
       expect(options).to eq({

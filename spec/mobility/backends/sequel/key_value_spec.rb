@@ -146,6 +146,42 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
       end
     end
 
+    context "with custom translation class" do
+      before(:all) do
+        DB.create_table!(:mobility_custom_translations) do
+          primary_key :id
+          String      :locale,      allow_null: false
+          String      :my_key
+          String      :my_value
+          Integer     :custom_id,   allow_null: false
+          String      :custom_type, allow_null: false
+          DateTime    :created_at,  allow_null: false
+          DateTime    :updated_at,  allow_null: false
+        end
+      end
+      after(:all) { DB.drop_table?(:mobility_custom_translations) }
+
+      before do
+        stub_const('CustomTranslation', Class.new(::Sequel::Model(:mobility_custom_translations)))
+        CustomTranslation.include Mobility::Backends::Sequel::KeyValue::Translatable.new(:my_key, :my_value, :custom)
+        translates Article, :title, :content, backend: :key_value, key_column: :my_key, value_column: :my_value, belongs_to: :custom, class_name: CustomTranslation, association_name: :custom_translations
+      end
+
+      it "correctly stores translations on custom table" do
+        expect {
+           article = Article.create(title: "foo")
+           expect(article.title).to eq("foo")
+
+           Mobility.with_locale(:ja) { article.title = "ほげ" }
+           article.save
+        }.to change { CustomTranslation.count }.by(2)
+
+        article = Article.first
+        expect(article.title).to eq("foo")
+        Mobility.with_locale(:ja) { expect(article.title).to eq("ほげ") }
+      end
+    end
+
     describe "storing translations" do
       let!(:article) do
         Mobility.with_locale(:en) { article = Article.create(title: "New Article") }

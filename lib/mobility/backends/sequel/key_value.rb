@@ -37,7 +37,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         # @!endgroup
 
         def build_op(attr, locale)
-          QualifiedIdentifier.new(table_alias(attr, locale), :value, locale, self, attr)
+          QualifiedIdentifier.new(table_alias(attr, locale), value_column, locale, self, attr)
         end
 
         # @param [Sequel::Dataset] dataset Dataset to prepare
@@ -56,10 +56,10 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           dataset.join_table(join_type,
                              class_name.table_name,
                              {
-                               key: attr.to_s,
-                               locale: locale.to_s,
-                               translatable_type: model_class.name,
-                               translatable_id: ::Sequel[:"#{model_class.table_name}"][:id]
+                               key_column => attr.to_s,
+                               :locale => locale.to_s,
+                               :"#{belongs_to}_type" => model_class.name,
+                               :"#{belongs_to}_id" => ::Sequel[:"#{model_class.table_name}"][:id]
                              },
                              table_alias: table_alias(attr, locale))
         end
@@ -127,25 +127,30 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       setup do |attributes, options|
         association_name  = options[:association_name]
         translation_class = options[:class_name]
+        key_column        = options[:key_column]
+        value_column      = options[:value_column]
+        belongs_to        = options[:belongs_to]
+        belongs_to_id     = :"#{belongs_to}_id"
+        belongs_to_type   = :"#{belongs_to}_type"
 
         attrs_method_name = :"#{association_name}_attributes"
         association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
         instance_variable_set(:"@#{attrs_method_name}", association_attributes)
 
         one_to_many association_name,
-          reciprocal:      :translatable,
-          key:             :translatable_id,
+          reciprocal:      belongs_to,
+          key:             belongs_to_id,
           reciprocal_type: :one_to_many,
-          conditions:      { translatable_type: self.to_s, key: association_attributes },
-          adder:           proc { |translation| translation.update(translatable_id: pk, translatable_type: self.class.to_s) },
-          remover:         proc { |translation| translation.update(translatable_id: nil, translatable_type: nil) },
-          clearer:         proc { send(:"#{association_name}_dataset").update(translatable_id: nil, translatable_type: nil) },
+          conditions:      { belongs_to_type => self.to_s, key_column => association_attributes },
+          adder:           proc { |translation| translation.update(belongs_to_id => pk, belongs_to_type => self.class.to_s) },
+          remover:         proc { |translation| translation.update(belongs_to_id => nil, belongs_to_type => nil) },
+          clearer:         proc { send_(:"#{association_name}_dataset").update(belongs_to_id => nil, belongs_to_type => nil) },
           class:           translation_class
 
         callback_methods = Module.new do
           define_method :before_save do
             super()
-            send(association_name).select { |t| attributes.include?(t.key) && Util.blank?(t.value) }.each(&:destroy)
+            send(association_name).select { |t| attributes.include?(t.__send__(key_column)) && Util.blank?(t.__send__(value_column)) }.each(&:destroy)
           end
           define_method :after_save do
             super()
@@ -161,7 +166,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
           @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
           (translation_classes - @mobility_after_destroy_translation_classes).each do |klass|
-            klass.where(translatable_id: id, translatable_type: self.class.name).destroy
+            klass.where(belongs_to_id => id, belongs_to_type => self.class.name).destroy
           end
           @mobility_after_destroy_translation_classes += translation_classes
         end
@@ -173,15 +178,15 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       # @param [Symbol] locale
       # @return [Mobility::Backends::Sequel::KeyValue::TextTranslation,Mobility::Backends::Sequel::KeyValue::StringTranslation]
       def translation_for(locale, **)
-        translation = model.send(association_name).find { |t| t.key == attribute && t.locale == locale.to_s }
-        translation ||= class_name.new(locale: locale, key: attribute)
+        translation = model.send(association_name).find { |t| t.__send__(key_column) == attribute && t.locale == locale.to_s }
+        translation ||= class_name.new(locale: locale, key_column => attribute)
         translation
       end
 
       # Saves translation which have been built and which have non-blank values.
       def save_translations
         cache.each_value do |translation|
-          next unless present?(translation.value)
+          next unless present?(translation.__send__ value_column)
           translation.id ? translation.save : model.send("add_#{singularize(association_name)}", translation)
         end
       end
@@ -209,16 +214,32 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
       end
 
-      module Translation
+      class Translatable < Module
+        attr_reader :key_column, :value_column, :belongs_to, :id_column, :type_column
+
+        def initialize(key_column, value_column, belongs_to)
+          @key_column = key_column
+          @value_column = value_column
+          @belongs_to = belongs_to
+          @id_column = :"#{belongs_to}_id"
+          @type_column = :"#{belongs_to}_type"
+        end
+
         # Strictly these are not "descendants", but to keep terminology
         # consistent with ActiveRecord KeyValue backend.
-        def self.descendants
+        def descendants
           @descendants ||= Set.new
         end
 
-        def self.included(base)
+        def included(base)
           @descendants ||= Set.new
           @descendants << base
+
+          mod = self
+          key_column = mod.key_column
+          id_column = mod.id_column
+          type_column = mod.type_column
+
           base.class_eval do
             plugin :validation_helpers
 
@@ -226,16 +247,16 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             #
             model = underscore(self.to_s)
             plural_model = pluralize(model)
-            many_to_one :translatable,
+            many_to_one mod.belongs_to,
               reciprocal: plural_model.to_sym,
               reciprocal_type: :many_to_one,
               setter: (proc do |able_instance|
-                self[:translatable_id]   = (able_instance.pk if able_instance)
-                self[:translatable_type] = (able_instance.class.name if able_instance)
+                self[id_column]   = (able_instance.pk if able_instance)
+                self[type_column] = (able_instance.class.name if able_instance)
               end),
               dataset: (proc do
-                translatable_type = send :translatable_type
-                translatable_id   = send :translatable_id
+                translatable_type = send type_column
+                translatable_id   = send id_column
                 return if translatable_type.nil? || translatable_id.nil?
                 klass = self.class.send(:constantize, translatable_type)
                 klass.where(klass.primary_key => translatable_id)
@@ -243,29 +264,30 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
               eager_loader: (proc do |eo|
                 id_map = {}
                 eo[:rows].each do |model|
-                  model_able_type = model.send :translatable_type
-                  model_able_id = model.send :translatable_id
-                  model.associations[:translatable] = nil
+                  model_able_type = model.send type_column
+                  model_able_id = model.send id_column
+                  model.associations[belongs_to] = nil
                   ((id_map[model_able_type] ||= {})[model_able_id] ||= []) << model if !model_able_type.nil? && !model_able_id.nil?
                 end
                 id_map.each do |klass_name, id_map|
                   klass = constantize(camelize(klass_name))
                   klass.where(klass.primary_key=>id_map.keys).all do |related_obj|
                     id_map[related_obj.pk].each do |model|
-                      model.associations[:translatable] = related_obj
+                      model.associations[belongs_to] = related_obj
                     end
                   end
                 end
               end)
 
-            def validate
-              super
-              validates_presence [:locale, :key, :translatable_id, :translatable_type]
-              validates_unique   [:locale, :key, :translatable_id, :translatable_type]
+            define_method :validate do
+              super()
+              validates_presence [:locale, key_column, id_column, type_column]
+              validates_unique   [:locale, key_column, id_column, type_column]
             end
           end
         end
       end
+      Translation = Translatable.new(:key, :value, :translatable)
 
       class TextTranslation < ::Sequel::Model(:mobility_text_translations)
         include Translation

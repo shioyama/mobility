@@ -310,7 +310,6 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
         article.destroy
       end
     end
-
   end
 
   describe "Backend methods" do
@@ -426,7 +425,6 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
     end
   end
 
-
   describe ".configure" do
     plugins :sequel
 
@@ -467,7 +465,6 @@ describe "Mobility::Backends::Sequel::KeyValue", orm: :sequel, type: :backend do
         .to raise_error(ArgumentError,
                         "You must define a Mobility::Sequel::IntegerTranslation class.")
     end
-
 
     it "sets default association_name, class_name, key_column, value_colum and belongs_to from type" do
       options = { type: :text }

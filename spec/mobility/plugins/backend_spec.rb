@@ -171,22 +171,65 @@ describe Mobility::Plugins::Backend, type: :plugin do
   end
 
   describe "#initialize" do
-    define_plugins :foo
+    define_plugins :my_plugin
 
-    it "excludes backend options from plugin key validation" do
-      klass = Class.new(Mobility::Pluggable)
-      backend_class = Class.new
-      def backend_class.valid_keys
+    let(:pluggable) do
+      Class.new(Mobility::Pluggable) do |pluggable|
+        pluggable.plugin :my_plugin
+      end
+    end
+
+    before do
+      Mobility::Backends.register_backend(:my_backend, backend_class)
+
+      stub_const('OtherBackendClass', Class.new)
+      Mobility::Backends.register_backend(:other_backend, OtherBackendClass)
+      def OtherBackendClass.valid_keys
         [:bar]
       end
-      klass.plugin :backend, backend_class
-      klass.plugin :foo
+    end
 
-      expect { klass.new(foo: 'foo', bar: 'bar') }.not_to raise_error
+    after do
+      backends = Mobility::Backends.instance_variable_get(:@backends)
+      backends.delete(:my_backend)
+      backends.delete(:other_backend)
+    end
+
+    it "excludes backend options from plugin key validation" do
+      pluggable.plugin :backend, :my_backend
+
+      translations = pluggable.new(my_plugin: 'my_plugin', foo: 'bar')
+      expect(translations.options).to eq(backend: [:my_backend, {}], foo: 'bar', my_plugin: 'my_plugin')
+      expect(translations.backend_options).to eq(foo: 'bar', my_plugin: 'my_plugin')
 
       expect {
-        klass.new(foo: 'foo', other: 'other')
-      }.to raise_error(Mobility::Pluggable::InvalidOptionKey)
+        pluggable.new(my_plugin: 'my_plugin', other: 'other')
+      }.to raise_error(Mobility::Pluggable::InvalidOptionKey, "No plugin configured for these keys: other.")
+    end
+
+    it "validates backend options when backend is an array" do
+      pluggable.plugin :backend, :my_backend, foo: "foo"
+
+      translations = pluggable.new(my_plugin: 'my_plugin', backend: [:other_backend, bar: "bar"])
+      expect(translations.options).to eq(backend: [:other_backend, bar: 'bar'], my_plugin: 'my_plugin')
+      expect(translations.backend_options).to eq(backend: [:other_backend, bar: 'bar'], bar: 'bar', my_plugin: 'my_plugin')
+      expect(translations.options).not_to be(translations.backend_options)
+
+      expect {
+        pluggable.new(my_plugin: 'my_plugin', backend: [:other_backend, baz: "baz"])
+      }.to raise_error(Mobility::Plugins::Backend::InvalidOptionKey, "These are not valid other_backend backend keys: baz.")
+      expect {
+        pluggable.new(my_plugin: 'my_plugin', backend: :other_backend, foo: "foo")
+      }.to raise_error(Mobility::Pluggable::InvalidOptionKey, "No plugin configured for these keys: foo.")
+    end
+
+    it "validates correct mixed in backend options" do
+      pluggable.plugin :backend, backend_class, foo: "foo"
+
+      translations = pluggable.new(backend: :other_backend, bar: "bar")
+      expect(translations.options).to eq(backend: :other_backend, bar: 'bar')
+      expect(translations.backend_options).to eq(backend: :other_backend, bar: 'bar')
+      expect(translations.options).not_to be(translations.backend_options)
     end
   end
 
@@ -221,7 +264,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
   describe "configuring defaults" do
     before do
       backend_class = stub_const("FooBackend", Class.new(Mobility::Backends::Null))
-      expect(backend_class).to receive(:valid_keys).twice.and_return([:association_name])
+      expect(backend_class).to receive(:valid_keys).at_least(1).time.and_return([:association_name])
       Mobility::Backends.register_backend(:foo, FooBackend)
     end
     after { Mobility::Backends.instance_variable_get(:@backends).delete(:foo) }

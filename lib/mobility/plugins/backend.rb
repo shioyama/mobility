@@ -33,13 +33,6 @@ Defines:
       def initialize(*args, **original_options)
         super
 
-        # Validate that the default backend from config has valid keys
-        if (default = self.class.defaults[:backend])
-          name, backend_options = default
-          extra_keys = backend_options.keys - backend.valid_keys
-          raise InvalidOptionKey, "These are not valid #{name} backend keys: #{extra_keys.join(', ')}." unless extra_keys.empty?
-        end
-
         include InstanceMethods
       end
 
@@ -87,7 +80,7 @@ Defines:
 
         case options[:backend]
         when String, Symbol, Class
-          @backend, @backend_options = options[:backend], options
+          @backend, @backend_options = options[:backend], options.dup
         when Array
           @backend, @backend_options = options[:backend]
           @backend_options = @backend_options.merge(original_options)
@@ -105,6 +98,14 @@ Defines:
       def validate_options(options)
         return super unless backend
         super(options.slice(*(options.keys - backend.valid_keys)))
+
+        # Validate that the default backend from config has valid keys, or if
+        # it is overridden by an array input that the array has valid keys.
+        if options[:backend].is_a?(Array)
+          name, backend_options = options[:backend]
+          extra_keys = backend_options.keys - backend.valid_keys
+          raise InvalidOptionKey, "These are not valid #{name} backend keys: #{extra_keys.join(', ')}." unless extra_keys.empty?
+        end
       end
 
       # Override default argument-handling in DSL to store kwargs passed along

@@ -21,9 +21,11 @@
 v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0)
 for more details on how to upgrade.
 
-### 1.0.2
+### 1.0.3
 - Fix `Mobility.default_backend`
   ([#497](https://github.com/shioyama/mobility/pull/497))
+
+### 1.0.2
 
 ### 1.0.1
 

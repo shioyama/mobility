@@ -106,7 +106,7 @@ module Mobility
     # Alias to default backend defined on *translations_class+.
     # @return [Symbol,Class]
     def default_backend
-      translations_class.defaults[:backend]
+      translations_class.defaults[:backend]&.first
     end
 
     # Configure Mobility

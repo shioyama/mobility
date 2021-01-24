@@ -257,5 +257,15 @@ describe Mobility, orm: :none do
       subject.translates_with translations_class
       expect(subject.default_backend).to eq(nil)
     end
+
+    it "returns backend symbol or class" do
+      translations_class = Class.new(Mobility::Translations) do
+        plugins do
+          backend :key_value, type: :string
+        end
+      end
+      described_class.translates_with(translations_class)
+      expect(subject.default_backend).to eq(:key_value)
+    end
   end
 end

@@ -245,9 +245,9 @@ describe Mobility, orm: :none do
 
   describe ".translates_with" do
     it "sets translations_class" do
-      klass = Class.new(Mobility::Translations)
-      described_class.translates_with(klass)
-      expect(described_class.translations_class).to eq(klass)
+      translations_class = Class.new(Mobility::Translations)
+      described_class.translates_with(translations_class)
+      expect(described_class.translations_class).to eq(translations_class)
     end
   end
 

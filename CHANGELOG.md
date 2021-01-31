@@ -21,6 +21,12 @@
 v1.0](https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0)
 for more details on how to upgrade.
 
+### 1.0.5
+- Fix duping with AR Table backend, fixes
+  [#490](https://github.com/shioyama/mobility/issues/490)
+  ([#499](https://github.com/shioyama/mobility/pull/499) and
+  [#501](https://github.com/shioyama/mobility/pull/501))
+
 ### 1.0.4
 - Correctly override default backend options, fixes
   [#492](https://github.com/shioyama/mobility/issues/492)

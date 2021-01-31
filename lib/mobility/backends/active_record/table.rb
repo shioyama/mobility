@@ -274,6 +274,12 @@ columns to that table.
             define_method :initialize_dup do |source|
               super(source)
               self.send("#{association_name}=", source.send(association_name).map(&:dup))
+
+              # for cache
+              # FIXME: do this better
+              if options[:cache]
+                instance_variable_set(:"@__mobility_#{association_name}_cache", {})
+              end
             end
           end
           include const_set(module_name, dupable)

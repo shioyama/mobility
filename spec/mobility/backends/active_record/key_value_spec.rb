@@ -41,6 +41,8 @@ describe "Mobility::Backends::ActiveRecord::KeyValue", orm: :active_record, type
       before { translates Article, :title, :content, backend: :key_value, type: :text }
 
       include_accessor_examples "Article"
+      include_dup_examples "Article"
+      include_cache_key_examples "Article"
 
       it "only fetches translation once per locale" do
         expect(title_backend.send(:translations)).to receive(:find).twice.and_call_original

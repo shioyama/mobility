@@ -34,6 +34,8 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
     before { translates Article, :title, :content, backend: :table, cache: true }
 
     include_accessor_examples "Article"
+    include_dup_examples "Article"
+    include_cache_key_examples "Article"
 
     it "only fetches translation once per locale" do
       article = Article.new

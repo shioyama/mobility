@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - master
-      - 0-8-stable
+      - 1-0
+      - 0-8
   pull_request:
     branches:
       - master
-      - 0-8-stable
+      - 1-0
+      - 0-8
 
 jobs:
   test:

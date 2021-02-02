@@ -83,7 +83,7 @@ Defines:
           @backend, @backend_options = options[:backend], options.dup
         when Array
           @backend, @backend_options = options[:backend]
-          @backend_options = @backend_options.merge(original_options)
+          @backend_options = @backend_options.merge(options)
         when NilClass
           @backend = @backend_options = nil
         else

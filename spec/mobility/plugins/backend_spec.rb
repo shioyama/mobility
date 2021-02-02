@@ -200,7 +200,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
 
       translations = pluggable.new(my_plugin: 'my_plugin', foo: 'bar')
       expect(translations.options).to eq(backend: [:my_backend, {}], foo: 'bar', my_plugin: 'my_plugin')
-      expect(translations.backend_options).to eq(foo: 'bar', my_plugin: 'my_plugin')
+      expect(translations.backend_options).to eq(backend: [:my_backend, {}], foo: 'bar', my_plugin: 'my_plugin')
 
       expect {
         pluggable.new(my_plugin: 'my_plugin', other: 'other')

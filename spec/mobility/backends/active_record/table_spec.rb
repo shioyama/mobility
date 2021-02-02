@@ -30,8 +30,14 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
   end
 
   context "with cache" do
-    plugins :active_record, :reader, :writer, :cache
-    before { translates Article, :title, :content, backend: :table, cache: true }
+    plugins do
+      backend :table
+      active_record
+      reader
+      writer
+      cache
+    end
+    before { translates Article, :title, :content }
 
     include_accessor_examples "Article"
     include_dup_examples "Article"

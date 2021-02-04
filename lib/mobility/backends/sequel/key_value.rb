@@ -1,4 +1,5 @@
 # frozen-string-literal: true
+require "set"
 require "mobility/util"
 require "mobility/backends/sequel"
 require "mobility/backends/key_value"

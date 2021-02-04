@@ -1,5 +1,6 @@
 # frozen-string-literal: true
 require "tsort"
+require "set"
 require "mobility/util"
 
 module Mobility

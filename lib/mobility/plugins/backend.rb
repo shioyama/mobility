@@ -114,15 +114,25 @@ Defines:
         defaults[key] = [backend, backend_options] if backend
       end
 
+      class MobilityBackends < Hash
+        def initialize(model)
+          @model = model
+          super()
+        end
+
+        def [](name)
+          return fetch(name) if has_key?(name)
+          return self[name.to_sym] if String === name
+          self[name] = @model.class.mobility_backend_class(name).new(@model, name.to_s)
+        end
+      end
+
       module InstanceMethods
         # Return a new backend for an attribute name.
         # @return [Hash] Hash of attribute names and backend instances
         # @api private
         def mobility_backends
-          @mobility_backends ||= ::Hash.new do |hash, name|
-            next hash[name.to_sym] if String === name
-            hash[name] = self.class.mobility_backend_class(name).new(self, name.to_s)
-          end
+          @mobility_backends ||= MobilityBackends.new(self)
         end
 
         def initialize_dup(other)

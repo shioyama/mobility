@@ -1,6 +1,8 @@
 # Mobility Changelog
 
-### Unreleased
+## 1.1
+
+### 1.1.0
 - Remove `Mobility::Plugins::Attributes#each`
   ([#475](https://github.com/shioyama/mobility/pull/475))
 - Add public method `Mobility::Plugins::ActiveRecord::Query.build_query`

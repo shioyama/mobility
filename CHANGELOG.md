@@ -2,6 +2,9 @@
 
 ## 1.1
 
+### 1.1.1
+- Updated signing key
+
 ### 1.1.0
 - Remove `Mobility::Plugins::Attributes#each`
   ([#475](https://github.com/shioyama/mobility/pull/475))

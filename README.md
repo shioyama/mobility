@@ -12,7 +12,7 @@ Mobility
 [docs]: http://www.rubydoc.info/gems/mobility
 [wiki]: https://github.com/shioyama/mobility/wiki
 
-**This is the readme for version 1.0 of Mobility. If you are using an earlier
+**This is the readme for version 1.x of Mobility. If you are using an earlier
 version (0.8.x or earlier), you probably want the readme on the [0-8
 branch](https://github.com/shioyama/mobility/tree/0-8).**
 

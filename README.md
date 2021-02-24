@@ -130,9 +130,7 @@ default `type` option for the KeyValue backend to `:string`.
  end
 ```
 
-We will assume the configuration above in the examples that follow. Other
-configuration options are described in the [API
-docs](http://www.rubydoc.info/gems/mobility/Mobility/Configuration).
+We will assume the configuration above in the examples that follow.
 
 See [Getting Started](#quickstart) to get started translating your models.
 
@@ -486,9 +484,7 @@ end
 ```
 
 Internally, Mobility assigns the fallbacks hash to an instance of
-`I18n::Locale::Fallbacks.new` (this can be customized by setting the
-`fallbacks_generator` configuration option, see the [API documentation on
-configuration](http://www.rubydoc.info/gems/mobility/Mobility/Configuration)).
+`I18n::Locale::Fallbacks.new`.
 
 By setting fallbacks for German and French to Japanese, values will fall
 through to the Japanese value if none is present for either of these locales,

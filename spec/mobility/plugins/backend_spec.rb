@@ -169,7 +169,7 @@ describe Mobility::Plugins::Backend, type: :plugin do
       end
 
       # regression test for https://github.com/shioyama/mobility/issues/494
-      it "does not prevent Marshal.dump from working" do
+      it "does not prevent Marshal from working" do
         mod = translations_class.new("title", backend: :null)
         stub_const('Article', model_class)
         model_class.include mod
@@ -177,7 +177,10 @@ describe Mobility::Plugins::Backend, type: :plugin do
         article = model_class.new
         article.mobility_backends[:title]
         expect {
-          expect(Marshal.dump(article)).not_to be_nil
+          expect(serialized = Marshal.dump(article)).not_to be_nil
+          expect(deserialized = Marshal.load(serialized)).not_to be_nil
+
+          expect(deserialized.mobility_backends[:title]).to be_a(Mobility::Backends::Null)
         }.not_to raise_error
       end
     end

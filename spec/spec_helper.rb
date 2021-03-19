@@ -73,7 +73,8 @@ RSpec.configure do |config|
     reset_i18n_fallbacks
     Mobility.locale = :en
 
-    if defined?(ActiveSupport)
+    # Remove once lowest supported version is Rails 6.2
+    if defined?(ActiveSupport::Dependencies::Reference)
       ActiveSupport::Dependencies::Reference.clear!
     end
 

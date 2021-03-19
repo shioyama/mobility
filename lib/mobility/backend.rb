@@ -70,6 +70,12 @@ On top of this, a backend will normally:
       @attribute = args[1]
     end
 
+    def ==(backend)
+      backend.class == self.class &&
+        backend.attribute == attribute &&
+        backend.model == model
+    end
+
     # @!macro [new] backend_reader
     #   Gets the translated value for provided locale from configured backend.
     #   @param [Symbol] locale Locale to read

@@ -1024,6 +1024,9 @@ Integrations
 * [mobility-ransack](https://github.com/shioyama/mobility-ransack): Search
   attributes translated by Mobility with
   [Ransack](https://github.com/activerecord-hackery/ransack).
+* [mobility-actiontext](https://github.com/sedubois/mobility-actiontext): Translate
+  Rails [Action Text](https://guides.rubyonrails.org/action_text_overview.html) rich text
+  with Mobility.
 
 Tutorials
 ---------

@@ -75,21 +75,21 @@ jobs:
             feature: 'unit'
             orm:
               name: 'active_record'
-              version: '6.2'
+              version: '7.0'
             experimental: true
           - ruby: '2.7'
             database: 'mysql'
             feature: 'unit'
             orm:
               name: 'active_record'
-              version: '6.2'
+              version: '7.0'
             experimental: true
           - ruby: '2.7'
             database: 'postgres'
             feature: 'unit'
             orm:
               name: 'active_record'
-              version: '6.2'
+              version: '7.0'
             experimental: true
         exclude:
           - ruby: '2.7'

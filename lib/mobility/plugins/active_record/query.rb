@@ -137,6 +137,8 @@ enabled for any one attribute on the model.
           end
 
           def order(opts, *rest)
+            return super unless @klass.respond_to?(:mobility_attribute?)
+
             case opts
             when Symbol, String
               @klass.mobility_attribute?(opts) ? order({ opts => :asc }, *rest) : super
@@ -161,6 +163,9 @@ enabled for any one attribute on the model.
               define_method method_name do |*attrs, &block|
                 return super(*attrs, &block) if (method_name == 'select' && block.present?)
 
+                if ::ActiveRecord::VERSION::STRING < '7.0'
+                  return super(*attrs, &block) unless @klass.respond_to?(:mobility_attribute?)
+                end
                 return super(*attrs, &block) unless attrs.any?(&@klass.method(:mobility_attribute?))
 
                 keys = attrs.dup

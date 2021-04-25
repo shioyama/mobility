@@ -153,4 +153,43 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
       end).to eq([article_ja])
     end
   end
+
+  describe "regression for #513" do
+    plugins :active_record, :query
+    before do
+      m = ActiveRecord::Migration.new
+      m.verbose = false
+
+      m.create_table :cars
+      stub_const('Car', Class.new(ActiveRecord::Base) do
+        has_many :parking_lots
+        has_many :car_parts
+      end)
+      translates Car, backend: :column
+
+      m.create_table(:parking_lots) { |t| t.integer :car_id }
+      stub_const('ParkingLot', Class.new(ActiveRecord::Base) do
+        belongs_to :car
+      end)
+
+      m.create_table(:car_parts) { |t| t.integer :car_id }
+      stub_const('CarPart', Class.new(ActiveRecord::Base) do
+        belongs_to :car
+      end)
+      translates CarPart, backend: :column
+    end
+    after do
+      m = ActiveRecord::Migration.new
+      m.verbose = false
+      m.drop_table :cars
+      m.drop_table :parking_lots
+      m.drop_table :car_parts
+    end
+
+    it "does not raise NameError" do
+      query = ParkingLot.includes(car: :car_parts).references(:car).merge(Car.i18n)
+      expect { query.first }.not_to raise_error
+      expect { query.order(:car_id) }.not_to raise_error
+    end
+  end
 end

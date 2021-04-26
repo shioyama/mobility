@@ -2,6 +2,10 @@
 
 ## 1.1
 
+### 1.1.2
+- Check whether class responds to mobility_attribute?
+  ([#515](https://github.com/shioyama/mobility/pull/515))
+
 ### 1.1.1
 - Updated signing key
 

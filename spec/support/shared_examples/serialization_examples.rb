@@ -54,17 +54,7 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       expect(instance.read_attribute(column1)).to match_hash({ en: "foo", fr: "bar" })
     end
 
-    it "deletes keys with nil values when saving", active_record_geq: '5.0' do
-      backend.write(:en, "foo")
-      expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
-      backend.write(:en, nil)
-      expect(instance.read_attribute(column1)).to match_hash({ en: nil })
-      instance.save
-      expect(backend.read(:en)).to eq(nil)
-      expect(instance.read_attribute(column1)).to match_hash({})
-    end
-
-    it "deletes keys with blank values when saving" do
+    it "leaves keys with blank values when saving" do
       backend.write(:en, "foo")
       expect(instance.read_attribute(column1)).to match_hash({ en: "foo" })
       instance.save
@@ -72,14 +62,14 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       backend.write(:en, "")
       instance.save
 
-      instance.reload if ActiveRecord::VERSION::MAJOR < 5 # don't ask me why
+      # instance.reload if ActiveRecord::VERSION::MAJOR < 5 # don't ask me why
       # Note: Sequel backend and Rails < 5.0 return a blank string here.
-      expect(backend.read(:en)).to eq(nil)
+      expect(backend.read(:en)).to eq("")
 
-      expect(instance.send(attribute1)).to eq(nil)
+      expect(instance.send(attribute1)).to eq("")
       instance.reload
-      expect(backend.read(:en)).to eq(nil)
-      expect(instance.read_attribute(column1)).to eq({})
+      expect(backend.read(:en)).to eq("")
+      expect(instance.read_attribute(column1)).to match_hash({ en: "" })
     end
 
     it "correctly stores serialized attributes" do
@@ -95,8 +85,8 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       backend.write(:en, "")
       instance.save
       instance = model_class.first
-      expect(instance.send(attribute1)).to eq(nil)
-      expect(instance.read_attribute(column1)).to match_hash({ fr: "bar" })
+      expect(instance.send(attribute1)).to eq("")
+      expect(instance.read_attribute(column1)).to match_hash({ en: "", fr: "bar" })
     end
   end
 
@@ -214,7 +204,7 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       expect(instance[column1]).to eq(serialize({}))
     end
 
-    it "deletes keys with blank values when saving" do
+    it "leaves keys with blank values when saving" do
       backend.write(:en, "foo")
       expect(get_translations(instance, column1)).to match_hash({ en: "foo" })
       instance.save
@@ -222,28 +212,12 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       backend.write(:en, "")
       instance.save
 
-      # Backend continues to return a blank string, but does not save it,
-      # because deserialized_values holds the value assigned rather than the
-      # value as it was actually serialized.
-      #
-      # This is different from the ActiveRecord backend, where the serialized
-      # value is read back, so the backend returns nil.
-      # TODO: Make this return nil? (or make AR return a blank string)
-      # (In practice this is not an issue since instance.title returns `value.presence`).
-      #
-      # Note that for Jsonb backend (when format is nil) this correctly returns
-      # nil.
-      if format
-        expect(backend.read(:en)).to eq("")
-        expect(instance.send(attribute1)).to eq("")
-      else
-        expect(backend.read(:en)).to eq(nil)
-        expect(instance.send(attribute1)).to eq(nil)
-      end
+      expect(backend.read(:en)).to eq("")
+      expect(instance.send(attribute1)).to eq("")
 
       instance.reload
-      expect(backend.read(:en)).to eq(nil)
-      expect(instance[column1]).to eq(serialize({}))
+      expect(backend.read(:en)).to eq("")
+      expect(instance[column1]).to eq(serialize({ en: "" }))
     end
 
     it "correctly stores serialized attributes" do
@@ -259,8 +233,8 @@ shared_examples_for "Sequel Model with serialized translations" do |model_class_
       backend.write(:en, "")
       instance.save
       instance = model_class.first
-      expect(instance.send(attribute1)).to eq(nil)
-      expect(instance[column1]).to eq(serialize({ fr: "bar" }))
+      expect(instance.send(attribute1)).to eq("")
+      expect(instance[column1]).to eq(serialize({ en: "", fr: "bar" }))
     end
   end
 

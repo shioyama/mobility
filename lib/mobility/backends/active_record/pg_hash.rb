@@ -32,7 +32,7 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
           def self.dump(obj)
             if obj.is_a? ::Hash
               obj.inject({}) do |translations, (locale, value)|
-                translations[locale] = value if value.present?
+                translations[locale] = value unless value.nil?
                 translations
               end
             else

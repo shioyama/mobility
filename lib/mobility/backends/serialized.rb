@@ -40,7 +40,7 @@ Format for serialization. Either +:yaml+ (default) or +:json+.
             return if obj.nil?
             if obj.is_a? ::Hash
               obj = obj.inject({}) do |translations, (locale, value)|
-                translations[locale] = value.to_s if Util.present?(value)
+                translations[locale] = value.to_s unless value.nil?
                 translations
               end
             else

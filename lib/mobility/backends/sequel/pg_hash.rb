@@ -41,7 +41,7 @@ jsonb).
           mod = Module.new do
             define_method :before_validation do
               columns.each do |column|
-                self[column].delete_if { |_, v| Util.blank?(v) }
+                self[column].delete_if { |_, v| v.nil? }
               end
               super()
             end

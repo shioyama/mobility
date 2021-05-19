@@ -1,4 +1,6 @@
 # frozen-string-literal: true
+require 'digest/md5'
+
 module Mobility
 =begin
 
@@ -70,6 +72,12 @@ On top of this, a backend will normally:
       @attribute = args[1]
     end
 
+    def ==(backend)
+      backend.class == self.class &&
+        backend.attribute == attribute &&
+        backend.model == model
+    end
+
     # @!macro [new] backend_reader
     #   Gets the translated value for provided locale from configured backend.
     #   @param [Symbol] locale Locale to read
@@ -117,7 +125,10 @@ On top of this, a backend will normally:
     # Extend included class with +setup+ method and other class methods
     def self.included(base)
       base.extend ClassMethods
-      base.singleton_class.attr_reader :options, :model_class
+      base.singleton_class.class_eval do
+        attr_accessor :options, :model_class
+        protected :options=, :model_class=
+      end
     end
 
     # Defines setup hooks for backend to customize model class.
@@ -167,10 +178,15 @@ On top of this, a backend will normally:
       # @param [Hash] options
       # @return [Class] backend subclass
       def build_subclass(model_class, options)
-        Class.new(self) do
-          @model_class = model_class
-          configure(options) if respond_to?(:configure)
-          @options = options.freeze
+        Class.new(self).tap do |klass|
+          klass.model_class = model_class
+          klass.configure(options) if klass.respond_to?(:configure)
+          klass.options = options.freeze
+
+          subclass_name = SubclassNameGenerator.call(model_class, self, options)
+          if subclass_name && !Object.const_defined?(subclass_name)
+            Object.const_set(subclass_name, klass)
+          end
         end
       end
 
@@ -202,6 +218,18 @@ On top of this, a backend will normally:
 
       def write(value, options = {})
         backend.write(locale, value, options)
+      end
+    end
+
+    module SubclassNameGenerator
+      def self.call(model_class, backend_class, options)
+        # If the model class and backend have names, we give the backend subclass a name
+        if model_class.name && backend_class.name
+          class_name_str = model_class.name.gsub('::', '_')
+          backend_name_str = backend_class.name.gsub('::', '_')
+          options_str = ::Digest::MD5.hexdigest(options.sort.inspect)[0..5]
+          [class_name_str, backend_name_str, options_str].join('__')
+        end
       end
     end
   end

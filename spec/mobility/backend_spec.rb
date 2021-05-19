@@ -43,6 +43,24 @@ describe Mobility::Backend do
       end
     end
 
+    describe "#==" do
+      it "returns true if two backends have the same class, model and attributes" do
+        expect(backend_class.new(model, attribute)).to eq(backend)
+      end
+
+      it "returns false if backends have different classes" do
+        expect(Class.new(backend_class).new(model, attribute)).not_to eq(backend)
+      end
+
+      it "returns false if backends have different attributes" do
+        expect(backend_class.new(model, "foo")).not_to eq(backend)
+      end
+
+      it "returns false if backends have different models" do
+        expect(backend_class.new(double(:other_model), attribute)).not_to eq(backend)
+      end
+    end
+
     describe "#each" do
       it "returns nothing by default" do
         backend = backend_class.new(model, attribute)

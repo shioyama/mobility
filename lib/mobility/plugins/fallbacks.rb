@@ -125,7 +125,12 @@ the current locale was +nil+.
 
       def generate_fallbacks(fallbacks)
         fallbacks_class = I18n.respond_to?(:fallbacks) ? I18nFallbacks : I18n::Locale::Fallbacks
-        fallbacks_class.new(fallbacks)
+        fallbacks_class.new(fallbacks).tap do |fallbacks_instance|
+          fallbacks.each_key do |locale|
+            # Initialize fallbacks
+            fallbacks_instance[locale]
+          end
+        end
       end
 
       class I18nFallbacks < ::I18n::Locale::Fallbacks

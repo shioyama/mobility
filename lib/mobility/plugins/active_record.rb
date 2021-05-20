@@ -4,6 +4,7 @@ require_relative "./active_record/dirty"
 require_relative "./active_record/cache"
 require_relative "./active_record/query"
 require_relative "./active_record/uniqueness_validation"
+require_relative "./active_record/original_column"
 
 module Mobility
 =begin
@@ -24,6 +25,7 @@ dirty for active_record_dirty) is also enabled.
       requires :active_record_cache
       requires :active_record_query
       requires :active_record_uniqueness_validation
+      requires :active_record_original_column
 
 
       included_hook do |klass|

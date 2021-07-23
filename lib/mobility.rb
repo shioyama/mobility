@@ -73,6 +73,9 @@ fallbacks plugin, whereas +Post+ uses +Translations+ which does not have that
 plugin enabled.
 
 =end
+
+def ruby2_keywords(*); end unless respond_to?(:ruby2_keywords, true)
+
 module Mobility
   # A generic exception used by Mobility.
   class Error < StandardError

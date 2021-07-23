@@ -55,6 +55,13 @@ model class is generated.
           end
         end
 
+        # Following is needed in order to not swallow `kwargs` on ruby >= 3.0.
+        # Otherwise `kwargs` are not passed by `super` to a possible other
+        # `method_missing` defined like this:
+        #
+        # def method_missing(name, *args, **kwargs, &block); end
+        ruby2_keywords :method_missing
+
         define_method :respond_to_missing? do |method_name, include_private = false|
           (method_name =~ method_name_regex) || super(method_name, include_private)
         end

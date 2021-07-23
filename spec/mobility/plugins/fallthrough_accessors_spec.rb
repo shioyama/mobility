@@ -40,6 +40,22 @@ describe Mobility::Plugins::FallthroughAccessors, type: :plugin do
       expect(instance.foo(**options)).to eq([options])
     end
 
+    it 'passes kwargs to super when method does not match' do
+      mod = Module.new do
+        def method_missing(method_name, *args, **kwargs, &block)
+          (method_name == :foo) ? [args, kwargs] : super
+        end
+      end
+
+      model_class = Class.new
+      model_class.include translations, mod
+
+      instance = model_class.new
+
+      kwargs = { some: 'params' }
+      expect(instance.foo(**kwargs)).to eq([[], kwargs])
+    end
+
     it 'does not pass on empty keyword options hash to super' do
       mod = Module.new do
         def method_missing(method_name, *args, &block)

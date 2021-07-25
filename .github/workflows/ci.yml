@@ -21,6 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
+          - '3.0'
           - '2.7'
           - '2.6'
         database:
@@ -45,6 +46,10 @@ jobs:
         experimental: [false]
         feature: ['unit']
         include:
+          - ruby: '3.0'
+            feature: 'unit'
+            orm:
+            experimental: false
           - ruby: '2.7'
             feature: 'unit'
             orm:
@@ -57,6 +62,40 @@ jobs:
             feature: 'unit'
             orm:
             experimental: false
+          - ruby: '3.0'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '6.1'
+            database: 'sqlite3'
+            experimental: false
+          - ruby: '3.0'
+            feature: 'performance'
+            experimental: false
+          - ruby: '3.0'
+            feature: 'i18n_fallbacks'
+            experimental: false
+          - ruby: '3.0'
+            database: 'sqlite3'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: '7.0'
+            experimental: true
+          - ruby: '3.0'
+            database: 'mysql'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: '7.0'
+            experimental: true
+          - ruby: '3.0'
+            database: 'postgres'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: '7.0'
+            experimental: true
           - ruby: '2.7'
             feature: 'rails'
             orm:
@@ -96,6 +135,22 @@ jobs:
             orm:
               name: 'active_record'
               version: '4.2'
+          - ruby: '3.0'
+            orm:
+              name: 'active_record'
+              version: '4.2'
+          - ruby: '3.0'
+            orm:
+              name: 'active_record'
+              version: '5.0'
+          - ruby: '3.0'
+            orm:
+              name: 'active_record'
+              version: '5.1'
+          - ruby: '3.0'
+            orm:
+              name: 'active_record'
+              version: '5.2'
     env:
       DB: ${{ matrix.database }}
       BUNDLE_JOBS: 4

@@ -6,6 +6,11 @@
 
 ## 1.1
 
+### 1.1.3
+- Do not swallow keyword args on ruby 3 in fallthrough accessors
+  ([#520](https://github.com/shioyama/mobility/pull/520)) thanks
+  [doits](https://github.com/doits)!
+
 ### 1.1.2
 - Check whether class responds to mobility_attribute?
   ([#515](https://github.com/shioyama/mobility/pull/515))

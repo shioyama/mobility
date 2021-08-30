@@ -34,6 +34,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         def configure(options)
           super
           if type = options[:type]
+            options[:include_other_translation_classes] ||= Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants.uniq
             options[:association_name] ||= :"#{options[:type]}_translations"
             options[:class_name]       ||= const_get("#{type.capitalize}Translation")
           end
@@ -155,6 +156,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         key_column         = options[:key_column]
         value_column       = options[:value_column]
         belongs_to         = options[:belongs_to]
+        include_other_translation_classes = options[:include_other_translation_classes]
 
         # Track all attributes for this association, so that we can limit the scope
         # of keys for the association to only these attributes. We need to track the
@@ -192,7 +194,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
 
         # Ensure we only call after destroy hook once per translations class
-        translation_classes = [translation_class, *Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants].uniq
+        translation_classes = [translation_class, *include_other_translation_classes].uniq
         after_destroy do
           @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
           (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(belongs_to => self).destroy_all }

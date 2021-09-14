@@ -10,6 +10,8 @@
 - Do not swallow keyword args on ruby 3 in fallthrough accessors
   ([#520](https://github.com/shioyama/mobility/pull/520)) thanks
   [doits](https://github.com/doits)!
+- Assign blank values in pg hash backends
+  ([#516](https://github.com/shioyama/mobility/pull/516))
 
 ### 1.1.2
 - Check whether class responds to mobility_attribute?

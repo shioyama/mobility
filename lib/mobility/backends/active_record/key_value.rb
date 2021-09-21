@@ -165,6 +165,10 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
         instance_variable_set(:"@#{attrs_method_name}", association_attributes)
 
+        translation_classes_method_name = :"__#{association_name}_translation_classes"
+        association_translation_classes = (instance_variable_get(:"@#{translation_classes_method_name}") || []) + Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants
+        instance_variable_set(:"@#{translation_classes_method_name}", association_translation_classes)
+
         has_many association_name, ->{ where key_column => association_attributes },
           as: belongs_to,
           class_name: translation_class.name,
@@ -192,8 +196,8 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
 
         # Ensure we only call after destroy hook once per translations class
-        translation_classes = [translation_class, *Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants].uniq
         after_destroy do
+          translation_classes = self.class.instance_variable_get(:"@#{translation_classes_method_name}")
           @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
           (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(belongs_to => self).destroy_all }
           @mobility_after_destroy_translation_classes += translation_classes

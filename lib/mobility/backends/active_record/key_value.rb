@@ -85,6 +85,24 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             autosave:   true
         end
 
+        def define_initialize_dup
+          b = self
+          module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"
+          unless const_defined?(module_name)
+            callback_methods = Module.new do
+              define_method :initialize_dup do |source|
+                super(source)
+                self.send("#{b.association_name}=", source.send(b.association_name).map(&:dup))
+                # Set inverse on associations
+                send(b.association_name).each do |translation|
+                  translation.send(:"#{b.belongs_to}=", self)
+                end
+              end
+            end
+            model_class.include const_set(module_name, callback_methods)
+          end
+        end
+
         # Called from setup block. Can be overridden to customize behaviour.
         def define_before_save_callback
           b = self
@@ -191,31 +209,10 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
       end
 
-      setup do |attributes, options, backend_class|
-        association_name  = options[:association_name]
-        translation_class = options[:class_name]
-        key_column        = options[:key_column]
-        value_column      = options[:value_column]
-        belongs_to        = options[:belongs_to]
-
+      setup do |attributes, _options, backend_class|
         backend_class.define_has_many_association(attributes)
+        backend_class.define_initialize_dup
         backend_class.define_before_save_callback
-
-        module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"
-        unless const_defined?(module_name)
-          callback_methods = Module.new do
-            define_method :initialize_dup do |source|
-              super(source)
-              self.send("#{association_name}=", source.send(association_name).map(&:dup))
-              # Set inverse on associations
-              send(association_name).each do |translation|
-                translation.send(:"#{belongs_to}=", self)
-              end
-            end
-          end
-          include const_set(module_name, callback_methods)
-        end
-
         backend_class.define_after_destroy_callback
       end
 

@@ -65,6 +65,15 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           end
         end
 
+        def define_before_save_callback
+          b = self
+          model_class.before_save do
+            send(b.association_name).select { |t| t.send(b.value_column).blank? }.each do |translation|
+              send(b.association_name).destroy(translation)
+            end
+          end
+        end
+
         # Called from setup block. Can be overridden to customize behaviour.
         def define_after_destroy_callback
           # Ensure we only call after destroy hook once per translations class
@@ -182,11 +191,8 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           class_name: translation_class.name,
           inverse_of: belongs_to,
           autosave:   true
-        before_save do
-          send(association_name).select { |t| t.send(value_column).blank? }.each do |translation|
-            send(association_name).destroy(translation)
-          end
-        end
+
+        backend_class.define_before_save_callback
 
         module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"
         unless const_defined?(module_name)

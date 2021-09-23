@@ -51,6 +51,21 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           end
         end
 
+        def define_save_callbacks(attributes)
+          b = self
+          callback_methods = Module.new do
+            define_method :before_save do
+              super()
+              send(b.association_name).select { |t| attributes.include?(t.__send__(b.key_column)) && Util.blank?(t.__send__(b.value_column)) }.each(&:destroy)
+            end
+            define_method :after_save do
+              super()
+              attributes.each { |attribute| mobility_backends[attribute].save_translations }
+            end
+          end
+          model_class.include callback_methods
+        end
+
         # Called from setup block. Can be overridden to customize behaviour.
         def define_after_destroy_callback
           # Clean up *all* leftover translations of this model, only once.
@@ -169,18 +184,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           clearer:         proc { send_(:"#{association_name}_dataset").update(belongs_to_id => nil, belongs_to_type => nil) },
           class:           translation_class
 
-        callback_methods = Module.new do
-          define_method :before_save do
-            super()
-            send(association_name).select { |t| attributes.include?(t.__send__(key_column)) && Util.blank?(t.__send__(value_column)) }.each(&:destroy)
-          end
-          define_method :after_save do
-            super()
-            attributes.each { |attribute| mobility_backends[attribute].save_translations }
-          end
-        end
-        include callback_methods
-
+        backend_class.define_save_callbacks(attributes)
         backend_class.define_after_destroy_callback
 
         include(mod = Module.new)

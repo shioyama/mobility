@@ -52,7 +52,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
 
         # Called from setup block. Can be overridden to customize behaviour.
-        def define_one_to_many_association(attributes)
+        def define_one_to_many_association(klass, attributes)
           belongs_to_id     = :"#{belongs_to}_id"
           belongs_to_type   = :"#{belongs_to}_type"
 
@@ -62,14 +62,14 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           # multiple times, so we don't "forget" earlier attributes.
           #
           attrs_method_name = :"#{association_name}_attributes"
-          association_attributes = (model_class.instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
-          model_class.instance_variable_set(:"@#{attrs_method_name}", association_attributes)
+          association_attributes = (klass.instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
+          klass.instance_variable_set(:"@#{attrs_method_name}", association_attributes)
 
-          model_class.one_to_many association_name,
+          klass.one_to_many association_name,
             reciprocal:      belongs_to,
             key:             belongs_to_id,
             reciprocal_type: :one_to_many,
-            conditions:      { belongs_to_type => model_class.to_s, key_column => association_attributes },
+            conditions:      { belongs_to_type => klass.to_s, key_column => association_attributes },
             adder:           proc { |translation| translation.update(belongs_to_id => pk, belongs_to_type => self.class.to_s) },
             remover:         proc { |translation| translation.update(belongs_to_id => nil, belongs_to_type => nil) },
             clearer:         proc { send_(:"#{association_name}_dataset").update(belongs_to_id => nil, belongs_to_type => nil) },
@@ -77,7 +77,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
 
         # Called from setup block. Can be overridden to customize behaviour.
-        def define_save_callbacks(attributes)
+        def define_save_callbacks(klass, attributes)
           b = self
           callback_methods = Module.new do
             define_method :before_save do
@@ -89,20 +89,20 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
               attributes.each { |attribute| mobility_backends[attribute].save_translations }
             end
           end
-          model_class.include callback_methods
+          klass.include callback_methods
         end
 
         # Called from setup block. Can be overridden to customize behaviour.
-        def define_after_destroy_callback
+        def define_after_destroy_callback(klass)
           # Clean up *all* leftover translations of this model, only once.
           b = self
           translation_classes = [class_name, *Mobility::Backends::Sequel::KeyValue::Translation.descendants].uniq
-          model_class.define_method :after_destroy do
+          klass.define_method :after_destroy do
             super()
 
             @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
-            (translation_classes - @mobility_after_destroy_translation_classes).each do |klass|
-              klass.where(:"#{b.belongs_to}_id" => id, :"#{b.belongs_to}_type" => self.class.name).destroy
+            (translation_classes - @mobility_after_destroy_translation_classes).each do |translation_class|
+              translation_class.where(:"#{b.belongs_to}_id" => id, :"#{b.belongs_to}_type" => self.class.name).destroy
             end
             @mobility_after_destroy_translation_classes += translation_classes
           end
@@ -181,9 +181,9 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
       end
 
       setup do |attributes, _options, backend_class|
-        backend_class.define_one_to_many_association(attributes)
-        backend_class.define_save_callbacks(attributes)
-        backend_class.define_after_destroy_callback
+        backend_class.define_one_to_many_association(self, attributes)
+        backend_class.define_save_callbacks(self, attributes)
+        backend_class.define_after_destroy_callback(self)
 
         include(mod = Module.new)
         backend_class.define_column_changes(mod, attributes)

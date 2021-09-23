@@ -66,19 +66,19 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
 
         # Called from setup block. Can be overridden to customize behaviour.
-        def define_has_many_association(attributes)
+        def define_has_many_association(klass, attributes)
           # Track all attributes for this association, so that we can limit the scope
           # of keys for the association to only these attributes. We need to track the
           # attributes assigned to the association in case this setup code is called
           # multiple times, so we don't "forget" earlier attributes.
           #
           attrs_method_name = :"__#{association_name}_attributes"
-          association_attributes = (model_class.instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
-          model_class.instance_variable_set(:"@#{attrs_method_name}", association_attributes)
+          association_attributes = (klass.instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
+          klass.instance_variable_set(:"@#{attrs_method_name}", association_attributes)
 
           b = self
 
-          model_class.has_many association_name, ->{ where b.key_column => association_attributes },
+          klass.has_many association_name, ->{ where b.key_column => association_attributes },
             as: belongs_to,
             class_name: class_name.name,
             inverse_of: belongs_to,
@@ -86,7 +86,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
 
         # Called from setup block. Can be overridden to customize behaviour.
-        def define_initialize_dup
+        def define_initialize_dup(klass)
           b = self
           module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"
           unless const_defined?(module_name)
@@ -100,14 +100,14 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
                 end
               end
             end
-            model_class.include const_set(module_name, callback_methods)
+            klass.include const_set(module_name, callback_methods)
           end
         end
 
         # Called from setup block. Can be overridden to customize behaviour.
-        def define_before_save_callback
+        def define_before_save_callback(klass)
           b = self
-          model_class.before_save do
+          klass.before_save do
             send(b.association_name).select { |t| t.send(b.value_column).blank? }.each do |translation|
               send(b.association_name).destroy(translation)
             end
@@ -115,13 +115,15 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
 
         # Called from setup block. Can be overridden to customize behaviour.
-        def define_after_destroy_callback
+        def define_after_destroy_callback(klass)
           # Ensure we only call after destroy hook once per translations class
           b = self
           translation_classes = [class_name, *Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants].uniq
-          model_class.after_destroy do
+          klass.after_destroy do
             @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
-            (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(b.belongs_to => self).destroy_all }
+            (translation_classes - @mobility_after_destroy_translation_classes).each do |translation_class|
+              translation_class.where(b.belongs_to => self).destroy_all
+            end
             @mobility_after_destroy_translation_classes += translation_classes
           end
         end
@@ -211,10 +213,10 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       end
 
       setup do |attributes, _options, backend_class|
-        backend_class.define_has_many_association(attributes)
-        backend_class.define_initialize_dup
-        backend_class.define_before_save_callback
-        backend_class.define_after_destroy_callback
+        backend_class.define_has_many_association(self, attributes)
+        backend_class.define_initialize_dup(self)
+        backend_class.define_before_save_callback(self)
+        backend_class.define_after_destroy_callback(self)
       end
 
       # Returns translation for a given locale, or builds one if none is present.

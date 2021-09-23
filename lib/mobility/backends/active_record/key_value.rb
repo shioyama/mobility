@@ -173,9 +173,9 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
       setup do |attributes, options, backend_class|
         association_name  = options[:association_name]
         translation_class = options[:class_name]
-        key_column         = options[:key_column]
-        value_column       = options[:value_column]
-        belongs_to         = options[:belongs_to]
+        key_column        = options[:key_column]
+        value_column      = options[:value_column]
+        belongs_to        = options[:belongs_to]
 
         # Track all attributes for this association, so that we can limit the scope
         # of keys for the association to only these attributes. We need to track the

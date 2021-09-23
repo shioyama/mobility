@@ -180,19 +180,13 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
       backend = self
 
-      setup do |attributes, options, backend_class|
-        association_name  = options[:association_name]
-        translation_class = options[:class_name]
-        key_column        = options[:key_column]
-        value_column      = options[:value_column]
-        belongs_to        = options[:belongs_to]
-
+      setup do |attributes, _options, backend_class|
         backend_class.define_one_to_many_association(attributes)
         backend_class.define_save_callbacks(attributes)
         backend_class.define_after_destroy_callback
 
         include(mod = Module.new)
-        backend.define_column_changes(mod, attributes)
+        backend_class.define_column_changes(mod, attributes)
       end
 
       # Returns translation for a given locale, or initializes one if none is present.

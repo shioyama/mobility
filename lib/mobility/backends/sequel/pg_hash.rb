@@ -33,9 +33,7 @@ jsonb).
           model[column_name.to_sym]
         end
 
-        backend = self
-
-        setup do |attributes, options|
+        setup do |attributes, options, backend_class|
           columns = attributes.map { |attribute| (options[:column_affix] % attribute).to_sym }
 
           mod = Module.new do
@@ -47,8 +45,8 @@ jsonb).
             end
           end
           include mod
-          backend.define_hash_initializer(mod, columns)
-          backend.define_column_changes(mod, attributes, column_affix: options[:column_affix])
+          backend_class.define_hash_initializer(mod, columns)
+          backend_class.define_column_changes(mod, attributes, column_affix: options[:column_affix])
 
           plugin :defaults_setter
           columns.each { |column| default_values[column] = {} }

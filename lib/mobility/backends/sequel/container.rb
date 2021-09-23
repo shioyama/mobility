@@ -57,9 +57,7 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
         end
       end
 
-      backend = self
-
-      setup do |attributes, options|
+      setup do |attributes, options, backend_class|
         column_name = options[:column_name]
         mod = Module.new do
           define_method :before_validation do
@@ -71,7 +69,7 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
           end
         end
         include mod
-        backend.define_hash_initializer(mod, [column_name])
+        backend_class.define_hash_initializer(mod, [column_name])
 
         plugin :defaults_setter
         attributes.each { |attribute| default_values[attribute.to_sym] = {} }

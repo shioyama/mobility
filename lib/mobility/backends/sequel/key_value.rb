@@ -178,8 +178,6 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
       end
 
-      backend = self
-
       setup do |attributes, _options, backend_class|
         backend_class.define_one_to_many_association(attributes)
         backend_class.define_save_callbacks(attributes)

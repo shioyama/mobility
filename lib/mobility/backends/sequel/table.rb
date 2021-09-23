@@ -116,9 +116,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         end
       end
 
-      backend = self
-
-      setup do |attributes, options|
+      setup do |attributes, options, backend_class|
         association_name = options[:association_name]
         subclass_name    = options[:subclass_name]
 
@@ -155,7 +153,7 @@ Implements the {Mobility::Backends::Table} backend for Sequel models.
         include callback_methods
 
         include(mod = Module.new)
-        backend.define_column_changes(mod, attributes)
+        backend_class.define_column_changes(mod, attributes)
       end
 
       def translation_for(locale, **)

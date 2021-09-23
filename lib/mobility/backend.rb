@@ -135,9 +135,11 @@ On top of this, a backend will normally:
       def setup &block
         if @setup_block
           setup_block = @setup_block
-          @setup_block = lambda do |*args|
-            class_exec(*args, &setup_block)
-            class_exec(*args, &block)
+          exec_setup_block = method(:exec_setup_block)
+          @setup_block = lambda do |attributes, options, backend_class|
+            [setup_block, block].each do |blk|
+              exec_setup_block.call(self, attributes, options, backend_class, &blk)
+            end
           end
         else
           @setup_block = block
@@ -189,6 +191,14 @@ On top of this, a backend will normally:
       def raise_unconfigured!(method_name)
         raise UnconfiguredError, "You are calling #{method_name} on an unconfigured backend class."
       end
+
+      def exec_setup_block(model_class, *args, &block)
+        if block.arity == 3
+          model_class.class_exec(*args[0..2], &block)
+        else
+          model_class.class_exec(*args[0..1], &block)
+        end
+      end
     end
 
     Translation = Struct.new(:backend, :locale) do
@@ -230,7 +240,7 @@ the parent backend class also have a +model_class+ and set of +options+.
       # @param [Hash] options
       def setup_model(model_class, attribute_names)
         return unless setup_block = @setup_block
-        model_class.class_exec(attribute_names, options, &setup_block)
+        exec_setup_block(model_class, attribute_names, options, self, &setup_block)
       end
 
       def inherited(_)

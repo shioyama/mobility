@@ -106,9 +106,9 @@ describe Mobility::Backend do
     end
 
     describe ".setup" do
-      before do
-        backend_class.class_eval do
-          setup do |attributes, options|
+      context "with two block arguments" do
+        before do
+          backend_class.setup do |attributes, options|
             def self.foo
               "foo"
             end
@@ -123,32 +123,30 @@ describe Mobility::Backend do
             end
           end
         end
-      end
 
-      it "stores setup as block which is called in model class" do
-        model_class = Class.new
-        backend_class.build_subclass(model_class, foo: "bar").setup_model(model_class, ["title"])
-        expect(model_class.foo).to eq("foo")
-        expect(model_class.new.bar).to eq("bar")
-      end
+        it "stores setup as block which is called in model class" do
+          model_class = Class.new
+          backend_class.build_subclass(model_class, foo: "bar").setup_model(model_class, ["title"])
+          expect(model_class.foo).to eq("foo")
+          expect(model_class.new.bar).to eq("bar")
+        end
 
-      it "passes attributes and options to setup block when called on class" do
-        model_class = Class.new
-        backend_class.build_subclass(model_class, foo: "bar").setup_model(model_class, ["title"])
-        expect(model_class.new.my_attributes).to eq(["title"])
-        expect(model_class.new.my_options).to eq({ foo: "bar" })
-      end
+        it "passes attributes and options to setup block when called on class" do
+          model_class = Class.new
+          backend_class.build_subclass(model_class, foo: "bar").setup_model(model_class, ["title"])
+          expect(model_class.new.my_attributes).to eq(["title"])
+          expect(model_class.new.my_options).to eq({ foo: "bar" })
+        end
 
-      it "assigns setup block to descendants" do
-        model_class = Class.new
-        subclass = backend_class.build_subclass(model_class, foo: "bar")
-        subclass.setup_model(model_class, ["title"])
-        expect(model_class.foo).to eq("foo")
-      end
+        it "assigns setup block to descendants" do
+          model_class = Class.new
+          subclass = backend_class.build_subclass(model_class, foo: "bar")
+          subclass.setup_model(model_class, ["title"])
+          expect(model_class.foo).to eq("foo")
+        end
 
-      it "concatenates blocks when called multiple times" do
-        backend_class.class_eval do
-          setup do |attributes, options|
+        it "concatenates blocks when called multiple times" do
+          backend_class.setup do |attributes, options|
             def self.foo
               "foo2"
             end
@@ -159,14 +157,61 @@ describe Mobility::Backend do
               "foobar"
             end
           end
-        end
-        model_class = Class.new
-        backend_class.build_subclass(model_class, foo: "bar").setup_model(model_class, ["title", "content"])
+          model_class = Class.new
+          backend_class.build_subclass(model_class, foo: "bar").setup_model(model_class, ["title", "content"])
 
-        aggregate_failures do
-          expect(model_class.foo).to eq("foo2")
-          expect(model_class.new.baz).to eq("titlecontent baz")
-          expect(model_class.foobar).to eq("foobar")
+          aggregate_failures do
+            expect(model_class.foo).to eq("foo2")
+            expect(model_class.new.baz).to eq("titlecontent baz")
+            expect(model_class.foobar).to eq("foobar")
+          end
+        end
+      end
+
+      context "with 3 block arguments" do
+        before do
+          backend_class.setup do |attributes, options, klass|
+            define_method :my_attributes do
+              attributes
+            end
+            define_method :my_options do
+              options
+            end
+            define_method :my_backend_class do
+              klass
+            end
+          end
+        end
+
+        it "passes configured backend class as third argument" do
+          model_class = Class.new
+          configured_backend_class = backend_class.build_subclass(model_class, foo: "bar")
+          configured_backend_class.setup_model(model_class, ["title"])
+
+          model = model_class.new
+
+          expect(model.my_attributes).to eq(["title"])
+          expect(model.my_options).to eq({ foo: "bar" })
+          expect(model.my_backend_class).to eq(configured_backend_class)
+        end
+
+        it "works with block concatenation" do
+          backend_class.setup do |attributes, options|
+            define_method :my_attributes_2 do
+              attributes
+            end
+          end
+          model_class = Class.new
+          configured_backend_class = backend_class.build_subclass(model_class, foo: "bar")
+          configured_backend_class.setup_model(model_class, ["title"])
+
+          model = model_class.new
+
+          aggregate_failures do
+            expect(model.my_attributes).to eq(["title"])
+            expect(model.my_options).to eq({ foo: "bar" })
+            expect(model.my_backend_class).to eq(configured_backend_class)
+          end
         end
       end
     end

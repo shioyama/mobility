@@ -51,6 +51,30 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           end
         end
 
+        def define_one_to_many_association(attributes)
+          belongs_to_id     = :"#{belongs_to}_id"
+          belongs_to_type   = :"#{belongs_to}_type"
+
+          # Track all attributes for this association, so that we can limit the scope
+          # of keys for the association to only these attributes. We need to track the
+          # attributes assigned to the association in case this setup code is called
+          # multiple times, so we don't "forget" earlier attributes.
+          #
+          attrs_method_name = :"#{association_name}_attributes"
+          association_attributes = (model_class.instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
+          model_class.instance_variable_set(:"@#{attrs_method_name}", association_attributes)
+
+          model_class.one_to_many association_name,
+            reciprocal:      belongs_to,
+            key:             belongs_to_id,
+            reciprocal_type: :one_to_many,
+            conditions:      { belongs_to_type => model_class.to_s, key_column => association_attributes },
+            adder:           proc { |translation| translation.update(belongs_to_id => pk, belongs_to_type => self.class.to_s) },
+            remover:         proc { |translation| translation.update(belongs_to_id => nil, belongs_to_type => nil) },
+            clearer:         proc { send_(:"#{association_name}_dataset").update(belongs_to_id => nil, belongs_to_type => nil) },
+            class:           class_name
+        end
+
         def define_save_callbacks(attributes)
           b = self
           callback_methods = Module.new do
@@ -162,28 +186,8 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         key_column        = options[:key_column]
         value_column      = options[:value_column]
         belongs_to        = options[:belongs_to]
-        belongs_to_id     = :"#{belongs_to}_id"
-        belongs_to_type   = :"#{belongs_to}_type"
 
-        # Track all attributes for this association, so that we can limit the scope
-        # of keys for the association to only these attributes. We need to track the
-        # attributes assigned to the association in case this setup code is called
-        # multiple times, so we don't "forget" earlier attributes.
-        #
-        attrs_method_name = :"#{association_name}_attributes"
-        association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
-        instance_variable_set(:"@#{attrs_method_name}", association_attributes)
-
-        one_to_many association_name,
-          reciprocal:      belongs_to,
-          key:             belongs_to_id,
-          reciprocal_type: :one_to_many,
-          conditions:      { belongs_to_type => self.to_s, key_column => association_attributes },
-          adder:           proc { |translation| translation.update(belongs_to_id => pk, belongs_to_type => self.class.to_s) },
-          remover:         proc { |translation| translation.update(belongs_to_id => nil, belongs_to_type => nil) },
-          clearer:         proc { send_(:"#{association_name}_dataset").update(belongs_to_id => nil, belongs_to_type => nil) },
-          class:           translation_class
-
+        backend_class.define_one_to_many_association(attributes)
         backend_class.define_save_callbacks(attributes)
         backend_class.define_after_destroy_callback
 

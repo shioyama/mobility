@@ -65,6 +65,27 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           end
         end
 
+        # Called from setup block. Can be overridden to customize behaviour.
+        def define_has_many_association(attributes)
+          # Track all attributes for this association, so that we can limit the scope
+          # of keys for the association to only these attributes. We need to track the
+          # attributes assigned to the association in case this setup code is called
+          # multiple times, so we don't "forget" earlier attributes.
+          #
+          attrs_method_name = :"__#{association_name}_attributes"
+          association_attributes = (model_class.instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
+          model_class.instance_variable_set(:"@#{attrs_method_name}", association_attributes)
+
+          b = self
+
+          model_class.has_many association_name, ->{ where b.key_column => association_attributes },
+            as: belongs_to,
+            class_name: class_name.name,
+            inverse_of: belongs_to,
+            autosave:   true
+        end
+
+        # Called from setup block. Can be overridden to customize behaviour.
         def define_before_save_callback
           b = self
           model_class.before_save do
@@ -177,21 +198,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         value_column      = options[:value_column]
         belongs_to        = options[:belongs_to]
 
-        # Track all attributes for this association, so that we can limit the scope
-        # of keys for the association to only these attributes. We need to track the
-        # attributes assigned to the association in case this setup code is called
-        # multiple times, so we don't "forget" earlier attributes.
-        #
-        attrs_method_name = :"__#{association_name}_attributes"
-        association_attributes = (instance_variable_get(:"@#{attrs_method_name}") || []) + attributes
-        instance_variable_set(:"@#{attrs_method_name}", association_attributes)
-
-        has_many association_name, ->{ where key_column => association_attributes },
-          as: belongs_to,
-          class_name: translation_class.name,
-          inverse_of: belongs_to,
-          autosave:   true
-
+        backend_class.define_has_many_association(attributes)
         backend_class.define_before_save_callback
 
         module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"

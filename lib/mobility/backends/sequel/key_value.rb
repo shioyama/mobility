@@ -51,6 +51,22 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           end
         end
 
+        # Called from setup block. Can be overridden to customize behaviour.
+        def define_after_destroy_callback
+          # Clean up *all* leftover translations of this model, only once.
+          b = self
+          translation_classes = [class_name, *Mobility::Backends::Sequel::KeyValue::Translation.descendants].uniq
+          model_class.define_method :after_destroy do
+            super()
+
+            @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
+            (translation_classes - @mobility_after_destroy_translation_classes).each do |klass|
+              klass.where(:"#{b.belongs_to}_id" => id, :"#{b.belongs_to}_type" => self.class.name).destroy
+            end
+            @mobility_after_destroy_translation_classes += translation_classes
+          end
+        end
+
         private
 
         def join_translations(dataset, attr, locale, join_type)
@@ -125,7 +141,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
 
       backend = self
 
-      setup do |attributes, options|
+      setup do |attributes, options, backend_class|
         association_name  = options[:association_name]
         translation_class = options[:class_name]
         key_column        = options[:key_column]
@@ -165,17 +181,8 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
         end
         include callback_methods
 
-        # Clean up *all* leftover translations of this model, only once.
-        translation_classes = [translation_class, *Mobility::Backends::Sequel::KeyValue::Translation.descendants].uniq
-        define_method :after_destroy do
-          super()
+        backend_class.define_after_destroy_callback
 
-          @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
-          (translation_classes - @mobility_after_destroy_translation_classes).each do |klass|
-            klass.where(belongs_to_id => id, belongs_to_type => self.class.name).destroy
-          end
-          @mobility_after_destroy_translation_classes += translation_classes
-        end
         include(mod = Module.new)
         backend.define_column_changes(mod, attributes)
       end

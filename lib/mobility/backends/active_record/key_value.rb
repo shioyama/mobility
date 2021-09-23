@@ -65,6 +65,18 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           end
         end
 
+        # Called from setup block. Can be overridden to customize behaviour.
+        def define_after_destroy_callback
+          # Ensure we only call after destroy hook once per translations class
+          b = self
+          translation_classes = [class_name, *Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants].uniq
+          model_class.after_destroy do
+            @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
+            (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(b.belongs_to => self).destroy_all }
+            @mobility_after_destroy_translation_classes += translation_classes
+          end
+        end
+
         private
 
         def join_translations(relation, key, locale, join_type)
@@ -149,7 +161,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
         end
       end
 
-      setup do |attributes, options|
+      setup do |attributes, options, backend_class|
         association_name  = options[:association_name]
         translation_class = options[:class_name]
         key_column         = options[:key_column]
@@ -191,13 +203,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
           include const_set(module_name, callback_methods)
         end
 
-        # Ensure we only call after destroy hook once per translations class
-        translation_classes = [translation_class, *Mobility::Backends::ActiveRecord::KeyValue::Translation.descendants].uniq
-        after_destroy do
-          @mobility_after_destroy_translation_classes = [] unless defined?(@mobility_after_destroy_translation_classes)
-          (translation_classes - @mobility_after_destroy_translation_classes).each { |klass| klass.where(belongs_to => self).destroy_all }
-          @mobility_after_destroy_translation_classes += translation_classes
-        end
+        backend_class.define_after_destroy_callback
       end
 
       # Returns translation for a given locale, or builds one if none is present.

@@ -21,8 +21,8 @@ On top of this, a backend will normally:
   corresponding to valid keys for configuring this backend.
 - implement a +configure+ class method to apply any normalization to the
   keys on the options hash included in +valid_keys+
-- call the +setup+ method yielding attributes and options to configure the
-  model class
+- call the +setup+ method yielding attributes and options (and optionally the
+  configured backend class) to configure the model class
 
 @example Defining a Backend
   class MyBackend
@@ -47,6 +47,13 @@ On top of this, a backend will normally:
     setup do |attributes, options|
       # Do something with attributes and options in context of model class.
     end
+
+    # The block can optionally take the configured backend class as its third
+    # argument:
+    #
+    # setup do |attributes, options, backend_class|
+    #   ...
+    # end
   end
 
 @see Mobility::Translations

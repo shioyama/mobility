@@ -148,7 +148,7 @@ describe "Mobility::Backends::Sequel::Table", orm: :sequel, type: :backend do
 
     let(:options) { {} }
     let(:backend_class) do
-      Class.new(described_class) { @model_class = Article }
+      described_class.build_subclass(Article, {})
     end
 
     it "sets association_name" do

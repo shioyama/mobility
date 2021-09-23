@@ -19,7 +19,8 @@ describe Mobility::Plugins::Backend, type: :plugin do
 
   describe "#included" do
     it "calls build_subclass on backend class with options merged with default options" do
-      expect(backend_class).to receive(:build_subclass).with(model_class, hash_including(foo: "bar")).and_return(Class.new(backend_class))
+      configured_backend_class = double.as_null_object
+      expect(backend_class).to receive(:build_subclass).with(model_class, hash_including(foo: "bar")).and_return(configured_backend_class)
       translations = translations_class.new("title", backend: backend_class, foo: "bar")
       model_class.include translations
     end
@@ -33,11 +34,13 @@ describe Mobility::Plugins::Backend, type: :plugin do
     it "freezes backend options after inclusion into model class" do
       translations = translations_class.new("title", backend: backend_class)
       model_class.include translations
-      expect(backend_class.options).to be_frozen
+      expect(translations.backend_class.options).to be_frozen
     end
 
     it "calls setup_model on backend class with model_class and attributes" do
-      expect(backend_class).to receive(:setup_model).with(model_class, ["title"])
+      configured_backend_class = double("configured backend class")
+      allow(backend_class).to receive(:build_subclass).and_return(configured_backend_class)
+      expect(configured_backend_class).to receive(:setup_model).with(model_class, ["title"])
       model_class.include translations_class.new("title", backend: backend_class)
     end
 
@@ -278,8 +281,10 @@ describe Mobility::Plugins::Backend, type: :plugin do
         expect(translations_class.new("title").inspect).to eq("#<Translations (FooBackend) @names=title>")
       end
 
-      it "calls setup_model on backend" do
-        expect(FooBackend).to receive(:setup_model).with(model_class, ["title"])
+      it "calls setup_model on configured backend" do
+        configured_backend_class = double
+        expect(FooBackend).to receive(:build_subclass).with(model_class, backend: [:foo, {}]).and_return(configured_backend_class)
+        expect(configured_backend_class).to receive(:setup_model).with(model_class, ["title"])
         model_class.include translations_class.new("title")
       end
     end

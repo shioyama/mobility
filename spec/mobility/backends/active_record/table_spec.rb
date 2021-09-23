@@ -243,7 +243,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
 
     let(:options) { {} }
     let(:backend_class) do
-      Class.new(described_class) { @model_class = Article }
+      described_class.build_subclass(Article, {})
     end
 
     it "sets association_name" do

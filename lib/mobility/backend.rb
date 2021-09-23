@@ -117,7 +117,6 @@ On top of this, a backend will normally:
     # Extend included class with +setup+ method and other class methods
     def self.included(base)
       base.extend ClassMethods
-      base.singleton_class.attr_reader :options, :model_class
     end
 
     # Defines setup hooks for backend to customize model class.
@@ -147,17 +146,6 @@ On top of this, a backend will normally:
 
       def inherited(subclass)
         subclass.instance_variable_set(:@setup_block, @setup_block)
-        subclass.instance_variable_set(:@options, @options)
-        subclass.instance_variable_set(:@model_class, @model_class)
-      end
-
-      # Call setup block on a class with attributes and options.
-      # @param model_class Class to be setup-ed
-      # @param [Array<String>] attribute_names
-      # @param [Hash] options
-      def setup_model(model_class, attribute_names)
-        return unless setup_block = @setup_block
-        model_class.class_exec(attribute_names, options, &setup_block)
       end
 
       # Build a subclass of this backend class for a given set of options
@@ -167,11 +155,7 @@ On top of this, a backend will normally:
       # @param [Hash] options
       # @return [Class] backend subclass
       def build_subclass(model_class, options)
-        Class.new(self) do
-          @model_class = model_class
-          configure(options) if respond_to?(:configure)
-          @options = options.freeze
-        end
+        ConfiguredBackend.build(self, model_class, options)
       end
 
       # Create instance and class methods to access value on options hash
@@ -188,10 +172,22 @@ On top of this, a backend will normally:
         EOM
       end
 
-      # Show useful information about this backend class, if it has no name.
-      # @return [String]
-      def inspect
-        name ? super : "#<#{superclass.name}>"
+      def options
+        raise_unconfigured!(:options)
+      end
+
+      def model_class
+        raise_unconfigured!(:model_class)
+      end
+
+      def setup_model(_model_class, _attributes)
+        raise_unconfigured!(:setup_model)
+      end
+
+      private
+
+      def raise_unconfigured!(method_name)
+        raise UnconfiguredError, "You are calling #{method_name} on an unconfigured backend class."
       end
     end
 
@@ -202,6 +198,49 @@ On top of this, a backend will normally:
 
       def write(value, options = {})
         backend.write(locale, value, options)
+      end
+    end
+
+    class ConfiguredError < StandardError; end
+    class UnconfiguredError < StandardError; end
+=begin
+
+Module included in configured backend classes, which in addition to methods on
+the parent backend class also have a +model_class+ and set of +options+.
+
+=end
+    module ConfiguredBackend
+      def self.build(backend_class, model_class, options)
+        Class.new(backend_class) do
+          extend ConfiguredBackend
+
+          @model_class = model_class
+          configure(options) if respond_to?(:configure)
+          @options = options.freeze
+        end
+      end
+
+      def self.extended(klass)
+        klass.singleton_class.attr_reader :options, :model_class
+      end
+
+      # Call setup block on a class with attributes and options.
+      # @param model_class Class to be setup-ed
+      # @param [Array<String>] attribute_names
+      # @param [Hash] options
+      def setup_model(model_class, attribute_names)
+        return unless setup_block = @setup_block
+        model_class.class_exec(attribute_names, options, &setup_block)
+      end
+
+      def inherited(_)
+        raise ConfiguredError, "Configured backends cannot be subclassed."
+      end
+
+      # Show subclassed backend class name, if it has one.
+      # @return [String]
+      def inspect
+        (name = superclass.name) ? "#<#{name}>" : super
       end
     end
   end

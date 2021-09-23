@@ -142,20 +142,8 @@ describe Mobility::Backend do
       it "assigns setup block to descendants" do
         model_class = Class.new
         subclass = backend_class.build_subclass(model_class, foo: "bar")
-        Class.new(subclass).setup_model(model_class, ["title"])
+        subclass.setup_model(model_class, ["title"])
         expect(model_class.foo).to eq("foo")
-      end
-
-      it "assigns options to descendants" do
-        model_class = Class.new
-        subclass = backend_class.build_subclass(model_class, foo: "bar")
-        expect(Class.new(subclass).options).to eq(foo: "bar")
-      end
-
-      it "assigns model_class to descendants" do
-        model_class = Class.new
-        subclass = backend_class.build_subclass(model_class, foo: "bar")
-        expect(Class.new(subclass).model_class).to eq(model_class)
       end
 
       it "concatenates blocks when called multiple times" do
@@ -182,13 +170,40 @@ describe Mobility::Backend do
         end
       end
     end
+
+    describe ".build_subclass" do
+      it "raises when subclassed again" do
+        model_class = Class.new
+        subclass = backend_class.build_subclass(model_class, foo: "bar")
+        expect { Class.new(subclass) }.to raise_error(Mobility::Backend::ConfiguredError)
+      end
+    end
+
+    describe "methods which raise unless called on configured subclass" do
+      it "raises when unconfigured" do
+        expect { backend_class.options }.to raise_error(Mobility::Backend::UnconfiguredError)
+        expect { backend_class.model_class }.to raise_error(Mobility::Backend::UnconfiguredError)
+        expect { backend_class.setup_model(Class.new, {}) }.to raise_error(Mobility::Backend::UnconfiguredError)
+      end
+
+      it "returns value when configured" do
+        model_class = double("model class")
+        options = double("options")
+        subclass = backend_class.build_subclass(model_class, options)
+        expect(subclass.model_class).to eq(model_class)
+        expect(subclass.options).to eq(options)
+      end
+    end
   end
 
-  describe ".inspect" do
+  describe "#inspect on configured backend" do
     it "returns superclass name" do
       backend = stub_const 'MyBackend', Class.new
+      model_class = stub_const 'Model', Class.new
       backend.include(described_class)
-      expect(Class.new(backend).inspect).to match(/MyBackend/)
+      options = { foo: "bar" }
+      subclass = backend.build_subclass(model_class, options)
+      expect(subclass.inspect).to match(/MyBackend/)
     end
   end
 end

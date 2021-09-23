@@ -85,6 +85,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
             autosave:   true
         end
 
+        # Called from setup block. Can be overridden to customize behaviour.
         def define_initialize_dup
           b = self
           module_name = "MobilityArKeyValue#{association_name.to_s.camelcase}"

@@ -51,6 +51,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
           end
         end
 
+        # Called from setup block. Can be overridden to customize behaviour.
         def define_one_to_many_association(attributes)
           belongs_to_id     = :"#{belongs_to}_id"
           belongs_to_type   = :"#{belongs_to}_type"
@@ -75,6 +76,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             class:           class_name
         end
 
+        # Called from setup block. Can be overridden to customize behaviour.
         def define_save_callbacks(attributes)
           b = self
           callback_methods = Module.new do

@@ -61,7 +61,7 @@ ActiveRecord query plugin.
               locale = args[0] || @global_locale
               @locales |= [locale]
               @model_class.mobility_backend_class(m).build_op(m.to_s, locale)
-            elsif @model_class.columns.include?(m.to_s)
+            elsif @model_class.columns.include?(m)
               ::Sequel::SQL::QualifiedIdentifier.new(@model_class.table_name, m)
             else
               super

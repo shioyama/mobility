@@ -131,7 +131,7 @@ Implements the {Mobility::Backends::KeyValue} backend for Sequel models.
             visit_sql_identifier(predicate, locale)
           when ::Sequel::SQL::BooleanExpression
             visit_boolean(predicate, locale)
-          when ::Sequel::SQL::Expression
+          when ::Sequel::SQL::ComplexExpression
             visit(predicate.args, locale)
           else
             {}

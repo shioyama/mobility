@@ -6,6 +6,18 @@
 
 ## 1.1
 
+## 1.2
+
+### 1.2.0
+- Add ColumnFallback plugin
+	([#512](https://github.com/shioyama/mobility/pull/512))
+- Fix Sequel querying on untranslated attributes in `i18n` block
+	([#529](https://github.com/shioyama/mobility/pull/529))
+- Allow passing configured backend class as third argument to setup
+	([#528](https://github.com/shioyama/mobility/pull/528))
+- Clearly distinguish backend classes from their configured subclasses
+	([#527](Clearly distinguish backend classes from their configured subclasses))
+
 ### 1.1.3
 - Do not swallow keyword args on ruby 3 in fallthrough accessors
   ([#520](https://github.com/shioyama/mobility/pull/520)) thanks

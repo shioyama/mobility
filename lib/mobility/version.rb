@@ -9,7 +9,7 @@ module Mobility
     MAJOR = 1
     MINOR = 2
     TINY = 0
-    PRE = "alpha"
+    PRE = nil
 
     STRING = [MAJOR, MINOR, TINY, PRE].compact.join(".")
   end

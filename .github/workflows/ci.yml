@@ -58,10 +58,6 @@ jobs:
             feature: 'unit'
             orm:
             experimental: false
-          - ruby: '2.5'
-            feature: 'unit'
-            orm:
-            experimental: false
           - ruby: '3.0'
             feature: 'rails'
             orm:

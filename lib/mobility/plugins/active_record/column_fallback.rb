@@ -14,120 +14,47 @@ Plugin to use an original column for a given locale, and otherwise use the backe
         requires :column_fallback, include: false
 
         included_hook do |_, backend_class|
-          case (column_fallback = options[:column_fallback])
+          backend_class.include BackendInstanceMethods
+          backend_class.extend BackendClassMethods
+        end
+
+        def self.use_column_fallback?(options, locale)
+          case column_fallback = options[:column_fallback]
           when TrueClass
-            backend_class.include I18nDefaultLocaleBackend
-          when Array, Proc
-            backend_class.include BackendModule.new(column_fallback)
+            locale == I18n.default_locale
+          when Array
+            column_fallback.include?(locale)
+          when Proc
+            column_fallback.call(locale)
           else
-            raise ArgumentError, "column_fallback value must be a boolean, an array of locales or a proc"
+            false
           end
         end
 
-        module I18nDefaultLocaleBackend
+        module BackendInstanceMethods
           def read(locale, **)
-            locale == I18n.default_locale ? model.read_attribute(attribute) : super
+            if ColumnFallback.use_column_fallback?(options, locale)
+              model.read_attribute(attribute)
+            else
+              super
+            end
           end
 
           def write(locale, value, **)
-            locale == I18n.default_locale ? model.send(:write_attribute, attribute, value) : super
-          end
-
-          def self.included(base)
-            base.extend(ClassMethods)
-          end
-
-          module ClassMethods
-            def build_node(attr, locale)
-              if locale == I18n.default_locale
-                model_class.arel_table[attr]
-              else
-                super
-              end
+            if ColumnFallback.use_column_fallback?(options, locale)
+              model.send(:write_attribute, attribute, value)
+            else
+              super
             end
           end
         end
 
-        class BackendModule < Module
-          def initialize(column_fallback)
-            case (@column_fallback = column_fallback)
-            when Array
-              define_array_accessors
-            when Proc
-              define_proc_accessors
-            end
-          end
-
-          def included(base)
-            base.extend(ClassMethods.new(@column_fallback))
-          end
-
-          private
-
-          def define_array_accessors
-            column_fallback = @column_fallback
-
-            module_eval <<-EOM, __FILE__, __LINE__ + 1
-            def read(locale, **)
-              if #{column_fallback}.include?(locale)
-                model.read_attribute(attribute)
-              else
-                super
-              end
-            end
-
-            def write(locale, value, **)
-              if #{column_fallback}.include?(locale)
-                model.send(:write_attribute, attribute, value)
-              else
-                super
-              end
-            end
-            EOM
-          end
-
-          def define_proc_accessors
-            column_fallback = @column_fallback
-
-            define_method :read do |locale, **options|
-              if column_fallback.call(locale)
-                model.read_attribute(attribute)
-              else
-                super(locale, **options)
-              end
-            end
-
-            define_method :write do |locale, value, **options|
-              if column_fallback.call(locale)
-                model.send(:write_attribute, attribute, value)
-              else
-                super(locale, value, **options)
-              end
-            end
-          end
-
-          class ClassMethods < Module
-            def initialize(column_fallback)
-              case column_fallback
-              when Array
-                module_eval <<-EOM, __FILE__, __LINE__ + 1
-                def build_node(attr, locale)
-                  if #{column_fallback}.include?(locale)
-                    model_class.arel_table[attr]
-                  else
-                    super
-                  end
-                end
-                EOM
-              when Proc
-                define_method(:build_node) do |attr, locale|
-                  if column_fallback.call(locale)
-                    model_class.arel_table[attr]
-                  else
-                    super(attr, locale)
-                  end
-                end
-              end
+        module BackendClassMethods
+          def build_node(attr, locale)
+            if ColumnFallback.use_column_fallback?(options, locale)
+              model_class.arel_table[attr]
+            else
+              super
             end
           end
         end

@@ -1,6 +1,8 @@
 # Mobility Changelog
 
-## 1.1
+## Unreleased
+- Simplify Fallbacks plugin
+  ([#531](https://github.com/shioyama/mobility/pull/531))
 
 ## 1.2
 
@@ -17,6 +19,8 @@
   ([#528](https://github.com/shioyama/mobility/pull/528))
 - Clearly distinguish backend classes from their configured subclasses
   ([#527](https://github.com/shioyama/mobility/pull/527))
+
+## 1.1
 
 ### 1.1.3
 - Do not swallow keyword args on ruby 3 in fallthrough accessors

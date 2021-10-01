@@ -117,8 +117,10 @@ the current locale was +nil+.
       # Applies fallbacks plugin to attributes. Completely disables fallbacks
       # on model if option is +false+.
       included_hook do |_, backend_class|
-        fallbacks = options[:fallbacks]
-        backend_class.include(BackendReader.new(fallbacks, method(:generate_fallbacks))) unless fallbacks == false
+        backend_class.include(BackendInstanceMethods) unless options[:fallbacks] == false
+        # This is weird. We need to find a better way to allow customization of
+        # rarely-customized code like this.
+        backend_class.define_method(:generate_fallbacks, &method(:generate_fallbacks))
       end
 
       private
@@ -134,33 +136,26 @@ the current locale was +nil+.
         end
       end
 
-      class BackendReader < Module
-        def initialize(fallbacks_option, fallbacks_generator)
-          @fallbacks_generator = fallbacks_generator
-          define_read(convert_option_to_fallbacks(fallbacks_option))
+      module BackendInstanceMethods
+        def read(locale, fallback: true, **accessor_options)
+          return super(locale, **options) if !fallback || accessor_options[:locale]
+
+          locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
+          locales.each do |fallback_locale|
+            value = super(fallback_locale, **accessor_options)
+            return value if Util.present?(value)
+          end
+
+          super(locale, **options)
         end
 
         private
 
-        def define_read(fallbacks)
-          define_method :read do |locale, fallback: true, **options|
-            return super(locale, **options) if !fallback || options[:locale]
-
-            locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
-            locales.each do |fallback_locale|
-              value = super(fallback_locale, **options)
-              return value if Util.present?(value)
-            end
-
-            super(locale, **options)
-          end
-        end
-
-        def convert_option_to_fallbacks(option)
-          if option.is_a?(::Hash)
-            @fallbacks_generator[option]
-          elsif option == true
-            @fallbacks_generator[{}]
+        def fallbacks
+          if options[:fallbacks].is_a?(Hash)
+            generate_fallbacks(options[:fallbacks])
+          elsif options[:fallbacks] == true
+            generate_fallbacks({})
           else
             ::Hash.new { [] }
           end

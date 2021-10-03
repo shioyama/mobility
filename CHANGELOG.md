@@ -9,6 +9,8 @@
 ### 1.2.2
 - Make models work with `Marshal.dump`
   ([#532](https://github.com/shioyama/mobility/pull/532))
+- Fix Sequel container op in Sequel
+  ([#533](https://github.com/shioyama/mobility/pull/533))
 
 ### 1.2.1
 - Refactor ColumnFallback plugin

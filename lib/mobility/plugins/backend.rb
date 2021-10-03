@@ -125,6 +125,14 @@ Defines:
           return self[name.to_sym] if String === name
           self[name] = @model.class.mobility_backend_class(name).new(@model, name.to_s)
         end
+
+        def marshal_dump
+          @model
+        end
+
+        def marshal_load(model)
+          @model = model
+        end
       end
 
       module InstanceMethods

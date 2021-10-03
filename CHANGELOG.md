@@ -1,9 +1,5 @@
 # Mobility Changelog
 
-## Unreleased
-- Simplify Fallbacks plugin
-  ([#531](https://github.com/shioyama/mobility/pull/531))
-
 ## 1.2
 
 ### 1.2.2
@@ -11,6 +7,8 @@
   ([#532](https://github.com/shioyama/mobility/pull/532))
 - Fix Sequel container op in Sequel
   ([#533](https://github.com/shioyama/mobility/pull/533))
+- Simplify Fallbacks plugin
+  ([#531](https://github.com/shioyama/mobility/pull/531))
 
 ### 1.2.1
 - Refactor ColumnFallback plugin

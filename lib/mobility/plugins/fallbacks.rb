@@ -152,13 +152,14 @@ the current locale was +nil+.
         private
 
         def fallbacks
-          if options[:fallbacks].is_a?(Hash)
-            generate_fallbacks(options[:fallbacks])
-          elsif options[:fallbacks] == true
-            generate_fallbacks({})
-          else
-            ::Hash.new { [] }
-          end
+          @fallbacks ||=
+            if options[:fallbacks].is_a?(Hash)
+              generate_fallbacks(options[:fallbacks])
+            elsif options[:fallbacks] == true
+              generate_fallbacks({})
+            else
+              ::Hash.new { [] }
+            end
         end
       end
     end

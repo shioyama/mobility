@@ -6,6 +6,10 @@
 
 ## 1.2
 
+### 1.2.2
+- Make models work with `Marshal.dump`
+  ([#532](https://github.com/shioyama/mobility/pull/532))
+
 ### 1.2.1
 - Refactor ColumnFallback plugin
   ([#530](https://github.com/shioyama/mobility/pull/530))

@@ -100,7 +100,7 @@ Implements the {Mobility::Backends::Container} backend for Sequel models.
       # @return [Mobility::Backends::Sequel::Container::JSONOp,Mobility::Backends::Sequel::Container::JSONBOp]
       def self.build_op(attr, locale)
         klass = const_get("#{options[:column_type].upcase}Op")
-        klass.new(klass.new(column_name.to_sym)[locale.to_s]).get_text(attr)
+        klass.new(klass.new(column_name.to_sym).get(locale.to_s)).get_text(attr)
       end
 
       class JSONOp < ::Sequel::Postgres::JSONOp; end

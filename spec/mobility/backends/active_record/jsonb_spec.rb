@@ -25,6 +25,14 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
     include_serialization_examples 'JsonbPost', column_affix: column_affix
     include_dup_examples 'JsonbPost'
     include_cache_key_examples 'JsonbPost'
+
+    it "does not impact dirty tracking on original column" do
+      post = JsonbPost.create!
+      post.reload
+
+      expect(post.my_title_i18n).to eq({})
+      expect(post.changes).to eq({})
+    end
   end
 
   context "with query plugin" do

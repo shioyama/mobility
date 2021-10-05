@@ -26,6 +26,14 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
     include_dup_examples 'JsonPost'
     include_cache_key_examples 'JsonPost'
 
+    it "does not impact dirty tracking on original column" do
+      post = JsonPost.create!
+      post.reload
+
+      expect(post.my_title_i18n).to eq({})
+      expect(post.changes).to eq({})
+    end
+
     describe "non-text values" do
       it "stores non-string types as-is when saving", active_record_geq: '5.0' do
         backend = post.mobility_backends[:title]

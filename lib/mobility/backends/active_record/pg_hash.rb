@@ -15,34 +15,25 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
         include ActiveRecord
         include HashValued
 
+        def read(locale, _options = nil)
+          translations[locale.to_s]
+        end
+
+        def write(locale, value, _options = nil)
+          if value.nil?
+            translations.delete(locale.to_s)
+          else
+            translations[locale.to_s] = value
+          end
+        end
+
         # @!macro backend_iterator
         def each_locale
           super { |l| yield l.to_sym }
         end
 
         def translations
-          model.read_attribute(column_name)
-        end
-
-        setup do |attributes, options = {}|
-          attributes.each { |attribute| store (options[:column_affix] % attribute), coder: Coder }
-        end
-
-        class Coder
-          def self.dump(obj)
-            if obj.is_a? ::Hash
-              obj.inject({}) do |translations, (locale, value)|
-                translations[locale] = value unless value.nil?
-                translations
-              end
-            else
-              raise ArgumentError, "Attribute is supposed to be a Hash, but was a #{obj.class}. -- #{obj.inspect}"
-            end
-          end
-
-          def self.load(obj)
-            obj
-          end
+          model[column_name]
         end
       end
       private_constant :PgHash

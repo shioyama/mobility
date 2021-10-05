@@ -27,6 +27,14 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
     include_dup_examples 'HstorePost'
     include_cache_key_examples 'HstorePost'
 
+    it "does not impact dirty tracking on original column" do
+      post = HstorePost.create!
+      post.reload
+
+      expect(post.my_title_i18n).to eq({})
+      expect(post.changes).to eq({})
+    end
+
     describe "non-text values" do
       it "converts non-string types to strings when saving" do
         post = HstorePost.new

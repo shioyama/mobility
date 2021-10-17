@@ -103,8 +103,6 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
             end
           end
         end
-
-        BackendInstanceMethods = ActiveModel::Dirty::BackendMethods
       end
     end
 

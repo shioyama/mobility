@@ -117,7 +117,7 @@ the current locale was +nil+.
       # Applies fallbacks plugin to attributes. Completely disables fallbacks
       # on model if option is +false+.
       included_hook do |_, backend_class|
-        backend_class.include(BackendInstanceMethods) unless options[:fallbacks] == false
+        backend_class.include(BackendMethods) unless options[:fallbacks] == false
         # This is weird. We need to find a better way to allow customization of
         # rarely-customized code like this.
         backend_class.define_method(:generate_fallbacks, &method(:generate_fallbacks))
@@ -136,7 +136,7 @@ the current locale was +nil+.
         end
       end
 
-      module BackendInstanceMethods
+      module BackendMethods
         def read(locale, fallback: true, **kwargs)
           return super(locale, **kwargs) if !fallback || kwargs[:locale]
 

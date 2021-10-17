@@ -13,11 +13,6 @@ Plugin to use an original column for a given locale, and otherwise use the backe
 
         requires :column_fallback, include: false
 
-        included_hook do |_, backend_class|
-          backend_class.include BackendInstanceMethods
-          backend_class.extend BackendClassMethods
-        end
-
         def self.use_column_fallback?(options, locale)
           case column_fallback = options[:column_fallback]
           when TrueClass
@@ -31,7 +26,7 @@ Plugin to use an original column for a given locale, and otherwise use the backe
           end
         end
 
-        module BackendInstanceMethods
+        module BackendMethods
           def read(locale, **)
             if ColumnFallback.use_column_fallback?(options, locale)
               model[attribute.to_sym]

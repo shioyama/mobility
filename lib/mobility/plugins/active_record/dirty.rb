@@ -51,12 +51,6 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
           end
         end
 
-        included_hook do |_, backend_class|
-          if options[:dirty]
-            backend_class.include BackendMethods
-          end
-        end
-
         private
 
         def dirty_handler_methods
@@ -110,7 +104,7 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
           end
         end
 
-        BackendMethods = ActiveModel::Dirty::BackendMethods
+        BackendInstanceMethods = ActiveModel::Dirty::BackendMethods
       end
     end
 

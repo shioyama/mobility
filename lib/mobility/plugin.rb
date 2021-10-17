@@ -95,6 +95,14 @@ Also includes a +configure+ class method to apply plugins to a pluggable
       if defined?(@default) && !pluggable.defaults.has_key?(name = Plugins.lookup_name(self))
         pluggable.defaults[name] = @default
       end
+      if !method_defined?(:included) &&
+          (defined?(self::BackendMethods) || defined?(self::BackendClassMethods))
+        plugin = self
+        included_hook do |_, backend_class|
+          backend_class.include(plugin::BackendMethods) if defined?(plugin::BackendMethods)
+          backend_class.extend(plugin::BackendClassMethods) if defined?(plugin::BackendClassMethods)
+        end
+      end
       super
     end
 

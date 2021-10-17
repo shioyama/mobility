@@ -1,5 +1,10 @@
 # Mobility Changelog
 
+## Unreleased
+
+- Fix ActiveRecord JSONB blank values
+  ([#536](https://github.com/shioyama/mobility/pull/536))
+
 ## 1.2
 
 ### 1.2.2

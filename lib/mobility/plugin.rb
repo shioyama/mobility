@@ -15,8 +15,14 @@ method calls on +Mobility::Pluggable+ instance.
   used to include any module(s) into the backend class, see
   {Mobility::Plugins::Backend}.)
 
-Also includes a +configure+ class method to apply plugins to a pluggable
-({Mobility::Pluggable} instance), with a block.
+To define methods on the backend, the plugin +included+ hook also looks for
+constants named +BackendMethods+ and/or +BackendClassMethods+ in the plugin
+namespace. If it finds these, *and* no included hook has been defined on the
+plugin, then it auto-generates an included hook in which the backend class
+includes/extends these modules.
+
+The module also includes a +configure+ class method to apply plugins to a
+pluggable ({Mobility::Pluggable} instance), with a block.
 
 @example Defining a plugin
   module MyPlugin
@@ -33,6 +39,21 @@ Also includes a +configure+ class method to apply plugins to a pluggable
     included_hook do |klass, backend_class|
       backend_class.include MyBackendMethods
       klass.include MyModelMethods
+    end
+  end
+
+@example With +BackendMethods+ module
+  module MyPlugin
+    extend Mobility::Plugin
+
+    module BackendMethods
+      def read(locale, **)
+        # ...
+      end
+
+      def write(locale, value, **)
+        # ...
+      end
     end
   end
 

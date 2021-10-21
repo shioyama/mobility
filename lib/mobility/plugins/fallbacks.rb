@@ -138,7 +138,7 @@ the current locale was +nil+.
 
       module BackendInstanceMethods
         def read(locale, fallback: true, **accessor_options)
-          return super(locale, **options) if !fallback || accessor_options[:locale]
+          return super(locale, **accessor_options) if !fallback || accessor_options[:locale]
 
           locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
           locales.each do |fallback_locale|
@@ -146,7 +146,7 @@ the current locale was +nil+.
             return value if Util.present?(value)
           end
 
-          super(locale, **options)
+          super(locale, **accessor_options)
         end
 
         private

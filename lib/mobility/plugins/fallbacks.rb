@@ -137,16 +137,16 @@ the current locale was +nil+.
       end
 
       module BackendInstanceMethods
-        def read(locale, fallback: true, **accessor_options)
-          return super(locale, **options) if !fallback || accessor_options[:locale]
+        def read(locale, fallback: true, **kwargs)
+          return super(locale, **kwargs) if !fallback || kwargs[:locale]
 
           locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
           locales.each do |fallback_locale|
-            value = super(fallback_locale, **accessor_options)
+            value = super(fallback_locale, **kwargs)
             return value if Util.present?(value)
           end
 
-          super(locale, **options)
+          super(locale, **kwargs)
         end
 
         private

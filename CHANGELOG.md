@@ -7,6 +7,10 @@
 
 ## 1.2
 
+### 1.2.3
+- Fix passing wrong options to super in fallbacks plugin
+  ([#539](https://github.com/shioyama/mobility/pull/539))
+
 ### 1.2.2
 - Make models work with `Marshal.dump`
   ([#532](https://github.com/shioyama/mobility/pull/532))

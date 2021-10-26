@@ -145,7 +145,7 @@ columns to that table.
           m = model_class.arel_table
           t = model_class.const_get(subclass_name).arel_table.alias(table_alias(locale))
           relation.joins(m.join(t, join_type).
-                         on(t[foreign_key].eq(m[:id]).
+                         on(t[foreign_key].eq(m[model_class.primary_key] || m[:id]).
                             and(t[:locale].eq(locale))).join_sources)
         end
 

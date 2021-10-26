@@ -138,7 +138,7 @@ Implements the {Mobility::Backends::KeyValue} backend for ActiveRecord models.
                          on(t[key_column].eq(key).
                             and(t[:locale].eq(locale).
                                 and(t[:"#{belongs_to}_type"].eq(model_class.base_class.name).
-                                    and(t[:"#{belongs_to}_id"].eq(m[:id]))))).join_sources)
+                                    and(t[:"#{belongs_to}_id"].eq(m[model_class.primary_key] || m[:id]))))).join_sources)
         end
 
         def already_joined?(relation, name, locale, join_type)

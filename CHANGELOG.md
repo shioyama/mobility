@@ -4,6 +4,8 @@
 
 - Fix ActiveRecord JSONB blank values
   ([#536](https://github.com/shioyama/mobility/pull/536))
+- Support primary keys other then :id on model classes
+  ([#542](https://github.com/shioyama/mobility/pull/542))
 
 ## 1.2
 

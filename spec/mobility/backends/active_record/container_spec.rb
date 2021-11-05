@@ -20,6 +20,19 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
     include_accessor_examples 'ContainerPost'
     include_dup_examples 'ContainerPost'
     include_cache_key_examples 'ContainerPost'
+
+    it 'does not change translations on access' do
+      post = ContainerPost.new
+
+      expect { post.title }.not_to change { post.translations }.from({})
+    end
+
+    it 'does not mix up dirty tracking on access' do
+      post = ContainerPost.new
+
+      expect { post.title }.not_to change { post.changes }.from({})
+      expect(post.changed?).to be(false)
+    end
   end
 
   context "with query plugin" do

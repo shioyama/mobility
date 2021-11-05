@@ -21,17 +21,22 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
     include_dup_examples 'ContainerPost'
     include_cache_key_examples 'ContainerPost'
 
-    it 'does not change translations on access' do
-      post = ContainerPost.new
+    it 'does not change translations and dirty tracking' do
+      post = ContainerPost.create!
 
-      expect { post.title }.not_to change { post.translations }.from({})
-    end
+      aggregate_failures "on access" do
+        expect { post.title }
+          .to not_change { post.translations }.from({})
+          .and not_change { post.changes }.from({})
+          .and not_change { post.changed? }.from(false)
+      end
 
-    it 'does not mix up dirty tracking on access' do
-      post = ContainerPost.new
-
-      expect { post.title }.not_to change { post.changes }.from({})
-      expect(post.changed?).to be(false)
+      aggregate_failures "on reload" do
+        expect { post.reload }
+          .to not_change { post.translations }.from({})
+          .and not_change { post.changes }.from({})
+          .and not_change { post.changed? }.from(false)
+      end
     end
   end
 

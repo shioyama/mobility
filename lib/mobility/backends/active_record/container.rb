@@ -22,7 +22,11 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       # @param [Hash] options
       # @return [String,Integer,Boolean] Value of translation
       def read(locale, _ = nil)
-        model_translations(locale)[attribute]
+        locale_translations = model_translations(locale)
+
+        return unless locale_translations
+
+        locale_translations[attribute.to_s]
       end
 
       # @note Translation may be a string, integer, boolean, hash or array
@@ -33,7 +37,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       # @return [String,Integer,Boolean] Updated value
       def write(locale, value, _ = nil)
         set_attribute_translation(locale, value)
-        model_translations(locale)[attribute]
+        read(locale)
       end
       # @!endgroup
 
@@ -42,8 +46,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
         # @option options [Symbol] column_name (:translations) Name of column on which to store translations
         # @raise [InvalidColumnType] if the type of the container column is not json or jsonb
         def configure(options)
-          options[:column_name] ||= :translations
-          options[:column_name] = options[:column_name].to_sym
+          options[:column_name] = options[:column_name]&.to_sym || :translations
         end
         # @!endgroup
 
@@ -84,8 +87,6 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       end
 
       setup do |_attributes, options|
-        store options[:column_name], coder: Coder
-
         # Fix for duping depth-2 jsonb column in AR < 5.0
         if ::ActiveRecord::VERSION::STRING < '5.0'
           column_name = options[:column_name]
@@ -107,32 +108,22 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       private
 
       def model_translations(locale)
-        model[column_name][locale] ||= {}
+        translations = model[column_name]
+
+        return unless translations
+
+        translations[locale.to_s]
       end
 
       def set_attribute_translation(locale, value)
-        translations = model[column_name] || {}
-        translations[locale.to_s] ||= {}
-        translations[locale.to_s][attribute] = value
-        model[column_name] = translations
-      end
+        locale_translations = model_translations(locale)
 
-      class Coder
-        def self.dump(obj)
-          if obj.is_a? ::Hash
-            obj.inject({}) do |translations, (locale, value)|
-              value.each do |k, v|
-                (translations[locale] ||= {})[k] = v if v.present?
-              end
-              translations
-            end
-          else
-            raise ArgumentError, "Attribute is supposed to be a Hash, but was a #{obj.class}. -- #{obj.inspect}"
-          end
-        end
-
-        def self.load(obj)
-          obj
+        if locale_translations
+          locale_translations[attribute.to_s] = value
+          locale_translations.compact!
+          model[column_name].compact!
+        elsif value
+          (model[column_name] ||= {})[locale.to_s] = { attribute.to_s => value }
         end
       end
 

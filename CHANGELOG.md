@@ -6,6 +6,8 @@
   ([#536](https://github.com/shioyama/mobility/pull/536))
 - Support primary keys other then :id on model classes
   ([#542](https://github.com/shioyama/mobility/pull/542))
+- Make it easier to include modules into backend class
+  ([#538](https://github.com/shioyama/mobility/pull/538))
 
 ## 1.2
 

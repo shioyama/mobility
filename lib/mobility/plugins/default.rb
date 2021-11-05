@@ -66,11 +66,6 @@ The proc can accept zero to three arguments (see examples below)
 
       requires :backend, include: :before
 
-      # Applies default plugin to attributes.
-      included_hook do |_klass, backend_class|
-        backend_class.include(BackendMethods)
-      end
-
       # Generate a default value for given parameters.
       # @param [Object, Proc] default_value A default value or Proc
       # @param [Symbol] locale

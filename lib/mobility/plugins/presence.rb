@@ -18,28 +18,25 @@ backend.
       default true
       requires :backend, include: :before
 
-      # Applies presence plugin to attributes.
-      included_hook do |_, backend_class|
-        backend_class.include(BackendMethods) if options[:presence]
-      end
-
       module BackendMethods
         # @!group Backend Accessors
         # @!macro backend_reader
         # @option options [Boolean] presence
         #   *false* to disable presence filter.
-        def read(locale, **options)
-          options.delete(:presence) == false ? super : Presence[super]
+        def read(locale, **kwargs)
+          return super unless options[:presence]
+          kwargs.delete(:presence) == false ? super : Presence[super]
         end
 
         # @!macro backend_writer
         # @option options [Boolean] presence
         #   *false* to disable presence filter.
-        def write(locale, value, **options)
-          if options.delete(:presence) == false
+        def write(locale, value, **kwargs)
+          return super unless options[:presence]
+          if kwargs.delete(:presence) == false
             super
           else
-            super(locale, Presence[value], **options)
+            super(locale, Presence[value], **kwargs)
           end
         end
         # @!endgroup

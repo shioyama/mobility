@@ -117,10 +117,21 @@ the current locale was +nil+.
       # Applies fallbacks plugin to attributes. Completely disables fallbacks
       # on model if option is +false+.
       included_hook do |_, backend_class|
-        backend_class.include(BackendInstanceMethods) unless options[:fallbacks] == false
-        # This is weird. We need to find a better way to allow customization of
-        # rarely-customized code like this.
-        backend_class.define_method(:generate_fallbacks, &method(:generate_fallbacks))
+        unless options[:fallbacks] == false
+          backend_class.include(BackendInstanceMethods)
+
+          fallbacks =
+            if options[:fallbacks].is_a?(Hash)
+              generate_fallbacks(options[:fallbacks])
+            elsif options[:fallbacks] == true
+              generate_fallbacks({})
+            else
+              ::Hash.new { [] }
+            end
+
+          backend_class.singleton_class.attr_reader :fallbacks
+          backend_class.instance_variable_set(:@fallbacks, fallbacks)
+        end
       end
 
       private
@@ -140,25 +151,13 @@ the current locale was +nil+.
         def read(locale, fallback: true, **kwargs)
           return super(locale, **kwargs) if !fallback || kwargs[:locale]
 
-          locales = fallback == true ? fallbacks[locale] : [locale, *fallback]
+          locales = fallback == true ? self.class.fallbacks[locale] : [locale, *fallback]
           locales.each do |fallback_locale|
             value = super(fallback_locale, **kwargs)
             return value if Util.present?(value)
           end
 
           super(locale, **kwargs)
-        end
-
-        private
-
-        def fallbacks
-          if options[:fallbacks].is_a?(Hash)
-            generate_fallbacks(options[:fallbacks])
-          elsif options[:fallbacks] == true
-            generate_fallbacks({})
-          else
-            ::Hash.new { [] }
-          end
         end
       end
     end

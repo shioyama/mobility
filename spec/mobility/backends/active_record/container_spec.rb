@@ -38,6 +38,18 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
           .and not_change { post.changed? }.from(false)
       end
     end
+
+    it 'deletes locale hash if last attribute is removed' do
+      post = ContainerPost.create!
+
+      ::Mobility.with_locale(:en) { post.title = 'Title en' }
+      ::Mobility.with_locale(:de) { post.title = 'Title de' }
+
+      expect { post.title = nil }
+        .to change { post.translations }
+        .from({ "en" => { "title" => "Title en" }, "de" => { "title" => "Title de" }})
+        .to({ "de" => { "title" => "Title de" }})
+    end
   end
 
   context "with query plugin" do

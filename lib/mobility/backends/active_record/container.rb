@@ -81,8 +81,8 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
 
       # @!macro backend_iterator
       def each_locale
-        model[column_name].each do |l, v|
-          yield l.to_sym if v.present?
+        model[column_name].each_key do |l|
+          yield l.to_sym
         end
       end
 
@@ -108,22 +108,23 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       private
 
       def model_translations(locale)
-        translations = model[column_name]
-
-        return unless translations
-
-        translations[locale.to_s]
+        model[column_name][locale.to_s]
       end
 
       def set_attribute_translation(locale, value)
         locale_translations = model_translations(locale)
 
         if locale_translations
-          locale_translations[attribute.to_s] = value
-          locale_translations.compact!
-          model[column_name].compact!
-        elsif value
-          (model[column_name] ||= {})[locale.to_s] = { attribute.to_s => value }
+          if value.nil?
+            locale_translations.delete(attribute.to_s)
+
+            # delete empty locale hash if last attribute was just deleted
+            model[column_name].delete(locale.to_s) if locale_translations.empty?
+          else
+            locale_translations[attribute.to_s] = value
+          end
+        elsif !value.nil?
+          model[column_name][locale.to_s] = { attribute.to_s => value }
         end
       end
 

@@ -46,7 +46,9 @@ module Mobility
         connection.data_source_exists?(table_name)
       end
 
-      delegate :connection, to: ::ActiveRecord::Base
+      def connection
+        ::ActiveRecord::Base.connection
+      end
 
       def truncate_index_name(index_name)
         if index_name.size < connection.index_name_length

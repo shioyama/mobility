@@ -9,6 +9,10 @@
 
 ## 1.2
 
+### 1.2.5
+- Avoid referencing ActiveRecord::Base
+  ([#550](https://github.com/shioyama/mobility/pull/550))
+
 ### 1.2.4
 - Fix fallbacks performance regression
   ([#548](https://github.com/shioyama/mobility/pull/548))

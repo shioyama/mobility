@@ -36,7 +36,7 @@ model class is generated.
       private
 
       def define_fallthrough_accessors(*names)
-        method_name_regex = /\A(#{names.join('|')})_([a-z]{2}(_[a-z]{2})?)(=?|\??)\z/.freeze
+        method_name_regex = /\A(#{names.join('|')})_([a-z]{2,3}(_[a-z]{2})?)(=?|\??)\z/.freeze
 
         define_method :method_missing do |method_name, *args, &block|
           if method_name =~ method_name_regex

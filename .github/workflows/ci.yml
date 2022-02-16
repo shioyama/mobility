@@ -188,9 +188,6 @@ jobs:
       - name: Install Postgres
         run: sudo apt-get install libpq-dev postgresql-client -y
         if: matrix.database == 'postgres'
-      - name: Install MySQL
-        run: sudo apt-get install libmysqlclient-dev mysql-client -y
-        if: matrix.database == 'mysql'
       - id: cache-bundler
         uses: actions/cache@v2
         with:

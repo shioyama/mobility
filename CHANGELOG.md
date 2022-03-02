@@ -14,6 +14,10 @@
 
 ## 1.2
 
+### 1.2.6
+- Require mfa on rubygems
+  ([#545](https://github.com/shioyama/mobility/pull/545))
+
 ### 1.2.5
 - Avoid referencing ActiveRecord::Base
   ([#550](https://github.com/shioyama/mobility/pull/550))

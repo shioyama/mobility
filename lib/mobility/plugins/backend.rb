@@ -161,14 +161,14 @@ Defines:
 
         def inherited(klass)
           parent_classes = mobility_backend_classes.freeze # ensure backend classes are not modified after being inherited
-          klass.class_eval { @mobility_backend_classes = parent_classes.dup }
+          klass.class_eval { @@mobility_backend_classes = parent_classes.dup }
           super
         end
 
         protected
 
         def mobility_backend_classes
-          @mobility_backend_classes ||= {}
+          @@mobility_backend_classes ||= {}
         end
       end
 

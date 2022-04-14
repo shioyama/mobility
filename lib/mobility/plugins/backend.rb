@@ -159,16 +159,22 @@ Defines:
           raise KeyError, "No backend for: #{name}"
         end
 
-        def inherited(klass)
-          parent_classes = mobility_backend_classes.freeze # ensure backend classes are not modified after being inherited
-          klass.class_eval { @mobility_backend_classes = parent_classes.dup }
-          super
-        end
-
         protected
 
         def mobility_backend_classes
-          @mobility_backend_classes ||= {}
+          if @mobility_backend_classes
+            @mobility_backend_classes
+          else
+            @mobility_backend_classes = {}
+            parent_class = self.superclass
+            while parent_class&.respond_to?(:mobility_backend_classes, true)
+              # ensure backend classes are not modified after being inherited
+              parent_class_classes = parent_class.mobility_backend_classes.freeze
+              @mobility_backend_classes.merge!(parent_class_classes)
+              parent_class = parent_class.superclass
+            end
+            @mobility_backend_classes
+          end
         end
       end
 

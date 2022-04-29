@@ -153,7 +153,13 @@ the ActiveRecord dirty plugin for more information.
           # suffixes is simplest given they change from Rails version to version.
           def patterns
             @patterns ||=
-              (klass.attribute_method_matchers.map { |p| "#{p.prefix}%s#{p.suffix}" } - excluded_patterns)
+              begin
+                # Method name changes in Rails 7.1
+                attribute_method_patterns = klass.respond_to?(:attribute_method_patterns) ?
+                  klass.attribute_method_patterns :
+                  klass.attribute_method_matchers
+                attribute_method_patterns.map { |p| "#{p.prefix}%s#{p.suffix}" } - excluded_patterns
+              end
           end
 
           private

@@ -6,8 +6,17 @@
   ([#536](https://github.com/shioyama/mobility/pull/536))
 - Support primary keys other then :id on model classes
   ([#542](https://github.com/shioyama/mobility/pull/542))
+- Handle `attribute_metohd_matchers` rename (part of
+  [#560](https://github.com/shioyama/mobility/pull/560))
+- Clean up and refactor container backend
+  ([#543](https://github.com/shioyama/mobility/pull/543)),
+  thanks [doits](https://github.com/doits)!
 
 ## 1.2
+
+### 1.2.6
+- Require mfa on rubygems
+  ([#545](https://github.com/shioyama/mobility/pull/545))
 
 ### 1.2.5
 - Avoid referencing ActiveRecord::Base

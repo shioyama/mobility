@@ -109,6 +109,20 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
         end
       end
 
+      it "does not prevent saving when a nil translation is generated and invalid" do
+        Article::Translation.validates :title, presence: true
+
+        Mobility.locale = :en
+        article = Article.new(title: "New Article")
+        expect(article.save).to eq(true)
+
+        Mobility.locale = :ja
+        article.title
+
+        Mobility.locale = :en
+        expect(article.save).to eq(true)
+      end
+
       it "removes nil translations when saving persisted record" do
         Mobility.locale = :en
         article = Article.create(title: "New Article")

@@ -157,4 +157,17 @@ describe Mobility::Plugins::Sequel::Query, orm: :sequel, type: :plugin do
       end.select_all(:articles).all).to eq([article_ja])
     end
   end
+
+  describe "regression for #564 (Sequel version)" do
+    it "works if translates is called multiple times" do
+      stub_const 'Article', Class.new(Sequel::Model)
+      Article.dataset = DB[:articles]
+
+      2.times { translates Article, :title, backend: :table }
+
+      article = Article.create(title: "Title")
+
+      expect(Article.i18n.where(title: "Title").select_all(:articles).all).to eq([article])
+    end
+  end
 end

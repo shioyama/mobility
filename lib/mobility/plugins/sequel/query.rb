@@ -135,10 +135,13 @@ ActiveRecord query plugin.
               keys, predicates = cond.keys, []
               model = dataset.model
 
+              used_keys = []
+
               query_map = attribute_modules(model).inject(IDENTITY) do |qm, mod|
-                i18n_keys = mod.names.map(&:to_sym) & keys
+                i18n_keys = mod.names.map(&:to_sym) & keys - used_keys
                 next qm if i18n_keys.empty?
 
+                used_keys += i18n_keys
                 mod_predicates = i18n_keys.map do |key|
                   build_predicate(dataset.backend_op(key, locale), cond.delete(key))
                 end

@@ -14,6 +14,11 @@
 
 ## 1.2
 
+### 1.2.7
+- Do not query same attribute more than once, fixes
+  [#564](https://github.com/shioyama/mobility/pull/578)
+  ([#577](https://github.com/shioyama/mobility/pull/577))
+
 ### 1.2.6
 - Require mfa on rubygems
   ([#545](https://github.com/shioyama/mobility/pull/545))

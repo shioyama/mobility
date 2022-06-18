@@ -6,13 +6,18 @@
   ([#536](https://github.com/shioyama/mobility/pull/536))
 - Support primary keys other then :id on model classes
   ([#542](https://github.com/shioyama/mobility/pull/542))
-- Handle `attribute_metohd_matchers` rename (part of
-  [#560](https://github.com/shioyama/mobility/pull/560))
 - Clean up and refactor container backend
   ([#543](https://github.com/shioyama/mobility/pull/543)),
   thanks [doits](https://github.com/doits)!
 
 ## 1.2
+
+### 1.2.8
+- Fix issues with subclassing, such as when using AR STI,
+  fixes [#566](https://github.com/shioyama/mobility/issues/566)
+  ([#568](https://github.com/shioyama/mobility/pull/568))
+- Handle `attribute_method_matchers` rename (part of
+  [#560](https://github.com/shioyama/mobility/pull/560))
 
 ### 1.2.7
 - Do not query same attribute more than once, fixes

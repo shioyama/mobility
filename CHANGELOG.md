@@ -9,6 +9,9 @@
 - Clean up and refactor container backend
   ([#543](https://github.com/shioyama/mobility/pull/543)),
   thanks [doits](https://github.com/doits)!
+- Update fallthrough_accessor regex to allow for ISO 639-2 codes
+  ([#580](https://github.com/shioyama/mobility/pull/580))
+  thanks [phil-allcock](https://github.com/phil-allcock)!
 
 ## 1.2
 

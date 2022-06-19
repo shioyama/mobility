@@ -22,7 +22,7 @@ describe Mobility::Plugins::FallthroughAccessors, type: :plugin do
     it_behaves_like "locale accessor", :title, 'en'
     it_behaves_like "locale accessor", :title, 'de'
     it_behaves_like "locale accessor", :title, 'pt-BR'
-    it_behaves_like "locale accessor", :title, 'ru'
+    it_behaves_like "locale accessor", :title, 'rus'
 
     it 'passes arguments and options to super when method does not match' do
       mod = Module.new do

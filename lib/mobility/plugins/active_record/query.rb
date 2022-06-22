@@ -163,9 +163,8 @@ enabled for any one attribute on the model.
               define_method method_name do |*attrs, &block|
                 return super(*attrs, &block) if (method_name == 'select' && block.present?)
 
-                if ::ActiveRecord::VERSION::STRING < '7.0'
-                  return super(*attrs, &block) unless @klass.respond_to?(:mobility_attribute?)
-                end
+                return super(*attrs, &block) unless @klass.respond_to?(:mobility_attribute?)
+
                 return super(*attrs, &block) unless attrs.any?(&@klass.method(:mobility_attribute?))
 
                 keys = attrs.dup

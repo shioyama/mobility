@@ -2,6 +2,11 @@
 
 ## 1.2
 
+### 1.2.9
+- Fix missing method `mobility_attribute?` on Rails 7
+  ([#582](https://github.com/shioyama/mobility/pull/582) and
+  [#584](https://github.com/shioyama/mobility/pull/584))
+
 ### 1.2.8
 - Fix issues with subclassing, such as when using AR STI,
   fixes [#566](https://github.com/shioyama/mobility/issues/566)

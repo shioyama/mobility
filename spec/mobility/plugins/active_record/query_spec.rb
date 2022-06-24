@@ -160,7 +160,7 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
       m = ActiveRecord::Migration.new
       m.verbose = false
 
-      m.create_table :cars
+      m.create_table(:cars) { |t| t.string :name }
       stub_const('Car', Class.new(ActiveRecord::Base) do
         has_many :parking_lots
         has_many :car_parts
@@ -190,6 +190,7 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
       query = ParkingLot.includes(car: :car_parts).references(:car).merge(Car.i18n)
       expect { query.first }.not_to raise_error
       expect { query.order(:car_id) }.not_to raise_error
+      expect { query.select(:name) }.not_to raise_error
     end
   end
 

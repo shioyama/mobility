@@ -850,6 +850,61 @@ backend-independent queries on translated and untranslated attributes without
 having to deal with the details of how these translations are stored. The same
 interface is supported with Sequel to build datasets.
 
+### Optional type checking
+
+Since Mobility supports different storage backends some of them will not
+guarantee type safety of input data. For example Postgres
+([`Mobility::Backend::Jsonb`](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Jsonb)
+let us to save any kind of json-based data in single column.  
+
+```ruby
+class Offer < ApplicationRecord
+  # ...
+   
+  translates :benefits
+end
+
+Offer.create!(benefits: ['fast', 'safe'])
+Offer.create!(benefits: 'cheap')
+
+Offer.find_each do |offer|
+  offer.benefits.each { |benefit| Customer.notify_by_benefit(benefit) }
+  # => NoMethodError (undefined method `each' for "cheap":String)
+end
+```
+
+To prevent errors like this or at least expose them earlier we can add
+`:type` option to attribute writer configuration:
+
+```ruby
+class Offer < ApplicationRecord
+  # ...
+   
+  translates :benefits, writer: { type: :array }
+end
+
+Offer.create!(benefits: ['fast', 'safe'])
+Offer.create!(benefits: 'cheap')
+# => Mobility::Plugins::Writer::TypeError ("benefits= called with string, array expected")
+
+# now error exposed before database records was corrupted
+# so we can fix it earlier and code below will executes safely 
+
+Offer.find_each do |offer|
+  offer.benefits.each { |benefit| Customer.notify_by_benefit(benefit) }
+end
+
+```
+
+List of available writers types:
+1) `:string`  
+2) `:integer` 
+3) `:float`
+4) `:bool`
+5) `:array`
+6) `:hash`
+
+
 <a name="backends"></a>Backends
 --------
 

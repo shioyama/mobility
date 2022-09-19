@@ -50,5 +50,29 @@ describe Mobility::Plugins::Writer, type: :plugin do
       expect(instance.send(:title=, 'foo', super: true)).to eq("set title to foo")
     end
   end
+
+  describe "type checking" do
+    plugin_setup :title, writer: { type: :integer }
+
+    let(:instance) { model_class.new }
+
+    it "correctly maps setter method for translated attribute to backend if correct type given" do
+      expect(Mobility).to receive(:locale).and_return(:de)
+      expect(listener).to receive(:write).with(:de, 1, any_args)
+      expect(instance.title = 1).to eq(1)
+    end
+
+    it "correctly maps setter method for translated attribute to backend if nil given" do
+      expect(Mobility).to receive(:locale).and_return(:de)
+      expect(listener).to receive(:write).with(:de, nil, any_args)
+      expect(instance.title = nil).to eq(nil)
+    end
+
+    it "raises Mobility::Plugins::Writer::TypeError if wrong type given" do
+      expect {
+        instance.send(:title=, 'foo', locale: :ru)
+      }.to raise_error(Mobility::Plugins::Writer::TypeError, "title= called with string, integer expected")
+    end
+  end
 end
 

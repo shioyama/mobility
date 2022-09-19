@@ -8,6 +8,9 @@ module Mobility
 Defines attribute writer that delegates to +Mobility::Backend#write+.
 
 =end
+      TYPES_MAP  = { String => :string, Integer => :integer, Float => :float,
+                     TrueClass => :bool, FalseClass => :bool, Array => :array, Hash => :hash }
+
       extend Plugin
 
       default true
@@ -15,15 +18,31 @@ Defines attribute writer that delegates to +Mobility::Backend#write+.
 
       initialize_hook do |*names|
         if options[:writer]
+          type_option = options[:writer][:type] if options[:writer].is_a?(Hash)
+
           names.each do |name|
             class_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{name}=(value, locale: nil, **options)
+                #{Writer.check_type(name, type_option) if type_option}
                 #{Writer.setup_source}
                 mobility_backends[:#{name}].write(locale, value, **options)
               end
             EOM
           end
         end
+      end
+
+      class TypeError < StandardError; end
+
+      def self.check_type(name, type)
+        <<-EOL
+        if !value.nil? 
+          value_type = #{TYPES_MAP}[value.class]
+          if value_type != :#{type}        
+            raise Mobility::Plugins::Writer::TypeError, "#{name}= called with \#{value_type}, #{type} expected"
+          end
+        end
+        EOL
       end
 
       def self.setup_source

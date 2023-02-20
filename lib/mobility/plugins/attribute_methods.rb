@@ -31,6 +31,7 @@ attributes only.
       included_hook do
         if options[:attribute_methods]
           define_method :untranslated_attributes, ::ActiveRecord::Base.instance_method(:attributes)
+          define_method :untranslated_attribute_names, ::ActiveRecord::Base.instance_method(:attribute_names)
         end
       end
 
@@ -41,6 +42,10 @@ attributes only.
 
         def attributes
           super.merge(translated_attributes)
+        end
+
+        def attribute_names
+          super.concat(translated_attributes.keys)
         end
       end
     end

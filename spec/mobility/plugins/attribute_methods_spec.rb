@@ -43,4 +43,17 @@ describe Mobility::Plugins::AttributeMethods, orm: :active_record, type: :plugin
       expect(instance.untranslated_attributes).to eq(untranslated_attributes)
     end
   end
+
+  describe "#attribute_names" do
+    it "adds translated attribute names to normal attribute names" do
+      expect(backend).to receive(:read).once.with(Mobility.locale, any_args).and_return('foo')
+      expect(instance.attribute_names).to eq(untranslated_attributes.keys.concat(['title']))
+    end
+  end
+
+  describe "#untranslated_attribute_names" do
+    it "adds translated attribute names to normal attribute names" do
+      expect(instance.untranslated_attribute_names).to eq(untranslated_attributes.keys)
+    end
+  end
 end

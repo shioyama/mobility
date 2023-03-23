@@ -45,7 +45,7 @@ Defines:
         klass.extend ClassMethods
 
         if backend
-          @backend_class = backend.build_subclass(klass, backend_options)
+          @backend_class = backend.build_subclass(klass, **backend_options)
 
           backend_class.setup_model(klass, names)
 

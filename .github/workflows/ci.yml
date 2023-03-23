@@ -25,6 +25,8 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
+          - '3.2'
+          - '3.1'
           - '3.0'
           - '2.7'
           - '2.6'
@@ -52,6 +54,14 @@ jobs:
         experimental: [false]
         feature: ['unit']
         include:
+          - ruby: '3.2'
+            feature: 'unit'
+            orm:
+            experimental: false
+          - ruby: '3.1'
+            feature: 'unit'
+            orm:
+            experimental: false
           - ruby: '3.0'
             feature: 'unit'
             orm:
@@ -64,6 +74,74 @@ jobs:
             feature: 'unit'
             orm:
             experimental: false
+          - ruby: '3.2'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '7.0'
+            database: 'sqlite3'
+            experimental: false
+          - ruby: '3.2'
+            feature: 'performance'
+            experimental: false
+          - ruby: '3.2'
+            feature: 'i18n_fallbacks'
+            experimental: false
+          - ruby: '3.2'
+            database: 'sqlite3'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.2'
+            database: 'mysql'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.2'
+            database: 'postgres'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.1'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '7.0'
+            database: 'sqlite3'
+            experimental: false
+          - ruby: '3.1'
+            feature: 'performance'
+            experimental: false
+          - ruby: '3.1'
+            feature: 'i18n_fallbacks'
+            experimental: false
+          - ruby: '3.1'
+            database: 'sqlite3'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.1'
+            database: 'mysql'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.1'
+            database: 'postgres'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
           - ruby: '3.0'
             feature: 'rails'
             orm:
@@ -157,6 +235,47 @@ jobs:
             orm:
               name: 'active_record'
               version: '5.2'
+          - ruby: '3.1'
+            orm:
+              name: 'active_record'
+              version: '4.2'
+          - ruby: '3.1'
+            orm:
+              name: 'active_record'
+              version: '5.0'
+          - ruby: '3.1'
+            orm:
+              name: 'active_record'
+              version: '5.1'
+          - ruby: '3.1'
+            orm:
+              name: 'active_record'
+              version: '5.2'
+          - ruby: '3.1'
+            orm:
+              name: 'active_record'
+              version: '6.0'
+          - ruby: '3.2'
+            orm:
+              name: 'active_record'
+              version: '4.2'
+          - ruby: '3.2'
+            orm:
+              name: 'active_record'
+              version: '5.0'
+          - ruby: '3.2'
+            orm:
+              name: 'active_record'
+              version: '5.1'
+          - ruby: '3.2'
+            orm:
+              name: 'active_record'
+              version: '5.2'
+          - ruby: '3.2'
+            orm:
+              name: 'active_record'
+              version: '6.0'
+
     env:
       DB: ${{ matrix.database }}
       BUNDLE_JOBS: 4

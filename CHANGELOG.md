@@ -1,6 +1,11 @@
 # Mobility Changelog
 
-## Unreleased
+## 1.3
+
+### 1.3.0.rc1
+
+This version includes potentially breaking chnages for jsonb and hstore
+backends. See PRs below for details.
 
 - Fix ActiveRecord JSONB blank values
   ([#536](https://github.com/shioyama/mobility/pull/536))

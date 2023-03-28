@@ -39,10 +39,10 @@ Gem::Specification.new do |spec|
   spec.signing_key = File.expand_path("~/.ssh/gem-private_key.pem") if $0 =~ /gem\z/
 
   spec.post_install_message = %q{
-Warning: Mobility v1.0 includes backwards-incompatible changes (mostly around configuration).
+Warning: Mobility v1.3.x includes potentially backwards-incompatible changes
+for jsonb/hstore backends.
 
-If you are upgrading from an earlier version, please see:
-- https://github.com/shioyama/mobility/releases/tag/v1.0.0
-- https://github.com/shioyama/mobility/wiki/Introduction-to-Mobility-v1.0
+Please see:
+- https://github.com/shioyama/mobility/issues/535
 }
 end

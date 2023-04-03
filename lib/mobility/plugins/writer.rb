@@ -18,7 +18,7 @@ Defines attribute writer that delegates to +Mobility::Backend#write+.
           names.each do |name|
             class_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{name}=(value, locale: nil, **options)
-                self.write_attribute(:"#{name}", value)
+                self.write_attribute(:"#{name}", value) if self.has_attribute?(:"#{name}")
                 #{Writer.setup_source}
                 mobility_backends[:#{name}].write(locale, value, **options)
               end

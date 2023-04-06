@@ -2,6 +2,11 @@
 
 ## 1.3
 
+### (unreleased)
+
+- Allow `I18n.available_locales` to contain Strings
+  ([#605](https://github.com/shioyama/mobility/issues/605))
+
 ### 1.3.0.rc3
 
 - Don't try to load generators if Rails is loaded but AR is not

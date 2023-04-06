@@ -5,7 +5,7 @@
 ### (unreleased)
 
 - Allow `I18n.available_locales` to contain Strings
-  ([#605](https://github.com/shioyama/mobility/issues/605))
+  ([#612](https://github.com/shioyama/mobility/pull/612))
 
 ### 1.3.0.rc3
 

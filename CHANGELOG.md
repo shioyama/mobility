@@ -2,6 +2,11 @@
 
 ## 1.3
 
+### (unreleased)
+
+- Allow `I18n.available_locales` to contain Strings
+  ([#605](https://github.com/shioyama/mobility/issues/605))
+
 ### 1.3.0.rc1
 
 This version includes potentially breaking chnages for jsonb and hstore

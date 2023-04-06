@@ -228,9 +228,9 @@ module Mobility
     #   methods (in LocaleAccessors) than is really necessary.
     def available_locales
       if defined?(Rails) && Rails.respond_to?(:application) && Rails.application
-        Rails.application.config.i18n.available_locales&.map(&:to_sym) || I18n.available_locales
+        Rails.application.config.i18n.available_locales&.map(&:to_sym) || I18n.available_locales.map(&:to_sym)
       else
-        I18n.available_locales
+        I18n.available_locales.map(&:to_sym)
       end
     end
 

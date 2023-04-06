@@ -175,6 +175,39 @@ describe Mobility, orm: :none do
     end if defined?(Rails)
   end
 
+  describe ".available_string_locales" do
+    around do |example|
+      @available_locales = I18n.available_locales
+      I18n.available_locales = ['en', 'pt']
+      example.run
+      I18n.available_locales = @available_locales
+    end
+
+    it "correctly converst I18n.available_locales to symbols" do
+      expect(described_class.available_locales).to eq([:en, :pt])
+    end
+
+    # @note Required since model may be loaded in initializer before Rails has
+    #   updated I18n.available_locales.
+    context 'Rails application is loaded' do
+      context 'available locales in Rails i18n config are present' do
+        it 'uses Rails i18n available locales converted to symbols' do
+          allow(Rails).to receive_message_chain(:application, :config, :i18n, :available_locales).
+            and_return([:by, :en])
+          expect(described_class.available_locales).to eq([:by, :en])
+        end
+      end
+
+      context 'available locales in Rails i18n config are nil' do
+        it 'uses I18n.available_locales converted to symbols' do
+          allow(Rails).to receive_message_chain(:application, :config, :i18n, :available_locales).
+            and_return(nil)
+          expect(described_class.available_locales).to eq([:en, :pt])
+        end
+      end
+    end if defined?(Rails)
+  end
+
   describe '.normalize_locale' do
     it "normalizes locale to lowercase string underscores" do
       expect(described_class.normalize_locale(:"pt-BR")).to eq("pt_br")

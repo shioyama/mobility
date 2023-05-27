@@ -15,10 +15,13 @@ describe Mobility::Plugins::Sequel::Query, orm: :sequel, type: :plugin do
       Article.include translations
       Article
     end
+    before { translates model_class, :title, backend: :table }
 
     context "default query scope" do
       it "defines query scope" do
-        expect(model_class.i18n).to eq(described_class.build_query(model_class, Mobility.locale))
+        actual_query = model_class.i18n.where(title: "foo")
+        expected_query = described_class.build_query(model_class, Mobility.locale).where(title: "foo")
+        expect(actual_query.sql).to eq(expected_query.sql)
       end
     end
 
@@ -29,7 +32,9 @@ describe Mobility::Plugins::Sequel::Query, orm: :sequel, type: :plugin do
       end
 
       it "defines query scope" do
-        expect(model_class.foo).to eq(described_class.build_query(model_class, Mobility.locale))
+        actual_query = model_class.foo.where(title: "foo")
+        expected_query = described_class.build_query(model_class, Mobility.locale).where(title: "foo")
+        expect(actual_query.sql).to eq(expected_query.sql)
         expect { model_class.i18n }.to raise_error(NoMethodError)
       end
     end

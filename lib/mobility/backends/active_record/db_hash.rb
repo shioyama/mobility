@@ -33,6 +33,7 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
         end
 
         def translations
+          model[column_name] ||= {}
           model[column_name]
         end
       end

@@ -1,5 +1,5 @@
 require 'mobility/backends/active_record/db_hash'
-require 'mobility/plugins/arel/nodes/pg_ops'
+require 'mobility/plugins/arel/nodes/json_ops'
 
 module Mobility
   module Backends

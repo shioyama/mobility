@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'mobility/backends/sequel/pg_hash'
+require 'mobility/backends/sequel/db_hash'
 
 Sequel.extension :pg_json, :pg_json_ops
 
@@ -13,7 +13,7 @@ Implements the {Mobility::Backends::Json} backend for Sequel models.
 
 =end
     module Sequel
-      class Json < PgHash
+      class Json < DbHash
         # @!group Backend Accessors
         #
         # @!method read(locale, options = {})

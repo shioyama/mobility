@@ -1,4 +1,4 @@
-require 'mobility/backends/sequel/pg_hash'
+require 'mobility/backends/sequel/db_hash'
 
 Sequel.extension :pg_hstore, :pg_hstore_ops
 
@@ -12,7 +12,7 @@ Implements the {Mobility::Backends::Hstore} backend for Sequel models.
 
 =end
     module Sequel
-      class Hstore < PgHash
+      class Hstore < DbHash
         # @!group Backend Accessors
         # @!macro backend_reader
         # @!method read(locale, options = {})

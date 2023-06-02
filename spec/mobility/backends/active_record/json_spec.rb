@@ -2,7 +2,7 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :postgres, type: :backend do
+describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: [:mysql, :postgres], type: :backend do
   require "mobility/backends/active_record/json"
 
   before { stub_const 'JsonPost', Class.new(ActiveRecord::Base) }
@@ -30,7 +30,7 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
       post = JsonPost.create!
       post.reload
 
-      expect(post.my_title_i18n).to eq({})
+      expect([nil, {}]).to include(post.my_title_i18n)
       expect(post.changes).to eq({})
     end
 

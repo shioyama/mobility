@@ -6,8 +6,6 @@ module Mobility
     module Arel
       module Nodes
         %w[
-          JsonDashArrow
-          JsonDashDoubleArrow
           JsonbDashArrow
           JsonbDashDoubleArrow
           JsonbQuestion
@@ -72,14 +70,6 @@ module Mobility
           end
         end
 
-        class Json < JsonDashDoubleArrow; end
-
-        class JsonContainer < Json
-          def initialize column, locale, attr
-            super(Nodes::JsonDashArrow.new(column, locale), attr)
-          end
-        end
-
         class JsonbContainer < Jsonb
           def initialize column, locale, attr
             @column, @locale = column, locale
@@ -93,14 +83,6 @@ module Mobility
       end
 
       module Visitors
-        def visit_Mobility_Plugins_Arel_Nodes_JsonDashArrow o, a
-          json_infix o, a, '->'
-        end
-
-        def visit_Mobility_Plugins_Arel_Nodes_JsonDashDoubleArrow o, a
-          json_infix o, a, '->>'
-        end
-
         def visit_Mobility_Plugins_Arel_Nodes_JsonbDashArrow o, a
           json_infix o, a, '->'
         end

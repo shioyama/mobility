@@ -1,5 +1,5 @@
-require 'mobility/backends/active_record/pg_hash'
-require 'mobility/plugins/arel/nodes/pg_ops'
+require 'mobility/backends/active_record/db_hash'
+require 'mobility/plugins/arel/nodes/json_ops'
 
 module Mobility
   module Backends
@@ -11,7 +11,7 @@ Implements the {Mobility::Backends::Json} backend for ActiveRecord models.
 
 =end
     module ActiveRecord
-      class Json < PgHash
+      class Json < DbHash
         # @!group Backend Accessors
         #
         # @!method read(locale, **options)

@@ -18,7 +18,7 @@ describe Mobility::Plugins::Sequel::Query, orm: :sequel, type: :plugin do
 
     context "default query scope" do
       it "defines query scope" do
-        expect(model_class.i18n).to eq(described_class.build_query(model_class, Mobility.locale))
+        expect(model_class.i18n.sql).to eq(described_class.build_query(model_class, Mobility.locale).sql)
       end
     end
 
@@ -29,7 +29,7 @@ describe Mobility::Plugins::Sequel::Query, orm: :sequel, type: :plugin do
       end
 
       it "defines query scope" do
-        expect(model_class.foo).to eq(described_class.build_query(model_class, Mobility.locale))
+        expect(model_class.foo.sql).to eq(described_class.build_query(model_class, Mobility.locale).sql)
         expect { model_class.i18n }.to raise_error(NoMethodError)
       end
     end

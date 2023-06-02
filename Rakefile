@@ -40,13 +40,13 @@ namespace :db do
   desc "Set up the database schema"
   task up: :setup do
     orm = ENV['ORM']
-    return unless orm
-
-    require orm
-    require "database"
-    DB = Mobility::Test::Database.connect(orm)
-    require "#{orm}/schema"
-    Mobility::Test::Schema.up
+    if orm
+      require orm
+      require "database"
+      DB = Mobility::Test::Database.connect(orm)
+      require "#{orm}/schema"
+      Mobility::Test::Schema.up
+    end
   end
 
   desc "Drop and recreate the database schema"

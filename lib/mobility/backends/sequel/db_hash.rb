@@ -12,7 +12,7 @@ jsonb).
 
 =end
     module Sequel
-      class PgHash
+      class DbHash
         include Sequel
         include HashValued
 
@@ -52,7 +52,7 @@ jsonb).
           columns.each { |column| default_values[column] = {} }
         end
       end
-      private_constant :PgHash
+      private_constant :DbHash
     end
   end
 end

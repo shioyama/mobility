@@ -11,7 +11,7 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
 
 =end
     module ActiveRecord
-      class PgHash
+      class DbHash
         include ActiveRecord
         include HashValued
 
@@ -33,10 +33,11 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
         end
 
         def translations
+          model[column_name] ||= {}
           model[column_name]
         end
       end
-      private_constant :PgHash
+      private_constant :DbHash
     end
   end
 end

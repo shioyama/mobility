@@ -212,6 +212,11 @@ jobs:
             experimental: true
         exclude:
           - ruby: '2.6'
+            database: 'mysql'
+            orm:
+              name: 'active_record'
+              version: '4.2'
+          - ruby: '2.6'
             orm:
               name: 'active_record'
               version: '7.0'

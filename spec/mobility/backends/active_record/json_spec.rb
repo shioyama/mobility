@@ -2,7 +2,7 @@ require "spec_helper"
 
 return unless defined?(ActiveRecord)
 
-describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, type: :backend do
+describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: [:mysql, :postgres], type: :backend do
   require "mobility/backends/active_record/json"
 
   before { stub_const 'JsonPost', Class.new(ActiveRecord::Base) }

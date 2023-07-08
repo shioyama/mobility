@@ -1027,6 +1027,7 @@ Integrations
 * [mobility-actiontext](https://github.com/sedubois/mobility-actiontext): Translate
   Rails [Action Text](https://guides.rubyonrails.org/action_text_overview.html) rich text
   with Mobility.
+* [mobility_typed](https://github.com/GeorgeGorbanev/mobility_typed): Add type checking to Rails models accessors.
 
 Tutorials
 ---------

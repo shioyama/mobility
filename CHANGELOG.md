@@ -2,6 +2,12 @@
 
 ## 1.3
 
+### Unreleased
+
+- Don't try to load generators if Rails is loaded but AR is not
+  ([#627](https://github.com/shioyama/mobility/pull/627)), thanks
+  [flop](https://github.com/flop)!
+
 ### 1.3.0.rc2
 
 - Pass `coder` as keyword argument to `serialize` (ActiveRecord version > 7.1)

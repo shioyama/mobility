@@ -1,6 +1,6 @@
 require "spec_helper"
 
-return unless defined?(Rails)
+return unless defined?(Rails) && defined?(ActiveRecord)
 
 require "rails/generators/mobility/translations_generator"
 

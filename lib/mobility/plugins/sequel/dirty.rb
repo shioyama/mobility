@@ -56,8 +56,17 @@ Automatically includes dirty plugin in model class when enabled.
             if model.column_changes.has_key?(locale_accessor) && model.initial_values[locale_accessor] == value
               super
               [model.changed_columns, model.initial_values].each { |h| h.delete(locale_accessor) }
-            elsif read(locale, **options.merge(fallback: false)) != value
+            elsif read(locale, **options.merge(fallback: false, cache: false)) != value
+              # Making sure to correctly save the initial value (we don't want get_column_value in will_change_column to try to read the underlying column).
+              model.initial_values[locale_accessor] = read(locale, **options.merge(fallback: false, cache: false))
               model.will_change_column(locale_accessor)
+              super
+            elsif model.changed_columns.include?(locale_accessor) && read(locale, **options.merge(fallback: false, cache: false)) == value
+              # Sometimes locale_accessor is flagged as changed in changed_columns when the value is the same... Not sure what's going on.
+              model.changed_columns.delete(locale_accessor)
+              super
+            else
+              # Always call super ?
               super
             end
           end

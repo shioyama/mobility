@@ -38,6 +38,13 @@ describe Mobility::Plugins::AttributeMethods, orm: :active_record, type: :plugin
     end
   end
 
+  describe "#as_json" do
+    it "adds translated attributes to normal attributes" do
+      expect(backend).to receive(:read).with(Mobility.locale, any_args).and_return('foo').at_least(1)
+      expect(instance.as_json).to eq(untranslated_attributes.merge('title' => 'foo'))
+    end
+  end
+
   describe "#untranslated_attributes" do
     it "returns original value of attributes method" do
       expect(instance.untranslated_attributes).to eq(untranslated_attributes)

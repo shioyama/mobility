@@ -110,7 +110,7 @@ columns to that table.
             options[:subclass_name] ||= :Translation
           end
           %i[foreign_key association_name subclass_name table_name].each { |key|
-            if options[key].is_a?(Array)
+          if options[key].is_a?(Enumerable)
               options[key] = options[key].map!(&:to_sym)
             else
               options[key] = options[key].to_sym

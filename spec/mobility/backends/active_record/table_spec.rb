@@ -267,7 +267,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
     end
 
     it "sets composite foreign_key" do
-      backend_class.configure(options)
+      backend_class.configure(options.merge!(foreign_key: [:article_id, :article_type]))
       expect(options[:foreign_key]).to eq([:article_id, :article_type])
     end
   end

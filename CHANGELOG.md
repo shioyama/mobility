@@ -7,6 +7,9 @@
 - Don't try to load generators if Rails is loaded but AR is not
   ([#627](https://github.com/shioyama/mobility/pull/627)), thanks
   [flop](https://github.com/flop)!
+- Allow compound foreign keys
+  ([#632](https://github.com/shioyama/mobility/pull/632)), thanks
+  [mival](https://github.com/mival)!
 
 ### 1.3.0.rc2
 

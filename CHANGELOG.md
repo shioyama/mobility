@@ -4,7 +4,7 @@
 
 ### 1.3.0.rc2
 
-- Pass `coder` as keyword argument to `serialize` (ActiveRecord version > 3.2)
+- Pass `coder` as keyword argument to `serialize` (ActiveRecord version > 7.1)
   ([#617](https://github.com/shioyama/mobility/pull/617))
 
 ### 1.3.0.rc1

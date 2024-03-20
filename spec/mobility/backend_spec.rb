@@ -251,7 +251,7 @@ describe Mobility::Backend do
 
       it "returns value when configured" do
         model_class = double("model class")
-        options = double("options")
+        options = {}
         subclass = backend_class.build_subclass(model_class, options)
         expect(subclass.model_class).to eq(model_class)
         expect(subclass.options).to eq(options)

@@ -63,10 +63,6 @@ gem 'mobility', '~> 1.3.0.rc2'
 Requirements:
 - ActiveRecord >= 6.1
 
-(Support for most backends and features is also supported with
-ActiveRecord/Rails 4.2, but there are some tests still failing. To see exactly
-what might not work, check pending specs in Rails 4.2 builds.)
-
 To translate attributes on a model, extend `Mobility`, then call `translates`
 passing in one or more attributes as well as a hash of options (see below).
 

@@ -2,6 +2,11 @@
 
 ## 1.3
 
+### 1.3.0.rc2
+
+- Pass `coder` as keyword argument to `serialize` (ActiveRecord version > 3.2)
+  ([#617](https://github.com/shioyama/mobility/pull/617))
+
 ### 1.3.0.rc1
 
 This version includes potentially breaking chnages for jsonb and hstore

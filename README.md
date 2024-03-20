@@ -55,7 +55,7 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 1.3.0.rc1'
+gem 'mobility', '~> 1.3.0.rc2'
 ```
 
 ### ActiveRecord (Rails)

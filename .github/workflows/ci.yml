@@ -166,7 +166,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Update packages
         run: sudo apt-get update
       - name: Install Sqlite
@@ -176,7 +176,7 @@ jobs:
         run: sudo apt-get install libpq-dev postgresql-client -y
         if: matrix.database == 'postgres'
       - id: cache-bundler
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: ${{ matrix.ruby }}-${{ matrix.orm.name }}-${{ matrix.orm.version }}-${{ matrix.feature }}-${{ hashFiles('mobility.gemspec') }}-${{ hashFiles('Gemfile') }}

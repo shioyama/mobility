@@ -61,7 +61,7 @@ gem 'mobility', '~> 1.3.0.rc2'
 ### ActiveRecord (Rails)
 
 Requirements:
-- ActiveRecord >= 5.0 (including 6.x)
+- ActiveRecord >= 6.1
 
 (Support for most backends and features is also supported with
 ActiveRecord/Rails 4.2, but there are some tests still failing. To see exactly

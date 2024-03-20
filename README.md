@@ -4,7 +4,6 @@ Mobility
 [![Gem Version](https://badge.fury.io/rb/mobility.svg)][gem]
 [![Build Status](https://github.com/shioyama/mobility/workflows/CI/badge.svg)][actions]
 [![Code Climate](https://api.codeclimate.com/v1/badges/72200f2b00c339ec4537/maintainability.svg)][codeclimate]
-[![Gitter Chat](https://badges.gitter.im/mobility-ruby/mobility.svg)](https://gitter.im/mobility-ruby/mobility)
 
 [gem]: https://rubygems.org/gems/mobility
 [actions]: https://github.com/shioyama/mobility/actions

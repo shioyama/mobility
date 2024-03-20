@@ -216,24 +216,19 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
         expect(instance.title_changed?).to eq(false)
         expect(instance.title_was).to eq("foo")
 
-        if ActiveRecord::VERSION::MAJOR >= 5
-          expect(instance.title_previously_changed?).to eq(true)
-          expect(instance.title_previous_change).to eq([nil, "foo"])
-        end
+        expect(instance.title_previously_changed?).to eq(true)
+        expect(instance.title_previous_change).to eq([nil, "foo"])
 
-        # AR-specific suffix methods, added in AR 5.1
-        if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR > 0
-          expect(instance.saved_change_to_title?).to eq(true)
-          expect(instance.saved_change_to_title).to eq([nil, "foo"])
-          expect(instance.title_before_last_save).to eq(nil)
-          expect(instance.title_in_database).to eq("foo")
+        expect(instance.saved_change_to_title?).to eq(true)
+        expect(instance.saved_change_to_title).to eq([nil, "foo"])
+        expect(instance.title_before_last_save).to eq(nil)
+        expect(instance.title_in_database).to eq("foo")
 
-          # attribute handlers
-          expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
-          expect(instance.saved_change_to_attribute(:title_en)).to eq([nil, 'foo'])
-          expect(instance.attribute_before_last_save(:title_en)).to eq(nil)
-          expect(instance.attribute_in_database(:title_en)).to eq('foo')
-        end
+        # attribute handlers
+        expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
+        expect(instance.saved_change_to_attribute(:title_en)).to eq([nil, 'foo'])
+        expect(instance.attribute_before_last_save(:title_en)).to eq(nil)
+        expect(instance.attribute_in_database(:title_en)).to eq('foo')
       end
 
       backend.write(:en, 'bar')
@@ -249,29 +244,24 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
 
         expect(instance.title_changed?).to eq(false)
 
-        if ActiveRecord::VERSION::MAJOR >= 5
-          expect(instance.title_previously_changed?).to eq(true)
-          expect(instance.title_previous_change).to eq(["foo", "bar"])
-          expect(instance.title_changed?).to eq(false)
+        expect(instance.title_previously_changed?).to eq(true)
+        expect(instance.title_previous_change).to eq(["foo", "bar"])
+        expect(instance.title_changed?).to eq(false)
 
-          # AR-specific suffix methods, added in 5.1
-          if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR > 0
-            expect(instance.saved_change_to_title?).to eq(true)
-            expect(instance.saved_change_to_title).to eq(["foo", "bar"])
-            expect(instance.title_before_last_save).to eq("foo")
-            expect(instance.will_save_change_to_title?).to eq(false)
-            expect(instance.title_change_to_be_saved).to eq(nil)
-            expect(instance.title_in_database).to eq("bar")
+        expect(instance.saved_change_to_title?).to eq(true)
+        expect(instance.saved_change_to_title).to eq(["foo", "bar"])
+        expect(instance.title_before_last_save).to eq("foo")
+        expect(instance.will_save_change_to_title?).to eq(false)
+        expect(instance.title_change_to_be_saved).to eq(nil)
+        expect(instance.title_in_database).to eq("bar")
 
-            # attribute handlers
-            expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
-            expect(instance.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
-            expect(instance.attribute_before_last_save(:title_en)).to eq('foo')
-            expect(instance.will_save_change_to_attribute?(:title_en)).to eq(false)
-            expect(instance.attribute_change_to_be_saved(:title_en)).to eq(nil)
-            expect(instance.attribute_in_database(:title_en)).to eq('bar')
-          end
-        end
+        # attribute handlers
+        expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
+        expect(instance.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
+        expect(instance.attribute_before_last_save(:title_en)).to eq('foo')
+        expect(instance.will_save_change_to_attribute?(:title_en)).to eq(false)
+        expect(instance.attribute_change_to_be_saved(:title_en)).to eq(nil)
+        expect(instance.attribute_in_database(:title_en)).to eq('bar')
       end
 
       aggregate_failures "force change" do
@@ -280,22 +270,19 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
         aggregate_failures "before save" do
           expect(instance.title_changed?).to eq(true)
 
-          # AR-specific suffix methods
-          if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR > 0
-            expect(instance.saved_change_to_title?).to eq(true)
-            expect(instance.saved_change_to_title).to eq(["foo", "bar"])
-            expect(instance.title_before_last_save).to eq("foo")
-            expect(instance.will_save_change_to_title?).to eq(true)
-            expect(instance.title_change_to_be_saved).to eq(["bar", "bar"])
-            expect(instance.title_in_database).to eq("bar")
+          expect(instance.saved_change_to_title?).to eq(true)
+          expect(instance.saved_change_to_title).to eq(["foo", "bar"])
+          expect(instance.title_before_last_save).to eq("foo")
+          expect(instance.will_save_change_to_title?).to eq(true)
+          expect(instance.title_change_to_be_saved).to eq(["bar", "bar"])
+          expect(instance.title_in_database).to eq("bar")
 
-            expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
-            expect(instance.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
-            expect(instance.attribute_before_last_save(:title_en)).to eq('foo')
-            expect(instance.will_save_change_to_attribute?(:title_en)).to eq(true)
-            expect(instance.attribute_change_to_be_saved(:title_en)).to eq(['bar', 'bar'])
-            expect(instance.attribute_in_database(:title_en)).to eq('bar')
-          end
+          expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
+          expect(instance.saved_change_to_attribute(:title_en)).to eq(['foo', 'bar'])
+          expect(instance.attribute_before_last_save(:title_en)).to eq('foo')
+          expect(instance.will_save_change_to_attribute?(:title_en)).to eq(true)
+          expect(instance.attribute_change_to_be_saved(:title_en)).to eq(['bar', 'bar'])
+          expect(instance.attribute_in_database(:title_en)).to eq('bar')
         end
 
         instance.save!
@@ -303,22 +290,19 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
         aggregate_failures "after save" do
           expect(instance.title_changed?).to eq(false)
 
-          # AR-specific suffix methods, added in 5.1
-          if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR > 0
-            expect(instance.saved_change_to_title?).to eq(true)
-            expect(instance.saved_change_to_title).to eq(["bar", "bar"])
-            expect(instance.title_before_last_save).to eq("bar")
-            expect(instance.will_save_change_to_title?).to eq(false)
-            expect(instance.title_change_to_be_saved).to eq(nil)
-            expect(instance.title_in_database).to eq("bar")
+          expect(instance.saved_change_to_title?).to eq(true)
+          expect(instance.saved_change_to_title).to eq(["bar", "bar"])
+          expect(instance.title_before_last_save).to eq("bar")
+          expect(instance.will_save_change_to_title?).to eq(false)
+          expect(instance.title_change_to_be_saved).to eq(nil)
+          expect(instance.title_in_database).to eq("bar")
 
-            expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
-            expect(instance.saved_change_to_attribute(:title_en)).to eq(['bar', 'bar'])
-            expect(instance.attribute_before_last_save(:title_en)).to eq('bar')
-            expect(instance.will_save_change_to_attribute?(:title_en)).to eq(false)
-            expect(instance.attribute_change_to_be_saved(:title_en)).to eq(nil)
-            expect(instance.attribute_in_database(:title_en)).to eq('bar')
-          end
+          expect(instance.saved_change_to_attribute?(:title_en)).to eq(true)
+          expect(instance.saved_change_to_attribute(:title_en)).to eq(['bar', 'bar'])
+          expect(instance.attribute_before_last_save(:title_en)).to eq('bar')
+          expect(instance.will_save_change_to_attribute?(:title_en)).to eq(false)
+          expect(instance.attribute_change_to_be_saved(:title_en)).to eq(nil)
+          expect(instance.attribute_in_database(:title_en)).to eq('bar')
         end
       end
     end

@@ -48,7 +48,7 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
     plugins :active_record, :reader, :writer, :query
     before { translates JsonPost, :title, :content, backend: :json, **column_options }
 
-    include_querying_examples 'JsonPost' unless ActiveRecord::VERSION::MAJOR < 5
+    include_querying_examples 'JsonPost'
     include_validation_examples 'JsonPost'
   end
 

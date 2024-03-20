@@ -10,7 +10,7 @@ group :development, :test do
   when 'active_record'
     orm_version ||= '7.0'
     case orm_version
-    when '4.2', '5.0', '5.1', '5.2', '6.0', '6.1', '7.0'
+    when '6.1', '7.0', '7.1'
       gem 'activerecord', "~> #{orm_version}.0"
     when 'edge'
       git 'https://github.com/rails/rails.git', branch: 'main' do

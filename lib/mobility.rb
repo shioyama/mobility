@@ -90,7 +90,7 @@ module Mobility
   CALL_COMPILABLE_REGEXP = /\A[a-zA-Z_]\w*[!?]?\z/
   private_constant :CALL_COMPILABLE_REGEXP
 
-  require "rails/generators/mobility/generators" if defined?(Rails)
+  require "rails/generators/mobility/generators" if defined?(Rails) && defined?(ActiveRecord)
 
   class << self
     def extended(model_class)

@@ -62,7 +62,6 @@ shared_examples_for "AR Model with serialized translations" do |model_class_name
       backend.write(:en, "")
       instance.save
 
-      # instance.reload if ActiveRecord::VERSION::MAJOR < 5 # don't ask me why
       # Note: Sequel backend and Rails < 5.0 return a blank string here.
       expect(backend.read(:en)).to eq("")
 

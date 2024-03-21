@@ -34,11 +34,7 @@ describe Mobility::Plugins::ActiveRecord::Cache, orm: :active_record, type: :plu
     model_class.include translations
 
     instance = model_class.create
-    if ::ActiveRecord::VERSION::MAJOR == 4
-      expect(instance.mobility_backends[:title]).to receive(:clear_cache).at_least(1).time
-    else
-      expect(instance.mobility_backends[:title]).to receive(:clear_cache).once
-    end
+    expect(instance.mobility_backends[:title]).to receive(:clear_cache).once
     instance.reload
   end
 end

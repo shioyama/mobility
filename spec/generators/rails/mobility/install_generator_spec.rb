@@ -1,6 +1,6 @@
 require "spec_helper"
 
-return unless defined?(Rails)
+return unless defined?(Rails) && defined?(ActiveRecord)
 
 require "rails/generators/mobility/install_generator"
 
@@ -42,11 +42,7 @@ describe Mobility::InstallGenerator, type: :generator do
         directory "db" do
           directory "migrate" do
             migration "create_text_translations" do
-              if ActiveRecord::VERSION::MAJOR < 5
-                contains "class CreateTextTranslations < ActiveRecord::Migration"
-              else
-                contains "class CreateTextTranslations < ActiveRecord::Migration[#{version_string_}]"
-              end
+              contains "class CreateTextTranslations < ActiveRecord::Migration[#{version_string_}]"
               contains "def change"
               contains "create_table :mobility_text_translations"
               contains "t.text :value"
@@ -67,11 +63,7 @@ describe Mobility::InstallGenerator, type: :generator do
         directory "db" do
           directory "migrate" do
             migration "create_string_translations" do
-              if ActiveRecord::VERSION::MAJOR < 5
-                contains "class CreateStringTranslations < ActiveRecord::Migration"
-              else
-                contains "class CreateStringTranslations < ActiveRecord::Migration[#{version_string_}]"
-              end
+              contains "class CreateStringTranslations < ActiveRecord::Migration[#{version_string_}]"
               contains "def change"
               contains "create_table :mobility_string_translations"
               contains "t.string :value"

@@ -2,10 +2,21 @@
 
 ## 1.3
 
-### (unreleased)
+### Unreleased
 
+- Don't try to load generators if Rails is loaded but AR is not
+  ([#627](https://github.com/shioyama/mobility/pull/627)), thanks
+  [flop](https://github.com/flop)!
+- Allow compound foreign keys
+  ([#632](https://github.com/shioyama/mobility/pull/632)), thanks
+  [mival](https://github.com/mival)!
 - Allow `I18n.available_locales` to contain Strings
-  ([#612](https://github.com/shioyama/mobility/pull/612))
+  ([#612](https://github.com/shioyama/mobility/pull/612))    
+
+### 1.3.0.rc2
+
+- Pass `coder` as keyword argument to `serialize` (ActiveRecord version > 7.1)
+  ([#617](https://github.com/shioyama/mobility/pull/617))
 
 ### 1.3.0.rc1
 

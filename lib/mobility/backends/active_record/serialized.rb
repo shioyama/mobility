@@ -51,7 +51,13 @@ Implements {Mobility::Backends::Serialized} backend for ActiveRecord models.
 
       setup do |attributes, options|
         coder = { yaml: YAMLCoder, json: JSONCoder }[options[:format]]
-        attributes.each { |attribute| serialize (options[:column_affix] % attribute), coder }
+        attributes.each do |attribute|
+          if (::ActiveRecord::VERSION::STRING >= "7.1")
+            serialize (options[:column_affix] % attribute), coder: coder
+          else
+            serialize (options[:column_affix] % attribute), coder
+          end
+        end
       end
 
       # @!group Cache Methods

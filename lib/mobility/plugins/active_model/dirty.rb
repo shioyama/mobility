@@ -142,7 +142,8 @@ the ActiveRecord dirty plugin for more information.
                     mutations_from_mobility.attribute_previously_changed?(attr_name))
                   mutations_from_mobility.send(#{method_name.inspect}, attr_name, *rest#{kwargs})
                 else
-                  super
+                  options = rest.first || {}
+                  super(attr_name, **options)
                 end
               end
               EOM

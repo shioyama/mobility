@@ -240,10 +240,14 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record, type: :pl
         expect(instance.attribute_changed?(:title_en)).to eq(false)
 
         expect(instance.title_previously_changed?).to eq(true)
+        expect(instance.title_previously_changed?(from: 'foo', to: 'bar')).to eq(true)
+        expect(instance.title_previously_changed?(from: 'foo', to: 'baz')).to eq(false)
         expect(instance.title_previous_change).to eq(["foo", "bar"])
         expect(instance.title_changed?).to eq(false)
 
         expect(instance.attribute_previously_changed?(:title_en)).to eq(true)
+        expect(instance.attribute_previously_changed?(:title_en, from: 'foo', to: 'bar')).to eq(true)
+        expect(instance.attribute_previously_changed?(:title_en, from: 'foo', to: 'baz')).to eq(false)
         expect(instance.attribute_changed?(:title_en)).to eq(false)
 
         expect(instance.title_previously_was).to eq('foo')

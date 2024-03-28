@@ -10,6 +10,8 @@
 - Allow compound foreign keys
   ([#632](https://github.com/shioyama/mobility/pull/632)), thanks
   [mival](https://github.com/mival)!
+- Allow `I18n.available_locales` to contain Strings
+  ([#612](https://github.com/shioyama/mobility/pull/612))    
 
 ### 1.3.0.rc2
 

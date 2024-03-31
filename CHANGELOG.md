@@ -2,7 +2,7 @@
 
 ## 1.3
 
-### Unreleased
+### 1.3.0.rc3
 
 - Don't try to load generators if Rails is loaded but AR is not
   ([#627](https://github.com/shioyama/mobility/pull/627)), thanks

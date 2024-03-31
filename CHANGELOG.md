@@ -10,6 +10,10 @@
 - Allow compound foreign keys
   ([#632](https://github.com/shioyama/mobility/pull/632)), thanks
   [mival](https://github.com/mival)!
+- Fix active model `*_previously_changed?` and active record
+  `will_save_change_to_*?` and `saved_change_to_*?` dirty methods to accept
+  kwargs ([#639](https://github.com/shioyama/mobility/pull/639)) thanks
+  [doits](https://github.com/doits)!
 
 ### 1.3.0.rc2
 

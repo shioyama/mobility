@@ -121,9 +121,9 @@ the current locale was +nil+.
           backend_class.include(BackendInstanceMethods)
 
           fallbacks =
-            if options[:fallbacks].is_a?(Hash)
-              generate_fallbacks(options[:fallbacks])
-            elsif options[:fallbacks] == true
+            if @fallbacks.is_a?(Hash)
+              generate_fallbacks(@fallbacks)
+            elsif @fallbacks == true
               generate_fallbacks({})
             else
               ::Hash.new { [] }
@@ -136,9 +136,24 @@ the current locale was +nil+.
 
       private
 
+      def initialize_options(original_options)
+        super
+
+        case options[:fallbacks]
+        when Array
+          @fallbacks, @fallbacks_options = options[:fallbacks]
+        else
+          @fallbacks = options[:fallbacks]
+        end
+      end
+
       def generate_fallbacks(fallbacks)
         fallbacks_class = I18n.respond_to?(:fallbacks) ? I18nFallbacks : I18n::Locale::Fallbacks
-        fallbacks_class.new(fallbacks)
+        fallbacks_instance = fallbacks_class.new(fallbacks)
+        if @fallbacks_options[:preload_fallbacks]
+          fallbacks.each_key { |locale| fallbacks_instance[locale] }
+        end
+        fallbacks_instance
       end
 
       class I18nFallbacks < ::I18n::Locale::Fallbacks
@@ -159,6 +174,10 @@ the current locale was +nil+.
 
           super(locale, **kwargs)
         end
+      end
+
+      def self.configure_default(defaults, key, fallbacks = nil, fallbacks_options = {})
+        defaults[key] = [fallbacks, fallbacks_options]
       end
     end
 

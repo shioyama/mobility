@@ -35,7 +35,6 @@ Other backends are not supported, for obvious reasons:
 
 =end
   class TranslationsGenerator < ::Rails::Generators::NamedBase
-    SUPPORTED_BACKENDS = %w[column table].freeze
     BACKEND_OPTIONS = { type: :string, desc: "Backend to use for translations (defaults to Mobility.default_backend)" }.freeze
     argument :attributes, type: :array, default: [], banner: "field[:type][:index] field[:type][:index]"
 
@@ -50,17 +49,16 @@ Other backends are not supported, for obvious reasons:
 
     def self.prepare_for_invocation(name, value)
       if name == :backend
-        if SUPPORTED_BACKENDS.include?(value)
+        begin
           require_relative "./backend_generators/#{value}_backend"
           Mobility::BackendGenerators.const_get("#{value}_backend".camelcase.freeze)
-        else
-          begin
-            require "mobility/backends/#{value}"
-            raise Thor::Error, "The #{value} backend does not have a translations generator."
-          rescue LoadError => e
-            raise unless e.message =~ /#{value}/
-            raise Thor::Error, "#{value} is not a Mobility backend."
-          end
+        rescue LoadError => e
+          raise unless e.message =~ /#{value}/
+          require "mobility/backends/#{value}"
+          raise Thor::Error, "The #{value} backend does not have a translations generator."
+        rescue LoadError => e
+          raise unless e.message =~ /#{value}/
+          raise Thor::Error, "#{value} is not a Mobility backend."
         end
       else
         super
@@ -70,7 +68,7 @@ Other backends are not supported, for obvious reasons:
     protected
 
     def say_status(status, message, *args)
-      if status == :invoke && SUPPORTED_BACKENDS.include?(message)
+      if status == :invoke
         super(status, "#{message}_backend", *args)
       else
         super

@@ -136,7 +136,7 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
       m.drop_table :json_container_posts
     end
     include_accessor_examples 'JsonContainerPost'
-    include_querying_examples 'JsonContainerPost' unless ActiveRecord::VERSION::MAJOR < 5
+    include_querying_examples 'JsonContainerPost'
   end
 
   context "with a non-json/jsonb column" do

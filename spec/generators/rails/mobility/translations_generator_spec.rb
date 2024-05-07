@@ -1,6 +1,6 @@
 require "spec_helper"
 
-return unless defined?(Rails)
+return unless defined?(Rails) && defined?(ActiveRecord)
 
 require "rails/generators/mobility/translations_generator"
 
@@ -67,11 +67,7 @@ describe Mobility::TranslationsGenerator, type: :generator do
           directory "db" do
             directory "migrate" do
               migration "create_post_title_and_content_translations_for_mobility_table_backend" do
-                if ActiveRecord::VERSION::MAJOR < 5
-                  contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration"
-                else
-                  contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
-                end
+                contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
                 contains "def change"
                 contains "create_table :post_translations"
                 contains "t.string :title"
@@ -110,11 +106,7 @@ describe Mobility::TranslationsGenerator, type: :generator do
           directory "db" do
             directory "migrate" do
               migration "create_post_title_and_content_translations_for_mobility_table_backend" do
-                if ActiveRecord::VERSION::MAJOR < 5
-                  contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration"
-                else
-                  contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
-                end
+                contains "class CreatePostTitleAndContentTranslationsForMobilityTableBackend < ActiveRecord::Migration[#{version_string_}]"
                 contains "add_column :post_translations, :title, :string"
                 contains "add_index :post_translations, [:title, :locale], name: :index_post_translations_on_title_and_locale"
                 contains "add_column :post_translations, :content, :text"
@@ -158,11 +150,7 @@ describe Mobility::TranslationsGenerator, type: :generator do
           directory "db" do
             directory "migrate" do
               migration "create_foo_title_and_content_translations_for_mobility_column_backend" do
-                if ActiveRecord::VERSION::MAJOR < 5
-                  contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration"
-                else
-                  contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration[#{version_string_}]"
-                end
+                contains "class CreateFooTitleAndContentTranslationsForMobilityColumnBackend < ActiveRecord::Migration[#{version_string_}]"
                 contains "add_column :foos, :title_en, :string"
                 contains "add_index  :foos, :title_en, name: :index_foos_on_title_en"
                 contains "add_column :foos, :title_ja, :string"

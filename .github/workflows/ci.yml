@@ -28,27 +28,17 @@ jobs:
           - '3.2'
           - '3.1'
           - '3.0'
-          - '2.7'
-          - '2.6'
         database:
           - 'sqlite3'
           - 'mysql'
           - 'postgres'
         orm:
           - name: 'active_record'
-            version: '4.2'
-          - name: 'active_record'
-            version: '5.0'
-          - name: 'active_record'
-            version: '5.1'
-          - name: 'active_record'
-            version: '5.2'
-          - name: 'active_record'
-            version: '6.0'
-          - name: 'active_record'
             version: '6.1'
           - name: 'active_record'
             version: '7.0'
+          - name: 'active_record'
+            version: '7.1'
           - name: 'sequel'
             version: '5'
         experimental: [false]
@@ -66,14 +56,6 @@ jobs:
             feature: 'unit'
             orm:
             experimental: false
-          - ruby: '2.7'
-            feature: 'unit'
-            orm:
-            experimental: false
-          - ruby: '2.6'
-            feature: 'unit'
-            orm:
-            experimental: false
           - ruby: '3.2'
             feature: 'rails'
             orm:
@@ -155,126 +137,6 @@ jobs:
           - ruby: '3.0'
             feature: 'i18n_fallbacks'
             experimental: false
-          - ruby: '3.0'
-            database: 'sqlite3'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '3.0'
-            database: 'mysql'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '3.0'
-            database: 'postgres'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '2.7'
-            feature: 'rails'
-            orm:
-              name: 'active_record'
-              version: '7.0'
-            database: 'sqlite3'
-            experimental: false
-          - ruby: '2.7'
-            feature: 'performance'
-            experimental: false
-          - ruby: '2.7'
-            feature: 'i18n_fallbacks'
-            experimental: false
-          - ruby: '2.7'
-            database: 'sqlite3'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '2.7'
-            database: 'mysql'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '2.7'
-            database: 'postgres'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-        exclude:
-          - ruby: '2.6'
-            orm:
-              name: 'active_record'
-              version: '7.0'
-          - ruby: '2.7'
-            orm:
-              name: 'active_record'
-              version: '4.2'
-          - ruby: '3.0'
-            orm:
-              name: 'active_record'
-              version: '4.2'
-          - ruby: '3.0'
-            orm:
-              name: 'active_record'
-              version: '5.0'
-          - ruby: '3.0'
-            orm:
-              name: 'active_record'
-              version: '5.1'
-          - ruby: '3.0'
-            orm:
-              name: 'active_record'
-              version: '5.2'
-          - ruby: '3.1'
-            orm:
-              name: 'active_record'
-              version: '4.2'
-          - ruby: '3.1'
-            orm:
-              name: 'active_record'
-              version: '5.0'
-          - ruby: '3.1'
-            orm:
-              name: 'active_record'
-              version: '5.1'
-          - ruby: '3.1'
-            orm:
-              name: 'active_record'
-              version: '5.2'
-          - ruby: '3.1'
-            orm:
-              name: 'active_record'
-              version: '6.0'
-          - ruby: '3.2'
-            orm:
-              name: 'active_record'
-              version: '4.2'
-          - ruby: '3.2'
-            orm:
-              name: 'active_record'
-              version: '5.0'
-          - ruby: '3.2'
-            orm:
-              name: 'active_record'
-              version: '5.1'
-          - ruby: '3.2'
-            orm:
-              name: 'active_record'
-              version: '5.2'
-          - ruby: '3.2'
-            orm:
-              name: 'active_record'
-              version: '6.0'
 
     env:
       DB: ${{ matrix.database }}
@@ -304,7 +166,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Update packages
         run: sudo apt-get update
       - name: Install Sqlite
@@ -314,7 +176,7 @@ jobs:
         run: sudo apt-get install libpq-dev postgresql-client -y
         if: matrix.database == 'postgres'
       - id: cache-bundler
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: ${{ matrix.ruby }}-${{ matrix.orm.name }}-${{ matrix.orm.version }}-${{ matrix.feature }}-${{ hashFiles('mobility.gemspec') }}-${{ hashFiles('Gemfile') }}

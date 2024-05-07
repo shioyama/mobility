@@ -119,6 +119,14 @@ the ActiveRecord dirty plugin for more information.
         class HandlerMethodsBuilder < Module
           attr_reader :klass
 
+          PATTERNS_WITH_KWARGS =
+            %w[
+              %s_changed?
+              %s_previously_changed?
+              will_save_change_to_%s?
+              saved_change_to_%s?
+            ].freeze
+
           # @param [Class] klass Dirty class to mimic
           def initialize(klass)
             @klass = klass
@@ -135,7 +143,7 @@ the ActiveRecord dirty plugin for more information.
             public_patterns.each do |pattern|
               method_name = pattern % 'attribute'
 
-              kwargs = pattern == '%s_changed?' ? ', **kwargs' : ''
+              kwargs = PATTERNS_WITH_KWARGS.include?(pattern) ? ', **kwargs' : ''
               module_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{method_name}(attr_name, *rest#{kwargs})
                 if (mutations_from_mobility.attribute_changed?(attr_name) ||
@@ -298,8 +306,10 @@ the ActiveRecord dirty plugin for more information.
               (OPTION_NOT_GIVEN == to || fetch_value(attr_name) == to)
           end
 
-          def attribute_previously_changed?(attr_name)
-            previous_changes.include?(attr_name)
+          def attribute_previously_changed?(attr_name, from: OPTION_NOT_GIVEN, to: OPTION_NOT_GIVEN)
+            previous_changes.include?(attr_name) &&
+              (OPTION_NOT_GIVEN == from || attribute_previous_change(attr_name).first == from) &&
+              (OPTION_NOT_GIVEN == to || attribute_previous_change(attr_name).second == to)
           end
 
           def attribute_was(attr_name)

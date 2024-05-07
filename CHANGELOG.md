@@ -2,6 +2,29 @@
 
 ## 1.3
 
+### (unreleased)
+
+- Allow `I18n.available_locales` to contain Strings
+  ([#612](https://github.com/shioyama/mobility/pull/612))
+
+### 1.3.0.rc3
+
+- Don't try to load generators if Rails is loaded but AR is not
+  ([#627](https://github.com/shioyama/mobility/pull/627)), thanks
+  [flop](https://github.com/flop)!
+- Allow compound foreign keys
+  ([#632](https://github.com/shioyama/mobility/pull/632)), thanks
+  [mival](https://github.com/mival)!
+- Fix active model `*_previously_changed?` and active record
+  `will_save_change_to_*?` and `saved_change_to_*?` dirty methods to accept
+  kwargs ([#639](https://github.com/shioyama/mobility/pull/639)) thanks
+  [doits](https://github.com/doits)!
+
+### 1.3.0.rc2
+
+- Pass `coder` as keyword argument to `serialize` (ActiveRecord version > 7.1)
+  ([#617](https://github.com/shioyama/mobility/pull/617))
+
 ### 1.3.0.rc1
 
 This version includes potentially breaking chnages for jsonb and hstore

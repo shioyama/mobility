@@ -4,7 +4,6 @@ Mobility
 [![Gem Version](https://badge.fury.io/rb/mobility.svg)][gem]
 [![Build Status](https://github.com/shioyama/mobility/workflows/CI/badge.svg)][actions]
 [![Code Climate](https://api.codeclimate.com/v1/badges/72200f2b00c339ec4537/maintainability.svg)][codeclimate]
-[![Gitter Chat](https://badges.gitter.im/mobility-ruby/mobility.svg)](https://gitter.im/mobility-ruby/mobility)
 
 [gem]: https://rubygems.org/gems/mobility
 [actions]: https://github.com/shioyama/mobility/actions
@@ -55,17 +54,13 @@ Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'mobility', '~> 1.3.0.rc1'
+gem 'mobility', '~> 1.3.0.rc3'
 ```
 
 ### ActiveRecord (Rails)
 
 Requirements:
-- ActiveRecord >= 5.0 (including 6.x)
-
-(Support for most backends and features is also supported with
-ActiveRecord/Rails 4.2, but there are some tests still failing. To see exactly
-what might not work, check pending specs in Rails 4.2 builds.)
+- ActiveRecord >= 6.1
 
 To translate attributes on a model, extend `Mobility`, then call `translates`
 passing in one or more attributes as well as a hash of options (see below).
@@ -1027,6 +1022,7 @@ Integrations
 * [mobility-actiontext](https://github.com/sedubois/mobility-actiontext): Translate
   Rails [Action Text](https://guides.rubyonrails.org/action_text_overview.html) rich text
   with Mobility.
+* [mobility_typed](https://github.com/GeorgeGorbanev/mobility_typed): Add type checking to Rails models accessors.
 
 Tutorials
 ---------

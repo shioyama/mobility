@@ -32,38 +32,50 @@ jobs:
             version: '7.0'
           - name: 'active_record'
             version: '7.1'
+          - name: 'active_record'
+            version: '7.2'
           - name: 'sequel'
             version: '5'
         experimental: [false]
         feature: ['unit']
+        exclude:
+          - ruby: '3.0'
+            database: 'sqlite3'
+            orm:
+              name: 'active_record'
+              version: '7.2'
+          - ruby: '3.0'
+            database: 'mysql'
+            orm:
+              name: 'active_record'
+              version: '7.2'
+          - ruby: '3.0'
+            database: 'postgres'
+            orm:
+              name: 'active_record'
+              version: '7.2'
+
         include:
           # rails/sqlite3/active_record-7.2
           - ruby: '3.3'
             feature: 'rails'
             orm:
               name: 'active_record'
-              version: '7.0'
+              version: '7.2'
             database: 'sqlite3'
             experimental: false
           - ruby: '3.2'
             feature: 'rails'
             orm:
               name: 'active_record'
-              version: '7.0'
+              version: '7.2'
             database: 'sqlite3'
             experimental: false
           - ruby: '3.1'
             feature: 'rails'
             orm:
               name: 'active_record'
-              version: '7.0'
-            database: 'sqlite3'
-            experimental: false
-          - ruby: '3.0'
-            feature: 'rails'
-            orm:
-              name: 'active_record'
-              version: '7.0'
+              version: '7.2'
             database: 'sqlite3'
             experimental: false
 

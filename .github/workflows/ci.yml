@@ -34,6 +34,8 @@ jobs:
             version: '7.1'
           - name: 'active_record'
             version: '7.2'
+          - name: 'active_record'
+            version: '8.0'
           - name: 'sequel'
             version: '5'
         experimental: [false]
@@ -54,6 +56,38 @@ jobs:
             orm:
               name: 'active_record'
               version: '7.2'
+
+          - ruby: '3.0'
+            database: 'sqlite3'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+          - ruby: '3.0'
+            database: 'mysql'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+          - ruby: '3.0'
+            database: 'postgres'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+
+          - ruby: '3.1'
+            database: 'sqlite3'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+          - ruby: '3.1'
+            database: 'mysql'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+          - ruby: '3.1'
+            database: 'postgres'
+            orm:
+              name: 'active_record'
+              version: '8.0'
 
         include:
           # rails/sqlite3/active_record-7.2

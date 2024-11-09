@@ -3,18 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - master
-      - 1-2
-      - 1-1
-      - 1-0
-      - 0-8
+      - '**'
   pull_request:
     branches:
-      - master
-      - 1-2
-      - 1-1
-      - 1-0
-      - 0-8
+      - '**'
 
 jobs:
   test:
@@ -44,74 +36,32 @@ jobs:
         experimental: [false]
         feature: ['unit']
         include:
+          # rails/sqlite3/active_record-7.2
           - ruby: '3.2'
-            feature: 'unit'
+            feature: 'rails'
             orm:
+              name: 'active_record'
+              version: '7.0'
+            database: 'sqlite3'
             experimental: false
           - ruby: '3.1'
-            feature: 'unit'
+            feature: 'rails'
             orm:
+              name: 'active_record'
+              version: '7.0'
+            database: 'sqlite3'
             experimental: false
           - ruby: '3.0'
-            feature: 'unit'
-            orm:
-            experimental: false
-          - ruby: '3.2'
             feature: 'rails'
             orm:
               name: 'active_record'
               version: '7.0'
             database: 'sqlite3'
             experimental: false
-          - ruby: '3.2'
-            feature: 'performance'
-            experimental: false
-          - ruby: '3.2'
-            feature: 'i18n_fallbacks'
-            experimental: false
-          - ruby: '3.2'
-            database: 'sqlite3'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '3.2'
-            database: 'mysql'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
+
+          # unit/postgres/edge
           - ruby: '3.2'
             database: 'postgres'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '3.1'
-            feature: 'rails'
-            orm:
-              name: 'active_record'
-              version: '7.0'
-            database: 'sqlite3'
-            experimental: false
-          - ruby: '3.1'
-            feature: 'performance'
-            experimental: false
-          - ruby: '3.1'
-            feature: 'i18n_fallbacks'
-            experimental: false
-          - ruby: '3.1'
-            database: 'sqlite3'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '3.1'
-            database: 'mysql'
             feature: 'unit'
             orm:
               name: 'active_record'
@@ -125,17 +75,93 @@ jobs:
               version: 'edge'
             experimental: true
           - ruby: '3.0'
-            feature: 'rails'
+            database: 'postgres'
+            feature: 'unit'
             orm:
               name: 'active_record'
-              version: '7.0'
+              version: 'edge'
+            experimental: true
+
+          # unit/mysql/edge
+          - ruby: '3.2'
+            database: 'mysql'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.1'
+            database: 'mysql'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.0'
+            database: 'mysql'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+
+          # unit/sqlite3/edge
+          - ruby: '3.2'
             database: 'sqlite3'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.1'
+            database: 'sqlite3'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+          - ruby: '3.0'
+            database: 'sqlite3'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
+
+          # i18n fallbacks
+          - ruby: '3.2'
+            feature: 'i18n_fallbacks'
+            experimental: false
+          - ruby: '3.1'
+            feature: 'i18n_fallbacks'
+            experimental: false
+          - ruby: '3.0'
+            feature: 'i18n_fallbacks'
+            experimental: false
+
+          # Performance tests
+          - ruby: '3.2'
+            feature: 'performance'
+            experimental: false
+          - ruby: '3.1'
+            feature: 'performance'
             experimental: false
           - ruby: '3.0'
             feature: 'performance'
             experimental: false
+
+          # Unit tests
+          - ruby: '3.2'
+            feature: 'unit'
+            orm:
+            experimental: false
+          - ruby: '3.1'
+            feature: 'unit'
+            orm:
+            experimental: false
           - ruby: '3.0'
-            feature: 'i18n_fallbacks'
+            feature: 'unit'
+            orm:
             experimental: false
 
     env:

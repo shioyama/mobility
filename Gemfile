@@ -10,7 +10,7 @@ group :development, :test do
   when 'active_record'
     orm_version ||= '7.0'
     case orm_version
-    when '6.1', '7.0', '7.1', '7.2'
+    when '6.1', '7.0', '7.1', '7.2', '8.0'
       gem 'activerecord', "~> #{orm_version}.0"
     when 'edge'
       git 'https://github.com/rails/rails.git', branch: 'main' do
@@ -47,6 +47,8 @@ group :development, :test do
     when 'sqlite3'
       if orm == 'active_record' && orm_version < '5.2'
         gem 'sqlite3', '~> 1.3.13'
+      elsif orm == 'active_record' && orm_version >= '8.0'
+        gem 'sqlite3', '>= 2.1.0'
       else
         gem 'sqlite3', '~> 1.4.1'
       end

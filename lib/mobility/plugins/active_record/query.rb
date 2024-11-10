@@ -137,19 +137,19 @@ enabled for any one attribute on the model.
           end
 
           def order(opts, *rest)
-            return super unless @klass.respond_to?(:mobility_attribute?)
+            return super unless klass.respond_to?(:mobility_attribute?)
 
             case opts
             when Symbol, String
-              @klass.mobility_attribute?(opts) ? order({ opts => :asc }, *rest) : super
+              klass.mobility_attribute?(opts) ? order({ opts => :asc }, *rest) : super
             when ::Hash
-              i18n_keys, keys = opts.keys.partition(&@klass.method(:mobility_attribute?))
+              i18n_keys, keys = opts.keys.partition(&klass.method(:mobility_attribute?))
               return super if i18n_keys.empty?
 
               base = keys.empty? ? self : super(opts.slice(keys))
 
               i18n_keys.inject(base) do |query, key|
-                backend_class = @klass.mobility_backend_class(key)
+                backend_class = klass.mobility_backend_class(key)
                 dir, node = opts[key], backend_node(key)
                 backend_class.apply_scope(query, node).order(node.send(dir.downcase))
               end
@@ -163,20 +163,20 @@ enabled for any one attribute on the model.
               define_method method_name do |*attrs, &block|
                 return super(*attrs, &block) if (method_name == 'select' && block.present?)
 
-                return super(*attrs, &block) unless @klass.respond_to?(:mobility_attribute?)
+                return super(*attrs, &block) unless klass.respond_to?(:mobility_attribute?)
 
-                return super(*attrs, &block) unless attrs.any?(&@klass.method(:mobility_attribute?))
+                return super(*attrs, &block) unless attrs.any?(&klass.method(:mobility_attribute?))
 
                 keys = attrs.dup
 
                 base = keys.each_with_index.inject(self) do |query, (key, index)|
-                  next query unless @klass.mobility_attribute?(key)
+                  next query unless klass.mobility_attribute?(key)
                   keys[index] = backend_node(key)
                   if method_name == "select" && query.order_values.any?
                     keys[index] = keys[index]
                       .as(::Mobility::Plugins::ActiveRecord::Query.attribute_alias(key.to_s))
                   end
-                  @klass.mobility_backend_class(key).apply_scope(query, backend_node(key))
+                  klass.mobility_backend_class(key).apply_scope(query, backend_node(key))
                 end
 
                 base.public_send(method_name, *keys, &block)
@@ -189,7 +189,7 @@ enabled for any one attribute on the model.
           # @param [Symbol] locale Locale
           # @return [Arel::Node] Arel node for this attribute in given locale
           def backend_node(name, locale = Mobility.locale)
-            @klass.mobility_backend_class(name)[name, locale]
+            klass.mobility_backend_class(name)[name, locale]
           end
 
           class WhereChain < ::ActiveRecord::QueryMethods::WhereChain

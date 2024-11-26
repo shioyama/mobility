@@ -50,7 +50,7 @@ group :development, :test do
       elsif orm == 'active_record' && orm_version >= '8.0'
         gem 'sqlite3', '>= 2.1.0'
       else
-        gem 'sqlite3', '~> 1.4.1'
+        gem 'sqlite3', '~> 1.5.0'
       end
     when 'mysql'
       gem 'mysql2'

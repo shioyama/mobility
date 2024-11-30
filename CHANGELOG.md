@@ -2,6 +2,12 @@
 
 ## 1.3
 
+### Unreleased
+
+- Use classify to generate table name
+  ([#634](https://github.com/shioyama/mobility/pull/634)), thanks
+  [divanburger](https://github.com/divanburger)!
+
 ### 1.3.0
 
 - Only support ActiveRecord >= 7.0

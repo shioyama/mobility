@@ -270,6 +270,12 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
       backend_class.configure(options.merge!(foreign_key: [:article_id, :article_type]))
       expect(options[:foreign_key]).to eq([:article_id, :article_type])
     end
+
+    it "strips out leading schema name from foreign key" do
+      Article.table_name = "my_schema.articles"
+      backend_class.configure(options)
+      expect(options[:foreign_key]).to eq(:article_id)
+    end
   end
 
   describe "with query plugin" do

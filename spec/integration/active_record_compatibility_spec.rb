@@ -50,7 +50,7 @@ describe "ActiveRecord compatibility", orm: :active_record do
       expect(Post.first.title).to eq("association changed value")
     end
 
-    it "resets cache when model is reloaded", active_record_geq: '5.0' do
+    it "resets cache when model is reloaded" do
       expect(post.mobility_backends[:title]).to receive(:clear_cache).once
       post.reload
     end

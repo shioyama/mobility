@@ -287,7 +287,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
     end
   end
 
-  describe ".pluck", active_record_geq: '5.0' do
+  describe ".pluck" do
     before do
       [["foo0", "bar3", true],
        ["foo2", "bar0", false],
@@ -341,7 +341,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
     end
   end
 
-  describe ".select/.group", active_record_geq: '5.0' do
+  describe ".select/.group" do
     before do
       [["foo", "baz", true],
        ["foo", "baz", false],
@@ -555,7 +555,7 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
           expect(query { __send__(a1).matches("%foo") }).to match_array([i[0], *i[5..6], barfoo])
         end
 
-        if ENV['DB'] == 'postgres' && ::ActiveRecord::VERSION::STRING >= '5.0'
+        if ENV['DB'] == 'postgres'
           it "works with case_sensitive option" do
             foobar = model_class.create(a1 => "foObar")
             barfoo = model_class.create(a1 => "barfOo")

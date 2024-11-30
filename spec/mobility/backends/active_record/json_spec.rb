@@ -35,7 +35,7 @@ describe "Mobility::Backends::ActiveRecord::Json", orm: :active_record, db: :pos
     end
 
     describe "non-text values" do
-      it "stores non-string types as-is when saving", active_record_geq: '5.0' do
+      it "stores non-string types as-is when saving" do
         backend = post.mobility_backends[:title]
         backend.write(:en, { foo: :bar } )
         post.save

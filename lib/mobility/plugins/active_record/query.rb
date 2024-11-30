@@ -158,29 +158,27 @@ enabled for any one attribute on the model.
             end
           end
 
-          if ::ActiveRecord::VERSION::STRING >= '5.0'
-            %w[pluck group select].each do |method_name|
-              define_method method_name do |*attrs, &block|
-                return super(*attrs, &block) if (method_name == 'select' && block.present?)
+          %w[pluck group select].each do |method_name|
+            define_method method_name do |*attrs, &block|
+              return super(*attrs, &block) if (method_name == 'select' && block.present?)
 
-                return super(*attrs, &block) unless klass.respond_to?(:mobility_attribute?)
+              return super(*attrs, &block) unless klass.respond_to?(:mobility_attribute?)
 
-                return super(*attrs, &block) unless attrs.any?(&klass.method(:mobility_attribute?))
+              return super(*attrs, &block) unless attrs.any?(&klass.method(:mobility_attribute?))
 
-                keys = attrs.dup
+              keys = attrs.dup
 
-                base = keys.each_with_index.inject(self) do |query, (key, index)|
-                  next query unless klass.mobility_attribute?(key)
-                  keys[index] = backend_node(key)
-                  if method_name == "select" && query.order_values.any?
-                    keys[index] = keys[index]
-                      .as(::Mobility::Plugins::ActiveRecord::Query.attribute_alias(key.to_s))
-                  end
-                  klass.mobility_backend_class(key).apply_scope(query, backend_node(key))
+              base = keys.each_with_index.inject(self) do |query, (key, index)|
+                next query unless klass.mobility_attribute?(key)
+                keys[index] = backend_node(key)
+                if method_name == "select" && query.order_values.any?
+                  keys[index] = keys[index]
+                    .as(::Mobility::Plugins::ActiveRecord::Query.attribute_alias(key.to_s))
                 end
-
-                base.public_send(method_name, *keys, &block)
+                klass.mobility_backend_class(key).apply_scope(query, backend_node(key))
               end
+
+              base.public_send(method_name, *keys, &block)
             end
           end
 

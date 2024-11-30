@@ -27,7 +27,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record, ty
         include_cache_key_examples 'SerializedPost'
 
         describe "non-text values" do
-          it "converts non-string types to strings when saving", active_record_geq: '5.0' do
+          it "converts non-string types to strings when saving" do
             post = SerializedPost.new
             backend = post.mobility_backends[:title]
             backend.write(:en, { foo: :bar } )

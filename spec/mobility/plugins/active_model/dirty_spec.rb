@@ -263,7 +263,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record, type: :pl
 
     # This is a regression spec to ensure we don't change the scope of
     # ActiveModel handler methods.
-    it 'does not change private status of attribute handler methods', active_record_geq: '5.0' do
+    it 'does not change private status of attribute handler methods' do
       expect(instance.respond_to?(:attribute_change)).to eq(false)
       expect(instance.respond_to?(:attribute_change, true)).to eq(true)
       expect(instance.respond_to?(:attribute_previous_change)).to eq(false)
@@ -284,7 +284,7 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record, type: :pl
       end
     end
 
-    it "returns changes on attribute for current locale", active_record_geq: '5.0' do
+    it "returns changes on attribute for current locale" do
       Mobility.locale = locale = :en
       backend.write(locale, 'foo')
       instance.save

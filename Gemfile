@@ -45,9 +45,7 @@ group :development, :test do
     gem 'pry-byebug'
     case ENV['DB']
     when 'sqlite3'
-      if orm == 'active_record' && orm_version < '5.2'
-        gem 'sqlite3', '~> 1.3.13'
-      elsif orm == 'active_record' && orm_version >= '8.0'
+      if orm == 'active_record' && orm_version >= '8.0'
         gem 'sqlite3', '>= 2.1.0'
       else
         gem 'sqlite3', '~> 1.5.0'
@@ -55,11 +53,7 @@ group :development, :test do
     when 'mysql'
       gem 'mysql2'
     when 'postgres'
-      if orm == 'active_record' && orm_version < '5.0'
-        gem 'pg', '< 1.0'
-      else
-        gem 'pg'
-      end
+      gem 'pg'
     end
   end
 end

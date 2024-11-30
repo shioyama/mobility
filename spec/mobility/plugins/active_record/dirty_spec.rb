@@ -18,10 +18,8 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
     stub_const 'Article', Class.new(ActiveRecord::Base)
     Article.include translations
 
-    # ensure we include these methods as a module rather than override in class
-    changes_applied_method = ::ActiveRecord::VERSION::STRING < '5.1' ? :changes_applied : :changes_internally_applied
     Article.class_eval do
-      define_method changes_applied_method do
+      define_method :changes_internally_applied do
         super()
       end
 
@@ -429,7 +427,7 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
     it_behaves_like "resets on model action", :reload
   end
 
-  describe "#saved_changes", active_record_geq: '5.1' do
+  describe "#saved_changes" do
     it "includes translated and untranslated attributes" do
       instance = model_class.create
 
@@ -448,7 +446,7 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
     end
   end
 
-  describe '#changes_to_save', active_record_geq: '5.1' do
+  describe '#changes_to_save' do
     it "includes translated and untranslated attributes" do
       instance = model_class.new
 
@@ -464,7 +462,7 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
     end
   end
 
-  describe '#has_changes_to_save?', active_record_geq: '6.0' do
+  describe '#has_changes_to_save?' do
     it 'detects changes to translated and untranslated attributes' do
       instance = model_class.new
       backend = backend_for(instance, :title)
@@ -480,7 +478,7 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
     end
   end
 
-  describe '#attributes_in_database', active_record_geq: '6.0' do
+  describe '#attributes_in_database' do
     it 'includes translated and untranslated attributes' do
       instance = model_class.create
       expect(instance.attributes_in_database).to eq({})
@@ -502,7 +500,7 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
     end
   end
 
-  describe '#changed_attribute_names_to_save', active_record_geq: '5.1' do
+  describe '#changed_attribute_names_to_save' do
     it 'includes translated attributes and untranslated attributes' do
       instance = model_class.new
       backend = backend_for(instance, :title)

@@ -4,6 +4,7 @@
 
 ### (unreleased)
 
+- Only support ActiveRecord >= 7.0
 - Allow `I18n.available_locales` to contain Strings
   ([#612](https://github.com/shioyama/mobility/pull/612))
 

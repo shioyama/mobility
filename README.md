@@ -60,7 +60,7 @@ gem 'mobility', '~> 1.3.0.rc3'
 ### ActiveRecord (Rails)
 
 Requirements:
-- ActiveRecord >= 6.1
+- ActiveRecord >= 7.0
 
 To translate attributes on a model, extend `Mobility`, then call `translates`
 passing in one or more attributes as well as a hash of options (see below).

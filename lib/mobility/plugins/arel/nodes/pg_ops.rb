@@ -26,17 +26,6 @@ module Mobility
           end)
         end
 
-        # Needed for AR 4.2, can be removed when support is deprecated
-        if ::ActiveRecord::VERSION::STRING < '5.0'
-          [JsonbDashDoubleArrow, HstoreDashArrow].each do |klass|
-            klass.class_eval do
-              def quoted_node other
-                other && super
-              end
-            end
-          end
-        end
-
         class Jsonb  < JsonbDashDoubleArrow
           def to_dash_arrow
             JsonbDashArrow.new left, right

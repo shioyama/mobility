@@ -54,7 +54,7 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
     end
 
     describe "non-text values" do
-      it "stores non-string types as-is when saving", active_record_geq: '5.0' do
+      it "stores non-string types as-is when saving" do
         backend = post.mobility_backends[:title]
         backend.write(:en, { foo: :bar } )
         post.save
@@ -103,8 +103,5 @@ describe "Mobility::Backends::ActiveRecord::Jsonb", orm: :active_record, db: :po
 
     include_accessor_examples 'JsonbPost'
     include_serialization_examples 'JsonbPost', column_affix: column_affix
-
-    # regression for https://github.com/shioyama/mobility/issues/308
-    include_querying_examples 'JsonbPost' if ActiveRecord::VERSION::STRING == '5.1'
   end
 end

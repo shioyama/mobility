@@ -86,25 +86,6 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
         end
       end
 
-      setup do |_attributes, options|
-        # Fix for duping depth-2 jsonb column in AR < 5.0
-        if ::ActiveRecord::VERSION::STRING < '5.0'
-          column_name = options[:column_name]
-          module_name = "MobilityArContainer#{column_name.to_s.camelcase}"
-          unless const_defined?(module_name)
-            dupable = Module.new do
-              class_eval <<-EOM, __FILE__, __LINE__ + 1
-                def initialize_dup(source)
-                  super
-                  self.#{column_name} = source.#{column_name}.deep_dup
-                end
-              EOM
-            end
-            include const_set(module_name, dupable)
-          end
-        end
-      end
-
       private
 
       def model_translations(locale)

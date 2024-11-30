@@ -79,28 +79,24 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
         )
 
         module InstanceMethods
-          if ::ActiveRecord::VERSION::STRING >= '5.1' # define patterns added in 5.1
-            def saved_changes
-              super.merge(mutations_from_mobility.previous_changes)
-            end
+          def saved_changes
+            super.merge(mutations_from_mobility.previous_changes)
+          end
 
-            def changes_to_save
-              super.merge(mutations_from_mobility.changes)
-            end
+          def changes_to_save
+            super.merge(mutations_from_mobility.changes)
+          end
 
-            def changed_attribute_names_to_save
-              super + mutations_from_mobility.changed
-            end
+          def changed_attribute_names_to_save
+            super + mutations_from_mobility.changed
+          end
 
-            def attributes_in_database
-              super.merge(mutations_from_mobility.changed_attributes)
-            end
+          def attributes_in_database
+            super.merge(mutations_from_mobility.changed_attributes)
+          end
 
-            if ::ActiveRecord::VERSION::STRING >= '6.0'
-              def has_changes_to_save?
-                super || mutations_from_mobility.changed?
-              end
-            end
+          def has_changes_to_save?
+            super || mutations_from_mobility.changed?
           end
 
           def reload(*)

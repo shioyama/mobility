@@ -2,11 +2,17 @@
 
 ## 1.3
 
-### (unreleased)
+### 1.3.0
 
 - Only support ActiveRecord >= 7.0
 - Allow `I18n.available_locales` to contain Strings
   ([#612](https://github.com/shioyama/mobility/pull/612))
+- Update CI config, add support for Rails 8
+  ([#653](https://github.com/shioyama/mobility/pull/653)), thanks
+  [d-rodriguez](https://github.com/n-rodriguez)!
+- Fix broken count statements in Active Record 8.0
+  ([#655](https://github.com/shioyama/mobility/pull/655)), thanks
+  [jukra](https://github.com/jukra)!
 
 ### 1.3.0.rc3
 

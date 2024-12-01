@@ -2,11 +2,13 @@
 
 ## 1.3
 
-### Unreleased
+### 1.3.1
 
 - Use classify to generate table name
   ([#634](https://github.com/shioyama/mobility/pull/634)), thanks
   [divanburger](https://github.com/divanburger)!
+- Fix select + count in ActiveRecord
+  8 ([#659](https://github.com/shioyama/mobility/pull/659))
 
 ### 1.3.0
 

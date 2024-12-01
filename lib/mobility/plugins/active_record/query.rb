@@ -21,6 +21,9 @@ enabled for any one attribute on the model.
 
         requires :query, include: false
 
+        ATTRIBUTE_ALIAS_PREFIX = "__mobility_"
+        ATTRIBUTE_ALIAS = "#{ATTRIBUTE_ALIAS_PREFIX}%s_%s__"
+
         included_hook do |klass, backend_class|
           plugin = self
           if options[:query]
@@ -39,7 +42,7 @@ enabled for any one attribute on the model.
 
         class << self
           def attribute_alias(attribute, locale = Mobility.locale)
-            "__mobility_%s_%s__"  % [attribute, ::Mobility.normalize_locale(locale)]
+            ATTRIBUTE_ALIAS % [attribute, ::Mobility.normalize_locale(locale)]
           end
 
           def build_query(klass, locale = Mobility.locale, &block)
@@ -179,6 +182,27 @@ enabled for any one attribute on the model.
               end
 
               base.public_send(method_name, *keys, &block)
+            end
+          end
+
+          if ::ActiveRecord::VERSION::MAJOR >= 8
+            # Fix for https://github.com/shioyama/mobility/pull/654#issuecomment-2503479112
+            # TODO: Make this better
+            def select_for_count
+              return super unless klass.respond_to?(:mobility_attribute?)
+
+              if select_values.any? { |value| value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) }
+                filtered_select_values = select_values.map do |value|
+                  value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) ? value.left : value
+                end
+
+                # Copied from lib/active_record/relation/calculations.rb
+                with_connection do |conn|
+                  arel_columns(filtered_select_values).map { |column| conn.visitor.compile(column) }.join(", ")
+                end
+              else
+                super
+              end
             end
           end
 

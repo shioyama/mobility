@@ -354,6 +354,9 @@ shared_examples_for "AR Model with translated scope" do |model_class_name, a1=:t
 
     describe "selecting translated attributes" do
       it "returns value from attribute methods on results" do
+        selected_unordered = query_scope.select(a1).map { |result| result.send(a1) }
+        expect(selected_unordered.sort).to eq(["bar", "bar", "bar", "foo", "foo"])
+
         selected = ordered_results.select(a1)
         expect(selected[0].send(a1)).to eq("foo")
         expect(selected[1].send(a1)).to eq("foo")

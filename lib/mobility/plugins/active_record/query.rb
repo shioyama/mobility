@@ -171,7 +171,7 @@ enabled for any one attribute on the model.
               base = keys.each_with_index.inject(self) do |query, (key, index)|
                 next query unless klass.mobility_attribute?(key)
                 keys[index] = backend_node(key)
-                if method_name == "select" && query.order_values.any?
+                if method_name == "select"
                   keys[index] = keys[index]
                     .as(::Mobility::Plugins::ActiveRecord::Query.attribute_alias(key.to_s))
                 end

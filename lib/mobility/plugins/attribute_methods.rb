@@ -25,6 +25,14 @@ attributes only.
             attributes.merge(name.to_s => send(name))
           end)
         end
+
+        private
+
+        define_method :attribute_names_for_serialization do
+          return unless defined?(super)
+
+          super() + names.map(&:to_s)
+        end
       end
 
       # Applies attribute_methods plugin for a given option value.

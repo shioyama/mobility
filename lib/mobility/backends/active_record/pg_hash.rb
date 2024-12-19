@@ -22,6 +22,7 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
         def write(locale, value, _options = nil)
           if value.nil?
             translations.delete(locale.to_s)
+            nil
           else
             translations[locale.to_s] = value
           end

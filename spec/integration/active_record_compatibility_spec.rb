@@ -48,6 +48,8 @@ describe "ActiveRecord compatibility", orm: :active_record do
       post.send(backend_for(post, :title).association_name).first.value = "association changed value"
       post.save
       expect(Post.first.title).to eq("association changed value")
+      post.title = nil
+      expect(post.title).to eq(nil)
     end
 
     it "resets cache when model is reloaded" do

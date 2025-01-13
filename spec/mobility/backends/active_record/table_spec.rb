@@ -90,7 +90,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
     describe "cleaning up blank translations" do
       let(:title_backend) { backend_for(article, :title) }
 
-      it "builds nil translations when reading but does not save them" do
+      it "does not build nil translations" do
         Mobility.locale = :en
         article = Article.new(title: "New Article")
         association_name = article.mobility_backends[:title].association_name
@@ -102,7 +102,7 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
         article.title
 
         aggregate_failures do
-          expect(article.send(association_name).size).to eq(3)
+          expect(article.send(association_name).size).to eq(1)
           article.save
           expect(article.title).to be_nil
           expect(article.reload.send(association_name).size).to eq(1)
@@ -166,10 +166,10 @@ describe "Mobility::Backends::ActiveRecord::Table", orm: :active_record, type: :
         expect(title_backend.read(:de)).to eq(nil)
       end
 
-      it "builds translation if no translation exists" do
+      it "does not build a translation if no translation exists" do
         expect {
           title_backend.read(:de)
-        }.to change(subject.send(title_backend.association_name), :size).by(1)
+        }.not_to change(subject.send(title_backend.association_name), :size)
       end
 
       describe "reading back written attributes" do

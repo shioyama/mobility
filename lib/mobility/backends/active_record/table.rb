@@ -293,9 +293,13 @@ columns to that table.
       end
 
       # Returns translation for a given locale, or builds one if none is present.
+      # @param [Boolean] for_read
       # @param [Symbol] locale
-      def translation_for(locale, **)
+      def translation_for(locale, for_read: false, **)
         translation = translations.in_locale(locale)
+        if translation.nil? && for_read
+          return translations.klass.new
+        end
         translation ||= translations.build(locale: locale)
         translation
       end

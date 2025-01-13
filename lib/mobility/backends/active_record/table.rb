@@ -293,7 +293,8 @@ columns to that table.
       end
 
       # Returns translation for a given locale, or builds one if none is present.
-      # @param [Boolean] for_read
+      # @param [Boolean] for_read will be set if trying to read a value, in which case blank
+      #   translation records will not be attached to the parent record.
       # @param [Symbol] locale
       def translation_for(locale, for_read: false, **)
         translation = translations.in_locale(locale)

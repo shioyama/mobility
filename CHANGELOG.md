@@ -2,6 +2,12 @@
 
 ## 1.3
 
+### 1.3.2
+
+- Handle `nil` assignment for PgHash
+  ([#665](https://github.com/shioyama/mobility/pull/665)), thanks
+  [unavailabl3](https://github.com/unavailabl3)!
+
 ### 1.3.1
 
 - Use classify to generate table name

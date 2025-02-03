@@ -292,10 +292,25 @@ columns to that table.
         end
       end
 
+      # @!macro backend_writer
+      def write(locale, value, **options)
+        super
+        if @cache_name
+          cache.values.each do |translation|
+            self.translations.push(translation) unless self.translations.include?(translation)
+          end
+        end
+      end
+
       # Returns translation for a given locale, or builds one if none is present.
+      # @param [Boolean] for_read will be set if trying to read a value, in which case blank
+      #   translation records will not be attached to the parent record.
       # @param [Symbol] locale
-      def translation_for(locale, **)
+      def translation_for(locale, for_read: false, **)
         translation = translations.in_locale(locale)
+        if for_read
+          return translations.klass.new(locale: locale) if translation.nil?
+        end
         translation ||= translations.build(locale: locale)
         translation
       end

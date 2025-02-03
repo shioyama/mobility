@@ -85,7 +85,7 @@ set.
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, **options)
-        translation_for(locale, **options).send(attribute)
+        translation_for(locale, for_read: true, **options).send(attribute)
       end
 
       # @!macro backend_writer
@@ -131,12 +131,12 @@ set.
       # Simple hash cache to memoize translations as a hash so they can be
       # fetched quickly.
       module Cache
-        def translation_for(locale, **options)
+        def translation_for(locale, for_read: false, **options)
           return super(locale, options) if options.delete(:cache) == false
           if cache.has_key?(locale)
             cache[locale]
           else
-            cache[locale] = super(locale, **options)
+            cache[locale] = super(locale, for_read: for_read, **options)
           end
         end
 

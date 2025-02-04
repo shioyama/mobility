@@ -25,10 +25,9 @@ describe Mobility::InstallGenerator, type: :generator do
           directory "initializers" do
             file "mobility.rb" do
               contains "Mobility.configure do"
-              contains "plugins do"
-              contains "backend :key_value"
-              contains "backend_reader"
-              contains "query"
+              contains "config.plugin(:backend, :key_value)"
+              contains "config.plugin(:backend_reader)"
+              contains "config.plugin(:query)"
             end
           end
         end

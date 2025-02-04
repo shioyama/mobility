@@ -85,7 +85,8 @@ set.
       # @!group Backend Accessors
       # @!macro backend_reader
       def read(locale, **options)
-        translation_for(locale, **options).send(attribute)
+        translation = translations.in_locale(locale)
+        translation.send(attribute) if translation
       end
 
       # @!macro backend_writer

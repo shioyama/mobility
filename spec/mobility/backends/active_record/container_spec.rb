@@ -52,6 +52,17 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
     end
   end
 
+  context "with cache plugin" do
+    plugins :active_record, :reader, :writer, :cache
+    before { translates ContainerPost, :title, backend: :container }
+
+    it 'resets cache on write' do
+      post = ContainerPost.create!
+
+      expect { post.title = 'aaa' }.to change { post.title }.from(nil).to('aaa')
+    end
+  end
+
   context "with query plugin" do
     plugins :active_record, :reader, :writer, :query
     before { translates ContainerPost, :title, :content, backend: :container }

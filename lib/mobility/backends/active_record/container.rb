@@ -37,7 +37,7 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
       # @return [String,Integer,Boolean] Updated value
       def write(locale, value, _ = nil)
         set_attribute_translation(locale, value)
-        read(locale)
+        value
       end
       # @!endgroup
 

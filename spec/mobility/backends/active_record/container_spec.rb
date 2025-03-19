@@ -63,6 +63,20 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
     end
   end
 
+  context "with presence plugin" do
+    plugins :active_record, :reader, :writer, :presence
+    before { translates ContainerPost, :title, backend: :container }
+
+    it 'applies presence plugin on write to database' do
+      post = ContainerPost.create!(title: 'Title en')
+
+      expect { post.title = "" }
+        .to change { post.translations }
+        .from({ "en" => { "title" => "Title en" }})
+        .to({})
+    end
+  end
+
   context "with query plugin" do
     plugins :active_record, :reader, :writer, :query
     before { translates ContainerPost, :title, :content, backend: :container }

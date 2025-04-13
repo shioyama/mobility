@@ -1,7 +1,12 @@
 require "spec_helper"
-require "mobility/backends/hash"
 
-describe Mobility::Backends::Hash, type: :backend, orm: :none do
+describe "Mobility::Backends::Hash", type: :backend, orm: :none do
+  before(:all) do
+    require "mobility/backends/hash" # leaks state if defined at top of file (defines Mobility::Backends::Hash, adds :hash to @backends)
+  end
+
+  let(:described_class) { Mobility::Backends::Hash }
+
   describe "#read/#write" do
     it "returns value for locale key" do
       backend = described_class.new

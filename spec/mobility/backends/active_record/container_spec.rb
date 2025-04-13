@@ -50,6 +50,12 @@ describe "Mobility::Backends::ActiveRecord::Container", orm: :active_record, db:
         .from({ "en" => { "title" => "Title en" }, "de" => { "title" => "Title de" }})
         .to({ "de" => { "title" => "Title de" }})
     end
+
+    it "returns translations as ActiveSupport::HashWithIndifferentAccess" do
+      post = ContainerPost.create!
+      
+      expect(post.translations.class).to eq(ActiveSupport::HashWithIndifferentAccess)
+    end
   end
 
   context "with query plugin" do

@@ -47,6 +47,11 @@ Implements the {Mobility::Backends::Container} backend for ActiveRecord models.
         # @raise [InvalidColumnType] if the type of the container column is not json or jsonb
         def configure(options)
           options[:column_name] = options[:column_name]&.to_sym || :translations
+
+          model_class.define_method(options[:column_name]) do
+            value = super()
+            value.is_a?(Hash) ? value.with_indifferent_access : value
+          end
         end
         # @!endgroup
 

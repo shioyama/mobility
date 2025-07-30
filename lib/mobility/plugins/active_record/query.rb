@@ -191,14 +191,16 @@ enabled for any one attribute on the model.
             def select_for_count
               return super unless klass.respond_to?(:mobility_attribute?)
 
-              if select_values.any? { |value| value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) }
-                filtered_select_values = select_values.map do |value|
+              select_nodes = select_values.select { |value| value.respond_to?(:right) && value.respond_to?(:left) }
+
+              if select_nodes.any? { |value| value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) }
+                filtered_select_nodes = select_nodes.map do |value|
                   value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) ? value.left : value
                 end
 
                 # Copied from lib/active_record/relation/calculations.rb
                 with_connection do |conn|
-                  arel_columns(filtered_select_values).map { |column| conn.visitor.compile(column) }.join(", ")
+                  arel_columns(filtered_select_nodes).map { |column| conn.visitor.compile(column) }.join(", ")
                 end
               else
                 super

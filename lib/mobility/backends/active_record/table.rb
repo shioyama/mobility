@@ -101,9 +101,8 @@ columns to that table.
         #   to append to model class to generate translation class
         def configure(options)
           table_name = model_class.table_name
-          options[:table_name]   ||= "#{table_name.singularize}_translations"
-          options[:foreign_key]  ||= table_name.classify.foreign_key
-          options[:parent_class] ||= find_abstract_ancestor(model_class) || Translation
+          options[:table_name]  ||= "#{table_name.singularize}_translations"
+          options[:foreign_key] ||= table_name.classify.foreign_key
           if (association_name = options[:association_name]).present?
             options[:subclass_name] ||= association_name.to_s.singularize.camelize.freeze
           else
@@ -166,18 +165,6 @@ columns to that table.
 
         def get_join(relation, locale)
           relation.joins_values.find { |v| (::Arel::Nodes::Join === v) && (v.left.name == table_alias(locale).to_s) }
-        end
-
-        def find_abstract_ancestor(klass)
-          current_class = klass
-          while current_class
-            if current_class.abstract_class?
-              return current_class
-            end
-            current_class = current_class.superclass
-          end
-
-          nil
         end
       end
 
@@ -258,13 +245,12 @@ columns to that table.
       setup do |_attributes, options|
         association_name = options[:association_name]
         subclass_name    = options[:subclass_name]
-        parent_class     = options[:parent_class]
 
         translation_class =
           if self.const_defined?(subclass_name, false)
             const_get(subclass_name, false)
           else
-            const_set(subclass_name, Class.new(parent_class))
+            const_set(subclass_name, Class.new(Translation))
           end
 
         translation_class.table_name = options[:table_name]
@@ -282,8 +268,6 @@ columns to that table.
           foreign_key: options[:foreign_key],
           inverse_of:  association_name,
           touch: true
-
-        translation_class.validates :locale, presence: true
 
         before_save do
           required_attributes = translation_class.attribute_names.select { |name| self.class.mobility_attribute?(name) }
@@ -334,6 +318,7 @@ columns to that table.
       # Subclassed dynamically to generate translation class.
       class Translation < ::ActiveRecord::Base
         self.abstract_class = true
+        validates :locale, presence: true
       end
     end
 

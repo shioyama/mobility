@@ -187,21 +187,25 @@ enabled for any one attribute on the model.
 
           if ::ActiveRecord::VERSION::MAJOR >= 8
             # Fix for https://github.com/shioyama/mobility/pull/654#issuecomment-2503479112
-            # TODO: Make this better
+            # When counting with select values that include mobility-translated attributes,
+            # we need to filter out the aliased columns that Mobility adds (e.g. __mobility_title_en__)
+            # to prevent errors in the COUNT SQL generation.
             def select_for_count
               return super unless klass.respond_to?(:mobility_attribute?)
 
-              if select_values.any? { |value| value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) }
-                filtered_select_values = select_values.map do |value|
-                  value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) ? value.left : value
-                end
+              # Check if any select values are Mobility attribute aliases
+              has_mobility_aliases = select_values.any? { |value| value.respond_to?(:right) && value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) }
 
-                # Copied from lib/active_record/relation/calculations.rb
-                with_connection do |conn|
-                  arel_columns(filtered_select_values).map { |column| conn.visitor.compile(column) }.join(", ")
-                end
-              else
-                super
+              return super unless has_mobility_aliases
+
+              # Filter out Mobility aliases, replacing them with the underlying columns
+              filtered_select_values = select_values.map do |value|
+                value.respond_to?(:right) && value.right.start_with?(ATTRIBUTE_ALIAS_PREFIX) ? value.left : value
+              end
+
+              # Copied from lib/active_record/relation/calculations.rb
+              with_connection do |conn|
+                arel_columns(filtered_select_values).map { |column| conn.visitor.compile(column) }.join(", ")
               end
             end
           end

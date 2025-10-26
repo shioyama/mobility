@@ -218,4 +218,49 @@ describe Mobility::Plugins::ActiveRecord::Query, orm: :active_record, type: :plu
       expect(Article.i18n.where(title: "Title", content: "Content")).to eq([article2])
     end
   end
+
+  describe "regression: select_for_count with mixed select values" do
+    # Test for bug where select_for_count called .right on string values
+    # causing NoMethodError when select_values contained non-Arel nodes
+    if ::ActiveRecord::VERSION::MAJOR >= 8
+      before do
+        stub_const 'Article', Class.new(ActiveRecord::Base)
+        translates Article, :title, backend: :table
+      end
+
+      it "handles count with regular column in select" do
+        Article.create(title: "Article 1")
+        Article.create(title: "Article 2")
+
+        # The original bug: calling .right on string values like "id"
+        # This should not raise NoMethodError: undefined method `right' for "id":String
+        expect { Article.select(:id).count }.not_to raise_error
+        expect(Article.select(:id).count).to eq(2)
+      end
+
+      it "handles count with translated column in select" do
+        Article.create(title: "Article 1")
+        Article.create(title: "Article 2")
+
+        # When selecting translated attributes, Mobility creates Arel::Nodes::As with aliases
+        # This should properly filter out the aliased columns for counting
+        relation = Article.i18n.select(:title)
+
+        expect { relation.count }.not_to raise_error
+        expect(relation.count).to eq(2)
+      end
+
+      it "handles count without select when mobility is present" do
+        Article.create(title: "Article 1")
+        Article.create(title: "Article 2")
+
+        # Ensure normal counting still works on models with mobility
+        expect { Article.count }.not_to raise_error
+        expect(Article.count).to eq(2)
+
+        expect { Article.i18n.count }.not_to raise_error
+        expect(Article.i18n.count).to eq(2)
+      end
+    end
+  end
 end

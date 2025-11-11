@@ -14,7 +14,7 @@ group :development, :test do
       gem 'activerecord', '~> 7.0'
       # see https://stackoverflow.com/questions/79360526/uninitialized-constant-activesupportloggerthreadsafelevellogger-nameerror
       gem 'concurrent-ruby', '1.3.4'
-    when '7.1', '7.2', '8.0'
+    when '7.1', '7.2', '8.0', '8.1'
       gem 'activerecord', "~> #{orm_version}.0"
     when 'edge'
       git 'https://github.com/rails/rails.git', branch: 'main' do

@@ -17,6 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
+          - '3.4'
           - '3.3'
           - '3.2'
           - '3.1'
@@ -33,6 +34,8 @@ jobs:
             version: '7.2'
           - name: 'active_record'
             version: '8.0'
+          - name: 'active_record'
+            version: '8.1'
           - name: 'sequel'
             version: '5'
         experimental: [false]
@@ -53,9 +56,31 @@ jobs:
             orm:
               name: 'active_record'
               version: '8.0'
+          - ruby: '3.1'
+            database: 'sqlite3'
+            orm:
+              name: 'active_record'
+              version: '8.1'
+          - ruby: '3.1'
+            database: 'mysql'
+            orm:
+              name: 'active_record'
+              version: '8.1'
+          - ruby: '3.1'
+            database: 'postgres'
+            orm:
+              name: 'active_record'
+              version: '8.1'
 
         include:
           # rails/sqlite3/active_record-7.2
+          - ruby: '3.4'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '7.2'
+            database: 'sqlite3'
+            experimental: false
           - ruby: '3.3'
             feature: 'rails'
             orm:
@@ -78,7 +103,44 @@ jobs:
             database: 'sqlite3'
             experimental: false
 
+          # rails/sqlite3/active_record-8.0
+          - ruby: '3.4'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+            database: 'sqlite3'
+            experimental: false
+          - ruby: '3.3'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+            database: 'sqlite3'
+            experimental: false
+          - ruby: '3.2'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+            database: 'sqlite3'
+            experimental: false
+          - ruby: '3.1'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '8.0'
+            database: 'sqlite3'
+            experimental: false
+
           # unit/postgres/edge
+          - ruby: '3.4'
+            database: 'postgres'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
           - ruby: '3.3'
             database: 'postgres'
             feature: 'unit'
@@ -95,6 +157,13 @@ jobs:
             experimental: true
 
           # unit/mysql/edge
+          - ruby: '3.4'
+            database: 'mysql'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
           - ruby: '3.3'
             database: 'mysql'
             feature: 'unit'
@@ -111,6 +180,13 @@ jobs:
             experimental: true
 
           # unit/sqlite3/edge
+          - ruby: '3.4'
+            database: 'sqlite3'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: 'edge'
+            experimental: true
           - ruby: '3.3'
             database: 'sqlite3'
             feature: 'unit'
@@ -127,6 +203,9 @@ jobs:
             experimental: true
 
           # i18n fallbacks
+          - ruby: '3.4'
+            feature: 'i18n_fallbacks'
+            experimental: false
           - ruby: '3.3'
             feature: 'i18n_fallbacks'
             experimental: false
@@ -138,6 +217,9 @@ jobs:
             experimental: false
 
           # Performance tests
+          - ruby: '3.4'
+            feature: 'performance'
+            experimental: false
           - ruby: '3.3'
             feature: 'performance'
             experimental: false
@@ -149,6 +231,10 @@ jobs:
             experimental: false
 
           # Unit tests
+          - ruby: '3.4'
+            feature: 'unit'
+            orm:
+            experimental: false
           - ruby: '3.3'
             feature: 'unit'
             orm:

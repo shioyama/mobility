@@ -19,16 +19,11 @@ jobs:
         ruby:
           - '3.3'
           - '3.2'
-          - '3.1'
         database:
           - 'sqlite3'
           - 'mysql'
           - 'postgres'
         orm:
-          - name: 'active_record'
-            version: '7.0'
-          - name: 'active_record'
-            version: '7.1'
           - name: 'active_record'
             version: '7.2'
           - name: 'active_record'
@@ -37,22 +32,6 @@ jobs:
             version: '5'
         experimental: [false]
         feature: ['unit']
-        exclude:
-          - ruby: '3.1'
-            database: 'sqlite3'
-            orm:
-              name: 'active_record'
-              version: '8.0'
-          - ruby: '3.1'
-            database: 'mysql'
-            orm:
-              name: 'active_record'
-              version: '8.0'
-          - ruby: '3.1'
-            database: 'postgres'
-            orm:
-              name: 'active_record'
-              version: '8.0'
 
         include:
           # rails/sqlite3/active_record-7.2
@@ -64,13 +43,6 @@ jobs:
             database: 'sqlite3'
             experimental: false
           - ruby: '3.2'
-            feature: 'rails'
-            orm:
-              name: 'active_record'
-              version: '7.2'
-            database: 'sqlite3'
-            experimental: false
-          - ruby: '3.1'
             feature: 'rails'
             orm:
               name: 'active_record'
@@ -133,18 +105,12 @@ jobs:
           - ruby: '3.2'
             feature: 'i18n_fallbacks'
             experimental: false
-          - ruby: '3.1'
-            feature: 'i18n_fallbacks'
-            experimental: false
 
           # Performance tests
           - ruby: '3.3'
             feature: 'performance'
             experimental: false
           - ruby: '3.2'
-            feature: 'performance'
-            experimental: false
-          - ruby: '3.1'
             feature: 'performance'
             experimental: false
 
@@ -154,10 +120,6 @@ jobs:
             orm:
             experimental: false
           - ruby: '3.2'
-            feature: 'unit'
-            orm:
-            experimental: false
-          - ruby: '3.1'
             feature: 'unit'
             orm:
             experimental: false

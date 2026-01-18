@@ -19,7 +19,8 @@ module Mobility
             database = config[driver]['database']
             port = config[driver]['port']
             host = config[driver]['host']
-            ::Sequel.connect(adapter: adapter, database: database, username: user, password: password, port: port, host: host)
+            encoding = config[driver]['encoding']
+            ::Sequel.connect(adapter: adapter, database: database, username: user, password: password, port: port, host: host, encoding: encoding)
           end
         end
 

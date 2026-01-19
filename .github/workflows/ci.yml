@@ -28,6 +28,8 @@ jobs:
             version: '7.2'
           - name: 'active_record'
             version: '8.0'
+          - name: 'active_record'
+            version: '8.1'
           - name: 'sequel'
             version: '5'
         experimental: [false]
@@ -49,54 +51,6 @@ jobs:
               version: '7.2'
             database: 'sqlite3'
             experimental: false
-
-          # unit/postgres/edge
-          - ruby: '3.3'
-            database: 'postgres'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '3.2'
-            database: 'postgres'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-
-          # unit/mysql/edge
-          - ruby: '3.3'
-            database: 'mysql'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '3.2'
-            database: 'mysql'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-
-          # unit/sqlite3/edge
-          - ruby: '3.3'
-            database: 'sqlite3'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
-          - ruby: '3.2'
-            database: 'sqlite3'
-            feature: 'unit'
-            orm:
-              name: 'active_record'
-              version: 'edge'
-            experimental: true
 
           # i18n fallbacks
           - ruby: '3.3'
@@ -123,6 +77,22 @@ jobs:
             feature: 'unit'
             orm:
             experimental: false
+        exclude:
+          - ruby: '3.2'
+            database: 'sqlite3'
+            orm:
+              name: 'active_record'
+              version: '8.1'
+          - ruby: '3.2'
+            database: 'mysql'
+            orm:
+              name: 'active_record'
+              version: '8.1'
+          - ruby: '3.2'
+            database: 'postgres'
+            orm:
+              name: 'active_record'
+              version: '8.1'
 
     env:
       DB: ${{ matrix.database }}

@@ -4,7 +4,7 @@ class CreateStringTranslations < <%= activerecord_migration_class %>
       t.string :locale, null: false
       t.string :key, null: false
       t.string :value
-      t.references :translatable, polymorphic: true, index: false
+      t.references :translatable, polymorphic: true, index: false, null: false
       t.timestamps null: false
     end
     add_index :mobility_string_translations, [:translatable_id, :translatable_type, :locale, :key], unique: true, name: :index_mobility_string_translations_on_keys

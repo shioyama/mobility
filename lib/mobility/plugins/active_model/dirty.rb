@@ -61,7 +61,7 @@ the ActiveRecord dirty plugin for more information.
             klass.include InstanceMethods
             klass.class_eval { private(*private_methods) }
 
-            backend_class.include BackendMethods
+            backend_class.prepend BackendMethods
           end
         end
 

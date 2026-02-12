@@ -29,7 +29,7 @@ Automatically includes dirty plugin in model class when enabled.
             # this just adds Sequel::Plugins::Dirty to @plugins
             klass.plugin :dirty
             define_dirty_methods(names)
-            backend_class.include BackendMethods
+            backend_class.prepend BackendMethods
           end
         end
 

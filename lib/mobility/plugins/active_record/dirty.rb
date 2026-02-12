@@ -53,7 +53,7 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
 
         included_hook do |_, backend_class|
           if options[:dirty]
-            backend_class.include BackendMethods
+            backend_class.prepend BackendMethods
           end
         end
 

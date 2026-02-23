@@ -103,6 +103,13 @@ module Mobility
               t.boolean :published
               t.timestamps null: false
             end
+          elsif ENV['DB'] == 'mysql'
+            create_table "json_posts" do |t|
+              t.json :my_title_i18n, default: -> { "(JSON_OBJECT())" }, null: false
+              t.json :my_content_i18n, default: -> { "(JSON_OBJECT())" }, null: false
+              t.boolean :published
+              t.timestamps null: false
+            end
           end
         end
       end

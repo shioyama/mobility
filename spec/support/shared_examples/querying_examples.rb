@@ -668,6 +668,11 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
             @ja_instance1 = model_class.create(a1 => "foo ja")
             @ja_instance2 = model_class.create(a1 => "foo")
           end
+
+          Mobility.with_locale(:'pt-BR') do
+            @pt_br_instance1 = model_class.create(a1 => "foo pt-BR")
+            @pt_br_instance2 = model_class.create(a1 => "foo")
+          end
         end
 
         it "returns correct result when querying on same attribute value in different locale" do
@@ -677,12 +682,20 @@ shared_examples_for "Sequel Model with translated dataset" do |model_class_name,
             expect(query_scope.where(a1 => "foo ja").select_all(table_name).all).to eq([@ja_instance1])
             expect(query_scope.where(a1 => "foo").select_all(table_name).all).to eq([@ja_instance2])
           end
+
+          Mobility.with_locale(:'pt-BR') do
+            expect(query_scope.where(a1 => "foo pt-BR").select_all(table_name).all).to eq([@pt_br_instance1])
+            expect(query_scope.where(a1 => "foo").select_all(table_name).all).to eq([@pt_br_instance2])
+          end
         end
 
         it "returns correct result when querying with locale option" do
           expect(query_scope.where(a1 => "foo", locale: :en).select_all(table_name).all).to match_array([@instance1, @instance5])
           expect(query_scope.where(a1 => "foo ja", locale: :ja).select_all(table_name).all).to eq([@ja_instance1])
           expect(query_scope.where(a1 => "foo", locale: :ja).select_all(table_name).all).to eq([@ja_instance2])
+
+          expect(query_scope.where(a1 => "foo pt-BR", locale: :'pt-BR').select_all(table_name).all).to eq([@pt_br_instance1])
+          expect(query_scope.where(a1 => "foo", locale: :'pt-BR').select_all(table_name).all).to eq([@pt_br_instance2])
         end
 
         it "returns correct result when querying with locale option twice in separate clauses" do

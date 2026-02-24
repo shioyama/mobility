@@ -20,7 +20,8 @@ namespace :db do
   desc "Create the database"
   task create: :setup do
     commands = {
-      "mysql"    => "mysql -h #{config['host']} -P #{config['port']} -u #{config['username']} --password=#{config['password']} -e 'create database #{config["database"]} default character set #{config["encoding"]} default collate #{config["collation"]};' >/dev/null",
+      "mysql57"  => "mysql -h #{config['host']} -P #{config['port']} -u #{config['username']} --password=#{config['password']} -e 'create database if not exists #{config["database"]} default character set #{config["encoding"]} default collate #{config["collation"]};' >/dev/null",
+      "mysql80"  => "mysql -h #{config['host']} -P #{config['port']} -u #{config['username']} --password=#{config['password']} -e 'create database if not exists #{config["database"]} default character set #{config["encoding"]} default collate #{config["collation"]};' >/dev/null",
       "postgres" => "psql -c 'create database #{config['database']};' -U #{config['username']} >/dev/null"
     }
     %x{#{commands[driver] || true}}
@@ -30,7 +31,8 @@ namespace :db do
   desc "Drop the database"
   task drop: :setup do
     commands = {
-      "mysql"    => "mysql -h #{config['host']} -P #{config['port']} -u #{config['username']} --password=#{config['password']} -e 'drop database #{config["database"]};' >/dev/null",
+      "mysql57"  => "mysql -h #{config['host']} -P #{config['port']} -u #{config['username']} --password=#{config['password']} -e 'drop database if exists #{config["database"]};' >/dev/null",
+      "mysql80"  => "mysql -h #{config['host']} -P #{config['port']} -u #{config['username']} --password=#{config['password']} -e 'drop database if exists #{config["database"]};' >/dev/null",
       "postgres" => "psql -c 'drop database #{config['database']};' -U #{config['username']} >/dev/null"
     }
     %x{#{commands[driver] || true}}

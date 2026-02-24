@@ -10,7 +10,8 @@ end
 
 require 'rails' if ENV['FEATURE'] == 'rails'
 
-db = ENV['DB'] || 'none'
+db = ENV['DB']
+db = 'none' if db.nil? || db == ''
 require 'pry-byebug'
 require 'i18n'
 require 'i18n/backend/fallbacks' if ENV['FEATURE'] == 'i18n_fallbacks'

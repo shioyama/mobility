@@ -1,7 +1,17 @@
-mysql:
+mysql57:
   adapter: mysql2
-  host: 127.0.0.1
-  port: 3306
+  host: <%= ENV['MYSQL57_HOST'] || '127.0.0.1' %>
+  port: <%= (ENV['MYSQL57_PORT'] || 3306).to_i %>
+  database: mobility_test
+  password: <%= ENV['MYSQL_PASSWORD'] %>
+  username: root
+  encoding: utf8
+  collation: utf8_unicode_ci
+
+mysql80:
+  adapter: mysql2
+  host: <%= ENV['MYSQL80_HOST'] || '127.0.0.1' %>
+  port: <%= (ENV['MYSQL80_PORT'] || 3307).to_i %>
   database: mobility_test
   password: <%= ENV['MYSQL_PASSWORD'] %>
   username: root
@@ -10,7 +20,7 @@ mysql:
 
 postgres:
   adapter: postgresql
-  host: localhost
+  host: <%= ENV['PGHOST'] || 'localhost' %>
   port: 5432
   database: mobility_test
   username: postgres

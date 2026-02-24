@@ -37,7 +37,9 @@ module Mobility
         end
 
         def driver
-          (ENV["DB"] or "sqlite3").downcase
+          driver = ENV["DB"]
+          driver = nil if driver == ''
+          (driver || "sqlite3").downcase
         end
 
         def in_memory?

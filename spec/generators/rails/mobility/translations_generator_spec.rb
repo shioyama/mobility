@@ -84,7 +84,7 @@ describe Mobility::TranslationsGenerator, type: :generator do
         }
       end
 
-      context "index name is too long for database", db: [:mysql, :postgres] do
+      context "index name is too long for database", db: [:mysql57, :mysql80, :postgres] do
         it_behaves_like "long index name truncator"
       end
     end
@@ -116,7 +116,7 @@ describe Mobility::TranslationsGenerator, type: :generator do
         }
       end
 
-      context "index name is too long for database", db: [:mysql, :postgres] do
+      context "index name is too long for database", db: [:mysql57, :mysql80, :postgres] do
         it_behaves_like "long index name truncator"
       end
     end

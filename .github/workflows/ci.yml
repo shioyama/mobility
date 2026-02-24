@@ -17,6 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
+          - '4.0'
+          - '3.4'
           - '3.3'
           - '3.2'
         database:
@@ -38,6 +40,20 @@ jobs:
 
         include:
           # rails/sqlite3/active_record-7.2
+          - ruby: '4.0'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '7.2'
+            database: 'sqlite3'
+            experimental: false
+          - ruby: '3.4'
+            feature: 'rails'
+            orm:
+              name: 'active_record'
+              version: '7.2'
+            database: 'sqlite3'
+            experimental: false
           - ruby: '3.3'
             feature: 'rails'
             orm:
@@ -54,6 +70,12 @@ jobs:
             experimental: false
 
           # i18n fallbacks
+          - ruby: '4.0'
+            feature: 'i18n_fallbacks'
+            experimental: false
+          - ruby: '3.4'
+            feature: 'i18n_fallbacks'
+            experimental: false
           - ruby: '3.3'
             feature: 'i18n_fallbacks'
             experimental: false
@@ -62,6 +84,12 @@ jobs:
             experimental: false
 
           # Performance tests
+          - ruby: '4.0'
+            feature: 'performance'
+            experimental: false
+          - ruby: '3.4'
+            feature: 'performance'
+            experimental: false
           - ruby: '3.3'
             feature: 'performance'
             experimental: false
@@ -70,6 +98,14 @@ jobs:
             experimental: false
 
           # Unit tests
+          - ruby: '4.0'
+            feature: 'unit'
+            orm:
+            experimental: false
+          - ruby: '3.4'
+            feature: 'unit'
+            orm:
+            experimental: false
           - ruby: '3.3'
             feature: 'unit'
             orm:

@@ -32,7 +32,7 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record, ty
             backend = post.mobility_backends[:title]
             backend.write(:en, { foo: :bar } )
             post.save
-            expect(post[column_affix % "title"]).to match_hash({ en: "{:foo=>:bar}" })
+            expect(post[column_affix % "title"]).to match_hash({ en: { foo: :bar }.to_s })
           end
         end
 

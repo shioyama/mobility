@@ -4,6 +4,7 @@ require "yaml"
 
 RSpec::Core::RakeTask.new(:spec) do |task|
   task.rspec_opts = '-f p'
+  task.fail_on_error = true
 end
 
 task :default => :spec

@@ -1,0 +1,22 @@
+ARG RUBY_VERSION
+FROM ruby:${RUBY_VERSION}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    libpq-dev \
+    postgresql-client \
+    default-mysql-client \
+    default-libmysqlclient-dev \
+    libsqlite3-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN printf "%s\n" "[client]" "ssl=false" > /root/.my.cnf
+
+WORKDIR /app
+
+ENV BUNDLE_PATH=/usr/local/bundle \
+  BUNDLE_JOBS=4

@@ -34,7 +34,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel, type: :backend 
         it "converts non-string types to strings when saving" do
           backend.write(:en, { foo: :bar } )
           post.save
-          expect(post[(column_affix % "title").to_sym]).to eq({ en: "{:foo=>:bar}" }.to_yaml)
+          expect(post[(column_affix % "title").to_sym]).to eq({ en: { foo: :bar }.to_s }.to_yaml)
         end
       end
 
@@ -59,7 +59,7 @@ describe "Mobility::Backends::Sequel::Serialized", orm: :sequel, type: :backend 
         it "converts non-string types to strings when saving" do
           backend.write(:en, { foo: :bar } )
           post.save
-          expect(post[(column_affix % "title").to_sym]).to eq({ en: "{:foo=>:bar}" }.to_json)
+          expect(post[(column_affix % "title").to_sym]).to eq({ en: { foo: :bar }.to_s }.to_json)
         end
       end
     end

@@ -41,7 +41,7 @@ describe "Mobility::Backends::ActiveRecord::Hstore", orm: :active_record, db: :p
         backend = post.mobility_backends[:title]
         backend.write(:en, { foo: :bar } )
         post.save
-        expect(post[column_affix % "title"]).to match_hash({ en: "{:foo=>:bar}" })
+        expect(post[column_affix % "title"]).to match_hash({ en: { foo: :bar }.to_s })
       end
     end
   end

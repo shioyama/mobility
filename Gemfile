@@ -6,6 +6,7 @@ gemspec
 orm, orm_version = ENV['ORM'], ENV['ORM_VERSION']
 
 group :development, :test do
+  gem 'ostruct'
   case orm
   when 'active_record'
     orm_version ||= '7.0'

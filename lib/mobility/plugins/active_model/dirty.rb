@@ -135,6 +135,28 @@ the ActiveRecord dirty plugin for more information.
             public_patterns.each do |pattern|
               method_name = pattern % 'attribute'
 
+              # ActiveRecord::AttributeMethods::Dirty defines saved_change_to_attribute? and
+              # will_save_change_to_attribute? with **options (from:/to:). MobilityMutationTracker
+              # aliases those to one-argument methods, so forwarding kwargs breaks. When keyword
+              # options are present, delegate to ActiveRecord; when absent and Mobility tracks
+              # the attribute, use the tracker’s predicate without kwargs.
+              if keyword_aware_dirty_handler_method?(method_name)
+                module_eval <<-RUBY, __FILE__, __LINE__ + 1
+                def #{method_name}(attr_name, *rest, **kwargs)
+                  mobility_tracks = mutations_from_mobility.attribute_changed?(attr_name) ||
+                                    mutations_from_mobility.attribute_previously_changed?(attr_name)
+                  if kwargs.any?
+                    super(attr_name, *rest, **kwargs)
+                  elsif mobility_tracks
+                    #{mobility_tracker_predicate_for(method_name)}
+                  else
+                    super(attr_name, *rest, **kwargs)
+                  end
+                end
+                RUBY
+                next
+              end
+
               kwargs = pattern == '%s_changed?' ? ', **kwargs' : ''
               module_eval <<-EOM, __FILE__, __LINE__ + 1
               def #{method_name}(attr_name, *rest#{kwargs})
@@ -146,6 +168,29 @@ the ActiveRecord dirty plugin for more information.
                 end
               end
               EOM
+            end
+          end
+
+          # Only these AR handler methods use **options in a way that breaks when forwarded to
+          # MobilityMutationTracker’s one-arg aliases. Other keyword-aware methods keep the
+          # generic implementation above (e.g. attribute_changed? via %s_changed?).
+          def keyword_aware_dirty_handler_method?(method_name)
+            return false unless %w[saved_change_to_attribute? will_save_change_to_attribute?].include?(method_name)
+            return false unless klass.public_method_defined?(method_name)
+
+            klass.instance_method(method_name).parameters.any? do |type, _|
+              %i[key keyreq keyrest].include?(type)
+            end
+          end
+
+          def mobility_tracker_predicate_for(method_name)
+            case method_name
+            when 'saved_change_to_attribute?'
+              'mutations_from_mobility.attribute_previously_changed?(attr_name)'
+            when 'will_save_change_to_attribute?'
+              'mutations_from_mobility.attribute_changed?(attr_name)'
+            else
+              raise ArgumentError, "Unhandled keyword-aware Mobility handler: #{method_name}"
             end
           end
 

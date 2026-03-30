@@ -6,20 +6,21 @@ module Mobility
   module Backends
 =begin
 
-Internal class used by ActiveRecord backends backed by a Postgres data type
-(hstore, jsonb).
+Internal class used by ActiveRecord backends backed by a database data type
+(hstore, jsonb, json).
 
 =end
     module ActiveRecord
-      class PgHash
+      class DbHash
         include ActiveRecord
         include HashValued
 
         def read(locale, _options = nil)
-          translations[locale.to_s]
+          translations&.fetch(locale.to_s, nil)
         end
 
         def write(locale, value, _options = nil)
+          translations = (model[column_name] ||= {})
           if value.nil?
             translations.delete(locale.to_s)
             nil
@@ -30,14 +31,18 @@ Internal class used by ActiveRecord backends backed by a Postgres data type
 
         # @!macro backend_iterator
         def each_locale
-          super { |l| yield l.to_sym }
+          model[column_name]&.each_key { |l| yield l.to_sym }
         end
 
         def translations
-          model[column_name]
+          if model.new_record?
+            model[column_name] ||= {}
+          else
+            model[column_name]
+          end
         end
       end
-      private_constant :PgHash
+      private_constant :DbHash
     end
   end
 end

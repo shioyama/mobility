@@ -54,7 +54,7 @@ group :development, :test do
       else
         gem 'sqlite3', '~> 1.5.0'
       end
-    when 'mysql'
+    when 'mysql57', 'mysql80'
       gem 'mysql2'
     when 'postgres'
       gem 'pg'

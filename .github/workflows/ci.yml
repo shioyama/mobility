@@ -21,7 +21,8 @@ jobs:
           - '3.2'
         database:
           - 'sqlite3'
-          - 'mysql'
+          - 'mysql57'
+          - 'mysql80'
           - 'postgres'
         orm:
           - name: 'active_record'
@@ -84,7 +85,12 @@ jobs:
               name: 'active_record'
               version: '8.1'
           - ruby: '3.2'
-            database: 'mysql'
+            database: 'mysql57'
+            orm:
+              name: 'active_record'
+              version: '8.1'
+          - ruby: '3.2'
+            database: 'mysql80'
             orm:
               name: 'active_record'
               version: '8.1'
@@ -100,6 +106,10 @@ jobs:
       BUNDLE_PATH: vendor/bundle
       ORM: ${{ matrix.orm.name }}
       ORM_VERSION: ${{ matrix.orm.version }}
+      MYSQL57_HOST: 127.0.0.1
+      MYSQL57_PORT: 3306
+      MYSQL80_HOST: 127.0.0.1
+      MYSQL80_PORT: 3307
       MYSQL_PASSWORD: root
       PGHOST: localhost
       PGPORT: 5432
@@ -113,9 +123,16 @@ jobs:
         ports: ["5432:5432"]
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-      mysql:
+      mysql57:
         image: mysql:5.7
         ports: ["3306:3306"]
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 5
+        env:
+          MYSQL_ROOT_PASSWORD: root
+
+      mysql80:
+        image: mysql:8.0
+        ports: ["3307:3306"]
         options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 5
         env:
           MYSQL_ROOT_PASSWORD: root
@@ -131,6 +148,9 @@ jobs:
       - name: Install Postgres
         run: sudo apt-get install libpq-dev postgresql-client -y
         if: matrix.database == 'postgres'
+      - name: Install MySQL client
+        run: sudo apt-get install default-mysql-client -y
+        if: startsWith(matrix.database, 'mysql')
       - id: cache-bundler
         uses: actions/cache@v4
         with:

@@ -31,7 +31,7 @@ tables](http://dejimata.com/2017/3/3/translating-with-mobility#strategy-2), as
 well as database-specific storage solutions such as
 [json/jsonb](https://www.postgresql.org/docs/current/static/datatype-json.html) and
 [Hstore](https://www.postgresql.org/docs/current/static/hstore.html) (for
-PostgreSQL).
+PostgreSQL), and JSON columns on MySQL.
 
 Mobility is a cross-platform solution, currently supporting both
 [ActiveRecord](http://api.rubyonrails.org/classes/ActiveRecord/Base.html)
@@ -912,12 +912,17 @@ Backend](https://github.com/shioyama/mobility/wiki/Column-Backend) page of the
 wiki and API documentation on the [`Mobility::Backend::Column`
 class](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Column).
 
-### PostgreSQL-specific Backends
+### PostgreSQL/MySQL Backends
 
-Mobility also supports JSON and Hstore storage options, if you are using
-PostgreSQL as your database. To use this option, create column(s) on the model
-table for each translated attribute, and set your backend to `:json`, `:jsonb`
-or `:hstore`. If you are using Sequel, note that you
+Mobility also supports JSON and Hstore storage options for backends which store
+translations in a Hash on database columns. To use this option, create column(s)
+on the model table for each translated attribute, and set your backend to
+`:json`, `:jsonb` or `:hstore`.
+
+Note: `:jsonb` and `:hstore` are PostgreSQL-specific. The `:json` backend is
+tested on PostgreSQL and MySQL 8.0+ (ActiveRecord).
+
+If you are using Sequel, note that you
 will need to enable the [pg_json](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_json_rb.html)
 or
 [pg_hstore](http://sequel.jeremyevans.net/rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html)
@@ -936,9 +941,8 @@ pages of the wiki and in the API documentation
 and
 [`Mobility::Backend::Hstore`](http://www.rubydoc.info/gems/mobility/Mobility/Backends/Hstore)).
 
-*Note: The Json backend (`:json`) may also work with recent versions of MySQL
-with JSON column support, although this backend/db combination is not tested.
-See [this issue](https://github.com/shioyama/mobility/issues/226) for details.*
+*Note: See [this issue](https://github.com/shioyama/mobility/issues/226) for
+historical context on MySQL JSON support.*
 
 Development
 -----------

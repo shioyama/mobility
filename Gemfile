@@ -6,6 +6,7 @@ gemspec
 orm, orm_version = ENV['ORM'], ENV['ORM_VERSION']
 
 group :development, :test do
+  gem 'ostruct'
   case orm
   when 'active_record'
     orm_version ||= '7.0'
@@ -54,7 +55,7 @@ group :development, :test do
       else
         gem 'sqlite3', '~> 1.5.0'
       end
-    when 'mysql'
+    when 'mysql57', 'mysql80'
       gem 'mysql2'
     when 'postgres'
       gem 'pg'

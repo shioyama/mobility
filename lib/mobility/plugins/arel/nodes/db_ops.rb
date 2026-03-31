@@ -87,6 +87,7 @@ module Mobility
         end
 
         def visit_Mobility_Plugins_Arel_Nodes_JsonDashDoubleArrow o, a
+          quote_mysql_json_key!(o) if mysql_visitor?
           json_infix o, a, '->>'
         end
 
@@ -112,12 +113,36 @@ module Mobility
 
         private
 
+        def mysql_visitor?
+          (defined?(::Arel::Visitors::MySQL) && is_a?(::Arel::Visitors::MySQL)) ||
+            (defined?(::Arel::Visitors::MySQL2) && is_a?(::Arel::Visitors::MySQL2))
+        end
+
+        # MySQL requires JSON path to be prefixed with '$.' and keys quoted to
+        # support locales like "pt-BR" when using the ->> operator.
+        def quote_mysql_json_key!(node)
+          return unless node.respond_to?(:right) && node.right.respond_to?(:value)
+
+          value = node.right.value.to_s
+          return if value.start_with?('$.')
+
+          node.right = node.right.class.new(%Q($."#{value}"))
+        end
+
         def json_infix o, a, opr
-          visit(Nodes::Grouping.new(::Arel::Nodes::InfixOperation.new(opr, o.left, o.right)), a)
+          node = Nodes::Grouping.new(::Arel::Nodes::InfixOperation.new(opr, o.left, o.right))
+
+          if mysql_visitor? && opr == '->>'
+            node = Nodes::Grouping.new(::Arel::Nodes::InfixOperation.new('COLLATE', node, ::Arel::Nodes::SqlLiteral.new('utf8mb4_general_ci')))
+          end
+
+          visit(node, a)
         end
       end
 
       ::Arel::Visitors::PostgreSQL.include Visitors
+      ::Arel::Visitors::MySQL.include Visitors if defined?(::Arel::Visitors::MySQL)
+      ::Arel::Visitors::MySQL2.include Visitors if defined?(::Arel::Visitors::MySQL2)
     end
   end
 end

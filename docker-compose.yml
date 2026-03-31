@@ -1,0 +1,94 @@
+services:
+  mysql57:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mobility_test
+    command: ["--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8", "--collation-server=utf8_unicode_ci"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  mysql80:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mobility_test
+    command: ["--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8", "--collation-server=utf8_unicode_ci"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: mobility_test
+      POSTGRES_USER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  ruby-3.3:
+    &ruby-base
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        RUBY_VERSION: "3.3"
+    working_dir: /app
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+    environment:
+      DB: ${DB:-sqlite3}
+      ORM: ${ORM:-none}
+      ORM_VERSION: ${ORM_VERSION:-}
+      FEATURE: ${FEATURE:-unit}
+      MYSQL57_HOST: ${MYSQL57_HOST:-mysql57}
+      MYSQL57_PORT: ${MYSQL57_PORT:-3306}
+      MYSQL80_HOST: ${MYSQL80_HOST:-mysql80}
+      MYSQL80_PORT: ${MYSQL80_PORT:-3306}
+      MYSQL_PASSWORD: root
+      PGHOST: postgres
+    depends_on:
+      mysql57:
+        condition: service_healthy
+      mysql80:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    command: ["bash", "-lc", "bundle config set path /usr/local/bundle && bundle install && bundle exec rake"]
+
+  ruby-3.2:
+    <<: *ruby-base
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        RUBY_VERSION: "3.2"
+
+  ruby-3.4:
+    <<: *ruby-base
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        RUBY_VERSION: "3.4"
+
+  ruby-4.0:
+    <<: *ruby-base
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        RUBY_VERSION: "4.0"
+
+volumes:
+  bundle_cache:

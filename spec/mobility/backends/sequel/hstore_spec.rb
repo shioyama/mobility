@@ -43,7 +43,7 @@ describe "Mobility::Backends::Sequel::Hstore", orm: :sequel, db: :postgres, type
         backend = post.mobility_backends[:title]
         backend.write(:en, { foo: :bar } )
         post.save
-        expect(post[(column_affix % "title").to_sym].to_hash).to eq({ "en" => "{:foo=>:bar}" })
+        expect(post[(column_affix % "title").to_sym].to_hash).to eq({ "en" => { foo: :bar }.to_s })
       end
     end
   end

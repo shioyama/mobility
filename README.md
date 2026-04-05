@@ -80,19 +80,11 @@ The generator will create an initializer file `config/initializers/mobility.rb`
 which looks something like this:
 
 ```ruby
-Mobility.configure do
-
-  # PLUGINS
-  plugins do
-    backend :key_value
-
-    active_record
-
-    reader
-    writer
-
-    # ...
-  end
+Mobility.configure do |config|
+  config.plugin(:backend, :key_value)
+  config.plugin(:active_record)
+  config.plugin(:reader)
+  config.plugin(:writer)
 end
 ```
 
@@ -101,12 +93,8 @@ with an optional default. To use a different default backend, you can
 change the default passed to the `backend` plugin, like this:
 
 ```diff
- Mobility.configure do
-
-   # PLUGINS
-   plugins do
--    backend :key_value
-+    backend :table
+-  config.plugin(:backend, :key_value)
++  config.plugin(:backend, :table)
 ```
 
 See other possible backends in the [backends section](#backends).
@@ -115,14 +103,8 @@ You can also set defaults for backend-specific options. Below, we set the
 default `type` option for the KeyValue backend to `:string`.
 
 ```diff
- Mobility.configure do
-
-   # PLUGINS
-   plugins do
--    backend :key_value
-+    backend :key_value, type: :string
-   end
- end
+-  config.plugin(:backend, :key_value)
++  config.plugin(:backend, :key_value, type: :string)
 ```
 
 We will assume the configuration above in the examples that follow.
@@ -137,11 +119,8 @@ Requirements:
 When configuring Mobility, ensure that you include the `sequel` plugin:
 
 ```diff
- plugins do
-   backend :key_value
-
--    active_record
-+    sequel
+-  config.plugin(:active_record)
++  config.plugin(:sequel)
 ```
 
 You can extend `Mobility` just like in ActiveRecord, or you can use the
@@ -284,9 +263,7 @@ accessors" in Mobility, and can be enabled by including the `locale_accessors`
 plugin, with a default set of accessors:
 
 ```diff
- plugins do
-   # ...
-+  locale_accessors [:en, :ja]
++  config.plugin(:locale_accessors, [:en, :ja])
 ```
 
 You can also override this default from `translates` in any model:
@@ -332,9 +309,7 @@ defined for a given locale.)
 Ensure the plugin is enabled:
 
 ```diff
- plugins do
-   # ...
-+  fallthrough_accessors
++  config.plugin(:fallthrough_accessors)
 ```
 
 ... then we can access any locale we want, without specifying them upfront:
@@ -457,10 +432,8 @@ Mobility offers basic support for translation fallbacks. First, enable the
 `fallbacks` plugin:
 
 ```diff
- plugins do
-   # ...
-+  fallbacks
-+  locale_accessors
++  config.plugin(:fallbacks)
++  config.plugin(:locale_accessors)
 ```
 
 Fallbacks will require `fallthrough_accessors` to handle methods like
@@ -564,9 +537,7 @@ fallbacks](https://github.com/svenfuchs/i18n/wiki/Fallbacks).
 Another option is to assign a default value, using the `default` plugin:
 
 ```diff
- plugins do
-   # ...
-+  default 'foo'
++  config.plugin(:default, 'foo')
 ```
 
 Here we've set a "default default" of `'foo'`, which will be returned if a fetch would
@@ -617,10 +588,7 @@ have enabled an ORM plugin (either `active_record` or `sequel`), since the
 dirty plugin will depend on one of these being enabled.
 
 ```diff
- plugins do
-   # ...
-   active_record
-+  dirty
++  config.plugin(:dirty)
 ```
 
 (Once enabled globally, the dirty plugin can be selectively disabled on classes
@@ -707,9 +675,7 @@ can be quickly retrieved again. The cache plugin is included in the default
 configuration created by the install generator:
 
 ```diff
- plugins do
-   # ...
-+  cache
++  config.plugin(:cache)
 ```
 
 It can be disabled selectively per model by passing `cache: false` when
@@ -737,10 +703,7 @@ this feature, include the `query` plugin, and ensure you also have an ORM
 plugin enabled (`active_record` or `sequel`):
 
 ```diff
- plugins do
-   # ...
-   active_record
-+  query
++  config.plugin(:query)
 ```
 
 Querying defines a scope or dataset class method, whose default name is `i18n`.

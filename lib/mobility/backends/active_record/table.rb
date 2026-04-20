@@ -250,7 +250,11 @@ columns to that table.
           if self.const_defined?(subclass_name, false)
             const_get(subclass_name, false)
           else
-            const_set(subclass_name, Class.new(Translation))
+            const_set(subclass_name, Class.new(Translation) {
+              def self.connection_pool
+                reflect_on_association(:translated_model).klass.connection_pool
+              end
+            })
           end
 
         translation_class.table_name = options[:table_name]

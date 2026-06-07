@@ -28,11 +28,12 @@ describe "Mobility::Backends::ActiveRecord::Serialized", orm: :active_record, ty
 
         describe "non-text values" do
           it "converts non-string types to strings when saving" do
+            value = { foo: :bar }
             post = SerializedPost.new
             backend = post.mobility_backends[:title]
-            backend.write(:en, { foo: :bar } )
+            backend.write(:en, value)
             post.save
-            expect(post[column_affix % "title"]).to match_hash({ en: "{:foo=>:bar}" })
+            expect(post[column_affix % "title"]).to match_hash({ en: value.to_s })
           end
         end
 

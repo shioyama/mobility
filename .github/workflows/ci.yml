@@ -51,6 +51,13 @@ jobs:
               version: '7.2'
             database: 'sqlite3'
             experimental: false
+          - ruby: 'truffleruby'
+            feature: 'unit'
+            orm:
+              name: 'active_record'
+              version: '7.2'
+            database: 'sqlite3'
+            experimental: false
 
           # i18n fallbacks
           - ruby: '3.3'
@@ -74,6 +81,10 @@ jobs:
             orm:
             experimental: false
           - ruby: '3.2'
+            feature: 'unit'
+            orm:
+            experimental: false
+          - ruby: 'truffleruby'
             feature: 'unit'
             orm:
             experimental: false

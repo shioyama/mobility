@@ -200,6 +200,30 @@ describe Mobility::Plugins::ActiveRecord::Dirty, orm: :active_record, type: :plu
         expect(instance.changes).to eq({ "title_fr" => [nil, "Titre en Francais"] })
       end
     end
+
+    it "does not dirty original object when duped" do
+      Mobility.locale = locale = :en
+      instance = model_class.create(title: "foo")
+      dupe = instance.dup
+
+      aggregate_failures do
+        expect(instance.changed?).to eq(false)
+        expect(dupe.changed?).to eq(false)
+
+        backend_for(dupe, :title).write(:en, "bar")
+
+        expect(instance.changed?).to eq(false)
+        expect(dupe.changed?).to eq(true)
+
+        dupe.save
+
+        expect(instance.changed?).to eq(false)
+        expect(dupe.changed?).to eq(false)
+
+        expect(instance.previous_changes).to include({ "title_en" => [nil, "foo"]})
+        expect(dupe.previous_changes).to include({ "title_en" => ["foo", "bar"]})
+      end
+    end
   end
 
   describe "suffix methods" do

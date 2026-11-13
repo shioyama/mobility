@@ -129,9 +129,19 @@ enabled for any one attribute on the model.
         private_constant :QueryMethod
 
         module QueryExtension
-          def where!(opts, *rest)
-            QueryBuilder.build(self, opts) do |untranslated_opts|
-              untranslated_opts ? super(untranslated_opts, *rest) : super
+          # Rails 8.2 (rails/rails#59634) makes #where, #where! and #find_by
+          # call the internal _where!, so override that instead of #where!.
+          if ::ActiveRecord::QueryMethods.method_defined?(:_where!)
+            def _where!(opts, rest = [])
+              QueryBuilder.build(self, opts) do |untranslated_opts|
+                untranslated_opts ? super(untranslated_opts, rest) : super
+              end
+            end
+          else
+            def where!(opts, *rest)
+              QueryBuilder.build(self, opts) do |untranslated_opts|
+                untranslated_opts ? super(untranslated_opts, *rest) : super
+              end
             end
           end
 
